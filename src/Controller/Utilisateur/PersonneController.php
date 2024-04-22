@@ -31,12 +31,15 @@ class PersonneController extends AbstractController
             ->add('prenom', TextColumn::class, ['label' => 'Prénoms'])
             ->add('contact', TextColumn::class, ['label' => 'Contact(s)'])
             ->add('email', TextColumn::class, ['label' => 'Email'])
-            //->add('fonction', TextColumn::class, ['label' => 'Fonction', 'field' => 'fonction.libelle'])
+            ->add('fonction', TextColumn::class, ['label' => 'Fonction', 'field' => 'f.libelle'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Employe::class,
                 'query' => function (QueryBuilder $qb) {
-                    $qb->select('u,fonction')
-                        ->from(Employe::class, 'u');
+                    $qb->select('u,f')
+                        ->from(Personne::class, 'u')
+                        ->join('u.fonction', 'f')
+                        ->where('f.code not in (:etudiant)')
+                        ->setParameter('etudiant', ['ETD', 'ADM']);
                 }
             ])
             ->setName('dt_app_utilisateur_personne');
