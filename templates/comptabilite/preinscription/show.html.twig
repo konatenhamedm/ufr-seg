@@ -1,0 +1,80 @@
+{% block page_content %}
+    <div class="modal-header">
+        <h4 class="modal-title">Détails Preinscription</h4>
+        <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <span class="svg-icon svg-icon-2x text-white">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor"></rect>
+					<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor"></rect>
+				</svg>
+            </span>
+        </div>
+    </div>
+   
+    <div class="modal-body">
+        <table class="table table-bordered">
+        <tbody>
+                            <tr>
+                    <th>Id</th>
+                    <td>{{ preinscription.id }}</td>
+                </tr>
+                            <tr>
+                    <th>Dat préinscription</th>
+                    <td>{{ preinscription.datePreinscription ? preinscription.datePreinscription|date('Y-m-d') : '' }}</td>
+                </tr>
+                            <tr>
+                    <th>Etat</th>
+                    <td>{{ preinscription.etat }}</td>
+                </tr>
+                            <tr>
+                    <th>Montant préinscription</th>
+                    <td>{{ preinscription.niveau.filiere.montantPreinscription }}</td>
+                </tr>
+                            <tr>
+                    <th>Date traitement</th>
+                    <td>{{ preinscription.dateValidation ? preinscription.datePreinscription|date('Y-m-d') : '' }}</td>
+                </tr>
+                            <tr>
+                    <th>Décision</th>
+                    <td> 
+                    {% if preinscription.etat in ['attente_paiement','valide'] %}Validé{% else %} en attente de complément {% endif %}
+                    
+                    </td>
+                </tr>
+                            <tr>
+                    <th>Observation</th>
+                    <td>{{ preinscription.commentaire ? preinscription.commentaire :'' }}</td>
+                </tr>
+                    </tbody>
+    </table>
+
+    {% if preinscription.commentaire and preinscription.etat in ['rejete','attente_informations','attente_validation'] %}
+    <div class="alert alert-danger d-flex align-items-center p-5">
+    <!--begin::Icon-->
+    <span class="svg-icon svg-icon-2hx svg-icon-primary me-3">...</span>
+    <!--end::Icon-->
+
+    <!--begin::Wrapper-->
+    <div class="d-flex flex-column">
+        <!--begin::Title-->
+        <h4 class="mb-1 text-dark">Alerte Commentaire</h4>
+        <!--end::Title-->
+        <!--begin::Content-->
+        <span>{{ preinscription.commentaire }}.</span>
+        <!--end::Content-->
+    </div>
+    <!--end::Wrapper-->
+</div>
+    {% endif %}
+    
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn dark btn-outline" data-bs-dismiss="modal">Fermer</button>
+    </div>
+
+{% endblock %}
+{% block java %}
+    <script>
+        
+    </script>
+{% endblock %}

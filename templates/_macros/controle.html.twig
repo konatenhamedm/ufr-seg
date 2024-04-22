@@ -1,0 +1,118 @@
+
+
+{% macro prototype_ligne_controle(form,nombre) %}
+    <div class="proto-container1" data-prototype="{{ _self.ligne_controle(form.notes.vars.prototype)|e }}"></div>
+    
+                 <div class="proto-container" data-prototype="{{ _self.ligne_controle_groupe(form.groupeTypes.vars.prototype)|e }}"></div>
+    
+    <table class="table table-bordered table-custom" id="tutorial">
+        <thead class="thead-dark">
+              <tr class="ligne_head">
+              
+                <th  style="background-color:white !important"width="5%" class="p-2"></th>
+                <th style="background-color:white !important" width="30%" class="p-2"></th>
+                 {#  {% for item in 1..3 %}   #}
+                          
+                                {% for groupe in form.groupeTypes %}
+                                            {{ _self.ligne_controle_groupe(groupe|e) }}
+                                {% endfor %}
+                          
+                    
+                 {# {% endfor %}   #}
+               
+                <th style="background-color:white !important" width="7%" class="p-2"></th>
+                <th style="background-color:white !important" width="10%" class="p-2"></th>
+            </tr>
+              <tr class="ligne">
+              
+                <th width="5%" class="p-2"></th>
+                <th width="30%" class="p-2">Etudiant</th>
+                {% for item in 1..nombre %}
+                <th width="10%" class="p-2"  >Note {{ item }}</th>
+                    
+                {% endfor %}
+               
+                <th width="7%" class="p-2">Moyenne</th>
+                <th width="10%" class="p-2">Rang</th>
+            </tr>
+        </thead>
+        <tbody  class="row-container">
+            {% for item in form.notes %}
+                {{ _self.ligne_controle(item|e) }}
+                <div class="proto-container" data-prototype="{{ _self.ligne_controle_colonne(item.valeurNotes.vars.prototype)|e }}"></div>
+                {% for item2 in item.valeurNotes %}
+                    {{ _self.ligne_controle_colonne(item|e) }}
+                {% endfor %}
+            {% endfor %}
+            <button type="button" data-protoname="__name__" class="btn btn-default add-collection add-ligne btn-xs" id="add_ligne" data-protoclass=".proto-container" data-container=".row-container">
+        <i class="fa fa-plus"></i>
+        Ajouter une ligne
+    </button>
+        </tbody>
+    </table>
+    
+{% endmacro %}
+
+{% macro ligne_controle(data) %}
+    
+    <tr class="row-colonne-row even pointer table-light ligne">
+        <td class="p-2">
+           
+            <div style="display:no " class="field-matiere">{{ form_widget(data.numeroEtape,{'attr':{'class':'form-control numero ','id':'userinput16','placeholder':'Numéro étape','readonly':'readonly'}}) }}</div>
+        </td>
+         <td class="p-2">
+            <div style="display:non">{{ form_widget(data.etudiant) }}</div>
+         </td>
+
+         {% for key,item in data.valeurNotes %}
+
+            <td class="p-2 colsp row-colonne">
+             {{ form_widget(item.note) }}
+             </td>
+            
+         {% endfor %}
+           <td class="p-2 text-end">
+             {{ form_widget(data.moyenneMatiere) }}
+             {# <div style="display:none">{{ form_widget(data.moyenneMatiere) }}</div> #} 
+           {# {{ form_widget(data.moyenneMatiere) }} #}
+          {#  {{ form_widget(data.MoyenneMatiere) }}
+            #}
+           </td>
+           <td class="p-2">
+           
+           </td>
+        
+    </tr>
+{% endmacro %}
+{% macro ligne_controle_colonne(data) %}
+   
+
+{% endmacro %}
+{% macro ligne_controle_groupe(data) %}
+ <th style="background-color:white !important" width="10%" class="p-2 row-colonne"  >
+   <table width="100%">
+							<tbody>
+                            <tr class="row-type">
+                                <td>
+                                {{ form_widget(data.dateNote) }}
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>
+                                {{ form_widget(data.type) }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td >
+                                    {{ form_widget(data.coef) }}
+                                 </td>
+							</tr>
+							
+						</tbody>
+                    </table>
+  </th>
+{% endmacro %}
+
+
+
+

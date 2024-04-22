@@ -1,0 +1,156 @@
+{% block page_content %}
+    {% form_theme form 'widget/fields-block.html.twig' %}
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Paiement de la préinscription</h5>
+        <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <span class="svg-icon svg-icon-2x text-white">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor"></rect>
+					<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor"></rect>
+				</svg>
+            </span>
+        </div>
+    </div>
+    {{ form_start(form, {'attr': {'role':'form', 'class': 'form'}}) }}
+    <div class="modal-body corp">
+        {{ include('_includes/ajax/response.html.twig') }}
+
+            <table class="table table-bordered table-custom">
+       {#  <thead class="thead-dark">
+            <tr>
+                <th width="70%" class="p-2">Code pré-inscription</th>
+                <th width="30%" class="p-2">Montant</th>
+            </tr>
+        </thead> #}
+        <tbody  class="row-container">
+             <tr class="row-colonne even pointer table-light">
+                <td class="p-2">
+                Code pré-inscription
+                    
+                </td>
+                 <td class="p-2"><b>{% if(preinscription.code) %}  {{ preinscription.code }} {% else %} NEANT {% endif %}</b></td>
+            </tr>
+             <tr class="row-colonne even pointer table-light">
+                <td class="p-2">
+                Nom et prénoms
+                    
+                </td>
+                 <td class="p-2"> <b>{{ etudiant.getNomComplet }}</b></td>
+            </tr>
+             <tr class="row-colonne even pointer table-light">
+                <td class="p-2">
+               <b>Montant à payer</b>
+                    
+                </td>
+                 <td class="p-2 total" style="color: red;"> <b> {{ preinscription.niveau.filiere.montantPreinscription }} Frcfa</b></td>
+            </tr>
+             <tr class="row-colonne even pointer table-light">
+                <td class="p-2">
+                Date de validation
+                    
+                </td>
+                 <td class="p-2"> <b>{{ preinscription.dateValidation |date("m/d/Y") }}</b></td>
+            </tr>
+             <tr class="row-colonne even pointer table-light">
+                <td class="p-2">
+                Filière
+                    
+                </td>
+                 <td class="p-2"> <b>{{ preinscription.niveau.filiere.libelle }}</b></td>
+            </tr>
+        </tbody>
+       {#  <tfoot>
+            <tr>
+                <th class="text-end p-2">TOTAL</th>
+                <th class="total text-end p-2 fw-bolder">0</td>
+            </tr>
+        </tfoot> #}
+    </table><br>
+
+
+       {#  <div class="alert alert-dismissible bg-light-primary border border-info border-1 border-dashed p-5 mb-5">
+        <div class="row p-0 m-0 mb-4">
+
+            <div class="col">
+                Code pré-inscription: <b>{% if(preinscription.code) %}  {{ preinscription.code }} {% else %} NEANT {% endif %}</b>
+            </div>
+            <div class="col">
+                Nom et prénoms: <b>{{ etudiant.getNomComplet }}</b>
+            </div>
+
+        </div>
+            <div class="row p-0 m-0">
+                <div class="col">
+                    <b>Montant à payer</b>: <b> {{ preinscription.niveau.filiere.montantPreinscription }} Frcfa</b>
+                </div>
+                <div class="col">
+                    Date de naissance: <b>{{ etudiant.dateNaissance |date("m/d/Y") }}</b>
+                </div>
+                <div class="col">
+                    Filière : <b>{{ preinscription.niveau.filiere.libelle }}</b>
+                </div>
+                
+            </div>
+    </div> #}
+       {% if(etat != 'paiement_confirmation') %}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="fv-row mb-3">
+                    {{ form_row(form.datePaiement) }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="fv-row mb-3">
+                    {{ form_row(form.modePaiement, {attr: {class: 'form-control form-control-sm bg-transparent'}}) }}
+                </div>
+            </div>
+        </div>
+        {% else %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="fv-row mb-3">
+                        {{ form_row(form.datePaiement, {attr: {class: 'form-control form-control-sm bg-transparent','readonly':'true'}}) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="fv-row mb-3">
+                        {{ form_row(form.modePaiement, {attr: {class: 'form-control form-control-sm bg-transparent','readonly':'true'}}) }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+    <div class="modal-footer">
+        {# {{ include('_includes/ajax/loader.html.twig') }} #}
+        <button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal">Annuler</button>
+        {% if(etat =="attente_paiement") %}
+{{ form_widget(form.payer) }}
+        {% else %}
+
+        {{ form_widget(form.confirmation) }}
+        {% endif %}
+    </div>
+    {{ form_widget(form._token) }}
+    {{ form_end(form, {render_rest: false}) }}
+{% endblock %}
+
+{% block java %}
+    <script>
+        $(function () {
+            init_select2('select', null, '.corp');
+            $('.no-auto').each(function () {
+                const $this = $(this);
+                const $id = $('#' + $this.attr('id'));
+                init_date_picker($id,  'down', (start, e) => {
+                    //$this.val(start.format('DD/MM/YYYY'));
+                }, null, null, false);
+
+                $id.on('apply.daterangepicker', function (ev, picker) {
+                    $(this).val(picker.startDate.format('DD/MM/YYYY'));
+                });
+            });
+        });
+
+    </script>
+{% endblock %}
