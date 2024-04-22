@@ -3,7 +3,7 @@ name: CD
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
@@ -13,14 +13,14 @@ jobs:
        SSHPASS: ${{ secrets.APP_PASS }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - name: APT UPDATE and install SSHPASS
         run: 
           sudo apt update && sudo apt install  sshpass
-      - name: test pwd
+      - name: deploy
         run: 
           sshpass -e ssh -o stricthostkeychecking=no ${{ secrets.APP_USER }}@${{ secrets.APP_HOST }}
           "cd ../var/www/clients/client1/web55/web/ &&
           git pull &&
           composer install &&
-          php bin/console d:m:m -n"  
+          php bin/console d:s:u --force"  
