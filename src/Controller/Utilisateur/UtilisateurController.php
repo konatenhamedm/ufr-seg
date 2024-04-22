@@ -51,10 +51,10 @@ class UtilisateurController extends AbstractController
 
 
                     if ($role == 'etudiant') {
-                        $qb->where('fonction.code = :etudiant');
+                        $qb->where('f.code = :etudiant');
                         $qb->setParameter('etudiant', 'ETD');
                     } else {
-                        $qb->where('fonction.code != :etudiant');
+                        $qb->where('f.code != :etudiant');
                         $qb->setParameter('etudiant', 'ETD');
                     }
                 }
