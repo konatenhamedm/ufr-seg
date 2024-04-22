@@ -25,7 +25,7 @@ class PersonneController extends AbstractController
 {
     #[Route('/', name: 'app_utilisateur_personne_index', methods: ['GET', 'POST'])]
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
-    {
+    { //je suis en mode test
         $table = $dataTableFactory->create()
             ->add('nom', TextColumn::class, ['label' => 'Nom'])
             ->add('prenom', TextColumn::class, ['label' => 'Prénoms'])
