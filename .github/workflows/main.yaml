@@ -22,8 +22,7 @@ jobs:
           "cd ../var/www/clients/client1/web55/web/ &&
          git config pull.rebase false &&
          git config pull.rebase true &&
-         git config pull.ff only && 
-         git checkout master &&
+         git config pull.ff only &&
          git pull  &&
           composer install &&
           php bin/console d:s:u --force"  
