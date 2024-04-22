@@ -9,6 +9,7 @@ use App\Repository\PersonneRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\BoolColumn;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
@@ -26,15 +27,20 @@ class PersonneController extends AbstractController
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
     {
         $table = $dataTableFactory->create()
-        ->add('nom', TextColumn::class, ['label' => 'Nom'])
-        ->add('prenom', TextColumn::class, ['label' => 'Prénoms'])
-        ->add('contact', TextColumn::class, ['label' => 'Contact(s)'])
-        ->add('email', TextColumn::class, ['label' => 'Email'])
-        ->add('fonction', TextColumn::class, ['label' => 'Fonction', 'field' => 'fonction.libelle'])
-        ->createAdapter(ORMAdapter::class, [
-            'entity' => Employe::class,
-        ])
-        ->setName('dt_app_utilisateur_personne');
+            ->add('nom', TextColumn::class, ['label' => 'Nom'])
+            ->add('prenom', TextColumn::class, ['label' => 'Prénoms'])
+            ->add('contact', TextColumn::class, ['label' => 'Contact(s)'])
+            ->add('email', TextColumn::class, ['label' => 'Email'])
+            ->add('fonction', TextColumn::class, ['label' => 'Fonction', 'field' => 'fonction.libelle'])
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => Employe::class,
+                'query' => function (QueryBuilder $qb) {
+                    $qb->select('u,fonction')
+                        ->from(Employe::class, 'u')
+                        ->join('e.fonction', 'fonction');
+                }
+            ])
+            ->setName('dt_app_utilisateur_personne');
 
         $renders = [
             'edit' =>  new ActionRender(function () {
@@ -57,11 +63,7 @@ class PersonneController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions'
-                , 'orderable' => false
-                ,'globalSearchable' => false
-                ,'className' => 'grid_row_actions'
-                , 'render' => function ($value, Personne $context) use ($renders) {
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Personne $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -74,17 +76,17 @@ class PersonneController extends AbstractController
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
-                        ],
-                        'delete' => [
-                            'target' => '#modal-small',
-                            'url' => $this->generateUrl('app_utilisateur_personne_delete', ['id' => $value]),
-                            'ajax' => true,
-                            'stacked' => false,
-                            'icon' => '%icon% bi bi-trash',
-                            'attrs' => ['class' => 'btn-danger'],
-                            'render' => $renders['delete']
+                            ],
+                            'delete' => [
+                                'target' => '#modal-small',
+                                'url' => $this->generateUrl('app_utilisateur_personne_delete', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-danger'],
+                                'render' => $renders['delete']
+                            ]
                         ]
-                    ]
 
                     ];
                     return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
@@ -137,28 +139,23 @@ class PersonneController extends AbstractController
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
                 $statutCode = 500;
                 if (!$isAjax) {
-                  $this->addFlash('warning', $message);
+                    $this->addFlash('warning', $message);
                 }
-
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
                 }
             }
-
-
         }
 
         return $this->render('utilisateur/personne/new.html.twig', [
@@ -182,7 +179,7 @@ class PersonneController extends AbstractController
         $form = $this->createForm(PersonneType::class, $personne, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_utilisateur_personne_edit', [
-                    'id' =>  $personne->getId()
+                'id' =>  $personne->getId()
             ])
         ]);
 
@@ -194,7 +191,7 @@ class PersonneController extends AbstractController
 
         $form->handleRequest($request);
 
-       if ($form->isSubmitted()) {
+        if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_utilisateur_personne_index');
 
@@ -210,26 +207,22 @@ class PersonneController extends AbstractController
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
                 $statutCode = 500;
                 if (!$isAjax) {
-                  $this->addFlash('warning', $message);
+                    $this->addFlash('warning', $message);
                 }
-
             }
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
                 }
             }
-
         }
 
         return $this->render('utilisateur/personne/edit.html.twig', [
@@ -244,14 +237,14 @@ class PersonneController extends AbstractController
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
-                'app_utilisateur_personne_delete'
-                ,   [
+                    'app_utilisateur_personne_delete',
+                    [
                         'id' => $personne->getId()
                     ]
                 )
             )
             ->setMethod('DELETE')
-        ->getForm();
+            ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = true;

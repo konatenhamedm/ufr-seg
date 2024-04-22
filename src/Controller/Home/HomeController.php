@@ -507,7 +507,8 @@ class HomeController extends AbstractController
 
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code étudiant'])
-            ->add('niveau', TextColumn::class, ['field' => 'niveau.code', 'label' => 'Code Niveau']);
+            ->add('niveau', TextColumn::class, ['field' => 'niveau.code', 'label' => 'Code Niveau'])
+            ->add('classe', TextColumn::class, ['field' => 'classe.libelle', 'label' => 'Classe']);
         /* ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
             ->add('dateInscription', DateTimeColumn::class, ['label' => 'Date création', 'format' => 'd-m-Y']); */
 
@@ -534,9 +535,10 @@ class HomeController extends AbstractController
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
             'query' => function (QueryBuilder $qb) use ($user, $etat) {
-                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant'])
+                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
                     ->from(Inscription::class, 'p')
                     ->join('p.niveau', 'niveau')
+                    ->join('p.classe', 'classe')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant')
                     ->leftJoin('p.caissiere', 'c');

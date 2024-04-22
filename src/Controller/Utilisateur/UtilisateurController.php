@@ -47,8 +47,8 @@ class UtilisateurController extends AbstractController
                     $qb->select('u, e, f,fonction')
                         ->from(Utilisateur::class, 'u')
                         ->join('u.personne', 'e')
-                        ->join('e.fonction', 'fonction')
                         ->join('e.fonction', 'f');
+
 
                     if ($role == 'etudiant') {
                         $qb->where('fonction.code = :etudiant');
