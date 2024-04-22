@@ -37,7 +37,7 @@ class PersonneController extends AbstractController
                 'query' => function (QueryBuilder $qb) {
                     $qb->select('u,fonction')
                         ->from(Employe::class, 'u')
-                        ->join('e.fonction', 'fonction');
+                        ->join('u.fonction', 'fonction');
                 }
             ])
             ->setName('dt_app_utilisateur_personne');
