@@ -44,7 +44,7 @@ class UtilisateurController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Utilisateur::class,
                 'query' => function (QueryBuilder $qb) use ($role) {
-                    $qb->select('u, e, f,fonction')
+                    $qb->select('u, e, f')
                         ->from(Utilisateur::class, 'u')
                         ->join('u.personne', 'e')
                         ->join('e.fonction', 'f');
