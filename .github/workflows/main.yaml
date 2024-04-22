@@ -2,8 +2,8 @@ name: CD
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
+      
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -20,6 +20,10 @@ jobs:
         run: 
           sshpass -e ssh -o stricthostkeychecking=no ${{ secrets.APP_USER }}@${{ secrets.APP_HOST }}
           "cd ../var/www/clients/client1/web55/web/ &&
-          git pull master &&
+         git config pull.rebase false &&
+         git config pull.rebase true &&
+         git config pull.ff only && 
+         git checkout master &&
+         git pull  &&
           composer install &&
           php bin/console d:s:u --force"  
