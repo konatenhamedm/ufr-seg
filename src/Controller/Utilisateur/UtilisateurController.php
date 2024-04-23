@@ -37,7 +37,7 @@ class UtilisateurController extends AbstractController
 
         $isEtudiant = $this->isGranted($role);
         $table = $dataTableFactory->create()
-            ->add('username', TextColumn::class, ['label' => 'Pseudo'])
+            ->add('email', TextColumn::class, ['label' => 'Pseudo'])
             //->add('email', TextColumn::class, ['label' => 'Email', 'field' => 'e.adresseMail'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'e.nom'])
             ->add('prenom', TextColumn::class, ['label' => 'Prénoms', 'field' => 'e.prenom'])
