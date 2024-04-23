@@ -23,7 +23,12 @@ class UtilisateurType extends AbstractType
     {
         $builder
             /*  ->add('username', TextType::class, ['label' => 'Pseudo']) */
-            ->add('email', EmailType::class, ['label' => 'Email', 'required' => true])
+            ->add('email', EmailType::class, [
+                'label' => 'Email', 'required' => true,
+                'attr' => [
+                    'class' => 'email',
+                ]
+            ])
             ->add(
                 'roles',
                 ChoiceType::class,
@@ -73,7 +78,10 @@ class UtilisateurType extends AbstractType
                     'choice_label' => 'nomComplet',
                     'query_builder' => function (EntityRepository $er) {
                         return $er->withoutAccount();
-                    }
+                    },
+                    'attr' => [
+                        'class' => 'personne',
+                    ]
                 ]
             );
     }

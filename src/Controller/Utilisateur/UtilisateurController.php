@@ -4,6 +4,7 @@ namespace App\Controller\Utilisateur;
 
 use App\Attribute\Module;
 use App\Attribute\RoleMethod;
+use App\Entity\Personne;
 use App\Service\FormError;
 use App\Entity\Utilisateur;
 use App\Form\EditUtilisateurType;
@@ -117,6 +118,20 @@ class UtilisateurController extends AbstractController
         ]);
     }
 
+    #[Route('/get/email/personne/{id}', name: 'get_email_personne', methods: ['GET'])]
+    public function getmatiere(Request $request, Personne  $personne)
+    {
+        $response = new Response();
+
+
+        $dataService = json_encode($personne->getEmail()); // formater le résultat de la requête en json
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setContent($dataService);
+
+        return $response;
+    }
+
+
     #[Route('/def/new', name: 'app_utilisateur_utilisateur_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $userPasswordHasher, FormError $formError, PersonneRepository $personneRepository): Response
     {
@@ -135,7 +150,7 @@ class UtilisateurController extends AbstractController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_utilisateur_utilisateur_index');
+            $redirect = $this->generateUrl('app_config_utilisateur_index');
 
             $username = $form->get('personne')->getData();
 
@@ -219,7 +234,7 @@ class UtilisateurController extends AbstractController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_utilisateur_utilisateur_index');
+            $redirect = $this->generateUrl('app_config_utilisateur_index');
 
 
             if ($form->isValid()) {

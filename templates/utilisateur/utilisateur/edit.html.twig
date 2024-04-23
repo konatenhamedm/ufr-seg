@@ -49,8 +49,29 @@
 
 {% block javascripts_inline %}
   <script>
-    $(function () {
-      init_select2('select');
+  $(function () {
+      init_select2('select',null,"#exampleModalSizeLg2");
+         function load_content(id) {
+                $.ajax({
+                    url:  '/admin/utilisateur/utilisateur/get/email/personne/'+id,
+                    method: 'GET',
+                      async: false,
+                    dataType: 'json',
+                    success: function(json){
+                        //$('.email').val('')
+                      $('.email').val(json)
+                    }
+                });     
+        }
+
+        //load_content($('.personne').val());
+
+              $('.personne').on('change',function(){
+            const $this = $(this);
+
+            load_content($this.val());
+            
+        })
     });
   </script>
 {% endblock %}

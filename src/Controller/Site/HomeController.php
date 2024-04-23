@@ -1301,9 +1301,6 @@ class HomeController extends AbstractController
 
                 $last_key = count($echeanciers);
                 $i = 1;
-
-
-
                 foreach ($echeanciers as $key => $echeancier) {
 
                     //  dd($montant, $echeancier->getMontant());

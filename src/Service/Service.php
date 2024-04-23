@@ -300,7 +300,7 @@ class Service
 
         $query = $this->em->createQueryBuilder();
         $query->select("count(a.id)")
-            ->from(Preinscription::class, 'a');
+            ->from(Inscription::class, 'a');
 
         $nb = $query->getQuery()->getSingleScalarResult();
         if ($nb == 0) {
