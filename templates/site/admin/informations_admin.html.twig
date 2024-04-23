@@ -204,7 +204,7 @@ const etat = "{{etudiant.etat}}";
             const $form_content = $(`#modal-lg`).find('.place_frais');
      function load_content(id) {
 
- var resIntervention;
+ let resIntervention;
 
  var somme=0;
         
@@ -219,30 +219,40 @@ const etat = "{{etudiant.etat}}";
                     success: function(json){
                         
                         $('.place_frais').html('')
+                        console.log(json)
                         $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
                              
                             somme = somme + parseInt(value.montant)
                           //  $("#"+ $('.matiere').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
                          // <option value="2" data-select2-id="select2-data-16283-qrxgsx">TP</option>
-                          resIntervention += ` 
-                           
+
+                            /* resIntervention += `
                             <div class="row">
                                         <div class="col-md-3 mb-4">${value.libelle} :</div>
                                         <div class="col-md-9 mb-4"><input class="form-control form-control-sm input-money input-mnt" type="text"  name="etudiant_admin[blocEcheanciers][0][total]" required="required" value="${value.montant}"></div>
                                         
                                       </div>
-                        `;
+                        `;*/
+                         $form_content.append(`
+                            <div class="row">
+                                        <div class="col-md-3 mb-4">${value.libelle} :</div>
+                                        <div class="col-md-9 mb-4"><input class="form-control form-control-sm input-money input-mnt" type="text"  name="etudiant_admin[blocEcheanciers][0][total]" required="required" value="${value.montant}"></div>
+                                        
+                                      </div>
+                        `)
+                       
+                         
                         
 
                           }); 
                          $('.total').val(somme)
                           
-                      
+                      //$form_content.append(resIntervention); 
 
                     }
                 });
 
-                 $form_content.html(resIntervention); 
+                 
                           
          
         }
