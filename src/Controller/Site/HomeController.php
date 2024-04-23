@@ -649,17 +649,17 @@ class HomeController extends AbstractController
         $etudiant->setDateNaissance(new DateTime());
         $info = new InfoEtudiant();
         $sommeFrais = 0;
-        $frais = $classeRepository->find(2)->getNiveau()->getFrais();
+        /*  $frais = $classeRepository->find(2)->getNiveau()->getFrais();
         //dd($frais->count());
 
         foreach ($frais as $key => $value) {
             $sommeFrais += (int)$value->getMontant();
-        }
+        } */
         $bloc_echeancier = new BlocEcheancier();
 
         $bloc_echeancier->setClasse($classeRepository->find(1));
         $bloc_echeancier->setDateInscription(new DateTime());
-        $bloc_echeancier->setTotal($sommeFrais);
+        //$bloc_echeancier->setTotal($sommeFrais);
 
 
         $etudiant->addBlocEcheancier($bloc_echeancier);

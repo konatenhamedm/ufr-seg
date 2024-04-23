@@ -26,6 +26,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     public const DEFAULT_ROUTE_SUIVI = 'app_home_timeline_index';
     public const DEFAULT_INFORMATION = 'site_information';
     public const DEFAULT_INFORMATION_CAISSIERE = 'app_parametre_preinscription_index';
+    public const DEFAULT_INFORMATION_cCOMPTABLE = 'app_inscription_etudiant_admin_index';
 
 
     public function __construct(private UrlGeneratorInterface $urlGenerator)
@@ -63,6 +64,9 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         } elseif (in_array('ROLE_CAISSIERE', $token->getUser()->getRoles()) || in_array('ROLE_SECRETAIRE', $token->getUser()->getRoles())) {
 
             $route = self::DEFAULT_INFORMATION_CAISSIERE;
+        } elseif (in_array('ROLE_COMPTABLE', $token->getUser()->getRoles())) {
+
+            $route = self::DEFAULT_INFORMATION_cCOMPTABLE;
         } else {
             $route = self::DEFAULT_INFORMATION;
         }
