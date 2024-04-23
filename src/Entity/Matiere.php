@@ -21,7 +21,7 @@ class Matiere
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 10, unique: true)]
+    #[ORM\Column(length: 150, unique: true)]
     #[Assert\NotBlank(message: 'Veuillez renseigner un code')]
     private ?string $code = null;
 
