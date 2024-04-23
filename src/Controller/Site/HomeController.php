@@ -96,7 +96,7 @@ class HomeController extends AbstractController
 
         $query = $this->em->createQueryBuilder();
         $query->select("count(a.id)")
-            ->from(Preinscription::class, 'a');
+            ->from(Inscription::class, 'a');
 
         $nb = $query->getQuery()->getSingleScalarResult();
         if ($nb == 0) {
@@ -649,7 +649,7 @@ class HomeController extends AbstractController
         $etudiant->setDateNaissance(new DateTime());
         $info = new InfoEtudiant();
         $sommeFrais = 0;
-        $frais = $classeRepository->find(1)->getNiveau()->getFrais();
+        $frais = $classeRepository->find(2)->getNiveau()->getFrais();
         //dd($frais->count());
 
         foreach ($frais as $key => $value) {

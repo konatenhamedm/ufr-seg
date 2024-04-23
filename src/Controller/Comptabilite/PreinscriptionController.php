@@ -3,6 +3,7 @@
 namespace App\Controller\Comptabilite;
 
 use App\Entity\InfoPreinscription;
+use App\Entity\Inscription;
 use App\Entity\Preinscription;
 use App\Entity\Validation;
 use App\Form\InfoPreinscriptionType;
@@ -462,7 +463,7 @@ class PreinscriptionController extends AbstractController
 
         $query = $this->em->createQueryBuilder();
         $query->select("count(a.id)")
-            ->from(Preinscription::class, 'a');
+            ->from(Inscription::class, 'a');
 
         $nb = $query->getQuery()->getSingleScalarResult();
         if ($nb == 0) {
