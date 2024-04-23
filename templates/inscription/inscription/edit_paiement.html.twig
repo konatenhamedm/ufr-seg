@@ -57,6 +57,7 @@
                                         {% for item in echeanciers %}
                                             {% set difference = date( "now" | date()).diff(date(item.dateCreation| date())) %}
                                             {% set leftDays = difference.days %}
+                                            {% set solde = item.montant - item.totaPayer %}
 
                                                     <tr class="row-colonne even pointer table-light">
                                         <td class="p-2">
@@ -67,12 +68,12 @@
                                         <td class="p-2 text-end">{% if item.etat == 'payer' %}
                                              {{ item.montant|number_format(0, '.', '.')}}
                                         {% else %}
-                                             {{ '0'|number_format(0, '.', '.')}}
+                                             {{ item.totaPayer|number_format(0, '.', '.')}}
                                         {% endif %}  </td>
                                         <td class="p-2 text-end">{% if item.etat == 'payer' %}
                                              {{ item.montant|number_format(0, '.', '.')}}
                                         {% else %}
-                                             {{ '0'|number_format(0, '.', '.')}}
+                                             {{ solde|number_format(0, '.', '.')}}
                                         {% endif %}  </td>
                                         <td class="p-2 text-center" {% if (jour == 0 or jour < 0) and item.etat !='payer' %}
                                             style="color: red;font-weight:bolder"

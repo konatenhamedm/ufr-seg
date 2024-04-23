@@ -1291,9 +1291,12 @@ class InscriptionController extends AbstractController
                 $message       = sprintf('Opération effectuée avec succès');
                 if ($inscription->getMontant() == $inscription->getTotalPaye()) {
                     $statut = 1;
+                    $resteSurPage = 1;
+                    $this->addFlash('success', $message);
                 } else {
                     $statut = 0;
-                    $this->addFlash('success', $message);
+                    $resteSurPage = 0;
+                    //$this->addFlash('success', $message);
                 }
 
                 $showAlert = true;
@@ -1306,7 +1309,12 @@ class InscriptionController extends AbstractController
                 $statut = 0;
                 $statutCode = 500;
                 if (!$isAjax) {
-                    $this->addFlash('warning', $message);
+                    if ($resteSurPage = 0) {
+
+                        $this->addFlash('warning', $message);
+                    } else {
+                        $this->addFlash('success', $message);
+                    }
                 }
             }
 
