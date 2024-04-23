@@ -422,6 +422,22 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, 
         } */
         return  $result;
     }
+    public function hasRoleNotIn($roleName)
+    {
+        $result = false;
+
+        if (!in_array($roleName, $this->getRoles())) {
+            $result = true;
+        }
+
+        /*  foreach ($this->getRoles() as $role) {
+            if (preg_match("/^{$roleName}/", $role, $matches)) {
+                $result = true;
+                break;
+            }
+        } */
+        return  $result;
+    }
 
     public function hasRoleOnModule(string $module, $exclude = null, $append = null)
     {

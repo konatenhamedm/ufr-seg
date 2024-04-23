@@ -34,7 +34,7 @@
             {% set default_target = link.target|default(options.target|default('#exampleModalSizeLg2')) %}
             {% set get_icon  = has_icon ? "<span class='svg-icon svg-icon-md'><i class=' " ~ link.icon | replace({'%icon%': ''}) ~ "'></i></span>" : link.icon %}
             {% if link.url is not iterable %}
-            <a href="{{ link.url }}" class="{{ class }}" {% if is_stacked %} data-bs-stacked-modal="{{ default_target }}" {% elseif modal %}data-bs-toggle="modal" data-bs-target="{{ default_target }}"{% endif %}
+            <a href="{{ link.url }}" class="{{ class }}" {% if is_stacked %} data-bs-stacked-modal="{{ default_target }}" data-bs-stacked-toggle="modal" {% elseif modal %}data-bs-toggle="modal" data-bs-target="{{ default_target }}"{% endif %}
                 {% for attr, val in attrs %}
                     {% if attr != 'class' %}
                         {{ attr }}="{{ val }}"

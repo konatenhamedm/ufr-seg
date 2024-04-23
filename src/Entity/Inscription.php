@@ -37,16 +37,16 @@ class Inscription
     #[ORM\ManyToOne]
     private ?Niveau $niveau = null;
 
-    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: FraisInscription::class, orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: FraisInscription::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $fraisInscriptions;
 
-    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: Echeancier::class, orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: Echeancier::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $echeanciers;
 
     #[ORM\Column(length: 255)]
     private ?string $etat = null;
 
-    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: InfoInscription::class)]
+    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: InfoInscription::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $infoInscriptions;
 
     #[ORM\ManyToOne]

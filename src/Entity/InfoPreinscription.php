@@ -35,8 +35,8 @@ class InfoPreinscription
     #[ORM\JoinColumn(nullable: false)]
     private ?Preinscription $preinscription = null;
 
-    #[ORM\ManyToOne(inversedBy: 'infoPreinscriptions')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(inversedBy: 'infoPreinscriptions', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?NaturePaiement $modePaiement = null;
 
     public function getId(): ?int

@@ -22,11 +22,13 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public const DEFAULT_ROUTE = 'app_default';
+    public const DEFAULT_ROUTE = 'app_liste_inscription_etudiant_admin_index';
     public const DEFAULT_ROUTE_SUIVI = 'app_home_timeline_index';
     public const DEFAULT_INFORMATION = 'site_information';
     public const DEFAULT_INFORMATION_CAISSIERE = 'app_parametre_preinscription_index';
-    public const DEFAULT_INFORMATION_cCOMPTABLE = 'app_inscription_etudiant_admin_index';
+    public const DEFAULT_INFORMATION_COMPTABLE = 'app_inscription_etudiant_admin_index';
+    public const DEFAULT_INFORMATION_DIRECTEUR = 'app_utilisateur_personne_index';
+    //public const DEFAULT_INFORMATION_AUTRE = '';
 
 
     public function __construct(private UrlGeneratorInterface $urlGenerator)
@@ -61,15 +63,24 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $route = '';
         if (in_array('ROLE_SUPER_ADMIN', $token->getUser()->getRoles())) {
             $route = self::DEFAULT_ROUTE_SUIVI;
-        } elseif (in_array('ROLE_CAISSIERE', $token->getUser()->getRoles()) || in_array('ROLE_SECRETAIRE', $token->getUser()->getRoles())) {
+        } elseif (in_array('ROLE_ETUDIANT', $token->getUser()->getRoles())) {
+            $route = self::DEFAULT_INFORMATION;
+        } else {
+            $route = self::DEFAULT_ROUTE;
+        }
+        /*    
+        
+        elseif (in_array('ROLE_CAISSIERE', $token->getUser()->getRoles()) || in_array('ROLE_SECRETAIRE', $token->getUser()->getRoles())) {
 
             $route = self::DEFAULT_INFORMATION_CAISSIERE;
-        } elseif (in_array('ROLE_COMPTABLE', $token->getUser()->getRoles())) {
+        } elseif (in_array('ROLE_ETUDIANT', $token->getUser()->getRoles())) {
 
-            $route = self::DEFAULT_INFORMATION_cCOMPTABLE;
+            $route = self::DEFAULT_INFORMATION_COMPTABLE;
+        } elseif (in_array('ROLE_DIRECTEUR', $token->getUser()->getRoles())) {
+            $route = self::DEFAULT_INFORMATION_DIRECTEUR;
         } else {
-            $route = self::DEFAULT_INFORMATION;
-        }
+           
+        } */
 
         // dd();
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {

@@ -18,28 +18,24 @@
              <table class="table table-striped table-bordered table-hover data-table dataTable no-footer dtr-inline">
                         <thead>
                             <tr class="fw-bold text-muted bg-light">
-                            <th style="width:60%">Type versement</th>
+                            <th style="width:40%">Type versement</th>
+                            <th style="width:15%">etat</th>
                             <th style="width:20%">Montant</th>
-                            <th style="width:18%">Action</th>
+                            <th style="width:25%">Action</th>
                             </tr>
                         </thead>
                         <tbody class="column-container">
                             {% for ligne in versements %}
                             <tr class="row-line">
-                                <td class="col-article">{{ ligne.modePaiement.libelle  }}</div>
+                                <td class="col-article p-2">{{ ligne.modePaiement.libelle  }}</div>
+                                <td class="col-article">{{ ligne.etat  }}</div>
                                 <td class="col-article text-end">{{ ligne.montant }}</div>
                                
-                                <td class="col-article">
-                                    <a title="" href=" {{ path('app_infoinscription_info_inscription_edit',{'id':ligne.id }) }} " class="btn btn-success btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2"> <i class="bi bi-pen text-light"></i></a>
-                                    <a title="" href="{{ path('default_print_iframe',{
-                    'r':'app_comptabilite_print_inscription_versement',
-                    'params': {
-                      'id': ligne.id
-                    }
-                    
-                    
-                  }) }}" class="btn btn-warning btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#exampleModalSizeLg1"> <i class="bi bi-printer text-light"></i></a>
-                                    <a title="" href="{{ path('app_infoinscription_info_inscription_delete',{'id':ligne.id})}}" class="btn btn-danger btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#exampleModalSizeLg1"> <i class="bi bi-trash text-light"></i></a>
+                                <td class="text-center">
+                                <a title="Modification" href="{{ path('app_infoinscription_info_inscription_edit',{'id':ligne.id }) }}" class="btn btn-primary btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2"><i class="bi bi-pen text-light"></i></a>
+                                <a title="" href="{{ path('default_print_iframe',{'r':'app_comptabilite_print_inscription_versement','params': {'id': ligne.id}}) }}" class="btn btn-warning btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2"><i class="bi bi-printer text-light"></i></a>
+                                 <a title="" href="{{ path('app_infoinscription_info_inscription_delete',{'id':ligne.id})}}" class="btn btn-danger btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#exampleModalSizeLg1"> <i class="bi bi-trash text-light"></i></a>
+                                 <a title="" href="{{ path('default_print_iframe',{'r':'app_comptabilite_inscription_print','params': {'id': ligne.inscription.id}}) }}" class="btn btn-success btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2"><i class="bi bi-printer text-light"></i></a>
                                                 
                                 </div>
                             </tr>

@@ -41,7 +41,7 @@ class InfoInscription
     #[ORM\ManyToOne]
     private ?Utilisateur $caissiere = null;
 
-    #[ORM\ManyToOne(inversedBy: 'infoInscriptions', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'infoInscriptions')]
     private ?Inscription $inscription = null;
 
     #[ORM\ManyToOne(inversedBy: 'infoInscriptions')]

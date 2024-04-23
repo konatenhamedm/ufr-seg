@@ -55,7 +55,7 @@ class InscriptionController extends AbstractController
     #[Route('/{id}/imprime', name: 'app_comptabilite_inscription_print', methods: ['GET'])]
     public function imprimer($id, Inscription $inscription, EcheancierRepository $echeancierRepository): Response
     {
-
+        //dd($echeancierRepository->findAllEcheanceDateFirst($id));
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'test.png';
         return $this->renderPdf("inscription/inscription/recu.html.twig", [
             'data' => $inscription,
@@ -1203,7 +1203,7 @@ class InscriptionController extends AbstractController
     {
         return $this->render('inscription/inscription/liste_versement.html.twig', [
             'inscription' => $inscription,
-            'versements' => $infoInscriptionRepository->findBy(['inscription' => $inscription]),
+            'versements' => $infoInscriptionRepository->findBy(['inscription' => $inscription, 'etat' => 'payer']),
         ]);
     }
 

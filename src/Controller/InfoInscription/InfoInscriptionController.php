@@ -8,6 +8,8 @@ use App\Entity\Inscription;
 use App\Entity\Niveau;
 use App\Entity\Utilisateur;
 use App\Form\InfoInscriptionType;
+use App\Form\InfoInscriptionVersementAdminType;
+use App\Form\InfoInscriptionVersementType;
 use App\Repository\EcheancierRepository;
 use App\Repository\InfoInscriptionRepository;
 use App\Repository\InscriptionRepository;
@@ -35,6 +37,137 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class InfoInscriptionController extends AbstractController
 {
     use FileTrait;
+
+    #[Route('liste/versement/{id}/', name: 'app_inscription_liste_versement_index', methods: ['GET', 'POST'])]
+    public function indexListeVersement(Request $request, DataTableFactory $dataTableFactory, $id): Response
+    {
+        $table = $dataTableFactory->create()
+            ->add('mode', TextColumn::class, ['label' => 'Mode Paiement', 'field' => 'mode.libelle'])
+            ->add('etat', TextColumn::class, ['label' => 'Etat'])
+            ->add('montant', TextColumn::class, ['label' => 'Montant',])
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => InfoInscription::class,
+                'query' => function (QueryBuilder $qb) use ($id) {
+                    $qb->select('u, mode,inscription')
+                        ->from(InfoInscription::class, 'u')
+                        ->join('u.modePaiement', 'mode')
+                        ->join('u.inscription', 'inscription')
+                        ->andWhere('u.etat = :etat')
+                        ->andWhere('inscription.id = :id')
+                        ->setParameter('id', $id)
+                        ->setParameter('etat', 'payer');
+                }
+            ])
+            ->setName('dt_app_inscription_liste_versement' . $id);
+
+        $renders = [
+            'edit' =>  new ActionRender(function () {
+                return true;
+            }),
+            'first_print' =>  new ActionRender(function () {
+                return true;
+            }),
+            'second_print' =>  new ActionRender(function () {
+                return true;
+            }),
+
+            'delete' => new ActionRender(function () {
+                return true;
+            }),
+        ];
+
+
+        $hasActions = false;
+
+        foreach ($renders as $_ => $cb) {
+            if ($cb->execute()) {
+                $hasActions = true;
+                break;
+            }
+        }
+
+        /*    <a title="Modification" href="{{ path('app_infoinscription_info_inscription_edit',{'id':ligne.id }) }}" class="btn btn-primary btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2"><i class="bi bi-pen text-light"></i></a>
+        <a title="" href="{{ path('default_print_iframe',{'r':'app_comptabilite_print_inscription_versement','params': {'id': ligne.id}}) }}" class="btn btn-warning btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2"><i class="bi bi-printer text-light"></i></a>
+         <a title="" href="{{ path('app_infoinscription_info_inscription_delete',{'id':ligne.id})}}" class="btn btn-danger btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#exampleModalSizeLg1"> <i class="bi bi-trash text-light"></i></a>
+         <a title="" href="{{ path('default_print_iframe',{'r':'app_comptabilite_inscription_print','params': {'id': ligne.inscription.id}}) }}" class="btn btn-success btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2"><i class="bi bi-printer text-light"></i></a>
+            */
+
+        if ($hasActions) {
+            $table->add('id', TextColumn::class, [
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, InfoInscription $context) use ($renders) {
+                    $options = [
+                        'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                        'target' => '#modal-xl2',
+
+                        'actions' => [
+                            'edit' => [
+                                'url' => $this->generateUrl('app_infoinscription_info_inscription_edit', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => true,
+                                'icon' => '%icon% bi bi-pen',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['edit']
+                            ],
+                            'first_print' => [
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_comptabilite_print_inscription_versement',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'stacked' => true,
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-warning '],
+                                'render' => $renders['first_print']
+                            ],
+                            'delete' => [
+                                'target' => '#modal-small',
+                                'url' => $this->generateUrl('app_infoinscription_info_inscription_delete', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => true,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-danger'],
+                                'render' => $renders['delete']
+                            ],
+                            'second_print' => [
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_comptabilite_inscription_print',
+                                    'params' => [
+                                        'id' => $context->getInscription()->getId(),
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'stacked' => true,
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-main '],
+                                'render' => $renders['second_print']
+                            ],
+                        ]
+
+                    ];
+                    return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                }
+            ]);
+        }
+
+
+        $table->handleRequest($request);
+
+        if ($table->isCallback()) {
+            return $table->getResponse();
+        }
+
+
+        return $this->render('infoinscription/info_inscription/liste_versement.html.twig', [
+            'datatable' => $table,
+            'id' => $id
+        ]);
+    }
+
+
+
+
     #[Route('/imprime/all/{etat}', name: 'app_comptabilite_print_all_point_cheque', methods: ['GET', 'POST'])]
     public function imprimerAll(Request $request, $etat, InfoInscriptionRepository $infoInscription, InscriptionRepository $inscriptionRepository, NiveauRepository $niveauRepository): Response
     {
@@ -821,7 +954,7 @@ class InfoInscriptionController extends AbstractController
         EcheancierRepository $echeancierRepository
     ): Response {
 
-        $form = $this->createForm(InfoInscriptionType::class, $infoInscription, [
+        $form = $this->createForm(InfoInscriptionVersementAdminType::class, $infoInscription, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_infoinscription_info_inscription_edit', [
                 'id' =>  $infoInscription->getId()
@@ -862,10 +995,8 @@ class InfoInscriptionController extends AbstractController
                     $infoInscription->setEtat('payer');
 
 
-                    $infoInscription->getEchenacier()->setEtat('payer');
+                    //$infoInscription->getEchenacier()->setEtat('payer');
                     $infoInscription->setDateValidation(new \DateTime());
-
-                    $echeancierRepository->save($infoInscription->getEchenacier(), true);
                 } else {
 
                     $infoInscription->setEtat($etat);
@@ -903,7 +1034,7 @@ class InfoInscriptionController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'app_infoinscription_info_inscription_delete', methods: ['DELETE', 'GET'])]
-    public function delete(Request $request, InfoInscription $infoInscription, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, InfoInscription $infoInscription, InscriptionRepository $inscriptionRepository, EcheancierRepository $echeancierRepository, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createFormBuilder()
             ->setAction(
@@ -918,11 +1049,48 @@ class InfoInscriptionController extends AbstractController
             ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $echanciers = $echeancierRepository->findBy(['inscription' => $infoInscription->getInscription()->getId()], ['dateCreation' => 'ASC']);
+            $inscription = $infoInscription->getInscription();
+
+            $montant = (int)$infoInscription->getMontant();
+
+            foreach ($echanciers as $echancier) {
+                if ($montant >= (int)$echancier->getMontant()) {
+                    $montant = $montant - (int)$echancier->getMontant();
+                    $echancier->setTotaPayer(0);
+                    $echancier->setEtat('pas_payer');
+                } else {
+
+                    if ($echancier->getTotaPayer() <= $montant) {
+                        $montant = $montant - (int)$echancier->getTotaPayer();
+                        $echancier->setTotaPayer(0);
+                        $echancier->setEtat('pas_payer');
+                    } else {
+
+                        $echancier->setTotaPayer((int)$echancier->getTotaPayer() - $montant);
+                        if ($echancier->getTotaPayer() == $echancier->getMontant()) {
+                            $echancier->setEtat('payer');
+                        } else {
+
+                            $echancier->setEtat('pas_payer');
+                        }
+
+                        $montant = 0;
+                    }
+                }
+                $echeancierRepository->save($echancier, true);
+            }
+            $inscription->setTotalPaye($inscription->getTotalPaye() - $infoInscription->getMontant());
+
+            $inscriptionRepository->save($inscription, true);
+
             $data = true;
             $entityManager->remove($infoInscription);
             $entityManager->flush();
 
-            $redirect = $this->generateUrl('app_infoinscription_info_inscription_index');
+            $redirect = $this->generateUrl('app_inscription_liste_versement_index', [
+                'id' => $infoInscription->getInscription()->getId()
+            ]);
 
             $message = 'Opération effectuée avec succès';
 

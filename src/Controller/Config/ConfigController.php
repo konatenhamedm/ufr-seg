@@ -92,7 +92,8 @@ class ConfigController extends AbstractController
                 'label' => 'DETAIL DES VERSEMENTS',
                 'icon' => 'bi bi-list',
                 'module' => 'gestion',
-                'href' => $this->generateUrl('app_inscription_liste_versements', ['id' => $id])
+                'href' => $this->generateUrl('app_inscription_liste_versement_index', ['id' => $id])
+                //'href' => $this->generateUrl('app_inscription_liste_versements', ['id' => $id])
             ]
         ];
 

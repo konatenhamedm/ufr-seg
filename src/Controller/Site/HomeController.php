@@ -587,6 +587,82 @@ class HomeController extends AbstractController
             'datatable' => $table
         ]);
     }
+    #[Route('/liste/inscription/etudiant/admin', name: 'app_liste_inscription_etudiant_admin_index', methods: ['GET', 'POST'])]
+    public function indexListeInscris(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    {
+        $table = $dataTableFactory->create()
+            ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
+            ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'etudiant.nom'])
+            ->add('prenom', TextColumn::class, ['label' => 'Prénoms', 'field' => 'etudiant.prenom'])
+            ->add('contact', TextColumn::class, ['label' => 'Contact', 'field' => 'etudiant.contact'])
+            ->add('classe', TextColumn::class, ['label' => 'Classe', 'field' => 'classe.libelle'])
+
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => Etudiant::class,
+                'query' => function (QueryBuilder $qb) {
+                    $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                        ->from(Inscription::class, 'p')
+                        ->join('p.classe', 'classe')
+                        ->join('p.niveau', 'niveau')
+                        ->join('niveau.filiere', 'filiere')
+                        ->join('p.etudiant', 'etudiant')
+                        ->leftJoin('p.caissiere', 'c')
+                        ->andWhere('p.classe is not null')
+                        ->orderBy('p.id', 'DESC');
+                }
+
+            ])
+            ->setName('dt_app_liste_inscription_etudiant_admin');
+
+        $renders = [
+            'edit' =>  new ActionRender(function () {
+                return false;
+            }),
+            'new' =>  new ActionRender(function () {
+                return false;
+            }),
+            'delete' => new ActionRender(function () {
+                return false;
+            }),
+        ];
+
+
+        $hasActions = false;
+
+        foreach ($renders as $_ => $cb) {
+            if ($cb->execute()) {
+                $hasActions = true;
+                break;
+            }
+        }
+
+        if ($hasActions) {
+            $table->add('id', TextColumn::class, [
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                    $options = [
+                        'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                        'target' => '#modal-lg',
+
+                        'actions' => []
+
+                    ];
+                    return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                }
+            ]);
+        }
+
+
+        $table->handleRequest($request);
+
+        if ($table->isCallback()) {
+            return $table->getResponse();
+        }
+
+
+        return $this->render('site/admin/index_liste_inscris.html.twig', [
+            'datatable' => $table
+        ]);
+    }
 
 
     #[Route('/all/frais/niveau/{id}', name: 'get_frais', methods: ['GET'])]
@@ -700,7 +776,7 @@ class HomeController extends AbstractController
             'validation_groups' => $validationGroups,
             'action' => $this->generateUrl('site_information_admin_new')
         ]);
-
+        $fullRedirect = false;
         $data = null;
         $statutCode = Response::HTTP_OK;
 

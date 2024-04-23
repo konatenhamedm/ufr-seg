@@ -31,10 +31,10 @@ class NaturePaiement
     #[ORM\Column]
     private ?bool $confirmation = null;
 
-    #[ORM\OneToMany(mappedBy: 'modePaiement', targetEntity: InfoPreinscription::class)]
+    #[ORM\OneToMany(mappedBy: 'modePaiement', targetEntity: InfoPreinscription::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $infoPreinscriptions;
 
-    #[ORM\OneToMany(mappedBy: 'modePaiement', targetEntity: InfoInscription::class)]
+    #[ORM\OneToMany(mappedBy: 'modePaiement', targetEntity: InfoInscription::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $infoInscriptions;
 
     public function __construct()
