@@ -329,7 +329,7 @@ class Service
                     $inscription->setCaissiere($this->getUser());
                     $inscription->setMontant($value->getTotal());
                     $inscription->setNiveau($this->classeRepository->find($value->getClasse())->getNiveau());
-                    $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getNiveau()->getFiliere()->getCode()));
+                    $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getNiveau()->getCode()));
                     $inscription->setClasse($value->getClasse());
                     $inscription->setCodeUtilisateur($this->getUser()->getEmail());
                     $inscription->setEtudiant($etudiant);

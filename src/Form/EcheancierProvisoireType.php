@@ -28,7 +28,7 @@ class EcheancierProvisoireType extends AbstractType
                 'html5' => true,
                 //  'attr'    => ['autocomplete' => 'off', 'class' => 'datepicker no-auto'],
             ])
-            ->add('montant', TextType::class, ['attr' => ['class' => 'input-money input-mnt']])
+            ->add('montant', TextType::class, ['attr' => ['class' => 'input-money input-mnt montant_echeancier']])
             /*  ->add('blocEcheancier', EntityType::class, [
                 'class' => BlocEcheancier::class,
                 'choice_label' => 'id',

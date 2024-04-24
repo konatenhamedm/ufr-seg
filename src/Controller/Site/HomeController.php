@@ -204,7 +204,7 @@ class HomeController extends AbstractController
                     $preinscription->setDatePreinscription(new \DateTime());
                     $preinscription->setNiveau($inscriptionDTO->getNiveau());
                     $preinscription->setUtilisateur($utilisateur);
-                    $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getFiliere()->getCode()));
+                    $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
                     $preinscriptionRepository->add($preinscription, true);
 
 
@@ -243,7 +243,7 @@ class HomeController extends AbstractController
                         $preinscription->setDatePreinscription(new \DateTime());
                         $preinscription->setNiveau($inscriptionDTO->getNiveau());
                         $preinscription->setUtilisateur($user);
-                        $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getFiliere()->getCode()));
+                        $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
                         $preinscriptionRepository->add($preinscription, true);
                         $userAuthenticator->authenticateUser(
                             $user,

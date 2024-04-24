@@ -236,7 +236,7 @@ const etat = "{{etudiant.etat}}";
                          $form_content.append(`
                             <div class="row">
                                         <div class="col-md-3 mb-4">${value.libelle} :</div>
-                                        <div class="col-md-9 mb-4"><input class="form-control form-control-sm input-money input-mnt" type="text"  name="etudiant_admin[blocEcheanciers][0][total]" required="required" value="${value.montant}"></div>
+                                        <div class="col-md-9 mb-4"><input class="form-control form-control-sm input-money input-mnt autre_fais" type="text"  name="etudiant_admin[blocEcheanciers][0][total]"  required="required" value="${value.montant}"></div>
                                         
                                       </div>
                         `)
@@ -245,6 +245,7 @@ const etat = "{{etudiant.etat}}";
                         
 
                           }); 
+                       
                          $('.total').val(somme)
                           
                       //$form_content.append(resIntervention); 
@@ -263,6 +264,18 @@ const etat = "{{etudiant.etat}}";
             const $this = $(this);
 
             load_content($this.val());
+            
+        })
+     
+        $('.autre_fais').on('update-value', function (e, val, element) {
+             total = 0;
+           $('.autre_fais').each(function(e){
+         const $this = $(this);
+             //somme = somme +parseInt($this.val())
+              total = total + parseInt($this.val().replaceAll(' ', ''));
+           })
+
+            $('.total').val(total)
             
         })
      $('#etudiant_infoEtudiants_0_habiteAvec_placeholder').closest( "label" ).hide()
@@ -294,10 +307,10 @@ const etat = "{{etudiant.etat}}";
         });
 
            if($("#etudiant_statutTravail_0").checked){
-$('.travail').show()
-        }else{
-$('.travail').hide()
-        }
+                $('.travail').show()
+                        }else{
+                $('.travail').hide()
+             }
 
 
           $("#etudiant_statutTravail_0").on('click',function () {
@@ -308,5 +321,7 @@ $('.travail').hide()
            $('.travail').hide()
 
         });
+
+       
     </script>
 {% endblock %}

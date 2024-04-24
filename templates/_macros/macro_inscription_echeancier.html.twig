@@ -49,7 +49,7 @@
                                 <div class="row">
                                     
                                     <div class="col-md-3 mb-4">Total</div>
-                                    <div class="col-md-9 mb-4">{{ form_widget(colonne.total) }}</div>
+                                    <div class="col-md-9 mb-4">{{ form_widget(colonne.total,{'attr':{'readonly':'readonly'}}) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -97,6 +97,14 @@
                                                     {{ _self.ligne_echeancier(item|e) }}
                                                 {% endfor %}
                                             </tbody>
+                                            <tfoot>
+                                            <tr>
+                                                <th class="text-end p-2 col " colspan="2">Total montant</th>
+                                                <th class="total text-center p-2 fw-bolder col-total"  data-class="col-total">0</td>
+                                                <th class="total text-center p-2 fw-bolder " colspan="3"></td>
+                                            </tr>
+                                        
+                                        </tfoot>
                                         </table>
                              
                             </div>

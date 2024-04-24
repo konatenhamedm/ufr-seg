@@ -6,6 +6,24 @@ function refresh() {
         $(this).find('.numero:first').val(index);
     })
     }
+    update_totaux()
+
+    function update_totaux(){
+        total = 0;
+        $('.montant_echeancier').each(function(e){
+      const $this = $(this);
+          //somme = somme +parseInt($this.val())
+           total = total + parseInt($this.val().replaceAll(' ', ''));
+        })
+  
+         $('.col-total').text(total)
+    }
+
+    $('.montant_echeancier').on('update-value', function (e, val, element) {
+     
+        update_totaux()
+       
+    })
 $(function () {
     refresh();
     init_select2('select');
@@ -37,8 +55,14 @@ $(function () {
         const $container = $('.proto-container_info_echeancier').find($this.attr('data-container')).closest('.row-container');
         addLine($container);
         refresh();
+        update_totaux()
 
         e.preventDefault(); // évite qu'un # apparaisse dans l'URL
+          $('.montant_echeancier').on('update-value', function (e, val, element) {
+     
+        update_totaux()
+       
+    })
     });
 // On ajoute un premier champ automatiquement s'il n'en existe pas déjà un (cas d'une nouvelle annonce par exemple).
 /*if (index == 0) {
@@ -90,6 +114,7 @@ $(function () {
             const $parent =  $this.closest('.row-colonne');
             $parent.remove();
  refresh();
+ update_totaux()
             if (index > 0) {
                 index -= 1;
             }
