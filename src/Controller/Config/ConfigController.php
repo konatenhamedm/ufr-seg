@@ -398,7 +398,7 @@ class ConfigController extends AbstractController
                 'label' => 'Dossiers non soldés',
                 'icon' => 'bi bi-list',
                 'module' => 'general',
-                'href' => $this->generateUrl('app_inscription_inscription_frais_index')
+                'href' => $this->generateUrl('app_inscription_inscription_frais_caissiere_index')
             ],
             [
                 'label' => 'Point des paiements',

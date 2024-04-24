@@ -505,6 +505,7 @@ class HomeController extends AbstractController
         $isRoleAdminFind = $this->isGranted('ROLE_ADMIN');
         $etat = 'valide';
 
+
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code étudiant'])
             ->add('niveau', TextColumn::class, ['field' => 'niveau.code', 'label' => 'Code Niveau'])
@@ -667,7 +668,183 @@ class HomeController extends AbstractController
 
         return $this->render('inscription/inscription/index_frais.html.twig', [
             'datatable' => $table,
-            'etat' => $etat
+            'etat' => $etat,
+            'type' => 'frais',
+        ]);
+    }
+    #[Route('/admin/frais/caissiere', name: 'app_inscription_inscription_frais_caissiere_index', methods: ['GET', 'POST'])]
+    public function indexListeCaissiere(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    {
+        $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
+        $isRoleFind = $this->isGranted('ROLE_SECRETAIRE');
+        $isRoleAdminFind = $this->isGranted('ROLE_ADMIN');
+        $etat = 'valide';
+
+
+        $table = $dataTableFactory->create()
+            ->add('code', TextColumn::class, ['label' => 'Code étudiant'])
+            ->add('niveau', TextColumn::class, ['field' => 'niveau.code', 'label' => 'Code Niveau'])
+            ->add('classe', TextColumn::class, ['field' => 'classe.libelle', 'label' => 'Classe']);
+        /* ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
+            ->add('dateInscription', DateTimeColumn::class, ['label' => 'Date création', 'format' => 'd-m-Y']); */
+
+        if ($etat != 'attente_echeancier') {
+
+            //$table->add('caissiere', TextColumn::class, ['field' => 'c.getNomComplet', 'label' => 'Caissière ']);
+        }
+
+
+        if (!$isEtudiant) {
+            $table->add('nom', TextColumn::class, ['field' => 'etudiant.nom', 'visible' => false])
+                ->add('prenom', TextColumn::class, ['field' => 'etudiant.prenom', 'visible' => false])
+                ->add('nom_prenom', TextColumn::class, ['label' => 'Nom et prénoms étudiant', 'render' => function ($value, Inscription $inscription) {
+                    return $inscription->getEtudiant()->getNomComplet();
+                }]);
+        }
+        if ($etat == 'valide') {
+            $table->add('montant', NumberFormatColumn::class, ['label' => 'Montant à payer', 'field' => 'p.montant'])
+                ->add('solde', TextColumn::class, ['label' => 'Solde', 'render' => function ($value, Inscription $inscription) {
+                    return (int)$inscription->getMontant() - (int)$inscription->getTotalPaye();
+                }]);
+            //  $table->add('datePaiement', DateTimeColumn::class, ['label' => 'Date de paiement', 'field' => 'p.datePaiement', 'format' => 'd-m-Y']);
+        }
+        $table->createAdapter(ORMAdapter::class, [
+            'entity' => Inscription::class,
+            'query' => function (QueryBuilder $qb) use ($user, $etat) {
+                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                    ->from(Inscription::class, 'p')
+                    ->join('p.niveau', 'niveau')
+                    ->join('p.classe', 'classe')
+                    ->join('niveau.filiere', 'filiere')
+                    ->join('p.etudiant', 'etudiant')
+                    ->leftJoin('p.caissiere', 'c');
+                if ($this->isGranted('ROLE_ETUDIANT')) {
+                    $qb->andWhere('p.etudiant = :etudiant')
+                        ->setParameter('etudiant', $user->getPersonne());
+                }
+                if ($etat == 'attente_echeance') {
+                    $qb->orWhere('p.etat = :etat')
+                        ->orWhere('p.etat = :etat2')
+                        ->setParameter('etat', 'attente_echeancier')
+                        ->setParameter('etat2', 'rejete');
+                } else {
+                    $qb->andWhere('p.etat = :etat')
+                        ->setParameter('etat', 'valide');
+                }
+            }
+        ])
+            ->setName('dt_app_inscription_inscription_frais_caissiere');
+
+        $renders = [
+            /* 'edit' =>  new ActionRender(function () {
+                return true;
+            }), */
+            'edit_etudiant' => new ActionRender(fn () => $etat == 'attente_echeancier' || $etat == 'rejete'),
+            'edit' => new ActionRender(fn () => $etat == 'echeance_soumis'),
+            'payer' => new ActionRender(fn () => $etat == 'valide'),
+            'payer_load' => new ActionRender(fn () => $etat == 'valide'),
+            'delete' => new ActionRender(fn () =>  $isRoleFind == true || $isRoleAdminFind == true),
+            /*  'delete' => new ActionRender(function () {
+                return ;
+            }), */
+            // 'recu' => new ActionRender(fn () => $etat == 'solde'),
+        ];
+
+
+        $hasActions = false;
+
+        foreach ($renders as $_ => $cb) {
+            if ($cb->execute()) {
+                $hasActions = true;
+                break;
+            }
+        }
+
+        if ($hasActions) {
+            $table->add('id', TextColumn::class, [
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                    $options = [
+                        'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                        'target' => '#modal-lg',
+
+                        'actions' => [
+                            'recu' => [
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_comptabilite_inscription_print',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'target' =>  '#exampleModalSizeSm2',
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-main btn-stack']
+                                //, 'render' => new ActionRender(fn() => $source || $etat != 'cree')
+                            ],
+                            /*  'payer' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('app_inscription_inscription_paiement_ok', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-cash',
+                                'attrs' => ['class' => 'btn-warning'],
+                                'render' => $renders['payer']
+                            ], */
+                            'payer_load' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('app_config_inscription_frais_scolarite_index', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-cash',
+                                'attrs' => ['class' => 'btn-warning'],
+                                'render' => $renders['payer_load']
+                            ],
+
+                            'edit_etudiant' => [
+                                'url' => $this->generateUrl('app_inscription_inscription_etudiant_edit', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-pen',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['edit_etudiant']
+                            ],
+                            'edit' => [
+                                'url' => $this->generateUrl('app_inscription_inscription_edit', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-pen',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['edit']
+                            ],
+                            /*  'delete' => [
+                                'target' => '#modal-small',
+                                'url' => $this->generateUrl('app_inscription_inscription_delete', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-danger'],
+                                'render' => $renders['delete']
+                            ] */
+                        ]
+
+                    ];
+                    return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                }
+            ]);
+        }
+
+
+        $table->handleRequest($request);
+
+        if ($table->isCallback()) {
+            return $table->getResponse();
+        }
+
+
+        return $this->render('inscription/inscription/index_frais_caissiere.html.twig', [
+            'datatable' => $table,
+            'etat' => $etat,
+            'type' => 'caissiere',
         ]);
     }
 }

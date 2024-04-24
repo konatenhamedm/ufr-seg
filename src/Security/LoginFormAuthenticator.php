@@ -26,7 +26,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     public const DEFAULT_ROUTE_SUIVI = 'app_home_timeline_index';
     public const DEFAULT_INFORMATION = 'site_information';
     public const DEFAULT_INFORMATION_CAISSIERE = 'app_parametre_preinscription_index';
-    public const DEFAULT_INFORMATION_COMPTABLE = 'app_inscription_etudiant_admin_index';
+    public const DEFAULT_LISTE_INSCRIS = 'app_inscription_etudiant_admin_index';
     public const DEFAULT_INFORMATION_DIRECTEUR = 'app_utilisateur_personne_index';
     //public const DEFAULT_INFORMATION_AUTRE = '';
 

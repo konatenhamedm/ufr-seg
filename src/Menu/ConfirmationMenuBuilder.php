@@ -32,7 +32,7 @@ class ConfirmationMenuBuilder
         $menu = $this->factory->createItem('root');
         $menu->setExtra('module', self::MODULE_NAME);
         if ($this->user->hasRoleInExept("ROLE_CAISSIERE") ||  $this->user->hasRoleInExept('ROLE_SECRETAIRE')) {
-            $menu->addChild('paiement.index', ['route' => 'app_config_preinscription_point_paiement_cheque_index', 'label' => 'PAIEMENT AVEC CONFIRMATION'])
+            $menu->addChild('paiement.index', ['route' => 'app_config_preinscription_point_paiement_cheque_index', 'label' => 'Paiement avec confirmation'])
                 ->setExtra('icon', 'bi bi-cash')->setExtra('role', 'ROLE_CAISSIERE');
         }
         /*    if (isset($menu[self::MODULE_NAME])) {
