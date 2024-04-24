@@ -189,8 +189,13 @@ tr:nth-child(even) {
                    
                    
                   </tr>
-                  {% endfor %}
-                 
+                  
+                 {% else %}
+                 <tr>
+                   <td colspan="4" style="text-align: center;">Il n'y aucunes données disponibles</td>
+                 </tr>
+                  
+                 {% endfor %}
                   
                  
           </table>
