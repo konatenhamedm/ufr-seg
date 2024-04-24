@@ -264,35 +264,43 @@ class Service
         $this->em->persist($inscription);
         $this->em->flush();
     }
-    public function paiementInscriptionEdit(Inscription $inscription, InfoInscription $infoInscription, $data = [])
+    public function paiementInscriptionEdit(Inscription $inscription)
     {
-        $paiement = new InfoInscription();
-        $paiement->setUtilisateur($this->getUser());
-        $paiement->setCode($inscription->getCode());
-        $paiement->setDateValidation(new \DateTime());
-        $paiement->setInscription($inscription);
-        $paiement->setDatePaiement($data['date']);
-        $paiement->setCaissiere($this->getUser());
-        $paiement->setModePaiement($data['modePaiement']);
-        $paiement->setMontant($data['montant']);
-        // $paiement->setEchenacier($echeancier);
-        if ($data['modePaiement']->getCode() == 'CHQ') {
-            $paiement->setNumeroCheque($data['numeroCheque']);
-            $paiement->setBanque($data['banque']);
-            $paiement->setTireur($data['tireur']);
-            $paiement->setContact($data['contact']);
-            $paiement->setDateCheque($data['dateCheque']);
+
+        $sommeMontant = (int)$this->infoRepository->getMontantInfoInscription($inscription);
+
+        $listeEcheanciers = $this->echeancierRepository->findAllEcheance($inscription->getId());
+        foreach ($listeEcheanciers as $key => $echeancier) {
+
+            if ($sommeMontant == 0) {
+                break;    /* Vous pourriez aussi utiliser 'break 1;' ici. */
+            }
+
+            $totalPayer = (int)$echeancier->getTotaPayer();
+
+            if ($sommeMontant >= $echeancier->getMontant()) {
+                $echeancier->setTotaPayer((int)$echeancier->getMontant());
+                $echeancier->setEtat('payer');
+                $sommeMontant = $sommeMontant - (int)$echeancier->getMontant();
+            } else {
+
+                $echeancier->setTotaPayer($sommeMontant);
+                $echeancier->setEtat('pas_payer');
+                $sommeMontant = 0;
+            }
+
+
+            $this->em->persist($echeancier);
+            $this->em->flush();
         }
 
-        if ($data['modePaiement']->isConfirmation()) {
+        $inscription->setTotalPaye($this->infoRepository->getMontantInfoInscription($inscription));
 
-            $paiement->setEtat('attente_confirmation');
-        } else {
+        if ($inscription->getMontant() == $this->infoRepository->getMontantInfoInscription($inscription)) {
 
-            $paiement->setEtat('payer');
+            $inscription->setEtat('solde');
         }
-
-        $this->em->persist($paiement);
+        $this->em->persist($inscription);
         $this->em->flush();
     }
     private function numero($code)

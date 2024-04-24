@@ -1309,12 +1309,8 @@ class InscriptionController extends AbstractController
                 $statut = 0;
                 $statutCode = 500;
                 if (!$isAjax) {
-                    if ($resteSurPage = 0) {
 
-                        $this->addFlash('warning', $message);
-                    } else {
-                        $this->addFlash('success', $message);
-                    }
+                    $this->addFlash('warning', $message);
                 }
             }
 

@@ -20,6 +20,4 @@ jobs:
         run: 
           sshpass -e ssh -o stricthostkeychecking=no ${{ secrets.APP_USER }}@${{ secrets.APP_HOST }}
           "cd ../var/www/clients/client1/web55/web/ &&
-         git add . &&
-         git commit -m "update" &&
-         git pull  "   
+         git pull "  

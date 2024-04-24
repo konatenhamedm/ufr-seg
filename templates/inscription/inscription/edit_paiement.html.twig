@@ -192,13 +192,10 @@
 
 
     </div>
-    <div class="modal-footer">
-        {# {{ include('_includes/ajax/loader.html.twig') }} #}
-       {#  <button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal">Annuler</button>
+    {# <div class="modal-footer">
+      
        
-            #}
-       
-    </div>
+    </div> #}
     {{ form_widget(form._token) }}
     {{ form_end(form, {render_rest: false}) }}
 {% endblock %}

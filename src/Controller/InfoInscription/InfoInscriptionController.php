@@ -17,6 +17,7 @@ use App\Repository\NiveauRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use App\Service\Omines\Column\NumberFormatColumn;
+use App\Service\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -951,7 +952,8 @@ class InfoInscriptionController extends AbstractController
         EntityManagerInterface $entityManager,
         FormError $formError,
         InscriptionRepository $inscriptionRepository,
-        EcheancierRepository $echeancierRepository
+        EcheancierRepository $echeancierRepository,
+        Service $service
     ): Response {
 
         $form = $this->createForm(InfoInscriptionVersementAdminType::class, $infoInscription, [
@@ -966,44 +968,33 @@ class InfoInscriptionController extends AbstractController
 
         $isAjax = $request->isXmlHttpRequest();
 
+        $oldMontant = (int)$infoInscription->getMontant();
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_infoinscription_info_inscription_index', [
+            /*  $redirect = $this->generateUrl('app_infoinscription_info_inscription_index', [
+                'id' => $infoInscription->getInscription()->getId()
+            ]); */
+            $redirect = $this->generateUrl('app_inscription_liste_versement_index', [
                 'id' => $infoInscription->getInscription()->getId()
             ]);
-            $etat = $form->get('etat')->getData();
 
-            //dd($etat);
+            $new_montant = (int)$form->get('montant')->getData();
+            $inscription = $infoInscription->getInscription();
+
 
             if ($form->isValid()) {
 
 
 
-                if ($etat == 'valide') {
-
-                    $total = $infoInscription->getInscription()->getTotalPaye() + $infoInscription->getMontant();
-                    $infoInscription->getInscription()->setTotalPaye($total);
-                    if ($total == $infoInscription->getInscription()->getMontant()) {
-                        $infoInscription->getInscription()->setEtat('solde');
-                    }
-                    $inscriptionRepository->save($infoInscription->getInscription(), true);
-
-
-                    $infoInscription->setEtat('payer');
-
-
-                    //$infoInscription->getEchenacier()->setEtat('payer');
-                    $infoInscription->setDateValidation(new \DateTime());
-                } else {
-
-                    $infoInscription->setEtat($etat);
-                }
-
                 $entityManager->persist($infoInscription);
                 $entityManager->flush();
+
+                if ($oldMontant != $new_montant) {
+                    $service->paiementInscriptionEdit($inscription);
+                }
 
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
@@ -1034,7 +1025,7 @@ class InfoInscriptionController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'app_infoinscription_info_inscription_delete', methods: ['DELETE', 'GET'])]
-    public function delete(Request $request, InfoInscription $infoInscription, InscriptionRepository $inscriptionRepository, EcheancierRepository $echeancierRepository, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Service $service, InfoInscription $infoInscription, InscriptionRepository $inscriptionRepository, EcheancierRepository $echeancierRepository, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createFormBuilder()
             ->setAction(
@@ -1049,44 +1040,15 @@ class InfoInscriptionController extends AbstractController
             ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $echanciers = $echeancierRepository->findBy(['inscription' => $infoInscription->getInscription()->getId()], ['dateCreation' => 'ASC']);
+
             $inscription = $infoInscription->getInscription();
-
-            $montant = (int)$infoInscription->getMontant();
-
-            foreach ($echanciers as $echancier) {
-                if ($montant >= (int)$echancier->getMontant()) {
-                    $montant = $montant - (int)$echancier->getMontant();
-                    $echancier->setTotaPayer(0);
-                    $echancier->setEtat('pas_payer');
-                } else {
-
-                    if ($echancier->getTotaPayer() <= $montant) {
-                        $montant = $montant - (int)$echancier->getTotaPayer();
-                        $echancier->setTotaPayer(0);
-                        $echancier->setEtat('pas_payer');
-                    } else {
-
-                        $echancier->setTotaPayer((int)$echancier->getTotaPayer() - $montant);
-                        if ($echancier->getTotaPayer() == $echancier->getMontant()) {
-                            $echancier->setEtat('payer');
-                        } else {
-
-                            $echancier->setEtat('pas_payer');
-                        }
-
-                        $montant = 0;
-                    }
-                }
-                $echeancierRepository->save($echancier, true);
-            }
-            $inscription->setTotalPaye($inscription->getTotalPaye() - $infoInscription->getMontant());
-
-            $inscriptionRepository->save($inscription, true);
-
             $data = true;
             $entityManager->remove($infoInscription);
             $entityManager->flush();
+
+            $service->paiementInscriptionEdit($inscription);
+
+
 
             $redirect = $this->generateUrl('app_inscription_liste_versement_index', [
                 'id' => $infoInscription->getInscription()->getId()
