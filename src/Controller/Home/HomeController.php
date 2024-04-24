@@ -595,7 +595,7 @@ class HomeController extends AbstractController
                         'actions' => [
                             'recu' => [
                                 'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_comptabilite_inscription_print',
+                                    'r' => 'app_comptabilite_inscription_print_seconde',
                                     'params' => [
                                         'id' => $value,
                                     ]
@@ -770,7 +770,7 @@ class HomeController extends AbstractController
                         'actions' => [
                             'recu' => [
                                 'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_comptabilite_inscription_print',
+                                    'r' => 'app_comptabilite_inscription_print_seconde',
                                     'params' => [
                                         'id' => $value,
                                     ]

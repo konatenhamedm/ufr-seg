@@ -79,6 +79,33 @@ class InscriptionController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
+    #[Route('/{id}/imprime/seconde', name: 'app_comptabilite_inscription_print_seconde', methods: ['GET'])]
+    public function imprimerSecondeExemple($id, Inscription $inscription, EcheancierRepository $echeancierRepository): Response
+    {
+        //dd($echeancierRepository->findAllEcheanceDateFirst($id));
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'test.png';
+        return $this->renderPdf("inscription/inscription/recu_seconde.html.twig", [
+            'data' => $inscription,
+            'info' => $echeancierRepository->findAllEcheanceDateFirst($id),
+            'nombre' => count($inscription->getEcheanciers()),
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'p',
+            'protected' => true,
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' =>  $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
     #[Route('/{id}/imprime/attente_confirmation', name: 'app_comptabilite_inscription_print_attente_confirmation', methods: ['GET'])]
     public function imprimeAttenteConfirmation($id, Inscription $inscription, EcheancierRepository $echeancierRepository): Response
     {
