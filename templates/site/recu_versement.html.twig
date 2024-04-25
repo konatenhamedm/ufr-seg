@@ -188,6 +188,19 @@
       </strong></td>
 
   </tr>
+     <tr>
+    <td>TOTAL PAYE :</td>
+    <td class=""><strong>{{ data.inscription.totalPaye | number_format(0, '.') }} FCFA
+      </strong></td>
+
+    </tr>
+    
+    <tr>
+    <td>SOLDE :</td>
+    <td class=""><strong>{{ (data.inscription.montant - data.inscription.totalPaye) | number_format(0, '.') }} FCFA
+      </strong></td>
+
+    </tr>
 
 </table>
  <hr>

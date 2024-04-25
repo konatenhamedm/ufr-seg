@@ -187,7 +187,21 @@
     <td class="montant"><strong>{% if data.infoPreinscription %}{{ data.infoPreinscription.montant | number_format(0, '.') }} FCFA{% else %} 'NEANT' {% endif %}
       </strong></td>
 
-  </tr>
+    </tr>
+    
+    <tr>
+    <td>TOTAL PAYE :</td>
+    <td class=""><strong>{{ data.totalPaye | number_format(0, '.') }} FCFA
+      </strong></td>
+
+    </tr>
+    
+    <tr>
+    <td>SOLDE :</td>
+    <td class=""><strong>{{ (data.montant - data.totalPaye) | number_format(0, '.') }} FCFA
+      </strong></td>
+
+    </tr>
 
 </table>
  <hr>

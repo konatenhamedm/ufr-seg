@@ -135,7 +135,7 @@ class InfoInscriptionController extends AbstractController
                                 'url' => $this->generateUrl('default_print_iframe', [
                                     'r' => 'app_comptabilite_inscription_print',
                                     'params' => [
-                                        'id' => $context->getInscription()->getId(),
+                                        'id' => $value,
                                     ]
                                 ]),
                                 'ajax' => true,
