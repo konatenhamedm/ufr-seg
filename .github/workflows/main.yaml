@@ -20,7 +20,7 @@ jobs:
         run: 
           sshpass -e ssh -o stricthostkeychecking=no ${{ secrets.APP_USER }}@${{ secrets.APP_HOST }}
           "cd ../var/www/clients/client1/web55/web/ &&
-          git stash &&
-         git pull 
+         git pull &&
+         php bin/console c:c
          
          "  
