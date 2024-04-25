@@ -17,16 +17,18 @@
     <div class="card-body">
     <div class="row">
         {% form_theme form 'widget/fields-block.html.twig' %}
-            {{ form_start(form)}}
+            {{ form_start(form,{'attr':{'id':'form'}})}}
             <fieldset>
 
              
               <div class="row small" style="position:relative">
+               <div class="col-md-3"></div>
                <div class="col-md-6">{{ form_row(form.classe) }}</div>
+               <div class="col-md-3 pt-5"> <button class="btn btn-main btn-filter btn-sm" type="button">Valider</button></div>
                 
-                <div class="col-md-1 pt-5">
+                {# <div class="col-md-1 pt-5">
                   <button class="btn btn-main btn-filter btn-sm" type="button">Rechercher</button>
-                </div>
+                </div> #}
                 
                 
               </div>
@@ -81,6 +83,17 @@
 
       loadDataTable($old_grid, null, {{ datatable_settings(datatable) }});
 
+     /* $classe.on('change', function (e) {
+      
+        const $this = $(this);
+        
+
+        //alert($dateDebut.val());
+        load_grid_data($form, $this, val);
+      });
+*/
+
+
       $('.btn-filter').on('click', function (e) {
         e.preventDefault();
         const $this = $(this);
@@ -89,7 +102,6 @@
         //alert($dateDebut.val());
         load_grid_data($form, $this, $classe.val());
       });
-
 
 
 
@@ -141,6 +153,7 @@
           }
         });
       }
+      
 
     });
   </script>

@@ -35,8 +35,6 @@ class EcheancierRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('f')
             ->innerJoin('f.inscription', 'l')
             ->andWhere('l.id = :id')
-            ->andWhere('f.etat = :etat')
-            ->setParameter('etat', 'pas_payer')
             ->setParameter('id', $value)
             ->orderBy('f.dateCreation', 'ASC')
             ->getQuery()

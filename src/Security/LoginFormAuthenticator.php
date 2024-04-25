@@ -65,6 +65,8 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             $route = self::DEFAULT_ROUTE_SUIVI;
         } elseif (in_array('ROLE_ETUDIANT', $token->getUser()->getRoles())) {
             $route = self::DEFAULT_INFORMATION;
+        } elseif (in_array('ROLE_CAISSIERE', $token->getUser()->getRoles())) {
+            $route = self::DEFAULT_LISTE_INSCRIS;
         } else {
             $route = self::DEFAULT_ROUTE;
         }

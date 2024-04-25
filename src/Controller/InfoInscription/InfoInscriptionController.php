@@ -997,7 +997,7 @@ class InfoInscriptionController extends AbstractController
                 }
 
                 $url = [
-                    'url' => $this->generateUrl('app_inscription_inscription_paiement_ok', [
+                    'url' => $this->generateUrl('app_inscription_liste_versement_index', [
                         'id' => $infoInscription->getInscription()->getId()
                     ]),
                     'tab' => '#module1',
@@ -1069,7 +1069,7 @@ class InfoInscriptionController extends AbstractController
             $message = 'Opération effectuée avec succès';
 
             $url = [
-                'url' => $this->generateUrl('app_inscription_inscription_paiement_ok', [
+                'url' => $this->generateUrl('app_inscription_liste_versement_index', [
                     'id' => $infoInscription->getInscription()->getId()
                 ]),
                 'tab' => '#module1',

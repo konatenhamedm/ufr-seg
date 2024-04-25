@@ -267,32 +267,44 @@ class Service
     public function paiementInscriptionEdit(Inscription $inscription)
     {
 
+        $sommeMontantReel = (int)$this->infoRepository->getMontantInfoInscription($inscription);
         $sommeMontant = (int)$this->infoRepository->getMontantInfoInscription($inscription);
 
         $listeEcheanciers = $this->echeancierRepository->findAllEcheance($inscription->getId());
-        foreach ($listeEcheanciers as $key => $echeancier) {
 
-            if ($sommeMontant == 0) {
-                break;    /* Vous pourriez aussi utiliser 'break 1;' ici. */
-            }
+        if ($sommeMontantReel == 0) {
+            foreach ($listeEcheanciers as $key => $echeancier) {
 
-            $totalPayer = (int)$echeancier->getTotaPayer();
 
-            if ($sommeMontant >= $echeancier->getMontant()) {
-                $echeancier->setTotaPayer((int)$echeancier->getMontant());
-                $echeancier->setEtat('payer');
-                $sommeMontant = $sommeMontant - (int)$echeancier->getMontant();
-            } else {
-
-                $echeancier->setTotaPayer($sommeMontant);
+                $echeancier->setTotaPayer('0');
                 $echeancier->setEtat('pas_payer');
-                $sommeMontant = 0;
+                $this->em->persist($echeancier);
+                $this->em->flush();
             }
+        } else {
+            foreach ($listeEcheanciers as $key => $echeancier) {
 
 
-            $this->em->persist($echeancier);
-            $this->em->flush();
+                $totalPayer = (int)$echeancier->getTotaPayer();
+
+                if ($sommeMontant >= $echeancier->getMontant()) {
+                    $echeancier->setTotaPayer((int)$echeancier->getMontant());
+                    $echeancier->setEtat('payer');
+                    $sommeMontant = $sommeMontant - (int)$echeancier->getMontant();
+                } else {
+
+                    $echeancier->setTotaPayer($sommeMontant);
+                    $echeancier->setEtat('pas_payer');
+                    $sommeMontant = 0;
+                }
+
+
+                $this->em->persist($echeancier);
+                $this->em->flush();
+            }
         }
+
+
 
         $inscription->setTotalPaye($this->infoRepository->getMontantInfoInscription($inscription));
 

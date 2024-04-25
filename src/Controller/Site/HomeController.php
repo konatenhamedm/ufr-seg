@@ -156,6 +156,11 @@ class HomeController extends AbstractController
         if ($form->isSubmitted()) {
 
             //dd($inscriptionDTO->getDateNaissance());
+            $prenoms = '';
+            $explodePrenom = explode(" ", $inscriptionDTO->getPrenom());
+            for ($i = 0; $i < count($explodePrenom); $i++) {
+                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
+            }
             $response = [];
             $fonction = $entityManager->getRepository(Fonction::class)->findOneByCode('ETD');
             $user = $utilisateurRepository->findOneByEmail($inscriptionDTO->getEmail());
@@ -163,8 +168,10 @@ class HomeController extends AbstractController
 
                 if (!$user) {
                     $etudiant = new Etudiant();
+
+
                     $etudiant->setNom(strtoupper($inscriptionDTO->getNom()));
-                    $etudiant->setPrenom(ucwords($inscriptionDTO->getPrenom()));
+                    $etudiant->setPrenom($prenoms);
                     $etudiant->setDateNaissance($inscriptionDTO->getDateNaissance());
                     // $etudiant->setCivilite($inscriptionDTO->getCivilite());
                     $etudiant->setGenre($inscriptionDTO->getGenre());
@@ -357,11 +364,17 @@ class HomeController extends AbstractController
             $redirect = $this->generateUrl('site_information');
             $datas = $preinscriptionRepository->findBy(array('etudiant' => $etudiant, 'etat' => 'attente_informations'));
 
+            $prenoms = '';
+            $explodePrenom = explode(" ", $form->get('prenom')->getData());
+            for ($i = 0; $i < count($explodePrenom); $i++) {
+                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
+            }
 
 
 
             if ($form->isValid()) {
-
+                $etudiant->setNom(strtoupper($form->get('nom')->getData()));
+                $etudiant->setPrenom($prenoms);
                 if ($form->getClickedButton()->getName() === 'valider') {
                     $etudiant->setEtat('complete');
                     $message       = 'Votre dossier a bien été transmis pour validation. Vous recevrez une notification après traitement.';
@@ -497,7 +510,7 @@ class HomeController extends AbstractController
         ])->add('classe', EntityType::class, [
             'class' => Classe::class,
             'choice_label' => 'libelle',
-            'label' => 'Classe',
+            'label' => 'Affichage par classe',
             'placeholder' => '---',
             'required' => false,
             'attr' => ['class' => 'form-control-sm has-select2']
@@ -521,7 +534,7 @@ class HomeController extends AbstractController
                         ->join('p.etudiant', 'etudiant')
                         ->leftJoin('p.caissiere', 'c')
                         ->andWhere('p.classe is not null')
-                        ->orderBy('p.id', 'DESC');
+                        ->orderBy('p.code', 'DESC');
 
                     if ($classe) {
                         $qb->andWhere('classe.id = :classe')
@@ -815,14 +828,19 @@ class HomeController extends AbstractController
             $response = [];
             $redirect = $this->generateUrl('app_inscription_etudiant_admin_index');
 
-
+            $prenoms = '';
+            $explodePrenom = explode(" ", $form->get('prenom')->getData());
+            for ($i = 0; $i < count($explodePrenom); $i++) {
+                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
+            }
             $blocEcheanciers = $form->get('blocEcheanciers')->getData();
 
             if ($form->isValid()) {
 
 
                 if (filter_var($etudiant->getEmail(), FILTER_VALIDATE_EMAIL)) {
-
+                    $etudiant->setNom(strtoupper($form->get('nom')->getData()));
+                    $etudiant->setPrenom($prenoms);
                     $etudiant->setFonction($fonctionRepository->findOneBy(['code' => 'ETD']));
                     $etudiant->setEtat('complete');
                     $entityManager->persist($etudiant);
@@ -1010,6 +1028,11 @@ class HomeController extends AbstractController
 
             $user = $utilisateurRepository->findOneBy(['personne' => $etudiant]);
             $blocEcheanciers = $form->get('blocEcheanciers')->getData();
+            $prenoms = '';
+            $explodePrenom = explode(" ", $form->get('prenom')->getData());
+            for ($i = 0; $i < count($explodePrenom); $i++) {
+                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
+            }
 
             if ($form->isValid()) {
 
@@ -1017,7 +1040,8 @@ class HomeController extends AbstractController
 
 
                 if (filter_var($etudiant->getEmail(), FILTER_VALIDATE_EMAIL)) {
-
+                    $etudiant->setNom(strtoupper($form->get('nom')->getData()));
+                    $etudiant->setPrenom($prenoms);
                     $entityManager->persist($etudiant);
                     $responseRegister = $service->registerEcheancierAdmin($blocEcheanciers, $etudiant);
 
@@ -1172,6 +1196,11 @@ class HomeController extends AbstractController
         if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_inscription_etudiant_admin_index');
+            $prenoms = '';
+            $explodePrenom = explode(" ", $form->get('prenom')->getData());
+            for ($i = 0; $i < count($explodePrenom); $i++) {
+                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
+            }
 
             $user = $utilisateurRepository->findOneBy(['personne' => $etudiant]);
             $blocEcheanciers = $form->get('blocEcheanciers')->getData();
@@ -1179,7 +1208,8 @@ class HomeController extends AbstractController
             if ($form->isValid()) {
 
                 //dd(filter_var($etudiant->getEmail(), FILTER_VALIDATE_EMAIL));
-
+                $etudiant->setNom(strtoupper($form->get('nom')->getData()));
+                $etudiant->setPrenom($prenoms);
                 $responseRegister = $service->registerEcheancierAdmin($blocEcheanciers, $etudiantRepository->find($id));
 
                 if ($responseRegister) {
@@ -1315,10 +1345,17 @@ class HomeController extends AbstractController
             $user = $utilisateurRepository->findOneBy(['personne' => $etudiant]);
             $blocEcheanciers = $form->get('blocEcheanciers')->getData();
 
+            $prenoms = '';
+            $explodePrenom = explode(" ", $form->get('prenom')->getData());
+            for ($i = 0; $i < count($explodePrenom); $i++) {
+                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
+            }
+
             if ($form->isValid()) {
 
                 //dd(filter_var($etudiant->getEmail(), FILTER_VALIDATE_EMAIL));
-
+                $etudiant->setNom(strtoupper($form->get('nom')->getData()));
+                $etudiant->setPrenom($prenoms);
                 $responseRegister = $service->registerEcheancierAdmin($blocEcheanciers, $etudiantRepository->find($id));
 
                 if ($responseRegister) {

@@ -70,8 +70,10 @@ class PersonneController extends AbstractController
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
 
+
                         'actions' => [
                             'edit' => [
+                                'target' => '#exampleModalSizeLg2',
                                 'url' => $this->generateUrl('app_utilisateur_personne_edit', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
@@ -129,11 +131,17 @@ class PersonneController extends AbstractController
             $response = [];
             $redirect = $this->generateUrl('app_utilisateur_personne_index');
 
-
+            $prenoms = '';
+            $explodePrenom = explode(" ", $form->get('prenom')->getData());
+            for ($i = 0; $i < count($explodePrenom); $i++) {
+                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
+            }
 
 
             if ($form->isValid()) {
 
+                $personne->setNom(strtoupper($form->get('nom')->getData()));
+                $personne->setPrenom($prenoms);
                 $entityManager->persist($personne);
                 $entityManager->flush();
 
@@ -196,12 +204,17 @@ class PersonneController extends AbstractController
         if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_utilisateur_personne_index');
-
-
+            $prenoms = '';
+            $explodePrenom = explode(" ", $form->get('prenom')->getData());
+            for ($i = 0; $i < count($explodePrenom); $i++) {
+                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
+            }
 
 
             if ($form->isValid()) {
 
+                $personne->setNom(strtoupper($form->get('nom')->getData()));
+                $personne->setPrenom($prenoms);
                 $entityManager->persist($personne);
                 $entityManager->flush();
 
