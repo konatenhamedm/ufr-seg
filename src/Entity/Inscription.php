@@ -41,12 +41,14 @@ class Inscription
     private Collection $fraisInscriptions;
 
     #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: Echeancier::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $echeanciers;
 
     #[ORM\Column(length: 255)]
     private ?string $etat = null;
 
     #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: InfoInscription::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $infoInscriptions;
 
     #[ORM\ManyToOne]
@@ -65,6 +67,10 @@ class Inscription
     #[ORM\ManyToOne(inversedBy: 'inscriptions')]
     private ?Classe $classe = null;
 
+    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: BlocEcheancier::class, orphanRemoval: true,  cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    private Collection $blocEcheanciers;
+
     public function __construct()
     {
         $this->fraisInscriptions = new ArrayCollection();
@@ -72,6 +78,7 @@ class Inscription
         $this->echeanciers = new ArrayCollection();
         $this->infoInscriptions = new ArrayCollection();
         $this->totalPaye = 0;
+        $this->blocEcheanciers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -323,6 +330,36 @@ class Inscription
     public function setClasse(?Classe $classe): static
     {
         $this->classe = $classe;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BlocEcheancier>
+     */
+    public function getBlocEcheanciers(): Collection
+    {
+        return $this->blocEcheanciers;
+    }
+
+    public function addBlocEcheancier(BlocEcheancier $blocEcheancier): static
+    {
+        if (!$this->blocEcheanciers->contains($blocEcheancier)) {
+            $this->blocEcheanciers->add($blocEcheancier);
+            $blocEcheancier->setInscription($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBlocEcheancier(BlocEcheancier $blocEcheancier): static
+    {
+        if ($this->blocEcheanciers->removeElement($blocEcheancier)) {
+            // set the owning side to null (unless already changed)
+            if ($blocEcheancier->getInscription() === $this) {
+                $blocEcheancier->setInscription(null);
+            }
+        }
 
         return $this;
     }

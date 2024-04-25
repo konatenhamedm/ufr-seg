@@ -27,14 +27,17 @@ class BlocEcheancier
     #[ORM\ManyToOne(inversedBy: 'blocEcheanciers')]
     private ?Etudiant $etudiant = null;
 
-    #[ORM\OneToMany(mappedBy: 'blocEcheancier', targetEntity: EcheancierProvisoire::class, orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(mappedBy: 'blocEcheancier', targetEntity: EcheancierProvisoire::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $echeancierProvisoires;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateInscription = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'blocEcheanciers')]
     private ?Inscription $inscription = null;
+
+
 
     public function __construct()
     {
