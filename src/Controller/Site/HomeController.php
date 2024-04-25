@@ -534,7 +534,7 @@ class HomeController extends AbstractController
                         ->join('p.etudiant', 'etudiant')
                         ->leftJoin('p.caissiere', 'c')
                         ->andWhere('p.classe is not null')
-                        ->orderBy('p.code', 'DESC');
+                        ->orderBy('p.id', 'DESC');
 
                     if ($classe) {
                         $qb->andWhere('classe.id = :classe')
@@ -1013,8 +1013,9 @@ class HomeController extends AbstractController
                 'id' =>  $etudiant->getId()
             ])
         ]);
-
+        $statut = null;
         $data = null;
+        $fullRedirect = false;
         $statutCode = Response::HTTP_OK;
 
         $isAjax = $request->isXmlHttpRequest();
@@ -1033,19 +1034,32 @@ class HomeController extends AbstractController
             for ($i = 0; $i < count($explodePrenom); $i++) {
                 $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
             }
-
+            $message = "";
             if ($form->isValid()) {
 
                 //dd(filter_var($etudiant->getEmail(), FILTER_VALIDATE_EMAIL));
-
 
                 if (filter_var($etudiant->getEmail(), FILTER_VALIDATE_EMAIL)) {
                     $etudiant->setNom(strtoupper($form->get('nom')->getData()));
                     $etudiant->setPrenom($prenoms);
                     $entityManager->persist($etudiant);
-                    $responseRegister = $service->registerEcheancierAdmin($blocEcheanciers, $etudiant);
 
-                    if ($responseRegister) {
+                    $responseRegister = $service->registerEcheancierAdminEdit($blocEcheanciers, $etudiant);
+                    // dd($responseRegister);
+
+                    if ($responseRegister == 'existe') {
+                        //il fait rien ici
+                        $statut = 0;
+                        $message       = "Opération échouée car il existe un inscription similaire à celle que vous envisager de créer actuellement";
+                        $this->addFlash('danger', $message);
+                    } elseif ($responseRegister == 'pasEgalite') {
+                        $statut = 0;
+                        $message       = "Opération échouée car le montant total à payer est different du montant total de l 'échanece";
+                        $this->addFlash('danger', $message);
+                        // il fait rien ici 
+                    } elseif ($responseRegister == 'bonneEgalitePresenceEcheancierPayer') {
+                        // bien enregistrer mais l'echeancier n'a pas ete pris en compte car un versment à été deja effectué sur ppur cette inscription
+
                         $entityManager->flush();
 
                         $user->setEmail($etudiant->getEmail());
@@ -1065,13 +1079,33 @@ class HomeController extends AbstractController
                             $context
                         );
                         $statut = 1;
-                        $message       = 'Opération effectuée avec succès';
+                        $message       = "Opération effectuée avec succès mais l'echeancier n'a pas ete pris en compte car un versment à été deja effectué sur pour cette inscription";
                         $this->addFlash('success', $message);
                     } else {
-                        $statut = 0;
-                        $message       = "Opération échouée car le montant total à payer est different du montant total de l 'échanece";
-                        $this->addFlash('danger', $message);
+
+                        $entityManager->flush();
+
+                        $user->setEmail($etudiant->getEmail());
+                        $utilisateurRepository->add($user, true);
+                        $info_user = [
+                            'login' => $etudiant->getEmail(),
+                            'password' => $etudiant->getNom() . '_' . 'password'
+                        ];
+
+                        $context = compact('info_user');
+                        // TO DO
+                        $sendMailService->send(
+                            'konatenhamed@ufrseg.enig-sarl.com',
+                            $etudiant->getEmail(),
+                            'Informations',
+                            'content_mail',
+                            $context
+                        );
+                        $statut = 1;
+                        $message       = "Opération effectuée avec succès";
+                        $this->addFlash('success', $message);
                     }
+
 
                     $this->addFlash('success', $message);
                 } else {

@@ -33,6 +33,9 @@ class BlocEcheancier
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateInscription = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Inscription $inscription = null;
+
     public function __construct()
     {
         $this->echeancierProvisoires = new ArrayCollection();
@@ -118,6 +121,18 @@ class BlocEcheancier
     public function setDateInscription(\DateTimeInterface $dateInscription): static
     {
         $this->dateInscription = $dateInscription;
+
+        return $this;
+    }
+
+    public function getInscription(): ?Inscription
+    {
+        return $this->inscription;
+    }
+
+    public function setInscription(?Inscription $inscription): static
+    {
+        $this->inscription = $inscription;
 
         return $this;
     }

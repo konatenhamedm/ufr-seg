@@ -1497,7 +1497,7 @@ class InscriptionController extends AbstractController
             $entityManager->remove($inscription);
             $entityManager->flush();
 
-            $redirect = $this->generateUrl('app_inscription_inscription_index');
+            $redirect = $this->generateUrl('app_inscription_etudiant_admin_index');
 
             $message = 'Opération effectuée avec succès';
 

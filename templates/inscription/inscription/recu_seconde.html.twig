@@ -217,9 +217,11 @@ tr:nth-child(even) {
                     <th>Montant à payer</th>
                    
                   </tr>
+                  {% set somme = 0 %}
 
                   {# {% for item in data.echeanciers|filter(v => v.etat == "payer") %} #}
                   {% for key,item in data.niveau.frais %}
+                  {% set somme = somme + item.montant %}
                      <tr>
                        <td>{{ key+1 }}</td>
                     <td>{{ item.typeFrais.libelle }}</td>
@@ -228,7 +230,10 @@ tr:nth-child(even) {
                    
                   </tr>
                   {% endfor %}
-                 
+                 <tr>
+                 <td colspan="2" class="">Total :</td>
+                 <td class=""  style="font-weight: bold;">{{ somme |number_format(0, '.', ' ') }}</td>
+                 </tr>
                   
                  
           </table>
@@ -250,9 +255,14 @@ tr:nth-child(even) {
                     <th>Montant versé</th>
                     <th>Solde</th>
                   </tr>
-
+                  {% set totalApayerEcheancier = 0 %}
+                  {% set soldeEcheancier = 0 %}
+                  {% set sommeVerseEcheancier = 0 %}
                   {# {% for item in data.echeanciers|filter(v => v.etat == "payer") %} #}
                   {% for key,item in data.echeanciers %}
+                   {% set totalApayerEcheancier = totalApayerEcheancier + item.montant  %}
+                  {% set sommeVerseEcheancier = sommeVerseEcheancier + item.totaPayer  %}
+                   {% set soldeEcheancier = soldeEcheancier + (item.montant - item.totaPayer)  %} 
                      <tr>
                        <td>{{ key+1 }}</td>
                     <td>{{ item.dateCreation | date('d/m/Y')}}</td>
@@ -272,6 +282,16 @@ tr:nth-child(even) {
                    
                   </tr>
                   {% endfor %}
+                     <tr>
+
+                  
+                  <td colspan="2" class="">Total :</td>
+                  <td style="font-weight: bold;">{{ totalApayerEcheancier |number_format(0, '.', ' ') }}</td>
+                  <td style="font-weight: bold;">{{ sommeVerseEcheancier |number_format(0, '.', ' ') }} </td>
+                  <td style="font-weight: bold;">{{ soldeEcheancier  |number_format(0, '.', ' ')}} </td>
+                  
+                  
+                  </tr>
                  
                   
                  

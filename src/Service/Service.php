@@ -358,6 +358,8 @@ class Service
                     $inscription->setTotalPaye('0');
                     $this->inscriptionRepository->save($inscription, true);
 
+                    $value->setInscription($inscription);
+
                     foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
                         $echeancierReel = new Echeancier();
                         $echeancierReel->setDateCreation(new DateTime());
@@ -370,6 +372,144 @@ class Service
                     $response;
                 } else {
                     $response = false;
+                }
+            }
+        }
+
+        return $response;
+    }
+    public function registerEcheancierAdminEdit($blocEcheanciers, $etudiant): string
+    {
+        $somme = 0;
+
+        // somme pas egal
+        //inscription a deja un echaneacier qui a eu des payements
+        $response = '';
+        foreach ($blocEcheanciers as $key => $value) {
+
+            foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                $somme += $echeancier->getMontant();
+            }
+            $newInscription = $this->inscriptionRepository->findOneBy(['classe' => $value->getClasse(), 'etudiant' => $etudiant]);
+            $newInscriptionCount = $this->inscriptionRepository->findBy(['classe' => $value->getClasse(), 'etudiant' => $etudiant]);
+            $inscription = $this->inscriptionRepository->find($value->getInscription()->getId());
+            //dd($inscription->getId());
+
+            if ($newInscription) {
+                //dd($inscription->getTotalPaye());
+                if ($newInscription->getId()  != $inscription->getId()) {
+                    if (count($newInscriptionCount) == 0) {
+                        if ($somme == (int)$value->getTotal()) {
+                            $inscription->setMontant($value->getTotal());
+                            $inscription->setNiveau($this->classeRepository->find($value->getClasse())->getNiveau());
+                            $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getNiveau()->getCode()));
+                            $inscription->setClasse($value->getClasse());
+
+                            if ($inscription->getTotalPaye() == "0") {
+
+                                $inscription->setTotalPaye('0');
+                            }
+
+                            $this->inscriptionRepository->save($inscription, true);
+
+                            $value->setInscription($inscription);
+                            //dd($inscription->getTotalPaye());
+                            if ($inscription->getTotalPaye() == "0") {
+
+                                foreach ($inscription->getEcheanciers() as $key => $echeancierInscription) {
+                                    $this->em->remove($echeancierInscription);
+                                    $this->em->flush();
+                                }
+
+
+                                foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                                    $echeancierReel = new Echeancier();
+                                    $echeancierReel->setDateCreation(new DateTime());
+                                    $echeancierReel->setEtat('pas_payer');
+                                    $echeancierReel->setInscription($inscription);
+                                    $echeancierReel->setMontant($echeancier->getMontant());
+                                    $echeancierReel->setTotaPayer('0');
+                                    $this->echeancierRepository->save($echeancierReel, true);
+                                }
+                                $response = 'bonneEgalite';
+                            } else {
+                                $response = 'bonneEgalitePresenceEcheancierPayer';
+                            }
+                        } else {
+                            $response = 'pasEgalite';
+                        }
+                    } else {
+                        $response = 'existe';
+                    }
+                } else {
+                    if ($somme == (int)$value->getTotal()) {
+
+                        if ($inscription->getTotalPaye() == "0") {
+
+                            foreach ($inscription->getEcheanciers() as $key => $echeancierInscription) {
+                                $this->em->remove($echeancierInscription);
+                                $this->em->flush();
+                            }
+
+                            foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                                $echeancierReel = new Echeancier();
+                                $echeancierReel->setDateCreation(new DateTime());
+                                $echeancierReel->setEtat('pas_payer');
+                                $echeancierReel->setInscription($inscription);
+                                $echeancierReel->setMontant($echeancier->getMontant());
+                                $echeancierReel->setTotaPayer('0');
+                                $this->echeancierRepository->save($echeancierReel, true);
+                            }
+                            $response = 'bonneEgalite';
+                        } else {
+                            $response = 'bonneEgalitePresenceEcheancierPayer';
+                        }
+                    } else {
+                        $response = 'pasEgalite';
+                    }
+                }
+            } else {
+
+                //dd(count($newInscriptionCount));
+                if (count($newInscriptionCount) == 0) {
+                    if ($somme == (int)$value->getTotal()) {
+                        $inscription->setMontant($value->getTotal());
+                        $inscription->setNiveau($this->classeRepository->find($value->getClasse())->getNiveau());
+                        $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getNiveau()->getCode()));
+                        $inscription->setClasse($value->getClasse());
+                        if ($inscription->getTotalPaye() == "0") {
+
+                            $inscription->setTotalPaye('0');
+                        }
+                        $this->inscriptionRepository->save($inscription, true);
+
+                        $value->setInscription($inscription);
+
+                        if ($inscription->getTotalPaye() == "0") {
+
+                            foreach ($inscription->getEcheanciers() as $key => $echeancierInscription) {
+                                $this->em->remove($echeancierInscription);
+                                $this->em->flush();
+                            }
+
+                            foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                                $echeancierReel = new Echeancier();
+                                $echeancierReel->setDateCreation(new DateTime());
+                                $echeancierReel->setEtat('pas_payer');
+                                $echeancierReel->setInscription($inscription);
+                                $echeancierReel->setMontant($echeancier->getMontant());
+                                $echeancierReel->setTotaPayer('0');
+                                $this->echeancierRepository->save($echeancierReel, true);
+                            }
+                            $response = 'bonneEgalite';
+                        } else {
+                            $response = 'bonneEgalitePresenceEcheancierPayer';
+                        }
+                    } else {
+                        $response = 'pasEgalite';
+                    }
+                } else {
+                    $response = 'existe';
                 }
             }
         }

@@ -231,9 +231,9 @@ tr:nth-child(even) {
                   <tr>
 
                   <td>Total :</td>
-                  <td style="font-weight: bold;">{{ totalApayer }}</td>
-                  <td style="font-weight: bold;">{{ sommeVerse }} </td>
-                  <td style="font-weight: bold;">{{ solde }} </td>
+                  <td style="font-weight: bold;">{{ totalApayer |number_format(0, '.', ' ') }}</td>
+                  <td style="font-weight: bold;">{{ sommeVerse |number_format(0, '.', ' ') }} </td>
+                  <td style="font-weight: bold;">{{ solde |number_format(0, '.', ' ') }} </td>
                   
                   
                   </tr>
