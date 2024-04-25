@@ -38,6 +38,7 @@ class ScolariteMenuBuilder
         if (isset($menu[self::MODULE_NAME])) {
             $menu->addChild('scolarite.index', ['route' => 'app_home_timeline_index', 'label' => ' Gestion des dossiers'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_SECRETAIRE');
             $menu->addChild('inscription', ['route' => 'app_inscription_etudiant_admin_index', 'label' => ' Inscription'])->setExtra('icon', 'bi bi-gear');
+            // $menu->addChild('inscription', ['route' => 'app_inscription_etudiant_admin_index', 'label' => ' Inscription'])->setExtra('icon', 'bi bi-gear');
         }
 
         return $menu;

@@ -497,27 +497,19 @@ class HomeController extends AbstractController
 
 
 
-    #[Route('/admin/frais', name: 'app_inscription_inscription_frais_index', methods: ['GET', 'POST'])]
-    public function indexListe(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    #[Route('/admin/frais/{etat}', name: 'app_inscription_inscription_frais_index', methods: ['GET', 'POST'])]
+    public function indexListe(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, $etat): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
         $isRoleFind = $this->isGranted('ROLE_SECRETAIRE');
         $isRoleAdminFind = $this->isGranted('ROLE_ADMIN');
-        $etat = 'valide';
+        // $etat = 'valide';
 
 
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code étudiant'])
             ->add('niveau', TextColumn::class, ['field' => 'niveau.code', 'label' => 'Code Niveau'])
             ->add('classe', TextColumn::class, ['field' => 'classe.libelle', 'label' => 'Classe']);
-        /* ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
-            ->add('dateInscription', DateTimeColumn::class, ['label' => 'Date création', 'format' => 'd-m-Y']); */
-
-        if ($etat != 'attente_echeancier') {
-
-            //$table->add('caissiere', TextColumn::class, ['field' => 'c.getNomComplet', 'label' => 'Caissière ']);
-        }
-
 
         if (!$isEtudiant) {
             $table->add('nom', TextColumn::class, ['field' => 'etudiant.nom', 'visible' => false])
@@ -526,13 +518,13 @@ class HomeController extends AbstractController
                     return $inscription->getEtudiant()->getNomComplet();
                 }]);
         }
-        if ($etat == 'valide') {
-            $table->add('montant', NumberFormatColumn::class, ['label' => 'Montant à payer', 'field' => 'p.montant'])
-                ->add('solde', TextColumn::class, ['label' => 'Solde', 'render' => function ($value, Inscription $inscription) {
-                    return (int)$inscription->getMontant() - (int)$inscription->getTotalPaye();
-                }]);
-            //  $table->add('datePaiement', DateTimeColumn::class, ['label' => 'Date de paiement', 'field' => 'p.datePaiement', 'format' => 'd-m-Y']);
-        }
+        // if ($etat == 'valide') {
+        $table->add('montant', NumberFormatColumn::class, ['label' => 'Montant à payer', 'field' => 'p.montant'])
+            ->add('solde', TextColumn::class, ['label' => 'Solde', 'render' => function ($value, Inscription $inscription) {
+                return (int)$inscription->getMontant() - (int)$inscription->getTotalPaye();
+            }]);
+        //  $table->add('datePaiement', DateTimeColumn::class, ['label' => 'Date de paiement', 'field' => 'p.datePaiement', 'format' => 'd-m-Y']);
+        // }
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
             'query' => function (QueryBuilder $qb) use ($user, $etat) {
@@ -547,18 +539,12 @@ class HomeController extends AbstractController
                     $qb->andWhere('p.etudiant = :etudiant')
                         ->setParameter('etudiant', $user->getPersonne());
                 }
-                if ($etat == 'attente_echeance') {
-                    $qb->orWhere('p.etat = :etat')
-                        ->orWhere('p.etat = :etat2')
-                        ->setParameter('etat', 'attente_echeancier')
-                        ->setParameter('etat2', 'rejete');
-                } else {
-                    $qb->andWhere('p.etat = :etat')
-                        ->setParameter('etat', 'valide');
-                }
+
+                $qb->andWhere('p.etat = :etat')
+                    ->setParameter('etat', $etat);
             }
         ])
-            ->setName('dt_app_inscription_inscription_frais');
+            ->setName('dt_app_inscription_inscription_frais' . $etat);
 
         $renders = [
             /* 'edit' =>  new ActionRender(function () {
@@ -604,7 +590,7 @@ class HomeController extends AbstractController
                                 'target' =>  '#exampleModalSizeSm2',
                                 'icon' => '%icon% bi bi-printer',
                                 'attrs' => ['class' => 'btn-main btn-stack']
-                                //, 'render' => new ActionRender(fn() => $source || $etat != 'cree')
+                                //'render' => new ActionRender(fn() => $context->getEtat() != 'cree')
                             ],
                             /*  'payer' => [
                                 'target' => '#exampleModalSizeSm2',

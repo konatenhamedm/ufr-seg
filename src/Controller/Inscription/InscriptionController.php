@@ -1478,7 +1478,7 @@ class InscriptionController extends AbstractController
     }
 
     #[Route('/def/{id}/delete', name: 'app_inscription_inscription_delete', methods: ['DELETE', 'GET'])]
-    public function delete(Request $request, Inscription $inscription, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Inscription $inscription, InscriptionRepository $inscriptionRepository, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createFormBuilder()
             ->setAction(
@@ -1492,20 +1492,35 @@ class InscriptionController extends AbstractController
             ->setMethod('DELETE')
             ->getForm();
         $form->handleRequest($request);
+        $showAlert = false;
         if ($form->isSubmitted() && $form->isValid()) {
             $data = true;
+
+
+
             $entityManager->remove($inscription);
+
+            if (count($inscriptionRepository->findBy(['etudiant' => $inscription->getEtudiant()])) > 1) {
+                $showAlert = true;
+                $message = 'Nous avons supprimer cette inscription mais Implossibe de supprimer le comptae car cet étudiant à d\'autres inscriptions';
+            } else {
+                $entityManager->remove($inscription->getEtudiant());
+                $message = 'Opération effectuée avec succès';
+            }
+
             $entityManager->flush();
+
 
             $redirect = $this->generateUrl('app_inscription_etudiant_admin_index');
 
-            $message = 'Opération effectuée avec succès';
+
 
             $response = [
                 'statut'   => 1,
                 'message'  => $message,
                 'redirect' => $redirect,
-                'data' => $data
+                'data' => $data,
+                'showAlert' => $showAlert
             ];
 
             $this->addFlash('success', $message);

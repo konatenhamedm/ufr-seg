@@ -534,7 +534,7 @@ class HomeController extends AbstractController
                         ->join('p.etudiant', 'etudiant')
                         ->leftJoin('p.caissiere', 'c')
                         ->andWhere('p.classe is not null')
-                        ->orderBy('p.id', 'DESC');
+                        ->orderBy('etudiant.nom', 'ASC');
 
                     if ($classe) {
                         $qb->andWhere('classe.id = :classe')
@@ -1115,6 +1115,7 @@ class HomeController extends AbstractController
                 }
 
                 $data = true;
+                $fullRedirect = true;
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
@@ -1125,7 +1126,7 @@ class HomeController extends AbstractController
             }
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'fullRedirect'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
