@@ -24,16 +24,20 @@ class Classe
     #[ORM\ManyToOne(inversedBy: 'classes')]
     private ?AnneeScolaire $anneeScolaire = null;
 
-    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: Cours::class, orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: Cours::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $cours;
 
-    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: Inscription::class)]
+    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: Inscription::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $inscriptions;
 
-    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: Controle::class)]
+    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: Controle::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $controles;
 
-    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: BlocEcheancier::class)]
+    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: BlocEcheancier::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $blocEcheanciers;
 
 

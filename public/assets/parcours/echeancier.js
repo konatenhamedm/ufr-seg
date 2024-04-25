@@ -12,15 +12,19 @@ function refresh() {
         total = 0;
         $('.montant_echeancier').each(function(e){
       const $this = $(this);
+      if ($this.val() != '') {
+        total = total + parseInt($this.val().replaceAll(' ', ''));
+
+        }
           //somme = somme +parseInt($this.val())
-           total = total + parseInt($this.val().replaceAll(' ', ''));
+           
         })
   
          $('.col-total').text(total)
     }
 
     $('.montant_echeancier').on('update-value', function (e, val, element) {
-     
+  
         update_totaux()
        
     })
@@ -59,7 +63,7 @@ $(function () {
 
         e.preventDefault(); // évite qu'un # apparaisse dans l'URL
           $('.montant_echeancier').on('update-value', function (e, val, element) {
-     
+            //alert(val)
         update_totaux()
        
     })

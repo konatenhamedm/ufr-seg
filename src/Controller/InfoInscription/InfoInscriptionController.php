@@ -944,7 +944,7 @@ class InfoInscriptionController extends AbstractController
             'info_inscription' => $infoInscription,
         ]);
     }
-
+    const TAB_ID = 'parametre-tabs';
     #[Route('/{id}/edit', name: 'app_infoinscription_info_inscription_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
@@ -977,9 +977,9 @@ class InfoInscriptionController extends AbstractController
             /*  $redirect = $this->generateUrl('app_infoinscription_info_inscription_index', [
                 'id' => $infoInscription->getInscription()->getId()
             ]); */
-            $redirect = $this->generateUrl('app_inscription_liste_versement_index', [
+            /*  $redirect = $this->generateUrl('app_inscription_liste_versement_index', [
                 'id' => $infoInscription->getInscription()->getId()
-            ]);
+            ]); */
 
             $new_montant = (int)$form->get('montant')->getData();
             $inscription = $infoInscription->getInscription();
@@ -996,7 +996,19 @@ class InfoInscriptionController extends AbstractController
                     $service->paiementInscriptionEdit($inscription);
                 }
 
+                $url = [
+                    'url' => $this->generateUrl('app_inscription_inscription_paiement_ok', [
+                        'id' => $infoInscription->getInscription()->getId()
+                    ]),
+                    'tab' => '#module1',
+                    'current' => '#module1'
+                ];
+
+                $tabId = self::TAB_ID;
+                $redirect = $url['url'];
+
                 $data = true;
+                $load_tab = true;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
@@ -1010,7 +1022,7 @@ class InfoInscriptionController extends AbstractController
             }
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'url', 'tabId'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -1050,17 +1062,31 @@ class InfoInscriptionController extends AbstractController
 
 
 
-            $redirect = $this->generateUrl('app_inscription_liste_versement_index', [
+            /*   $redirect = $this->generateUrl('app_inscription_liste_versement_index', [
                 'id' => $infoInscription->getInscription()->getId()
             ]);
-
+ */
             $message = 'Opération effectuée avec succès';
+
+            $url = [
+                'url' => $this->generateUrl('app_inscription_inscription_paiement_ok', [
+                    'id' => $infoInscription->getInscription()->getId()
+                ]),
+                'tab' => '#module1',
+                'current' => '#module1'
+            ];
+
+            $tabId = self::TAB_ID;
+            $redirect = $url['url'];
+
 
             $response = [
                 'statut'   => 1,
                 'message'  => $message,
                 'redirect' => $redirect,
-                'data' => $data
+                'data' => $data,
+                'url' => $url,
+                'tabId' => $tabId
             ];
 
             $this->addFlash('success', $message);

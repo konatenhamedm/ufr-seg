@@ -58,6 +58,7 @@ use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -484,9 +485,24 @@ class HomeController extends AbstractController
     }
 
 
-    #[Route('/inscription/etudiant/admin', name: 'app_inscription_etudiant_admin_index', methods: ['GET', 'POST'])]
+    #[Route('/inscription/etudiant/admin', name: 'app_inscription_etudiant_admin_index', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function indexInformationAdmin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
     {
+        $classe = $request->query->get('classe');
+        //dd($niveau, $dateDebut);
+
+        $builder = $this->createFormBuilder(null, [
+            'method' => 'GET',
+            'action' => $this->generateUrl('app_inscription_etudiant_admin_index', compact('classe'))
+        ])->add('classe', EntityType::class, [
+            'class' => Classe::class,
+            'choice_label' => 'libelle',
+            'label' => 'Classe',
+            'placeholder' => '---',
+            'required' => false,
+            'attr' => ['class' => 'form-control-sm has-select2']
+        ]);
+
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'etudiant.nom'])
@@ -496,7 +512,7 @@ class HomeController extends AbstractController
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Etudiant::class,
-                'query' => function (QueryBuilder $qb) {
+                'query' => function (QueryBuilder $qb) use ($classe) {
                     $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
                         ->join('p.classe', 'classe')
@@ -506,10 +522,15 @@ class HomeController extends AbstractController
                         ->leftJoin('p.caissiere', 'c')
                         ->andWhere('p.classe is not null')
                         ->orderBy('p.id', 'DESC');
+
+                    if ($classe) {
+                        $qb->andWhere('classe.id = :classe')
+                            ->setParameter('classe', $classe);
+                    }
                 }
 
             ])
-            ->setName('dt_app_inscription_etudiant_admin');
+            ->setName('dt_app_inscription_etudiant_admin_' . $classe);
 
         $renders = [
             'edit' =>  new ActionRender(function () {
@@ -523,7 +544,7 @@ class HomeController extends AbstractController
             }),
         ];
 
-
+        $gridId = $classe;
         $hasActions = false;
 
         foreach ($renders as $_ => $cb) {
@@ -584,12 +605,16 @@ class HomeController extends AbstractController
 
 
         return $this->render('site/admin/index.html.twig', [
-            'datatable' => $table
+            'datatable' => $table,
+            'form' => $builder->getForm(),
+            'grid_id' => $gridId
         ]);
     }
     #[Route('/liste/inscription/etudiant/admin', name: 'app_liste_inscription_etudiant_admin_index', methods: ['GET', 'POST'])]
     public function indexListeInscris(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
     {
+
+
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'etudiant.nom'])
@@ -660,7 +685,8 @@ class HomeController extends AbstractController
 
 
         return $this->render('site/admin/index_liste_inscris.html.twig', [
-            'datatable' => $table
+            'datatable' => $table,
+
         ]);
     }
 
@@ -804,7 +830,7 @@ class HomeController extends AbstractController
 
                     //dd($responseRegister);
                     if ($responseRegister == true) {
-
+                        //$etudiant->setNom(strtoupper($form->get('nom')->getData()));
                         $entityManager->flush($etudiant);
 
                         $utilisateur = new Utilisateur();

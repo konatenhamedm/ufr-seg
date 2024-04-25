@@ -46,6 +46,8 @@ class InscriptionController extends AbstractController
     use FileTrait;
 
 
+
+
     public function __construct(Registry $workflow)
     {
 
@@ -1234,6 +1236,8 @@ class InscriptionController extends AbstractController
         ]);
     }
 
+    const TAB_ID = 'parametre-tabs';
+
 
     #[Route('/{id}/paiement/admin/ok', name: 'app_inscription_inscription_paiement_ok', methods: ['GET', 'POST'])]
     public function paiement(Request $request, Inscription $inscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, InfoInscriptionRepository $infoInscriptionRepository, FormError $formError, FraisInscriptionRepository $fraisRepository, EcheancierRepository $echeancierRepository, UserInterface $user, NaturePaiementRepository $naturePaiementRepository, Service $service): Response
@@ -1249,6 +1253,8 @@ class InscriptionController extends AbstractController
         ]);
 
         $data = null;
+        $url = null;
+        $tabId = null;
         $statutCode = Response::HTTP_OK;
 
         $isAjax = $request->isXmlHttpRequest();
@@ -1271,7 +1277,7 @@ class InscriptionController extends AbstractController
 
 
             //dd($inscription->getId());
-            $all_data = [
+            $allData = [
 
                 'echeanciers' => $echeanciers,
                 'date' => $date,
@@ -1287,48 +1293,34 @@ class InscriptionController extends AbstractController
 
             if ($form->isValid()) {
 
-                /*  $paiement = new InfoInscription();
-                $paiement->setUtilisateur($this->getUser());
-                $paiement->setCode($inscription->getCode());
-                $paiement->setDateValidation(new \DateTime());
-                $paiement->setInscription($inscription);
-                $paiement->setDatePaiement($all_data['date']);
-                $paiement->setCaissiere($this->getUser());
-                $paiement->setModePaiement($all_data['modePaiement']);
-                $paiement->setMontant($all_data['montant']);
-                // $paiement->setEchenacier($echeancier);
-                if ($all_data['modePaiement']->getCode() == 'CHQ') {
-                    $paiement->setNumeroCheque($all_data['numeroCheque']);
-                    $paiement->setBanque($all_data['banque']);
-                    $paiement->setTireur($all_data['tireur']);
-                    $paiement->setContact($all_data['contact']);
-                    $paiement->setDateCheque($all_data['dateCheque']);
-                }
-                if ($all_data['modePaiement']->isConfirmation()) {
-                    $paiement->setEtat('attente_confirmation');
-                } else {
-                    $paiement->setEtat('payer');
-                }
 
-                $entityManager->persist($paiement);
-                $entityManager->flush(); */
 
-                $service->paiementInscriptionNew($inscription, $all_data);
+                $service->paiementInscriptionNew($inscription, $allData);
 
-                $message       = sprintf('Opération effectuée avec succès');
+                $message = sprintf('Opération effectuée avec succès');
+
+                /*$url = [
+                    'url' => $this->generateUrl('app_config_inscription_frais_scolarite_index', [
+                        'id' => $inscription->getId()
+                    ]),
+                    'tab' => '#module0',
+                    'current' => '#module0'
+                ];
+
+                $tabId = self::TAB_ID;
+                $redirect = $url['url'];*/
                 if ($inscription->getMontant() == $inscription->getTotalPaye()) {
                     $statut = 1;
-                    $resteSurPage = 1;
+
                     $this->addFlash('success', $message);
                 } else {
                     $statut = 0;
-                    $resteSurPage = 0;
-                    //$this->addFlash('success', $message);
                 }
 
-                $showAlert = true;
-                $data = true;
 
+                $data = true;
+                $load_tab = true;
+                //$statut = 1;
 
                 $this->addFlash('success', $message);
             } else {
@@ -1342,7 +1334,7 @@ class InscriptionController extends AbstractController
             }
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'url', 'tabId'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);

@@ -65,12 +65,16 @@
                                         
                                         </td>
                                         <td class="p-2 text-end">{{ item.montant|number_format(0, '.', '.')}}</td>
-                                        <td class="p-2 text-end">{% if item.etat == 'payer' %}
+                                       
+                                        <td class="p-2 text-end">
+                                        {% if item.etat == 'payer' %}
                                              {{ item.montant|number_format(0, '.', '.')}}
                                         {% else %}
-                                             {{ item.totaPayer|number_format(0, '.', '.')}}
-                                        {% endif %}  </td>
-                                        <td class="p-2 text-end">{% if item.etat == 'payer' %}
+                                             {{ (item.montant - solde )|number_format(0, '.', '.')}}
+                                        {% endif %}  
+                                        </td>
+                                        <td class="p-2 text-end">
+                                        {% if item.etat == 'payer' %}
                                              {{ item.montant|number_format(0, '.', '.')}}
                                         {% else %}
                                              {{ solde|number_format(0, '.', '.')}}
@@ -205,7 +209,7 @@
     
 
 
-	  var elements = Array.from(document.querySelectorAll("[data-bs-stacked-modal]"));
+	 {#  var elements = Array.from(document.querySelectorAll("[data-bs-stacked-modal]"));
 
             if (elements && elements.length > 0) {
                 elements.forEach((element) => {
@@ -228,7 +232,7 @@
                         }
                     });
                 });
-            }
+            } #}
         $(function () {
 
      $('.cheque').hide()

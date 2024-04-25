@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\BlocEcheancier;
 use App\Entity\EcheancierProvisoire;
 use App\Form\DataTransformer\ThousandNumberTransformer;
+use DateTime;
 use Doctrine\DBAL\Types\IntegerType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -13,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType as TypeIntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class EcheancierProvisoireType extends AbstractType
 {
@@ -26,6 +28,11 @@ class EcheancierProvisoireType extends AbstractType
                 'label'   => false,
                 // 'format'  => 'dd/MM/yyyy',
                 'html5' => true,
+                'data'   => new DateTime(),
+
+                "constraints" => array(
+                    new NotNull(null, "S'il vous veillez renseigner la date écheancier")
+                )
                 //  'attr'    => ['autocomplete' => 'off', 'class' => 'datepicker no-auto'],
             ])
             ->add('montant', TextType::class, ['attr' => ['class' => 'input-money input-mnt montant_echeancier']])

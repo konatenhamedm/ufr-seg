@@ -169,7 +169,9 @@
             </div>
 
             <div class="row">
-                <div class="col-md-8"><button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal">Annuler</button>
+                <div class="col-md-8">
+                {# <button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal"></button> #}
+                <a class="btn btn-default btn-sm" href="{{ path('app_inscription_etudiant_admin_index') }}">Annuler</a>
                      {{ form_widget(form.save) }}
                         {% if etudiant.etat =="pas_complet" %}
                         
@@ -200,8 +202,84 @@
 <script src="{{ asset('assets/parcours/stage.js') }}"></script>
 <script src="{{ asset('assets/parcours/document.js') }}"></script>
     <script>
+(function ($) {
+    $.fn.extend({
+
+    // With every keystroke capitalize first letter of ALL words in the text
+    upperFirstAll: function() {
+        $(this).keyup(function(event) {
+            var box = event.target;
+            var txt = $(this).val();
+            var start = box.selectionStart;
+            var end = box.selectionEnd;
+
+            $(this).val(txt.toLowerCase().replace(/^(.)|(\s|\-)(.)/g,
+            function(c) {
+                return c.toUpperCase();
+            }));
+            box.setSelectionRange(start, end);
+        });
+        return this;
+    },
+
+    // With every keystroke capitalize first letter of the FIRST word in the text
+    upperFirst: function() {
+        $(this).keyup(function(event) {
+            var box = event.target;
+            var txt = $(this).val();
+            var start = box.selectionStart;
+            var end = box.selectionEnd;
+
+            $(this).val(txt.toLowerCase().replace(/^(.)/g,
+            function(c) {
+                return c.toUpperCase();
+            }));
+            box.setSelectionRange(start, end);
+        });
+        return this;
+    },
+
+    // Converts with every keystroke the hole text to lowercase
+    lowerCase: function() {
+        $(this).keyup(function(event) {
+            var box = event.target;
+            var txt = $(this).val();
+            var start = box.selectionStart;
+            var end = box.selectionEnd;
+
+            $(this).val(txt.toLowerCase());
+            box.setSelectionRange(start, end);
+        });
+        return this;
+    },
+
+    // Converts with every keystroke the hole text to uppercase
+    upperCase: function() {
+        $(this).keyup(function(event) {
+            var box = event.target;
+            var txt = $(this).val();
+            var start = box.selectionStart;
+            var end = box.selectionEnd;
+
+            $(this).val(txt.toUpperCase());
+            box.setSelectionRange(start, end);
+        });
+        return this;
+    }
+
+    });
+}(jQuery));
+
+$('#etudiant_admin_prenom').upperFirstAll()
+      $(function() { 
+            $('#etudiant_admin_nom').keyup(function() { 
+                this.value = this.value.toLocaleUpperCase(); 
+            }); 
+        }); 
 const etat = "{{etudiant.etat}}";
             const $form_content = $(`#modal-lg`).find('.place_frais');
+
+        
      function load_content(id) {
 
  let resIntervention;
