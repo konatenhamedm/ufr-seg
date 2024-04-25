@@ -36,7 +36,7 @@ class ScolariteCaissiereMenuBuilder
         }
 
         if (isset($menu[self::MODULE_NAME])) {
-            $menu->addChild('inscription', ['route' => 'app_liste_inscription_etudiant_admin_index', 'label' => ' Inscription'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_COMPTABLE');
+            $menu->addChild('inscription', ['route' => 'app_inscription_etudiant_admin_index', 'label' => ' Inscription'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_COMPTABLE');
             $menu->addChild('inscription.caissiere', ['route' => 'app_inscription_etudiant_admin_index', 'label' => ' Inscription'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_CAISSIERE');
             $menu->addChild('inscription.secretaire', ['route' => 'app_liste_inscription_etudiant_admin_index', 'label' => ' Inscription'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_SECRETAIRE');
         }
