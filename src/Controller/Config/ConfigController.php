@@ -86,7 +86,8 @@ class ConfigController extends AbstractController
                 'label' => 'PAIEMENT',
                 'icon' => 'bi bi-list',
                 'module' => 'general',
-                'href' => $this->generateUrl('app_inscription_inscription_paiement_ok', ['id' => $id])
+                'href' => $this->generateUrl('app_inscription_inscription_paiement_recapitulatif', ['id' => $id])
+                // 'href' => $this->generateUrl('app_inscription_inscription_paiement_ok', ['id' => $id])
             ],
             [
                 'label' => 'DETAIL DES VERSEMENTS',

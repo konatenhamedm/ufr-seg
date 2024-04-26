@@ -497,13 +497,13 @@ class HomeController extends AbstractController
 
 
 
-    #[Route('/admin/frais/{etat}', name: 'app_inscription_inscription_frais_index', methods: ['GET', 'POST'])]
-    public function indexListe(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, $etat): Response
+    #[Route('/admin/frais/', name: 'app_inscription_inscription_frais_index', methods: ['GET', 'POST'])]
+    public function indexListe(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
         $isRoleFind = $this->isGranted('ROLE_SECRETAIRE');
         $isRoleAdminFind = $this->isGranted('ROLE_ADMIN');
-        // $etat = 'valide';
+        $etat = 'valide';
 
 
         $table = $dataTableFactory->create()
@@ -544,7 +544,7 @@ class HomeController extends AbstractController
                     ->setParameter('etat', $etat);
             }
         ])
-            ->setName('dt_app_inscription_inscription_frais' . $etat);
+            ->setName('dt_app_inscription_inscription_frais');
 
         $renders = [
             /* 'edit' =>  new ActionRender(function () {

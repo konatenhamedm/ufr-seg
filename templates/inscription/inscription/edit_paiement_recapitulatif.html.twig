@@ -1,0 +1,182 @@
+{% block page_content %}
+
+    <div class="modal-body corp ">
+    {# g-5 g-xl-8 #}
+     <div class="row ">
+                    <div class="col-xl-12 col-md-12">
+                        <!--begin::Tables Widget 3-->
+                        <div class="card card-xl-stretch mb-xl-12" >
+                            <!--begin::Header-->
+                             <div class="card-header border-0 p-1" style="border-bottom:1px solid white;background: #3a4049;min-height: 50px !important;">
+                                <h3 class="card-title align-items-start flex-column text-white">
+                                <span class="card-label fw-bold fs-3 mb-1 text-white">
+
+                                         POINT SUR L'ECHEANCIER
+
+                                </span>
+                                </h3>
+                                
+                                    <a title="Modification" href="{{ path('app_inscription_inscription_paiement_ok',{'id':inscription.id }) }}" class="btn btn-primary btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2"><i class="bi bi-pen text-light"></i>
+                                    Faire un versement
+                                    </a>
+
+
+
+                            </div>
+                            <!--end::Header-->
+
+                            <!--begin::Body-->
+                            <div class="card-body py-3 " style="padding: 0px;">
+                                <!--begin::Table container-->
+        
+         
+                            {# {% set difference = date(ligne.dateFin| date() ).diff(date( "now" | date())) %} #}
+    
+                                
+                                <table class="table table-bordered table-custom">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th width="40%" class="p-2">Dates buttoir</th>
+                                                <th width="40%" class="p-2">Montant à payer</th>
+                                                <th width="40%" class="p-2">Total payé</th>
+                                                <th width="20%" class="p-2">solde</th>
+                                                <th width="20%" class="p-2">Statut</th>
+                                            </tr>
+                                        </thead>
+                                    {# Statut (on mettra ici la mention et aussi un code de couleur : rouge quand la date prévue est passée et que l’échéancier n’a pas été soldé. Vert quand c’est soldé.)
+                                    #}
+                                        <tbody  class="row-">
+                                            {% set jour = 0 %}
+                                            {% set somme = 0 %}
+                                        {% for item in echeanciers %}
+                                            {% set difference = date( "now" | date()).diff(date(item.dateCreation| date())) %}
+                                            {% set leftDays = difference.days %}
+                                            {% set solde = item.montant - item.totaPayer %}
+
+                                                    <tr class="row-colonne even pointer table-light">
+                                        <td class="p-2">
+                                            {{ item.dateCreation|date("m/d/Y") }}
+                                        
+                                        </td>
+                                        <td class="p-2 text-end">{{ item.montant|number_format(0, '.', '.')}}</td>
+                                       
+                                        <td class="p-2 text-end">
+                                        {% if item.etat == 'payer' %}
+                                             {{ item.montant|number_format(0, '.', '.')}}
+                                        {% else %}
+                                             {{ (item.montant - solde )|number_format(0, '.', '.')}}
+                                        {% endif %}  
+                                        </td>
+                                        <td class="p-2 text-end">
+                                        {% if item.etat == 'payer' %}
+                                             {{ '0'|number_format(0, '.', '.')}}
+                                        {% else %}
+                                             {{ solde|number_format(0, '.', '.')}}
+                                        {% endif %}  </td>
+                                        <td class="p-2 text-center" {% if (jour == 0 or jour < 0) and item.etat !='payer' %}
+                                            style="color: red;font-weight:bolder"
+                                        {% else %}
+                                            style="color: green;font-weight:bolder"
+                                        {% endif %}>{% if item.etat == 'pas_payer' %}
+                                        {{ ' NON SOLDé'|upper }}
+                                        {% elseif item.etat == 'attente_confirmation' %}
+                                         {{ ' Attente confirmation'|upper }}
+
+                                        {% else %}
+                                            {{ ' Payée'|upper }}
+                                        {% endif %}  </td>
+                                    {#  <td class="p-2"></td> #}
+                                    </tr>
+                                    {% set somme = somme + item.montant %}
+                                        {% endfor %}
+                                    
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th class="text-end p-2">TOTAL</th>
+                                                <th class="total text-end p-2 fw-bolder total">{{ somme|number_format(0, '.', '.') }} </td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-end p-2" style="color: red;font-weight:bolder">TOTAL PAYE</th>
+                                                <th class="total-saisi text-end p-2 fw-bolder total" style="color: red;font-weight:bolder">{{ inscription.totalPaye|number_format(0, '.', '.') }} </td>
+                                            </tr>
+                                        </tfoot>
+                                </table>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <!--begin::Col-->
+                
+                </div>
+
+        
+
+
+    </div>
+ 
+{% endblock %}
+
+{% block java %}
+    <script>
+    
+
+
+	  var elements = Array.from(document.querySelectorAll("[data-bs-stacked-modal]"));
+
+            if (elements && elements.length > 0) {
+                elements.forEach((element) => {
+                    if (element.getAttribute("data-kt-initialized") === "1" ) {
+                        return;
+                    }
+
+                    const url = element.getAttribute('href');
+                    element.setAttribute("data-kt-initialized", "1");
+
+
+                    element.addEventListener("click", function(e) {
+                        e.preventDefault();
+
+                        const modalEl = document.querySelector(this.getAttribute("data-bs-stacked-modal"));
+
+                        if (modalEl) {
+                            const modal = new bootstrap.Modal(modalEl);
+                            modal.show(element);
+                        }
+                    });
+                });
+            }
+        $(function () {
+
+     $('.cheque').hide()
+
+             $('#inscription_payement_modePaiement').on('change',function(){
+                 const $this = $(this);
+                const current_value = $this.find('option:selected').attr('data-value');
+                if(current_value == 'CHQ'){
+                     $('.cheque').show()
+                }else{
+                     $('.cheque').hide()
+                }
+            })
+            
+
+           
+            init_select2('select',null,'.config_form');
+           
+            init_select2('select', null, '.corp');
+            $('.no-auto').each(function () {
+                const $this = $(this);
+                const $id = $('#' + $this.attr('id'));
+                init_date_picker($id,  'down', (start, e) => {
+                    //$this.val(start.format('DD/MM/YYYY'));
+                }, null, null, false);
+
+                $id.on('apply.daterangepicker', function (ev, picker) {
+                    $(this).val(picker.startDate.format('DD/MM/YYYY'));
+                });
+            });
+        });
+
+    </script>
+{% endblock %}

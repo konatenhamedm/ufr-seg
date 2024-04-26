@@ -1238,6 +1238,18 @@ class InscriptionController extends AbstractController
 
     const TAB_ID = 'parametre-tabs';
 
+    #[Route('/{id}/paiement/admin/recapitulatif', name: 'app_inscription_inscription_paiement_recapitulatif', methods: ['GET', 'POST'])]
+    public function paiementRecapitulatif(Request $request, Inscription $inscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, InfoInscriptionRepository $infoInscriptionRepository, FormError $formError, FraisInscriptionRepository $fraisRepository, EcheancierRepository $echeancierRepository, UserInterface $user, NaturePaiementRepository $naturePaiementRepository, Service $service): Response
+    {
+
+
+        return $this->render('inscription/inscription/edit_paiement_recapitulatif.html.twig', [
+            'inscription' => $inscription,
+            'echeanciers' => $echeancierRepository->findBy(array('inscription' => $inscription->getId())),
+            'versements' => $infoInscriptionRepository->findBy(['inscription' => $inscription]),
+        ]);
+    }
+
 
     #[Route('/{id}/paiement/admin/ok', name: 'app_inscription_inscription_paiement_ok', methods: ['GET', 'POST'])]
     public function paiement(Request $request, Inscription $inscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, InfoInscriptionRepository $infoInscriptionRepository, FormError $formError, FraisInscriptionRepository $fraisRepository, EcheancierRepository $echeancierRepository, UserInterface $user, NaturePaiementRepository $naturePaiementRepository, Service $service): Response
@@ -1255,6 +1267,7 @@ class InscriptionController extends AbstractController
         $data = null;
         $url = null;
         $tabId = null;
+        $statut = null;
         $statutCode = Response::HTTP_OK;
 
         $isAjax = $request->isXmlHttpRequest();
@@ -1299,8 +1312,8 @@ class InscriptionController extends AbstractController
 
                 $message = sprintf('Opération effectuée avec succès');
 
-                /*$url = [
-                    'url' => $this->generateUrl('app_config_inscription_frais_scolarite_index', [
+                $url = [
+                    'url' => $this->generateUrl('app_inscription_inscription_paiement_recapitulatif', [
                         'id' => $inscription->getId()
                     ]),
                     'tab' => '#module0',
@@ -1308,19 +1321,19 @@ class InscriptionController extends AbstractController
                 ];
 
                 $tabId = self::TAB_ID;
-                $redirect = $url['url'];*/
-                if ($inscription->getMontant() == $inscription->getTotalPaye()) {
+                $redirect = $url['url'];
+                /*    if ($inscription->getMontant() == $inscription->getTotalPaye()) {
                     $statut = 1;
 
                     $this->addFlash('success', $message);
                 } else {
                     $statut = 0;
-                }
+                } */
 
 
                 $data = true;
                 $load_tab = true;
-                //$statut = 1;
+                $statut = 1;
 
                 $this->addFlash('success', $message);
             } else {

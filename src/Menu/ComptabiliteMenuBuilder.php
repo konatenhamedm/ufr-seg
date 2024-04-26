@@ -40,8 +40,8 @@ class ComptabiliteMenuBuilder
         if (isset($menu[self::MODULE_NAME])) {
 
             $menu->addChild('parametre.index', ['route' => 'app_parametre_preinscription_index', 'label' => 'Préinscriptions'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_CAISSIERE');
-            $menu->addChild('personne.index', ['route' => 'app_config_frais_gestion_index', 'label' => 'Frais de scolarité'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_CAISSIERE');
-            // $menu->addChild('personne.index', ['route' => 'app_inscription_inscription_frais_index', 'label' => 'Frais de scolarité'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_CAISSIERE');
+            //$menu->addChild('personne.index', ['route' => 'app_config_frais_gestion_index', 'label' => 'Frais de scolarité'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_CAISSIERE');
+            $menu->addChild('personne.index', ['route' => 'app_inscription_inscription_frais_index', 'label' => 'Frais de scolarité'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_CAISSIERE');
             $menu->addChild('paiement', ['route' => 'app_config_preinscription_point_paiement_index', 'label' => 'Point des paiements'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_SECRETAIRE');
             $menu->addChild('cheque', ['route' => 'app_config_preinscription_point_paiement_cheque_index', 'label' => 'Paiements à confirmer'])->setExtra('icon', 'bi bi-cash')->setExtra('role', 'ROLE_CAISSIERE');
             if (!$this->user->hasRoleIn("ROLE_ADMIN")) {
