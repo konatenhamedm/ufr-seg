@@ -79,6 +79,9 @@ class InfoInscription
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateValidation = null;
 
+    #[ORM\ManyToOne(inversedBy: 'infoInscriptions')]
+    private ?TypeFrais $typeFrais = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -273,6 +276,18 @@ class InfoInscription
     public function setDateValidation(?\DateTimeInterface $dateValidation): static
     {
         $this->dateValidation = $dateValidation;
+
+        return $this;
+    }
+
+    public function getTypeFrais(): ?TypeFrais
+    {
+        return $this->typeFrais;
+    }
+
+    public function setTypeFrais(?TypeFrais $typeFrais): static
+    {
+        $this->typeFrais = $typeFrais;
 
         return $this;
     }

@@ -44,14 +44,16 @@ class InfoInscriptionController extends AbstractController
     {
         $table = $dataTableFactory->create()
             ->add('mode', TextColumn::class, ['label' => 'Mode Paiement', 'field' => 'mode.libelle'])
+            ->add('typeFrais', TextColumn::class, ['label' => 'Type Frais', 'field' => 'type.libelle'])
             ->add('datePaiement', DateTimeColumn::class, ['label' => 'Date de paiement', 'format' => 'd-m-Y', 'searchable' => false])
             ->add('montant', TextColumn::class, ['label' => 'Montant',])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => InfoInscription::class,
                 'query' => function (QueryBuilder $qb) use ($id) {
-                    $qb->select('u, mode,inscription')
+                    $qb->select('u, mode,inscription,type')
                         ->from(InfoInscription::class, 'u')
                         ->join('u.modePaiement', 'mode')
+                        ->join('u.typeFrais', 'type')
                         ->join('u.inscription', 'inscription')
                         ->andWhere('u.etat = :etat')
                         ->andWhere('inscription.id = :id')

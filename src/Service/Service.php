@@ -208,6 +208,7 @@ class Service
         $paiement->setCaissiere($this->getUser());
         $paiement->setModePaiement($data['modePaiement']);
         $paiement->setMontant($data['montant']);
+        $paiement->setTypeFrais($data['typeFrais']);
         // $paiement->setEchenacier($echeancier);
         if ($data['modePaiement']->getCode() == 'CHQ') {
             $paiement->setNumeroCheque($data['numeroCheque']);

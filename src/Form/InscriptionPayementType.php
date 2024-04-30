@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Inscription;
 use App\Entity\NaturePaiement;
+use App\Entity\TypeFrais;
 use App\Form\DataTransformer\ThousandNumberTransformer;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -41,6 +42,19 @@ class InscriptionPayementType extends AbstractType
                 },
                 'choice_label' => 'libelle',
                 'label' => 'Mode de paiement',
+                'attr' => ['class' => 'has-select2 form-select']
+            ])
+            ->add('typeFrais', EntityType::class, [
+                'class' => TypeFrais::class,
+                'required' => true,
+                'mapped' => false,
+                'placeholder' => '----',
+                'label_attr' => ['class' => 'label-required mode'],
+                'choice_attr' => function (TypeFrais $typeFrais) {
+                    return ['data-value' => $typeFrais->getCode()];
+                },
+                'choice_label' => 'libelle',
+                'label' => 'Type frais',
                 'attr' => ['class' => 'has-select2 form-select']
             ])
             ->add('banque', TextType::class, ['mapped' => false, 'label' => 'Banque', "constraints" => array(

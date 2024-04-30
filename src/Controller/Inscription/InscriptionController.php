@@ -20,6 +20,7 @@ use App\Repository\InfoInscriptionRepository;
 use App\Repository\InfoPreinscriptionRepository;
 use App\Repository\InscriptionRepository;
 use App\Repository\NaturePaiementRepository;
+use App\Repository\TypeFraisRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use App\Service\Omines\Column\NumberFormatColumn;
@@ -1252,7 +1253,7 @@ class InscriptionController extends AbstractController
 
 
     #[Route('/{id}/paiement/admin/ok', name: 'app_inscription_inscription_paiement_ok', methods: ['GET', 'POST'])]
-    public function paiement(Request $request, Inscription $inscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, InfoInscriptionRepository $infoInscriptionRepository, FormError $formError, FraisInscriptionRepository $fraisRepository, EcheancierRepository $echeancierRepository, UserInterface $user, NaturePaiementRepository $naturePaiementRepository, Service $service): Response
+    public function paiement(Request $request, TypeFraisRepository $typeFraisRepository, Inscription $inscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, InfoInscriptionRepository $infoInscriptionRepository, FormError $formError, FraisInscriptionRepository $fraisRepository, EcheancierRepository $echeancierRepository, UserInterface $user, NaturePaiementRepository $naturePaiementRepository, Service $service): Response
     {
 
 
@@ -1284,7 +1285,8 @@ class InscriptionController extends AbstractController
 
             $echeanciers = $echeancierRepository->findAllEcheance($inscription->getId());
             $date = $form->get('datePaiement')->getData();
-            $mode =   $mode = $naturePaiementRepository->find($form->get('modePaiement')->getData()->getId());
+            $mode =  $naturePaiementRepository->find($form->get('modePaiement')->getData()->getId());
+            $type =  $typeFraisRepository->find($form->get('typeFrais')->getData()->getId());
 
             $montant = (int) $form->get('montant')->getData();
 
@@ -1295,6 +1297,7 @@ class InscriptionController extends AbstractController
                 'echeanciers' => $echeanciers,
                 'date' => $date,
                 'modePaiement' => $mode,
+                'typeFrais' => $type,
                 'montant' => $montant,
                 'numeroCheque' => $form->get('numeroCheque')->getData(),
                 'banque' => $form->get('banque')->getData(),
