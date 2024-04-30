@@ -146,7 +146,7 @@ tr:nth-child(even) {
                   <tr style=" border: 0px !important;">
                     <th style=" border: 0px !important;">Code : {{ data.code }}</th>
                     <th style=" border: 0px !important;">Nom :{{ data.etudiant.nom }}</th>
-                    <th style=" border: 0px !important;">Filière :{{ data.niveau.libelle }}</th>
+                    <th style=" border: 0px !important;">Niveau :{{ data.niveau.libelle }}</th>
                   </tr>
                   <tr style=" border: 0px !important;">
                     <td style=" border: 0px !important;">Date inscription :{{ data.dateInscription | date('d/m/Y') }}</td>
@@ -197,6 +197,7 @@ tr:nth-child(even) {
                     <th>Date</th>
                     <th>Montant à payer</th>
                     <th>Montant versé</th>
+                    {# <th>Mode paiement</th> #}
                     <th>Solde</th>
                   </tr>
 
@@ -217,6 +218,7 @@ tr:nth-child(even) {
                     {% else %}
                       {{ item.totaPayer |number_format(0, '.', ' ') }}
                     {% endif %}</td>
+                   {#  <td>{{ item.modePaiement.libelle }}</td> #}
                     <td>{% if item.etat == 'payer' %}
                         0
                          {% elseif item.etat == 'attente_confirmation' %}

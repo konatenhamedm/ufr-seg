@@ -10,10 +10,12 @@ use App\Entity\Echeancier;
 use App\Entity\EcheancierProvisoire;
 use App\Entity\Employe;
 use App\Entity\Etudiant;
+use App\Entity\Filiere;
 use App\Entity\Fonction;
 use App\Entity\InfoEtudiant;
 use App\Entity\InfoInscription;
 use App\Entity\Inscription;
+use App\Entity\Niveau;
 use App\Entity\NiveauEtudiant;
 use App\Entity\Pays;
 use App\Entity\Preinscription;
@@ -106,6 +108,73 @@ class HomeController extends AbstractController
             $nb = $nb + 1;
         }
         return ($code . '-' . date("y") . '-' . str_pad($nb, 3, '0', STR_PAD_LEFT));
+    }
+
+
+    #[Route('/liste/niveau/par/filiere/{id}',  methods: ['GET'])]
+    public function getNiveau(Request $request, NiveauRepository  $niveauRepository, $id)
+    {
+        $response = new Response();
+        $tabNiveaux = array();
+
+
+        // $id = $request->get('id');
+
+        if ($id) {
+
+
+            $niveaux = $niveauRepository->findBy(['filiere' => $id]);
+            // dd($frais);
+
+            $i = 0;
+
+            foreach ($niveaux as $e) {
+                // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
+                $tabNiveaux[$i]['id'] = $e->getId();
+                $tabNiveaux[$i]['libelle'] = $e->getLibelle();
+
+
+                $i++;
+            }
+
+            $dataService = json_encode($tabNiveaux); // formater le résultat de la requête en json
+
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent($dataService);
+        }
+        return $response;
+    }
+    #[Route('/liste/classe/par/niveau/{id}',  methods: ['GET'])]
+    public function getClasse(Request $request, ClasseRepository  $classeRepository, $id)
+    {
+        $response = new Response();
+        $tabClasse = array();
+
+
+        // $id = $request->get('id');
+
+        if ($id) {
+
+
+            $classes = $classeRepository->findBy(['niveau' => $id]);
+            // dd($frais);
+
+            $i = 0;
+
+            foreach ($classes as $e) {
+                // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
+                $tabClasse[$i]['id'] = $e->getId();
+                $tabClasse[$i]['libelle'] = $e->getLibelle();
+
+                $i++;
+            }
+
+            $dataService = json_encode($tabClasse); // formater le résultat de la requête en json
+
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent($dataService);
+        }
+        return $response;
     }
 
     #[Route(path: '/', name: 'site_home', methods: ['GET', 'POST'])]
@@ -502,11 +571,13 @@ class HomeController extends AbstractController
     public function indexInformationAdmin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
     {
         $classe = $request->query->get('classe');
-        //dd($niveau, $dateDebut);
+        $niveau = $request->query->get('niveau');
+        $filiere = $request->query->get('filiere');
+        // dd($niveau, $filiere);
 
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
-            'action' => $this->generateUrl('app_inscription_etudiant_admin_index', compact('classe'))
+            'action' => $this->generateUrl('app_inscription_etudiant_admin_index', compact('classe', 'niveau', 'filiere')),
         ])->add('classe', EntityType::class, [
             'class' => Classe::class,
             'choice_label' => 'libelle',
@@ -514,7 +585,23 @@ class HomeController extends AbstractController
             'placeholder' => '---',
             'required' => false,
             'attr' => ['class' => 'form-control-sm has-select2']
-        ]);
+        ])
+            ->add('niveau', EntityType::class, [
+                'class' => Niveau::class,
+                'choice_label' => 'libelle',
+                'label' => 'Niveau',
+                'placeholder' => '---',
+                'required' => false,
+                'attr' => ['class' => 'form-control-sm has-select2']
+            ])
+            ->add('filiere', EntityType::class, [
+                'class' => Filiere::class,
+                'choice_label' => 'libelle',
+                'label' => 'Filiere',
+                // 'placeholder' => '---',
+                'required' => false,
+                'attr' => ['class' => 'form-control-sm has-select2']
+            ]);
 
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
@@ -525,7 +612,7 @@ class HomeController extends AbstractController
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Etudiant::class,
-                'query' => function (QueryBuilder $qb) use ($classe) {
+                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau) {
                     $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
                         ->join('p.classe', 'classe')
@@ -536,14 +623,26 @@ class HomeController extends AbstractController
                         ->andWhere('p.classe is not null')
                         ->orderBy('etudiant.nom', 'ASC');
 
-                    if ($classe) {
-                        $qb->andWhere('classe.id = :classe')
-                            ->setParameter('classe', $classe);
+                    //dd($classe, $niveau, $filiere);
+
+                    if ($classe || $niveau || $filiere) {
+                        if ($classe) {
+                            $qb->andWhere('classe.id = :classe')
+                                ->setParameter('classe', $classe);
+                        }
+                        if ($niveau) {
+                            $qb->andWhere('niveau.id = :niveau')
+                                ->setParameter('niveau', $niveau);
+                        }
+                        if ($filiere) {
+                            $qb->andWhere('filiere.id = :filiere')
+                                ->setParameter('filiere', $filiere);
+                        }
                     }
                 }
 
             ])
-            ->setName('dt_app_inscription_etudiant_admin_' . $classe);
+            ->setName('dt_app_inscription_etudiant_admin_' . $classe . '_' . $niveau . '_' . $filiere);
 
         $renders = [
             'edit' =>  new ActionRender(function () {
@@ -557,7 +656,7 @@ class HomeController extends AbstractController
             }),
         ];
 
-        $gridId = $classe;
+        $gridId = $classe . '_' . $niveau . '_' . $filiere;
         $hasActions = false;
 
         foreach ($renders as $_ => $cb) {

@@ -146,12 +146,12 @@ tr:nth-child(even) {
                   <tr style=" border: 0px !important;">
                     <th style=" border: 0px !important;">Code : {{ data.code }}</th>
                     <th style=" border: 0px !important;">Nom :{{ data.etudiant.nom }}</th>
-                    <th style=" border: 0px !important;">Filière :{{ data.niveau.filiere.libelle }}</th>
+                    <th style=" border: 0px !important;">Niveau :{{ data.niveau.libelle }}</th>
                   </tr>
                   <tr style=" border: 0px !important;">
                     <td style=" border: 0px !important;">Date inscription :{{ data.dateInscription | date('d/m/Y') }}</td>
                     <td style=" border: 0px !important;">Prénoms :{{ data.etudiant.prenom  }}</td>
-                    <td style=" border: 0px !important;">Niveau :{{ data.niveau.libelle }}</td>
+                    <td style=" border: 0px !important;">Classe :{{ data.classe.libelle }}</td>
                   </tr>
                 
                  
@@ -251,6 +251,7 @@ tr:nth-child(even) {
                   <tr style="background-color: #dddddd">
                     <th>N°</th>
                     <th>Date</th>
+                    {# <th>Mode paiement</th> #}
                     <th>Montant à payer</th>
                     <th>Montant versé</th>
                     <th>Solde</th>
@@ -266,6 +267,7 @@ tr:nth-child(even) {
                      <tr>
                        <td>{{ key+1 }}</td>
                     <td>{{ item.dateCreation | date('d/m/Y')}}</td>
+                    {# <td>{{ item.modePaiement.libelle }}</td> #}
                     <td class="text-end">{{ item.montant |number_format(0, '.', ' ') }}</td>
                     <td>{% if item.etat == 'payer' %}
                       {{ item.totaPayer |number_format(0, '.', ' ') }}
