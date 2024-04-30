@@ -79,7 +79,7 @@ class PreinscriptionController extends AbstractController
                 [
                     'label' => 'PAIEMENTS SCOLARITE',
                     'id' => 'param_scolarite',
-                    'href' => $this->generateUrl('app_comptabilite_inscription_index')
+                    'href' => $this->generateUrl('app_comptabilite_paiement_scolarite_index')
                 ],
                 /*, [
                     'label' => 'Attente confirmation',

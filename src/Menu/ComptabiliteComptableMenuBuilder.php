@@ -41,13 +41,17 @@ class ComptabiliteComptableMenuBuilder
 
             $menu->addChild('parametre.index', ['route' => 'app_parametre_preinscription_index', 'label' => 'Préinscriptions'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_COMPTABLE');
             // $menu->addChild('personne.index', ['route' => 'app_config_frais_gestion_index', 'label' => 'Frais de scolarité'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_COMPTABLE');
-            $menu->addChild('personne.index', ['route' => 'app_inscription_inscription_frais_index', 'label' => 'Frais de scolarité'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_CAISSIERE');
+            $menu->addChild('personne.index', ['route' => 'app_inscription_inscription_frais_index', 'label' => 'Frais de scolarité non soldés'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_CAISSIERE');
+            $menu->addChild('solde', ['route' => 'app_inscription_inscription_frais_solde_index', 'label' => 'Frais de scolarité soldés'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_CAISSIERE');
+            $menu->addChild('personne.index', ['route' => 'app_inscription_inscription_frais_index', 'label' => 'Frais de scolarité non soldés'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_COMPTABLE');
+            $menu->addChild('solde', ['route' => 'app_inscription_inscription_frais_solde_index', 'label' => 'Frais de scolarité soldés'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_COMPTABLE');
+
             $menu->addChild('paiement', ['route' => 'app_config_preinscription_point_paiement_index', 'label' => 'Point des paiements'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_COMPTABLE');
             $menu->addChild('cheque', ['route' => 'app_config_preinscription_point_paiement_cheque_index', 'label' => 'Paiements à confirmer'])->setExtra('icon', 'bi bi-cash')->setExtra('role', 'ROLE_COMPTABLE');
-            // if (!$this->user->hasRoleIn("ROLE_ADMIN")) {
+            if (!$this->user->hasRoleIn("ROLE_COMPTABLE")) {
 
-            $menu->addChild('cheque_secretaire', ['route' => 'app_config_preinscription_point_paiement_cheque_index', 'label' => 'Paiements à confirmer'])->setExtra('icon', 'bi bi-cash')->setExtra('role', 'ROLE_COMPTABLE');
-            // }
+                $menu->addChild('cheque_secretaire', ['route' => 'app_config_preinscription_point_paiement_cheque_index', 'label' => 'Paiements à confirmer'])->setExtra('icon', 'bi bi-cash')->setExtra('role', 'ROLE_COMPTABLE');
+            }
         }
 
         return $menu;

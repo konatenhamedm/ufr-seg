@@ -118,7 +118,7 @@ tr:nth-child(even) {
        <div style="width:65%;text-align:right;float:center;">
             <div style="text-align:center;"  class="">
                     <b>UFR-SEG</b><br>
-                  22 BP 1484 Abidjan 2 - Tél : 27 22 49 60 49 - ufrseg@yahoo.com <br>
+                  BP V 43 ABIDJAN ,TEL :01 01 15 44 44  ufrseg-filierespro-ufhb.ci <br>
                   Abidjan-Cocody
                <div style="border-top:1px solid #000"></div>
               </div>
@@ -129,7 +129,7 @@ tr:nth-child(even) {
            <div style="text-align:center;margin-top:-45px"  class="">
                     République de COTE D'IVOIRE <br>
                 <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
-               <b style="font-weight: bolder;">Année scolaire : 2021-2022</b>
+               <b style="font-weight: bolder;">Année scolaire : {{ data.classe.anneeScolaire.libelle}}</b>
               </div>
           
         </div>
@@ -251,38 +251,20 @@ tr:nth-child(even) {
 </div><br>
   <div style="border-top:20px solid grey"></div><br>
 
-{#  <div class="clearfix">
-       <div style="width:70%;text-align:left;float:left;padding-left: 0px;">
-         <table>
-              <caption>
-               <b>Modalités de versement</b><br>
-              </caption> 
-                  <tr >
-                    <th style="background-color: #dddddd;border:1px solide black;">N</th>
-                      {% for key,item in 1..4 %}
-                         <td>{{key+1}}</td>
-                 
-                      {% endfor %}
-                  </tr>
-                  <tr>
-                   <th style="background-color: #dddddd;border:1px solide black;">Date</th>
-                    {% for item in 1..4 %}
-                         <td>{{"12/02/2024"}}</td>
-                  
-                      {% endfor %}
-                  </tr>
-                  <tr>
-                    <th style="background-color: #dddddd;border:1px solide black;">Montant</th>
-                    {% for item in 1..4 %}
-                         <td>{{"12 0000"}}</td>
-                  
-                      {% endfor %}
-                  </tr>
-                
-                 
-          </table>
-        </div>
-</div> #}
+  <div style="width:40%;text-align:left;float:left;padding-right: 0px;">
+  
+  </div>
+  <div style="width:58%;text-align:right;float:right;">
+  <h2><u>Signature comptable</u></h2>
+  </div>
+
+  <br><br><br><br><br><br><br>  <br><br><br>
+
+<div>
+ <p style="text-align: center;"><strong>NB : {{ 'Les montants déjà payés ne sont plus rembousables. ILS NE SONT PAS TRANSFERABLES NON PLUS SUR UN AUTRE ETUDIANT OU UNE AUTRE FILIERE. MERCI DE VOTRE COMPREHENSION' | upper}}</strong></p>
+</div>
+
+
 
 </div>
     
@@ -300,8 +282,8 @@ tr:nth-child(even) {
         <div style="border-top:2px solid #000"></div>
        <p  align="center" style="align: center;margin-top:-1px">
         COCODY ECOLE POLICEI - 01 BP 5889 Abidjan 01 - e-mail: 
-        <a href="mailto:ufr@gmail.com">ufr@gmail.com</a><br>
-        Tél: +225 21 27 53 50 FAX.: +225 21 27 53 29 - Fax: (225) 21 27 53 29 - RC: 236319
+        <a href="mailto:ufrseg-filierespro-ufhb.ci">ufrseg-filierespro-ufhb.ci</a><br>
+        TEL :01 01 15 44 44
        </p>
     </htmlpagefooter>
   </body>

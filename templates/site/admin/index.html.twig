@@ -109,7 +109,8 @@
      
 
       loadDataTable($old_grid, null,null,null, {{ datatable_settings(datatable) }});
-
+      load_content($niveau.val(),false)
+      load_content($filiere.val(),true)
      $classe.on('change', function (e) {
       
         const $this = $(this);
@@ -118,7 +119,7 @@
         //alert($dateDebut.val());
          //loadDataTableBene($old_gride, $this.val(),$niveau.val(),$filiere.val(), {{ datatable_settings(datatable) }});
          load_grid_data(null, $this, $this.val(),$niveau.val(),$filiere.val());
-         load_content($filiere.val(),'')
+         //load_content($filiere.val(),'')
       });
        $filiere.on('change', function (e) {
       
@@ -134,12 +135,6 @@
          load_content($this.val(),false)
       });
 
-
-      /*$('.btn-filter').on('click', function (e) {
-        e.preventDefault();
-        const $this = $(this);
-        load_grid_data($form, $this, $classe.val());
-      });*/
 
       function load_content(id,type) {
                if(type == true){

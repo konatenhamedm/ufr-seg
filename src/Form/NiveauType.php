@@ -66,7 +66,7 @@ class NiveauType extends AbstractType
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
                         ->innerJoin('c.fonction', 'f')
-                        ->andWhere('f.code =:code')
+                        ->andWhere('f.code = :code')
                         ->setParameter('code', 'DR')
                         ->orderBy('c.id', 'ASC');
                 },

@@ -135,7 +135,7 @@ class ConfigController extends AbstractController
                 'label' => 'PAIEMENTS SCOLARITE',
                 'icon' => 'bi bi-list',
                 'module' => 'gestion',
-                'href' => $this->generateUrl('app_comptabilite_inscription_index')
+                'href' => $this->generateUrl('app_comptabilite_paiement_scolarite_index')
             ]
         ];
 

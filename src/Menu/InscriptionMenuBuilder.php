@@ -31,7 +31,7 @@ class InscriptionMenuBuilder
     {
         $menu = $this->factory->createItem('root');
         $menu->setExtra('module', self::MODULE_NAME);
-        if ($this->user->hasRoleInExept("ROLE_CAISSIERE") ||  $this->user->hasRoleInExept('ROLE_SECRETAIRE')) {
+        if ($this->user->hasRoleInExept('ROLE_SECRETAIRE')) {
             $menu->addChild(self::MODULE_NAME, ['label' => 'Inscriptions']);
         }
 

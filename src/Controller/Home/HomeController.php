@@ -497,7 +497,7 @@ class HomeController extends AbstractController
 
 
 
-    #[Route('/admin/frais/', name: 'app_inscription_inscription_frais_index', methods: ['GET', 'POST'])]
+    #[Route('/admin/frais', name: 'app_inscription_inscription_frais_index', methods: ['GET', 'POST'])]
     public function indexListe(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
@@ -656,6 +656,127 @@ class HomeController extends AbstractController
             'datatable' => $table,
             'etat' => $etat,
             'type' => 'frais',
+            //'titre' => $etat == 'valide' ? : 'liste des frais',
+        ]);
+    }
+    #[Route('/admin/frais/solde', name: 'app_inscription_inscription_frais_solde_index', methods: ['GET', 'POST'])]
+    public function indexListeFraisSolde(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    {
+        $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
+        $isRoleFind = $this->isGranted('ROLE_SECRETAIRE');
+        $isRoleAdminFind = $this->isGranted('ROLE_ADMIN');
+        $etat = 'solde';
+
+
+        $table = $dataTableFactory->create()
+            ->add('code', TextColumn::class, ['label' => 'Code étudiant'])
+            ->add('niveau', TextColumn::class, ['field' => 'niveau.code', 'label' => 'Code Niveau'])
+            ->add('classe', TextColumn::class, ['field' => 'classe.libelle', 'label' => 'Classe']);
+
+        if (!$isEtudiant) {
+            $table->add('nom', TextColumn::class, ['field' => 'etudiant.nom', 'visible' => false])
+                ->add('prenom', TextColumn::class, ['field' => 'etudiant.prenom', 'visible' => false])
+                ->add('nom_prenom', TextColumn::class, ['label' => 'Nom et prénoms étudiant', 'render' => function ($value, Inscription $inscription) {
+                    return $inscription->getEtudiant()->getNomComplet();
+                }]);
+        }
+        // if ($etat == 'valide') {
+        $table->add('montant', NumberFormatColumn::class, ['label' => 'Montant à payer', 'field' => 'p.montant'])
+            ->add('solde', TextColumn::class, ['label' => 'Solde', 'render' => function ($value, Inscription $inscription) {
+                return (int)$inscription->getMontant() - (int)$inscription->getTotalPaye();
+            }]);
+        //  $table->add('datePaiement', DateTimeColumn::class, ['label' => 'Date de paiement', 'field' => 'p.datePaiement', 'format' => 'd-m-Y']);
+        // }
+        $table->createAdapter(ORMAdapter::class, [
+            'entity' => Inscription::class,
+            'query' => function (QueryBuilder $qb) use ($user, $etat) {
+                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                    ->from(Inscription::class, 'p')
+                    ->join('p.niveau', 'niveau')
+                    ->join('p.classe', 'classe')
+                    ->join('niveau.filiere', 'filiere')
+                    ->join('p.etudiant', 'etudiant')
+                    ->leftJoin('p.caissiere', 'c');
+                if ($this->isGranted('ROLE_ETUDIANT')) {
+                    $qb->andWhere('p.etudiant = :etudiant')
+                        ->setParameter('etudiant', $user->getPersonne());
+                }
+
+                $qb->andWhere('p.etat = :etat')
+                    ->setParameter('etat', $etat);
+            }
+        ])
+            ->setName('dt_app_inscription_inscription_frais_solde');
+
+        $renders = [
+            /* 'edit' =>  new ActionRender(function () {
+                return true;
+            }), */
+            'edit_etudiant' => new ActionRender(fn () => $etat == 'attente_echeancier' || $etat == 'rejete'),
+            'edit' => new ActionRender(fn () => $etat == 'echeance_soumis'),
+            'payer' => new ActionRender(fn () => $etat == 'valide'),
+            'payer_load' => new ActionRender(fn () => $etat == 'valide'),
+            'delete' => new ActionRender(fn () =>  $isRoleFind == true || $isRoleAdminFind == true),
+            /*  'delete' => new ActionRender(function () {
+                return ;
+            }), */
+            // 'recu' => new ActionRender(fn () => $etat == 'solde'),
+        ];
+
+
+        $hasActions = false;
+
+        foreach ($renders as $_ => $cb) {
+            if ($cb->execute()) {
+                $hasActions = true;
+                break;
+            }
+        }
+
+        if ($hasActions) {
+            $table->add('id', TextColumn::class, [
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                    $options = [
+                        'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                        'target' => '#modal-lg',
+
+                        'actions' => [
+                            'recu' => [
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_comptabilite_inscription_print_seconde',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'target' =>  '#exampleModalSizeSm2',
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-main btn-stack']
+                                //'render' => new ActionRender(fn() => $context->getEtat() != 'cree')
+                            ],
+
+
+                        ]
+
+                    ];
+                    return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                }
+            ]);
+        }
+
+
+        $table->handleRequest($request);
+
+        if ($table->isCallback()) {
+            return $table->getResponse();
+        }
+
+
+        return $this->render('inscription/inscription/index_frais_solde.html.twig', [
+            'datatable' => $table,
+            'etat' => $etat,
+            'type' => 'frais',
+            //'titre' => $etat == 'valide' ? : 'liste des frais',
         ]);
     }
     #[Route('/admin/frais/caissiere', name: 'app_inscription_inscription_frais_caissiere_index', methods: ['GET', 'POST'])]

@@ -22,16 +22,23 @@
                
              </div>
               <div class="row small" style="position:relative">
-               <div class="col-md-2">{{ form_row(form.mode) }}</div>
-                <div class="col-md-2">{{ form_row(form.niveau) }}</div>
-                <div class="col-md-2">{{ form_row(form.caissiere) }}</div>
-           
+
+              <div class="row">
+               <div class="col-md-3">{{ form_row(form.filiere) }}</div>
+                <div class="col-md-3">{{ form_row(form.niveau) }}</div>
+                <div class="col-md-2">{{ form_row(form.classe) }}</div>
                 <div class="col-md-2">{{ form_row(form.dateDebut) }}</div>
                 <div class="col-md-2">{{ form_row(form.dateFin) }}</div>
+              
+              </div>
+              <div class="row">
+              <div class="col-md-3">{{ form_row(form.typeFrais) }}</div>
+                <div class="col-md-3">{{ form_row(form.mode) }}</div>
+                <div class="col-md-3">{{ form_row(form.caissiere) }}</div>
                 <div class="col-md-1 pt-5">
                   <button class="btn btn-main btn-filter btn-sm" type="button">Rechercher</button>
                 </div>
-                <div class="col-md-1 p-5">
+                <div class="col-md-2 p-5">
                 <a style="height: 35px;" title="Point des paiements" href="{{ path('default_print_iframe',{
                     'r':'app_comptabilite_print_all'
                   }) }}" class="btn btn-warning btn-sm btn-imprimer" 
@@ -46,6 +53,8 @@
                             <i class="fa fa-print text-light"></i>
                 </a>
                 </div>
+              </div>
+
                 
               </div>
             </fieldset>
@@ -53,7 +62,7 @@
       </div>
       <div class="row">
         <div class="col-sm-12">
-          <div id="grid_app_comptabilite_inscription_{{ grid_id }}" class="grid-dt-wrapper">Chargement....</div>
+          <div id="grid_app_comptabilite_paiement_scolarite_{{ grid_id }}" class="grid-dt-wrapper">Chargement....</div>
         </div>
       </div>
     </div>
@@ -65,6 +74,7 @@
   <script>
     
     $(function () {
+
             $('.no-auto').each(function () {
                 const $this = $(this);
                 const $id = $('#' + $this.attr('id'));
@@ -76,22 +86,26 @@
                     $(this).val(picker.startDate.format('DD/MM/YYYY'));
                 });
             });
+            
       const grid_prefix_id = "{{ grid_id }}";
-      const $old_grid = $('#grid_app_comptabilite_inscription_' + grid_prefix_id);
+      const $old_grid = $('#grid_app_comptabilite_paiement_scolarite_' + grid_prefix_id);
       init_select2('.has-select2');
 
-      function loadDataTable($grid, niveau,caissiere,dateDebut,dateFin,mode ,options = null, contents = '') {
+      function loadDataTable($grid, niveau,caissiere,dateDebut,dateFin,mode,classe,typeFrais,filiere ,options = null, contents = '') {
         $grid.initDataTables(
           options
           ? options
           : {{ datatable_settings(datatable) }}, {
           searching: true,
-          ajaxUrl: Routing.generate('app_comptabilite_inscription_index', {
+          ajaxUrl: Routing.generate('app_comptabilite_paiement_scolarite_index', {
             niveau: niveau,
             caissiere: caissiere,
             dateDebut: dateDebut,
             dateFin: dateFin,
-            mode: mode
+            mode: mode,
+            classe: classe,
+            filiere: filiere,
+            typeFrais: typeFrais
             
           }),
           language: {
@@ -109,6 +123,11 @@
       const $dateDebut = $('#{{ form.dateDebut.vars.id }}');
       const $dateFin = $('#{{ form.dateFin.vars.id }}');
       const $mode = $('#{{ form.mode.vars.id }}');
+      const $classe = $('#{{ form.classe.vars.id }}');
+      const $filiere = $('#{{ form.filiere.vars.id }}');
+      const $typeFrais = $('#{{ form.typeFrais.vars.id }}');
+
+     
       
 
       $niveau.on('change', function () {
@@ -124,15 +143,15 @@
      
       });
 
-      loadDataTable($old_grid, null,null,null,null,null, {{ datatable_settings(datatable) }});
-
+      loadDataTable($old_grid, null,null,null,null,null,null,null,null, {{ datatable_settings(datatable) }});
+      
       $('.btn-filter').on('click', function (e) {
         e.preventDefault();
         const $this = $(this);
         const $form = $this.closest('form');
 
         //alert($dateDebut.val());
-        load_grid_data($form, $this, $niveau.val(),$caissiere.val(),$dateDebut.val(),$dateFin.val(),$mode.val());
+        load_grid_data($form, $this, $niveau.val(),$caissiere.val(),$dateDebut.val(),$dateFin.val(),$mode.val(),$classe.val(),$typeFrais.val(),$filiere.val());
       });
 
 
@@ -141,21 +160,71 @@
         const $this = $(this);
         const $form = $this.closest('form');
 
-        //alert($niveau.val());
-        imprimer({id:1});
+      
+      });
+
+      $filiere.on('change', function (e) {
+      
+        const $this = $(this);
+      
+         load_content_filiere($this.val())
+         load_content_niveau($('#form_niveau').val())
+      });
+       $niveau.on('change', function (e) {
+      
+        const $this = $(this);
+        
+         load_content_niveau($this.val())
       });
 
 
-      function imprimer(filters = []){
-$.getJSON("{{ path('app_affectation_materiel_location_sortie_index') }}", {filters: filters}, function (data) {
+      function load_content_filiere(id) {
+             
+                 $.ajax({
+                    url:  '/liste/niveau/par/filiere/'+id,
+                    method: 'GET',
+                      async: false,
+                    dataType: 'json',
+                    success: function(json){
+                      $('#form_niveau').html('');
                  
-                
+                          $('#form_niveau').append('<option value selected="default">Choisissez</option>');
+                          $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $('#form_niveau').append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          }); 
 
-                                });
+                    }
+                });
+              
+        }
 
-      }
+        function load_content_niveau(id){
 
-      function load_grid_data($form, $button, niveau,caissiere,dateDebut,dateFin,mode) {
+            $.ajax({
+                    url:  '/liste/classe/par/niveau/'+id,
+                    method: 'GET',
+                      async: false,
+                    dataType: 'json',
+                    success: function(json){
+                      $('#form_classe').html('');
+                 
+                          $('#form_classe').append('<option value selected="default">Choisissez</option>');
+                          $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $('#form_classe').append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          }); 
+
+                    }
+                });
+        }
+
+
+
+
+      function load_grid_data($form, $button, niveau,caissiere,dateDebut,dateFin,mode,classe,typeFrais,filiere) {
         const id = $old_grid.find('table').attr('id');
         const $table = $old_grid.find(`#${id}`);
         const table = $table.DataTable();
@@ -163,11 +232,14 @@ $.getJSON("{{ path('app_affectation_materiel_location_sortie_index') }}", {filte
           url: $form.attr('action'),
           type: $form.attr('method'),
           data: {
-            niveau: niveau,
+             niveau: niveau,
             caissiere: caissiere,
             dateDebut: dateDebut,
             dateFin: dateFin,
-            mode: mode
+            mode: mode,
+            classe: classe,
+            filiere: filiere,
+            typeFrais: typeFrais
           },
           beforeSend: function () {
             $button.append('<span class="spinner-border spinner-ajax spinner-border-sm" role="status" aria-hidden="true"></span> ');
@@ -184,23 +256,23 @@ $.getJSON("{{ path('app_affectation_materiel_location_sortie_index') }}", {filte
             }
 
            // let grid_val = `${niveau}_${caissiere}_${dateDebut}_${dateFin}`;
-            let grid_val = `${niveau}_${caissiere}_${mode}`;
+            let grid_val = `${niveau}_${caissiere}_${mode}_${classe}_${typeFrais}_${filiere}`;
 
             //alert(grid_val)
 
-            $old_grid.attr('id', `grid_app_comptabilite_inscription_${grid_val}`).empty().html(`
+            $old_grid.attr('id', `grid_app_comptabilite_paiement_scolarite_${grid_val}`).empty().html(`
                                     <div class="spinner spinner-track spinner-primary mr-15 text-primary">
                                         <div class="ml-15">Chargement des données de la grille</div>
                                     </div>
                             `);
             var options = {{ datatable_settings(datatable) }};
-            var name = `dt_app_comptabilite_inscription_${grid_val}`;
+            var name = `dt_app_comptabilite_paiement_scolarite_${grid_val}`;
 
             options['name'] = name;
 
-            console.log(name);
+            console.log(classe);
 
-            loadDataTable($old_grid, niveau,caissiere,dateDebut,dateFin,mode ,options)
+            loadDataTable($old_grid, niveau,caissiere,dateDebut,dateFin,mode,classe,typeFrais,filiere ,options)
           }
         });
       }

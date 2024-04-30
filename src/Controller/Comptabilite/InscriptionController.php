@@ -22,8 +22,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\FileTrait;
+use App\Entity\Classe;
+use App\Entity\Filiere;
+use App\Entity\InfoInscription;
 use App\Entity\NaturePaiement;
 use App\Entity\Niveau;
+use App\Entity\TypeFrais;
 use App\Entity\Utilisateur;
 use App\Repository\InfoInscriptionRepository;
 use App\Repository\NiveauRepository;
@@ -275,6 +279,267 @@ class InscriptionController extends AbstractController
 
 
         return $this->render('comptabilite/inscription/index.html.twig', [
+            'datatable' => $table,
+            'form' => $builder->getForm(),
+            'grid_id' => $gridId
+        ]);
+    }
+    #[Route('/paiement/scolarite', name: 'app_comptabilite_paiement_scolarite_index',  methods: ['GET', 'POST'], options: ['expose' => true])]
+    public function indexPaiementScolarite(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
+    {
+        //  $isDirecteur = $this->isGranted('ROLE_DIRECTEUR');
+
+        $niveau = $request->query->get('niveau');
+        $caissiere = $request->query->get('caissiere');
+        $dateDebut = $request->query->get('dateDebut');
+        $dateFin = $request->query->get('dateFin');
+        $filiere = $request->query->get('filiere');
+        $mode = $request->query->get('mode');
+        $classe = $request->query->get('classe');
+        $typeFrais = $request->query->get('typeFrais');
+        //dd($niveau, $dateDebut);
+
+        $builder = $this->createFormBuilder(null, [
+            'method' => 'GET',
+            'action' => $this->generateUrl('app_comptabilite_paiement_scolarite_index', compact('niveau', 'caissiere', 'dateDebut', 'dateFin', 'mode', 'filiere', 'classe', 'typeFrais')),
+        ])->add('niveau', EntityType::class, [
+            'class' => Niveau::class,
+            'choice_label' => 'libelle',
+            'label' => 'Niveau',
+            'placeholder' => '---',
+            'required' => false,
+            'attr' => ['class' => 'form-control-sm has-select2']
+        ])
+            ->add('filiere', EntityType::class, [
+                'class' => Filiere::class,
+                'choice_label' => 'libelle',
+                'label' => 'Filiere',
+                'placeholder' => '---',
+                'required' => false,
+                'attr' => ['class' => 'form-control-sm has-select2']
+            ])
+            ->add('classe', EntityType::class, [
+                'class' => Classe::class,
+                'choice_label' => 'libelle',
+                'label' => 'Classe',
+                'placeholder' => '---',
+                'required' => false,
+                'attr' => ['class' => 'form-control-sm has-select2']
+            ])
+            ->add('typeFrais', EntityType::class, [
+                'class' => TypeFrais::class,
+                'choice_label' => 'libelle',
+                'label' => 'Type frais',
+                'placeholder' => '---',
+                'required' => false,
+                'attr' => ['class' => 'form-control-sm has-select2']
+            ])
+            ->add('mode', EntityType::class, [
+                'class' => NaturePaiement::class,
+                'choice_label' => 'libelle',
+                'label' => 'Mode de paiement',
+                'placeholder' => '---',
+                'required' => false,
+                'attr' => ['class' => 'form-control-sm has-select2']
+            ])
+            ->add('dateDebut', DateType::class, [
+                'widget' => 'single_text',
+                'label'   => 'Date début',
+                'format'  => 'dd/MM/yyyy',
+                'required' => false,
+                'html5' => false,
+                'attr'    => ['autocomplete' => 'off', 'class' => 'form-control-sm datepicker no-auto'],
+            ])
+            ->add('dateFin', DateType::class, [
+                'widget' => 'single_text',
+                'label'   => 'Date fin',
+                'format'  => 'dd/MM/yyyy',
+                'required' => false,
+                'html5' => false,
+                'attr'    => ['autocomplete' => 'off', 'class' => 'form-control-sm datepicker no-auto'],
+            ])
+            ->add('caissiere', EntityType::class, [
+                'class' => Utilisateur::class,
+                'choice_label' => 'getNomComplet',
+                'label' => 'Caissière',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('c')
+                        ->join('c.personne', 'p')
+                        ->join('p.fonction', 'f')
+                        ->andWhere('f.code = :caissiere')
+                        ->setParameter('caissiere', 'CAI')
+                        ->orderBy('c.id', 'DESC');
+                },
+                'placeholder' => '---',
+                'choice_attr' => function (Utilisateur $user) {
+                    return ['data-type' => $user->getId()];
+                },
+                'required' => false,
+                'attr' => ['class' => 'form-control-sm has-select2']
+            ]);
+
+
+        $table = $dataTableFactory->create()
+            ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'i.code'])
+            ->add('nom', TextColumn::class, ['label' => 'Nom et prénoms', 'field' => 'etudiant.getNomComplet'])
+            ->add('niveau', TextColumn::class, ['label' => 'Niveau', 'field' => 'niveau.getSigle'])
+            ->add('classe', TextColumn::class, ['label' => 'Classe', 'field' => 'classe.libelle'])
+            ->add('datePaiement', DateTimeColumn::class, ['label' => 'Date paiement', 'format' => 'd-m-Y', 'field' => 'i.datePaiement'])
+            ->add('montant', NumberFormatColumn::class, ['label' => 'Montant', 'field' => 'i.montant'])
+            ->add('caissiere', TextColumn::class, ['label' => 'Caissière', 'field' => 'ca.getNomComplet'])
+
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => InfoInscription::class,
+                'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $filiere, $classe, $typeFrais) {
+                    $qb->select(['p', 'i', 'niveau', 'filiere', 'etudiant', 'ca', 'classe', 'typeFrais'])
+                        ->from(InfoInscription::class, 'i')
+                        ->join('i.inscription', 'p')
+                        ->join('p.niveau', 'niveau')
+                        ->join('i.typeFrais', 'typeFrais')
+                        ->join('p.classe', 'classe')
+                        ->leftJoin('i.caissiere', 'ca')
+                        ->join('niveau.filiere', 'filiere')
+                        ->join('p.etudiant', 'etudiant')
+                        ->orderBy('i.datePaiement', 'DESC');
+
+                    if ($niveau || $caissiere || $dateDebut || $dateFin || $mode || $filiere || $classe || $typeFrais) {
+                        if ($filiere) {
+                            $qb->andWhere('filiere.id = :filiere')
+                                ->setParameter('filiere', $filiere);
+                        }
+                        if ($classe) {
+                            $qb->andWhere('classe.id = :classe')
+                                ->setParameter('classe', $classe);
+                        }
+                        if ($typeFrais) {
+                            $qb->andWhere('typeFrais.id = :typeFrais')
+                                ->setParameter('typeFrais', $typeFrais);
+                        }
+                        if ($niveau) {
+                            $qb->andWhere('niveau.id = :niveau')
+                                ->setParameter('niveau', $niveau);
+                        }
+                        if ($mode) {
+                            $qb->andWhere('mode.id = :mode')
+                                ->setParameter('mode', $mode);
+                        }
+                        if ($caissiere) {
+                            $qb->andWhere('ca.id = :caissiere')
+                                ->setParameter('caissiere', $caissiere);
+                        }
+
+                        if ($dateDebut && $dateFin == null) {
+                            $truc = explode('-', str_replace("/", "-", $dateDebut));
+                            $new_date_debut = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
+
+                            $qb->andWhere('i.datePaiement = :dateDebut')
+                                ->setParameter('dateDebut', $new_date_debut);
+                        }
+                        if ($dateFin && $dateDebut == null) {
+
+                            $truc = explode('-', str_replace("/", "-", $dateDebut));
+                            $new_date_fin = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
+
+                            $qb->andWhere('i.datePaiement  = :dateFin')
+                                ->setParameter('dateFin', $new_date_fin);
+                        }
+                        if ($dateDebut && $dateFin) {
+
+                            $truc_debut = explode('-', str_replace("/", "-", $dateDebut));
+                            $new_date_debut = $truc_debut[2] . '-' . $truc_debut[1] . '-' . $truc_debut[0];
+
+                            $truc = explode('-', str_replace("/", "-", $dateFin));
+                            $new_date_fin = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
+                            // dd($new_date_debut, $new_date_fin);
+
+                            $qb->andWhere('i.datePaiement BETWEEN :dateDebut AND :dateFin')
+                                ->setParameter('dateDebut', $new_date_debut)
+                                ->setParameter("dateFin", $new_date_fin);
+                        }
+                    }
+                }
+            ])
+            ->setName('dt_app_comptabilite_paiement_scolarite_' . $niveau . '_' . $caissiere . '_' . $mode . '_' . $classe . '_' . $typeFrais . '_' . $filiere);
+
+        $renders = [
+            'edit' =>  new ActionRender(function () {
+                return false;
+            }),
+            'imprime' =>  new ActionRender(function () {
+                return true;
+            }),
+            'delete' => new ActionRender(function () {
+                return true;
+            }),
+        ];
+
+        $gridId = $niveau . '_' . $caissiere . '_' . $mode . '_' . $classe . '_' . $typeFrais . '_' . $filiere;
+        // dd($gridId);
+
+        $hasActions = false;
+
+        foreach ($renders as $_ => $cb) {
+            if ($cb->execute()) {
+                $hasActions = true;
+                break;
+            }
+        }
+
+        if ($hasActions) {
+            $table->add('id', TextColumn::class, [
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, InfoInscription $context) use ($renders) {
+                    $options = [
+                        'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                        'target' => '#modal-lg',
+
+                        'actions' => [
+                            'edit' => [
+                                'url' => $this->generateUrl('app_comptabilite_versement_index', ['id' => $value]),
+                                'ajax' => false,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-cash',
+                                'attrs' => ['class' => 'btn-main', 'title' => 'Frais \'écolage'],
+                                'render' => $renders['edit']
+                            ],
+                            'imprime' => [
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_comptabilite_print_inscription_versement',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'target' =>  '#exampleModalSizeSm2',
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-main btn-stack']
+                                //, 'render' => new ActionRender(fn() => $source || $etat != 'cree')
+                            ],
+                            /*  'imprime' => [
+                                'url' => $this->generateUrl('app_comptabilite_print', ['id' => $value]),
+                                'ajax' => false,
+                                'stacked' => false,
+                                'icon' => '%icon% fa fa-print',
+                                'attrs' => ['class' => 'btn-main', 'title' => 'Frais \'écolage'],
+                                'render' => $renders['imprime']
+                            ], */
+
+                        ]
+
+                    ];
+                    return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                }
+            ]);
+        }
+
+
+        $table->handleRequest($request);
+
+        if ($table->isCallback()) {
+            return $table->getResponse();
+        }
+
+
+        return $this->render('comptabilite/inscription/index_scolarite_point.html.twig', [
             'datatable' => $table,
             'form' => $builder->getForm(),
             'grid_id' => $gridId

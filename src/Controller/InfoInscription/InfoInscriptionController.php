@@ -42,6 +42,8 @@ class InfoInscriptionController extends AbstractController
     #[Route('liste/versement/{id}/', name: 'app_inscription_liste_versement_index', methods: ['GET', 'POST'])]
     public function indexListeVersement(Request $request, DataTableFactory $dataTableFactory, $id): Response
     {
+        $isRoleAdminFind = $this->isGranted('ROLE_CAISSIERE');
+
         $table = $dataTableFactory->create()
             ->add('mode', TextColumn::class, ['label' => 'Mode Paiement', 'field' => 'mode.libelle'])
             ->add('typeFrais', TextColumn::class, ['label' => 'Type Frais', 'field' => 'type.libelle'])
@@ -64,9 +66,10 @@ class InfoInscriptionController extends AbstractController
             ->setName('dt_app_inscription_liste_versement' . $id);
 
         $renders = [
-            'edit' =>  new ActionRender(function () {
+            /* 'edit' =>  new ActionRender(function () {
                 return true;
-            }),
+            }), */
+            'edit' => new ActionRender(fn () => $isRoleAdminFind == false),
             'first_print' =>  new ActionRender(function () {
                 return true;
             }),
@@ -74,9 +77,10 @@ class InfoInscriptionController extends AbstractController
                 return true;
             }),
 
-            'delete' => new ActionRender(function () {
+            'delete' => new ActionRender(fn () => $isRoleAdminFind == false),
+            /*  'delete' => new ActionRender(function () {
                 return true;
-            }),
+            }), */
         ];
 
 
