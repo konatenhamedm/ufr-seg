@@ -635,6 +635,51 @@ class InscriptionController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
+    #[Route('/imprime/versement/inscription/all', name: 'app_comptabilite_print_versement_inscription_all', methods: ['GET', 'POST'])]
+    public function pointVersementInscription(Request $request, InfoInscriptionRepository $infoInscriptionRepository, NiveauRepository $niveauRepository, InscriptionRepository $inscriptionRepository): Response
+    {
+
+        $niveau = $request->query->get('niveau');
+
+
+        $totalImpaye = 0;
+        $totalPayer = 0;
+
+
+
+        /*   foreach ($preinscriptions as $key => $value) {
+
+            if ($value['etat'] == "valide") {
+                $totalPayer += $value['montant_preinscription'];
+            } else {
+                $totalImpaye += $value['montant_preinscription'];
+            }
+        } */
+
+        //dd($dateNiveau);
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("site/liste_versement.html.twig", [
+            'total_payer' => $totalPayer,
+            'data' => $infoInscriptionRepository->findAll(),
+            'total_impaye' => $totalImpaye
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'p',
+            'protected' => true,
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
 
 
     /**
