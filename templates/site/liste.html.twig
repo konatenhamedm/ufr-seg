@@ -170,7 +170,7 @@ tr:nth-child(even) {
              <td style="vertical-align:middle;text-align:center;" >{{ ligne.infoPreinscription.datePaiement | date('d/m/Y') }}</td>
             <td style="vertical-align:middle;text-align:center;">{{ligne.infoPreinscription.montant |number_format(0, '.', '.') }}</td>
              <td style="vertical-align:middle;text-align:center;" >{{ ligne.infoPreinscription.modePaiement.libelle }}</td>
-             <td style="vertical-align:middle;text-align:center;" >{{ ligne.caissiere.getNomComplet ? ligne.caissiere.getNomComplet :'' }}</td>
+             <td style="vertical-align:middle;text-align:center;" >{{ ligne.caissiere ? ligne.caissiere.getNomComplet :'' }}</td>
         {#     <td style="vertical-align:middle;text-align:center;" ><span style="font-size:15px;color:#FF2E2E">{% if ligne.etat == "valide" %} {{ligne.montant_preinscription  |number_format(0, '.', '.') }} {% else %} {{ '0'|number_format(0, '.', '.') }} {% endif %}</span ></td>
             <td style="vertical-align:middle;text-align:center;" >{% if ligne.etat in ["paiement_confirmation","attente_paiement"] %} {{ligne.montant_preinscription  |number_format(0, '.', '.') }} {% else %} {{ '0'|number_format(0, '.', '.') }} {% endif %}</td>
             <td style="vertical-align:middle;text-align:center;" >{% if ligne.etat in ["paiement_confirmation","attente_paiement"]  %} {{ligne.montant_preinscription  |number_format(0, '.', '.') }} {% else %} {{ '0'|number_format(0, '.', '.') }} {% endif %}</td>
