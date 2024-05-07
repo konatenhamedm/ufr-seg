@@ -277,9 +277,10 @@ $('#etudiant_admin_prenom').upperFirstAll()
             }); 
         }); 
 const etat = "{{etudiant.etat}}";
-            const $form_content_second  = $(`#modal-lg`).find('.place_frais_deux');
+            const $form_content = $(`#modal-lg`).find('.place_frais');
+            const $form_content_second = $(`#modal-lg`).find('.place_frais_deux');
 
-        
+
      function load_content_second(id) {
 
                 let resIntervention;
@@ -349,6 +350,7 @@ const etat = "{{etudiant.etat}}";
         })
      
         $('.autre_fais').on('update-value', function (e, val, element) {
+            
              total = 0;
            $('.autre_fais').each(function(e){
          const $this = $(this);
