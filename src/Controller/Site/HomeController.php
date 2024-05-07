@@ -611,7 +611,7 @@ class HomeController extends AbstractController
             ->add('classe', TextColumn::class, ['label' => 'Classe', 'field' => 'classe.libelle'])
 
             ->createAdapter(ORMAdapter::class, [
-                'entity' => Etudiant::class,
+                'entity' => Inscription::class,
                 'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau) {
                     $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
@@ -682,13 +682,23 @@ class HomeController extends AbstractController
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
                             ],
+                            'add_echeancier' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('app_inscription_inscription_edit_admin_echeancier', ['id' =>  $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'label' => "Modifier écheancier",
+                                'icon' => '%icon% bi bi-calendar-event',
+                                'attrs' => ['class' => 'btn-warning', 'title' => 'Modifier écheancier'],
+                                'render' =>  new ActionRender(fn () => $context->getInfoInscriptions()->count() == 0)
+                            ],
                             'new' => [
                                 'target' => '#exampleModalSizeSm2',
                                 'url' => $this->generateUrl('site_information_edit_new', ['id' =>  $context->getEtudiant()->getId()]),
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-plus-square',
-                                'attrs' => ['class' => 'btn-primary'],
+                                'attrs' => ['class' => 'btn-primary', 'title' => 'Nouvelle inscription'],
                                 'render' => $renders['new']
                             ],
                             'delete' => [
@@ -1233,7 +1243,7 @@ class HomeController extends AbstractController
             }
         }
 
-        return $this->render('site/admin/informations_admin.html.twig', [
+        return $this->render('site/admin/informations_admin_edit.html.twig', [
             'etudiant' => $etudiant,
             'etat' => 'ok',
             'form' => $form->createView(),

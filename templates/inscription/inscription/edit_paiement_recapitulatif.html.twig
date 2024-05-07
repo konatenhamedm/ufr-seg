@@ -36,10 +36,10 @@
                                 <table class="table table-bordered table-custom">
                                         <thead class="thead-dark">
                                             <tr>
-                                                <th width="40%" class="p-2">Dates buttoir</th>
-                                                <th width="40%" class="p-2">Montant à payer</th>
-                                                <th width="40%" class="p-2">Total payé</th>
-                                                <th width="20%" class="p-2">solde</th>
+                                                <th width="10%" class="p-2">Dates buttoir</th>
+                                                <th width="30%" class="p-2">Montant à payer</th>
+                                                <th width="20%" class="p-2">Total payé</th>
+                                                <th width="30%" class="p-2">solde</th>
                                                 <th width="20%" class="p-2">Statut</th>
                                             </tr>
                                         </thead>
@@ -93,12 +93,22 @@
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th class="text-end p-2">TOTAL</th>
-                                                <th class="total text-end p-2 fw-bolder total">{{ somme|number_format(0, '.', '.') }} </td>
+                                                <th class="text-end p-2" style="color: green;font-weight:bolder">TOTAL</th>
+                                                <th class="total text-end p-2 fw-bolder total" style="color: green;font-weight:bolder">{{ inscription.montant|number_format(0, '.', '.') }} </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
                                             <tr>
-                                                <th class="text-end p-2" style="color: red;font-weight:bolder">TOTAL PAYE</th>
-                                                <th class="total-saisi text-end p-2 fw-bolder total" style="color: red;font-weight:bolder">{{ inscription.totalPaye|number_format(0, '.', '.') }} </td>
+                                                <th class="text-end p-2" colspan="2" style="color: green;font-weight:bolder">TOTAL PAYE</th>
+                                                <th class="total-saisi text-end p-2 fw-bolder total" style="color: green;font-weight:bolder">{{ inscription.totalPaye|number_format(0, '.', '.') }} </td>
+                                             <td></td>
+                                             <td></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-end p-2" colspan="3" style="color: red;font-weight:bolder">TOTAL SOLDE</th>
+                                                <th class="total-saisi text-end p-2 fw-bolder total" style="color: red;font-weight:bolder">{{ (inscription.montant - inscription.totalPaye)|number_format(0, '.', '.') }} </td>
+                                                <td></td>
                                             </tr>
                                         </tfoot>
                                 </table>

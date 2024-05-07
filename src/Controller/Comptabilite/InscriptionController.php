@@ -297,7 +297,7 @@ class InscriptionController extends AbstractController
         $mode = $request->query->get('mode');
         $classe = $request->query->get('classe');
         $typeFrais = $request->query->get('typeFrais');
-        //dd($niveau, $dateDebut);
+        // dd($niveau);
 
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
@@ -635,11 +635,13 @@ class InscriptionController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
-    #[Route('/imprime/versement/inscription/all', name: 'app_comptabilite_print_versement_inscription_all', methods: ['GET', 'POST'])]
+    #[Route('/imprime/versement/inscription/all', name: 'app_comptabilite_print_versement_inscription_all', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function pointVersementInscription(Request $request, InfoInscriptionRepository $infoInscriptionRepository, NiveauRepository $niveauRepository, InscriptionRepository $inscriptionRepository): Response
     {
 
         $niveau = $request->query->get('niveau');
+
+        // dd($request->query, $niveau);
 
 
         $totalImpaye = 0;

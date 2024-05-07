@@ -20,6 +20,14 @@
                 {{ _self.ligne_echeancier(item|e) }}
             {% endfor %}
         </tbody>
+         <tfoot>
+                                            <tr>
+                                                <th class="text-end p-2 col "  style="color:red;font-weight:bolder"  >Total montant</th>
+                                                <th class="total text-end p-2 fw-bolder col-total" style="color:red;font-weight:bolder"  data-class="col-total">0</td>
+                                                <th class="total text-center p-2 fw-bolder " ></td>
+                                            </tr>
+                                        
+                                        </tfoot>
     </table>
     
 {% endmacro %}

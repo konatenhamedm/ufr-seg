@@ -23,10 +23,11 @@ class EcheancierType extends AbstractType
                 'widget' => 'single_text',
 
             ])
-            ->add('montant', TextType::class, [
+            ->add('montant', TextType::class, ['attr' => ['class' => 'input-money input-mnt montant-input montant_echeancier']])
+            /*  ->add('montant', TextType::class, [
                 'label' => 'Montant',
                 'attr' => ['class' => 'input-money montant-input']
-            ])
+            ]) */
             /* ->add('inscription') */;
         $builder->get('montant')->addModelTransformer(new ThousandNumberTransformer());
     }

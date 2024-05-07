@@ -9,6 +9,7 @@ use App\Entity\Inscription;
 use App\Entity\Paiement;
 use App\Entity\Preinscription;
 use App\Entity\Versement;
+use App\Form\InscriptionAdminType;
 use App\Form\InscriptionAffectationClasseType;
 use App\Form\InscriptionPayementType;
 use App\Form\InscriptionRejeterType;
@@ -1162,6 +1163,72 @@ class InscriptionController extends AbstractController
             'inscription' => $inscription,
             'form' => $form->createView(),
             'frais' => $fraisRepository->findBy(array('inscription' => $inscription->getId())),
+        ]);
+    }
+    #[Route('/{id}/edit/admin/echeancier', name: 'app_inscription_inscription_edit_admin_echeancier', methods: ['GET', 'POST'])]
+    public function editAdminEcheancier(Request $request, Inscription $inscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, FormError $formError, FraisInscriptionRepository $fraisRepository): Response
+    {
+
+        // dd('');
+
+        $form = $this->createForm(InscriptionAdminType::class, $inscription, [
+            'method' => 'POST',
+            'action' => $this->generateUrl('app_inscription_inscription_edit_admin_echeancier', [
+                'id' =>  $inscription->getId()
+            ])
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_inscription_etudiant_admin_index');
+
+
+            $echeanciers = $form->get('echeanciers')->getData();
+
+            $somme = 0;
+            foreach ($echeanciers as $key => $value) {
+                $somme += $value->getMontant();
+            }
+
+            if ($form->isValid()) {
+                $inscription->setMontant($somme);
+                $entityManager->persist($inscription);
+                $entityManager->flush();
+                $data = true;
+
+                $statut = 1;
+                $message       = 'Opération effectuée avec succès';
+                $this->addFlash('success', $message);
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->render('inscription/inscription/edit_echeancier.html.twig', [
+            'inscription' => $inscription,
+            'form' => $form->createView(),
+
         ]);
     }
     #[Route('/{id}/edit/rejeter', name: 'app_inscription_inscription_rejeter', methods: ['GET', 'POST'])]

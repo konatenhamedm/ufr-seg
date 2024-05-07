@@ -39,7 +39,7 @@
                   <button class="btn btn-main btn-filter btn-sm" type="button">Rechercher</button>
                 </div>
                 <div class="col-md-2 p-5">
-                <a style="height: 35px;" title="Point des paiements" href="{{ path('default_print_iframe',{
+                <a  id='btn-imprimer' style="height: 35px;" title="Point des paiements" href="{{ path('default_print_iframe',{
                     'r':'app_comptabilite_print_versement_inscription_all'
                   }) }}" class="btn btn-warning btn-sm btn-imprimer" 
                 data-bs-toggle="modal" data-bs-target="#exampleModalSizeSm2">
@@ -72,6 +72,8 @@
 {% block java %}
   <script src="{{ asset('assets/js/datatables.js') }}"></script>
   <script>
+
+  
     
     $(function () {
 
@@ -221,7 +223,22 @@
                 });
         }
 
+        $('#btn-imprimer').on('click',function(e){
+           e.preventDefault();
+        const $this = $(this);
+        const $form = $this.closest('form');
+ console.log($form)
+            $.ajax({
+              url: '/admin/comptabilite/inscription/paiement/scolarite',
+                      type: 'GET',
+                      data: {
+                        niveau: 1,
+                        
+                      },
+            })
 
+            
+          })
 
 
       function load_grid_data($form, $button, niveau,caissiere,dateDebut,dateFin,mode,classe,typeFrais,filiere) {

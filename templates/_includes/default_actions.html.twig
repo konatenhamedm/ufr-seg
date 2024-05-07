@@ -42,10 +42,11 @@
                 {% endfor %}
             >
                 {% if has_icon %}
-                    <span class='svg-icon svg-icon-md'><i class='{{ link.icon | replace({'%icon%': ''}) }}'></i></span>
+                    <span class='svg-icon svg-icon-md'><i class='{{ link.icon | replace({'%icon%': ''}) }}'></i> </span>
                 {% else %}
-                    <span class="pl-2 pr-2">{{ link.icon | raw }}</span>
+                    <span class="pl-2 pr-2">{{ link.icon | raw }}{# <i class='icon  bi bi-pen'></i> </span>  #}{{ link.label}}
                 {% endif %}
+                
             </a>
             {% elseif link.url | length %}
                 <div class="dropdown">
