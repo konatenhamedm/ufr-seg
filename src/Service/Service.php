@@ -608,7 +608,7 @@ class Service
             }
 
             $inscription = $this->inscriptionRepository->findOneBy(['classe' => $value->getClasse(), 'etudiant' => $etudiant]);
-            if ($inscription->getFraisInscriptions() != null) {
+            if ($this->fraisInscriptionRepository->findBy(['inscription' => $inscription])) {
 
                 foreach ($inscription->getFraisInscriptions() as $key => $fraisInscription) {
                     $this->em->remove($fraisInscription);
