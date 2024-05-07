@@ -22,7 +22,7 @@ class FraisInscription
     #[ORM\JoinColumn(nullable: false)]
     private ?TypeFrais $typeFrais = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: '0')]
+    #[ORM\Column(length: 255)]
     private ?string $montant = null;
 
 
