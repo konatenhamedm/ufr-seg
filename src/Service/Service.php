@@ -631,7 +631,7 @@ class Service
 
                 foreach ($value->getFraisBlocs() as $key => $fraisItem) {
                     $frais = new FraisInscription();
-                    $frais->setMontant($fraisItem->getMontant());
+                    $frais->setMontant((int)$fraisItem->getMontant());
                     $frais->setInscription($inscription);
                     $frais->setTypeFrais($fraisItem->getTypeFrais());
                     $this->fraisInscriptionRepository->save($frais, true);
