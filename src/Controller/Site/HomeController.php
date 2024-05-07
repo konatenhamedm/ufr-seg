@@ -1171,11 +1171,32 @@ class HomeController extends AbstractController
                     $etudiant->setNom(strtoupper($form->get('nom')->getData()));
                     $etudiant->setPrenom($prenoms);
                     $entityManager->persist($etudiant);
+                    $entityManager->flush();
 
-                    $responseRegister = $service->registerEcheancierAdminEdit($blocEcheanciers, $etudiant);
+                    $user->setEmail($etudiant->getEmail());
+                    $utilisateurRepository->add($user, true);
+                    $info_user = [
+                        'login' => $etudiant->getEmail(),
+                        'password' => $etudiant->getNom() . '_' . 'password'
+                    ];
+
+                    $context = compact('info_user');
+                    // TO DO
+                    $sendMailService->send(
+                        'konatenhamed@ufrseg.enig-sarl.com',
+                        $etudiant->getEmail(),
+                        'Informations',
+                        'content_mail',
+                        $context
+                    );
+                    $statut = 1;
+                    $message       = "Opération effectuée avec succès";
+                    $this->addFlash('success', $message);
+
+                    $service->updateInscription($blocEcheanciers, $etudiant);
                     // dd($responseRegister);
 
-                    if ($responseRegister == 'existe') {
+                    /* if ($responseRegister == 'existe') {
                         //il fait rien ici
                         $statut = 0;
                         $message       = "Opération échouée car il existe un inscription similaire à celle que vous envisager de créer actuellement";
@@ -1198,7 +1219,7 @@ class HomeController extends AbstractController
                         ];
 
                         $context = compact('info_user');
-                        // TO DO
+                   
                         $sendMailService->send(
                             'konatenhamed@ufrseg.enig-sarl.com',
                             $etudiant->getEmail(),
@@ -1221,7 +1242,7 @@ class HomeController extends AbstractController
                         ];
 
                         $context = compact('info_user');
-                        // TO DO
+                     
                         $sendMailService->send(
                             'konatenhamed@ufrseg.enig-sarl.com',
                             $etudiant->getEmail(),
@@ -1232,7 +1253,7 @@ class HomeController extends AbstractController
                         $statut = 1;
                         $message       = "Opération effectuée avec succès";
                         $this->addFlash('success', $message);
-                    }
+                    } */
 
 
                     $this->addFlash('success', $message);

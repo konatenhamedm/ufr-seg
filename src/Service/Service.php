@@ -7,6 +7,7 @@ use App\Entity\AnneeScolaire;
 use App\Entity\ArticleMagasin;
 use App\Entity\Document;
 use App\Entity\Echeancier;
+use App\Entity\Etudiant;
 use App\Entity\FraisInscription;
 use App\Entity\InfoInscription;
 use App\Entity\Inscription;
@@ -594,6 +595,73 @@ class Service
 
         return $response;
     }
+
+
+    public function updateInscription($blocEcheanciers, Etudiant $etudiant): string
+    {
+        $sommeEcheancier = 0;
+        $response = 'bonneEgalitePresenceEcheancierPayer';
+        foreach ($blocEcheanciers as $key => $value) {
+
+            foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                $sommeEcheancier += $echeancier->getMontant();
+            }
+
+            $inscription = $this->inscriptionRepository->findOneBy(['classe' => $value->getClasse(), 'etudiant' => $etudiant]);
+
+            foreach ($inscription->getFraisInscriptions() as $key => $fraisInscription) {
+                $this->em->remove($fraisInscription);
+                $this->em->flush();
+            }
+            foreach ($inscription->getEcheanciers() as $key => $echeancierInscription) {
+                $this->em->remove($echeancierInscription);
+                $this->em->flush();
+            }
+            foreach ($inscription->getInfoInscriptions() as $key => $infoInscription) {
+                $this->em->remove($infoInscription);
+                $this->em->flush();
+            }
+            /*  foreach ($value->getFraisBlocs() as $key => $fraisBloc) {
+                $this->em->remove($fraisBloc);
+                $this->em->flush();
+            } */
+
+
+            if ($value->getFraisBlocs()) {
+
+                foreach ($value->getFraisBlocs() as $key => $fraisItem) {
+                    $frais = new FraisInscription();
+                    $frais->setMontant($fraisItem->getMontant());
+                    $frais->setInscription($inscription);
+                    $frais->setTypeFrais($fraisItem->getTypeFrais());
+                    $this->fraisInscriptionRepository->save($frais, true);
+                }
+            }
+            foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                $echeancierReel = new Echeancier();
+                $echeancierReel->setDateCreation(new DateTime());
+                $echeancierReel->setEtat('pas_payer');
+                $echeancierReel->setInscription($inscription);
+                $echeancierReel->setMontant($echeancier->getMontant());
+                $echeancierReel->setTotaPayer('0');
+                $this->echeancierRepository->save($echeancierReel, true);
+            }
+
+
+            $inscription->setTotalPaye('0');
+
+
+            $this->em->persist($inscription);
+            $this->em->flush();
+            // $newInscriptionCount = $this->inscriptionRepository->findBy(['classe' => $value->getClasse(), 'etudiant' => $etudiant]);
+            //$inscription = $this->inscriptionRepository->find($value->getInscription()->getId());
+
+
+
+        }
+        return $response;
+    }
+
     public function registerEcheancierAdminAfterValidationEtudiant($blocEcheanciers, $etudiant, $inscription): bool
     {
         $somme = 0;
