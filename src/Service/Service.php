@@ -385,7 +385,8 @@ class Service
                         $frais->setMontant($fraisItem->getMontant());
                         $frais->setInscription($inscription);
                         $frais->setTypeFrais($fraisItem->getTypeFrais());
-                        $this->fraisInscriptionRepository->save($frais, true);
+                        $this->em->persist($frais);
+                        $this->em->flush();
                     }
                     $response;
                 } else {
@@ -461,13 +462,16 @@ class Service
                                     $echeancierReel->setTotaPayer('0');
                                     $this->echeancierRepository->save($echeancierReel, true);
                                 }
+                                if ($value->getFraisBlocs()) {
 
-                                foreach ($value->getFraisBlocs() as $key => $fraisItem) {
-                                    $frais = new FraisInscription();
-                                    $frais->setMontant($fraisItem->getMontant());
-                                    $frais->setInscription($inscription);
-                                    $frais->setTypeFrais($fraisItem->getTypeFrais());
-                                    $this->fraisInscriptionRepository->save($frais, true);
+                                    foreach ($value->getFraisBlocs() as $key => $fraisItem) {
+                                        $frais = new FraisInscription();
+                                        $frais->setMontant((int)$fraisItem->getMontant());
+                                        $frais->setInscription($inscription);
+                                        $frais->setTypeFrais($fraisItem->getTypeFrais());
+                                        $this->em->persist($frais);
+                                        $this->em->flush();
+                                    }
                                 }
                                 $response = 'bonneEgalite';
                             } else {
@@ -495,6 +499,14 @@ class Service
 
                         foreach ($inscription->getEcheanciers() as $key => $echeancierInscription) {
                             $this->em->remove($echeancierInscription);
+                            $this->em->flush();
+                        }
+                        foreach ($inscription->getFraisInscriptions() as $key => $fraisInscription) {
+                            $this->em->remove($fraisInscription);
+                            $this->em->flush();
+                        }
+                        foreach ($value->getFraisBlocs() as $key => $bloc) {
+                            $this->em->remove($bloc);
                             $this->em->flush();
                         }
 
