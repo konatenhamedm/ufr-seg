@@ -1166,7 +1166,7 @@ class InscriptionController extends AbstractController
         ]);
     }
     #[Route('/{id}/edit/admin/echeancier', name: 'app_inscription_inscription_edit_admin_echeancier', methods: ['GET', 'POST'])]
-    public function editAdminEcheancier(Request $request, Inscription $inscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, FormError $formError, FraisInscriptionRepository $fraisRepository): Response
+    public function editAdminEcheancier(Request $request, Inscription $inscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, FormError $formError, FraisInscriptionRepository $fraisRepository, InfoInscriptionRepository $infoInscriptionRepository): Response
     {
 
         // dd('');
@@ -1190,22 +1190,50 @@ class InscriptionController extends AbstractController
             $response = [];
             $redirect = $this->generateUrl('app_inscription_etudiant_admin_index');
 
-
+            $versements = $infoInscriptionRepository->findOneBy(['inscription' => $inscription->getId()]);
             $echeanciers = $form->get('echeanciers')->getData();
+            $fraisInscription = $form->get('fraisInscriptions')->getData();
 
             $somme = 0;
+            $sommeFraisInscription = 0;
             foreach ($echeanciers as $key => $value) {
-                $somme += $value->getMontant();
+                $somme += (int)$value->getMontant();
+            }
+            foreach ($fraisInscription as $key => $frais) {
+                $sommeFraisInscription += (int)$frais->getMontant();
             }
 
-            if ($form->isValid()) {
-                $inscription->setMontant($somme);
-                $entityManager->persist($inscription);
-                $entityManager->flush();
-                $data = true;
+            // dd($sommeFraisInscription, $somme);
 
-                $statut = 1;
-                $message       = 'Opération effectuée avec succès';
+            if ($form->isValid()) {
+
+                if ((int)$inscription->getMontant() == $somme) {
+
+                    $inscription->setMontant($somme);
+                    $inscription->setTotalPaye('0');
+                    $entityManager->persist($inscription);
+                    $entityManager->flush();
+
+
+                    if ($versements) {
+
+                        foreach ($versements as $key => $versement) {
+                            $entityManager->remove($versement);
+                            $entityManager->flush();
+                        }
+                    }
+
+
+                    $statut = 1;
+                    $message       = 'Opération effectuée avec succès';
+                } else {
+
+                    $statut = 0;
+                    $message       = "Opération échouée car le montant total à payer est different du montant total de l 'échanece";
+                    $this->addFlash('danger', $message);
+                }
+
+                $data = true;
                 $this->addFlash('success', $message);
             } else {
                 $message = $formError->all($form);

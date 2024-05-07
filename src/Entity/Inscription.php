@@ -38,6 +38,7 @@ class Inscription
     private ?Niveau $niveau = null;
 
     #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: FraisInscription::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $fraisInscriptions;
 
     #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: Echeancier::class, orphanRemoval: true, cascade: ['persist', 'remove'])]

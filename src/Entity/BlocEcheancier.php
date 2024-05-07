@@ -31,17 +31,22 @@ class BlocEcheancier
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $echeancierProvisoires;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateInscription = null;
 
     #[ORM\ManyToOne(inversedBy: 'blocEcheanciers')]
     private ?Inscription $inscription = null;
+
+    #[ORM\OneToMany(mappedBy: 'blocEcheancier', targetEntity: FraisBloc::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    private Collection $fraisBlocs;
 
 
 
     public function __construct()
     {
         $this->echeancierProvisoires = new ArrayCollection();
+        $this->fraisBlocs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -121,7 +126,7 @@ class BlocEcheancier
         return $this->dateInscription;
     }
 
-    public function setDateInscription(\DateTimeInterface $dateInscription): static
+    public function setDateInscription($dateInscription): static
     {
         $this->dateInscription = $dateInscription;
 
@@ -136,6 +141,36 @@ class BlocEcheancier
     public function setInscription(?Inscription $inscription): static
     {
         $this->inscription = $inscription;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FraisBloc>
+     */
+    public function getFraisBlocs(): Collection
+    {
+        return $this->fraisBlocs;
+    }
+
+    public function addFraisBloc(FraisBloc $fraisBloc): static
+    {
+        if (!$this->fraisBlocs->contains($fraisBloc)) {
+            $this->fraisBlocs->add($fraisBloc);
+            $fraisBloc->setBlocEcheancier($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFraisBloc(FraisBloc $fraisBloc): static
+    {
+        if ($this->fraisBlocs->removeElement($fraisBloc)) {
+            // set the owning side to null (unless already changed)
+            if ($fraisBloc->getBlocEcheancier() === $this) {
+                $fraisBloc->setBlocEcheancier(null);
+            }
+        }
 
         return $this;
     }

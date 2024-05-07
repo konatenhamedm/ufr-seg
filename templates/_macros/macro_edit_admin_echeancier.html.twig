@@ -1,0 +1,127 @@
+{% macro prototype_ligne_echeancier(form,etat) %}
+
+
+  <div class="row-colonne_info_echeancier  my-3 py-2" style="border-bottom:3px solid #000">
+
+        <div class="row g-5 g-xl-8">
+
+                <div class="col-xl-6 col-md-6">
+
+                                <!--begin::Tables Widget 3-->
+                                <div class="card card-xl-stretch mb-xl-8" >
+                                    <!--begin::Header-->
+                                    <div class="card-header border-0 p-1" style="border-bottom:1px solid white;background: #3a4049;min-height: 50px !important;">
+                                        <h3 class="card-title align-items-start flex-column text-white" >
+                                        <span class="card-label fw-bold fs-3 mb-1 text-white">
+
+                                                frais inscription
+
+                                        </span>
+                                        </h3>
+                                           <div class="proto-container-frais" data-prototype="{{ _self.ligne_frais(form.fraisInscriptions.vars.prototype)|e }}"></div>
+                                  <button type="button" data-protoname="__name__" class="btn btn-primary add-collection-frais add-frais btn-xs" id="add_ligne" data-protoclass=".proto-container-frais" data-container=".row-container-frais">
+                                    <i class="fa fa-plus"></i>
+                                    Ajouter une ligne
+                                </button>
+
+                                    </div>
+
+                                    <div class="card-body py-3 " style="padding: 0px;">
+                                                <div class="place_frais_deux row-container-frais" >
+                                                {% for item in form.fraisInscriptions %}
+                                                            {{ _self.ligne_frais(item|e) }}
+                                                        {% endfor %}
+                                                </div>
+                                                    <div class="row">
+                                                        
+                                                        <div class="col-md-7 mb-4">Total</div>
+                                                         <div class="col-md-4 mb-4" style="color:red">{{ form_widget(form.montant,{'attr':{'readonly':'readonly'}}) }}</div>
+                                                         <div class="col-md-1 p-0 mb-4"></div>
+                                                    </div>
+                                    </div>
+                                </div>
+                </div>
+
+               
+
+                <div class="col-xl-6 col-md-6" >
+                        <!--begin::Tables Widget 3-->
+                        <div class="card card-xl-stretch mb-xl-8" >
+                            <!--begin::Header-->
+                            <div class="card-header border-0 p-1" style="border-bottom:1px solid white;background: #3a4049;min-height: 50px !important;">
+                                <h3 class="card-title align-items-start flex-column text-white">
+                                <span class="card-label fw-bold fs-3 mb-1 text-white">
+
+                                        Echéancier
+
+                                </span>
+                                </h3>
+                               
+                                 <div class="proto-container" data-prototype="{{ _self.ligne_echeancier(form.echeanciers.vars.prototype)|e }}"></div>
+                                  <button type="button" data-protoname="__name__" class="btn btn-success add-collection add-ligne btn-xs" id="add_ligne" data-protoclass=".proto-container" data-container=".row-container">
+                                    <i class="fa fa-plus"></i>
+                                    Ajouter une ligne
+                                </button>
+
+
+                            </div>
+
+                            <div class="card-body  p-0">
+                                    <table class="table table-bordered table-custom">
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th width="50%" class="p-2">Date versement</th>
+                                                    <th width="40%" class="p-2">Montant</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody  class="row-container">
+                                                {% for item in form.echeanciers %}
+                                                    {{ _self.ligne_echeancier(item|e) }}
+                                                {% endfor %}
+                                            </tbody>
+                                            <tfoot>
+                                                    <tr>
+                                                        <th class="text-end p-2 col "  style="color:red;font-weight:bolder"  >Montant total</th>
+                                                        <th class="total text-end p-2 fw-bolder col-total" style="color:red;font-weight:bolder"  data-class="col-total">0</td>
+                                                        <th class="total text-center p-2 fw-bolder " ></td>
+                                                    </tr>
+                                                
+                                                </tfoot>
+                                    </table>
+                            </div>     
+                        </div>     
+                </div>     
+        
+        </div>
+
+    </div> 
+{% endmacro %}
+
+{% macro ligne_echeancier(data) %}
+   
+    <tr class="row-colonne even pointer table-light">
+        <td class="p-2">
+           
+            <div style="display: " class="field-matiere">{{ form_widget(data.dateCreation) }}</div>
+        </td>
+        <td class="p-2">{{ form_widget(data.montant) }}</td>
+        <td class="p-2 del-col"><a href="#" class="btn btn-danger btn-xs"><span class="bi bi-trash"></span></a></td>
+    </tr>
+{% endmacro %}
+
+{% macro ligne_frais(data) %}
+   
+    <div class="row row-colonne-frais">
+        <div class="col-md-7 mb-4">
+        {{ form_widget(data.typeFrais,{'attr':{'class':'form-control numero ','id':'userinput16','placeholder':'Numéro étape'}}) }}
+        </div>
+        <div class="col-md-4">
+        {{ form_widget(data.montant) }}
+        </div>
+        <div class="col-md-1 p-0 del-col">
+        <a href="#" class="btn btn-danger btn-sm"><span class="bi bi-trash"></span></a>
+        </div>
+    
+    </div>
+{% endmacro %}

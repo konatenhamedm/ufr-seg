@@ -46,6 +46,17 @@ class BlocEcheancierType extends AbstractType
                 'by_reference' => false,
                 'allow_delete' => true,
                 'prototype' => true,
+            ])
+            ->add('fraisBlocs', CollectionType::class, [
+                'entry_type' => FraisBlocType::class,
+                'entry_options' => [
+                    'label' => false,
+                ],
+                'allow_add' => true,
+                'label' => false,
+                'by_reference' => false,
+                'allow_delete' => true,
+                'prototype' => true,
             ]);
         $builder->get('total')->addModelTransformer(new ThousandNumberTransformer());
         /*  ->add('etudiant', EntityType::class, [

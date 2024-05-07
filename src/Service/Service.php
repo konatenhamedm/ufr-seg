@@ -7,6 +7,7 @@ use App\Entity\AnneeScolaire;
 use App\Entity\ArticleMagasin;
 use App\Entity\Document;
 use App\Entity\Echeancier;
+use App\Entity\FraisInscription;
 use App\Entity\InfoInscription;
 use App\Entity\Inscription;
 use App\Entity\LigneDocument;
@@ -21,6 +22,7 @@ use App\Repository\ClasseRepository;
 use App\Repository\CoursRepository;
 use App\Repository\DocumentRepository;
 use App\Repository\EcheancierRepository;
+use App\Repository\FraisInscriptionRepository;
 use App\Repository\InfoInscriptionRepository;
 use App\Repository\InscriptionRepository;
 use App\Repository\LigneDocumentRepository;
@@ -53,6 +55,8 @@ class Service
     private $security;
     private $anneeScolaireRepository;
     private $inscriptionRepository;
+    private $fraisInscriptionRepository;
+    private $infoInscriptionRepository;
 
 
     public function __construct(
@@ -70,7 +74,8 @@ class Service
         NoteRepository $noteRepository,
         CoursRepository $coursRepository,
         AnneeScolaireRepository $anneeScolaireRepository,
-        InscriptionRepository $inscriptionRepository
+        InscriptionRepository $inscriptionRepository,
+        FraisInscriptionRepository $fraisInscriptionRepository
     ) {
         $this->em = $em;
         $this->security = $security;
@@ -87,6 +92,8 @@ class Service
         $this->coursRepository = $coursRepository;
         $this->anneeScolaireRepository = $anneeScolaireRepository;
         $this->inscriptionRepository = $inscriptionRepository;
+        $this->fraisInscriptionRepository = $fraisInscriptionRepository;
+        $this->infoInscriptionRepository = $infoInscriptionRepository;
 
         //$this->verifieIfFile2(15,2);
     }
@@ -337,6 +344,7 @@ class Service
         $response = true;
         foreach ($blocEcheanciers as $key => $value) {
 
+
             foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
                 $somme += $echeancier->getMontant();
             }
@@ -370,6 +378,15 @@ class Service
                         $echeancierReel->setTotaPayer('0');
                         $this->echeancierRepository->save($echeancierReel, true);
                     }
+
+                    //dd($value->getFraisBlocs()->count());
+                    foreach ($value->getFraisBlocs() as $key => $fraisItem) {
+                        $frais = new FraisInscription();
+                        $frais->setMontant($fraisItem->getMontant());
+                        $frais->setInscription($inscription);
+                        $frais->setTypeFrais($fraisItem->getTypeFrais());
+                        $this->fraisInscriptionRepository->save($frais, true);
+                    }
                     $response;
                 } else {
                     $response = false;
@@ -401,6 +418,7 @@ class Service
                 if ($newInscription->getId()  != $inscription->getId()) {
                     if (count($newInscriptionCount) == 0) {
                         if ($somme == (int)$value->getTotal()) {
+
                             $inscription->setMontant($value->getTotal());
                             $inscription->setNiveau($this->classeRepository->find($value->getClasse())->getNiveau());
                             $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getNiveau()->getCode()));
@@ -412,6 +430,17 @@ class Service
                             }
 
                             $this->inscriptionRepository->save($inscription, true);
+
+                            $versements = $this->infoInscriptionRepository->findOneBy(['inscription' => $inscription->getId()]);
+
+                            if ($versements) {
+
+                                foreach ($versements as $key => $versement) {
+                                    $this->em->remove($versement);
+                                    $this->em->flush();
+                                }
+                            }
+
 
                             $value->setInscription($inscription);
                             //dd($inscription->getTotalPaye());
@@ -432,6 +461,14 @@ class Service
                                     $echeancierReel->setTotaPayer('0');
                                     $this->echeancierRepository->save($echeancierReel, true);
                                 }
+
+                                foreach ($value->getFraisBlocs() as $key => $fraisItem) {
+                                    $frais = new FraisInscription();
+                                    $frais->setMontant($fraisItem->getMontant());
+                                    $frais->setInscription($inscription);
+                                    $frais->setTypeFrais($fraisItem->getTypeFrais());
+                                    $this->fraisInscriptionRepository->save($frais, true);
+                                }
                                 $response = 'bonneEgalite';
                             } else {
                                 $response = 'bonneEgalitePresenceEcheancierPayer';
@@ -443,28 +480,46 @@ class Service
                         $response = 'existe';
                     }
                 } else {
-                    if ($somme == (int)$value->getTotal()) {
+                    $versements = $this->infoInscriptionRepository->findOneBy(['inscription' => $inscription->getId()]);
 
-                        if ($inscription->getTotalPaye() == "0") {
+                    if ($versements) {
 
-                            foreach ($inscription->getEcheanciers() as $key => $echeancierInscription) {
-                                $this->em->remove($echeancierInscription);
-                                $this->em->flush();
-                            }
-
-                            foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
-                                $echeancierReel = new Echeancier();
-                                $echeancierReel->setDateCreation(new DateTime());
-                                $echeancierReel->setEtat('pas_payer');
-                                $echeancierReel->setInscription($inscription);
-                                $echeancierReel->setMontant($echeancier->getMontant());
-                                $echeancierReel->setTotaPayer('0');
-                                $this->echeancierRepository->save($echeancierReel, true);
-                            }
-                            $response = 'bonneEgalite';
-                        } else {
-                            $response = 'bonneEgalitePresenceEcheancierPayer';
+                        foreach ($versements as $key => $versement) {
+                            $this->em->remove($versement);
+                            $this->em->flush();
                         }
+                    }
+                    if ($somme == (int)$value->getTotal()) {
+                        //dd('');
+                        //if ($inscription->getTotalPaye() == "0") { TO DO a decommenter apres avoir tester
+
+                        foreach ($inscription->getEcheanciers() as $key => $echeancierInscription) {
+                            $this->em->remove($echeancierInscription);
+                            $this->em->flush();
+                        }
+
+                        $inscription->setTotalPaye('0');
+                        foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                            $echeancierReel = new Echeancier();
+                            $echeancierReel->setDateCreation(new DateTime());
+                            $echeancierReel->setEtat('pas_payer');
+                            $echeancierReel->setInscription($inscription);
+                            $echeancierReel->setMontant($echeancier->getMontant());
+                            $echeancierReel->setTotaPayer('0');
+                            $this->echeancierRepository->save($echeancierReel, true);
+                        }
+
+                        foreach ($value->getFraisBlocs() as $key => $fraisItem) {
+                            $frais = new FraisInscription();
+                            $frais->setMontant($fraisItem->getMontant());
+                            $frais->setInscription($inscription);
+                            $frais->setTypeFrais($fraisItem->getTypeFrais());
+                            $this->fraisInscriptionRepository->save($frais, true);
+                        }
+                        $response = 'bonneEgalite';
+                        // } else {
+                        $response = 'bonneEgalitePresenceEcheancierPayer';
+                        //}
                     } else {
                         $response = 'pasEgalite';
                     }

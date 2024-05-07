@@ -12,6 +12,7 @@ use App\Entity\Employe;
 use App\Entity\Etudiant;
 use App\Entity\Filiere;
 use App\Entity\Fonction;
+use App\Entity\FraisBloc;
 use App\Entity\InfoEtudiant;
 use App\Entity\InfoInscription;
 use App\Entity\Inscription;
@@ -690,7 +691,7 @@ class HomeController extends AbstractController
                                 'label' => "Modifier écheancier",
                                 'icon' => '%icon% bi bi-calendar-event',
                                 'attrs' => ['class' => 'btn-warning', 'title' => 'Modifier écheancier'],
-                                'render' =>  new ActionRender(fn () => $context->getInfoInscriptions()->count() == 0)
+                                //'render' =>  new ActionRender(fn () => $context->getInfoInscriptions()->count() == 0)
                             ],
                             'new' => [
                                 'target' => '#exampleModalSizeSm2',
@@ -832,7 +833,7 @@ class HomeController extends AbstractController
 
             foreach ($frais as $e) {
                 // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
-                $tabFrais[$i]['id'] = $e->getId();
+                $tabFrais[$i]['id'] = $e->getTypeFrais()->getId();
                 $tabFrais[$i]['libelle'] = $e->getTypeFrais()->getLibelle();
                 $tabFrais[$i]['montant'] = $e->getMontant();
 
@@ -866,9 +867,12 @@ class HomeController extends AbstractController
         ClasseRepository $classeRepository,
         InscriptionRepository $inscriptionRepository,
         EcheancierRepository $echeancierRepository,
+        FraisRepository $fraisRepository,
         Service $service
         // Etudiant $etudiant
     ): Response {
+
+        //dd('');
         $etudiant = new Etudiant();
         $etudiant->setDateNaissance(new DateTime());
         $info = new InfoEtudiant();
@@ -882,6 +886,18 @@ class HomeController extends AbstractController
         $bloc_echeancier = new BlocEcheancier();
 
         $bloc_echeancier->setClasse($classeRepository->find(1));
+
+        //$allFrais = $fraisRepository->findBy(['niveau' => $classeRepository->find(3)->getNiveau()]);
+
+
+        /*   foreach ($allFrais as $key => $value) {
+            $fraisBloc = new FraisBloc();
+            $fraisBloc->setMontant($value->getMontant());
+            $fraisBloc->setTypeFrais($value->getTypeFrais());
+            $bloc_echeancier->addFraisBloc($fraisBloc);
+        } */
+
+
         $bloc_echeancier->setDateInscription(new DateTime());
         //$bloc_echeancier->setTotal($sommeFrais);
 
@@ -943,6 +959,8 @@ class HomeController extends AbstractController
                 $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
             }
             $blocEcheanciers = $form->get('blocEcheanciers')->getData();
+            // $blocEcheancierssss = $form->get('etudiant_admin_blocEcheanciers_1_autre_fais')->getData();
+            //dd($blocEcheancierssss);
 
             if ($form->isValid()) {
 

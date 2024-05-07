@@ -35,8 +35,13 @@
                                     
                                 </div>
                             
-                                      <div class="place_frais" >
+                                      {# <div class="place_frais" >
                                        
+                                      </div> #}
+                                      <div class="place_frais_deux" >
+                                        {% for item in colonne.fraisBlocs %}
+                                                    {{ _self.ligne_frais(item|e) }}
+                                                {% endfor %}
                                       </div>
                                       {# <div class="row">
                                         <div class="col-md-3 mb-4">Frais inscription :</div>
@@ -150,4 +155,17 @@
         <td class="p-2">{{ form_widget(data.montant) }}</td>
        <td class="p-2 text-center del-col"></td>
     </tr>
+{% endmacro %}
+{% macro ligne_frais(data) %}
+   
+    <div class="row">
+        <div class="col-md-7 mb-4">
+        {{ form_widget(data.typeFrais,{'attr':{'class':'form-control numero ','id':'userinput16','placeholder':'Numéro étape','readonly':'readonly'}}) }}
+        </div>
+        <div class="col-md-5">
+        {{ form_widget(data.montant) }}
+        </div>
+    
+    </div>
+
 {% endmacro %}

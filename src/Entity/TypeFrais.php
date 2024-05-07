@@ -32,9 +32,13 @@ class TypeFrais
     #[ORM\OneToMany(mappedBy: 'typeFrais', targetEntity: InfoInscription::class)]
     private Collection $infoInscriptions;
 
+    #[ORM\OneToMany(mappedBy: 'typeFrais', targetEntity: FraisBloc::class)]
+    private Collection $fraisBlocs;
+
     public function __construct()
     {
         $this->infoInscriptions = new ArrayCollection();
+        $this->fraisBlocs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,6 +94,36 @@ class TypeFrais
             // set the owning side to null (unless already changed)
             if ($infoInscription->getTypeFrais() === $this) {
                 $infoInscription->setTypeFrais(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FraisBloc>
+     */
+    public function getFraisBlocs(): Collection
+    {
+        return $this->fraisBlocs;
+    }
+
+    public function addFraisBloc(FraisBloc $fraisBloc): static
+    {
+        if (!$this->fraisBlocs->contains($fraisBloc)) {
+            $this->fraisBlocs->add($fraisBloc);
+            $fraisBloc->setTypeFrais($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFraisBloc(FraisBloc $fraisBloc): static
+    {
+        if ($this->fraisBlocs->removeElement($fraisBloc)) {
+            // set the owning side to null (unless already changed)
+            if ($fraisBloc->getTypeFrais() === $this) {
+                $fraisBloc->setTypeFrais(null);
             }
         }
 

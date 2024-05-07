@@ -2,10 +2,13 @@
 
 namespace App\Form;
 
+use App\Entity\FraisInscription;
 use App\Entity\Inscription;
+use App\Form\DataTransformer\ThousandNumberTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -20,6 +23,21 @@ class InscriptionAdminType extends AbstractType
             ->add('niveauEtudiant')
             ->add('etudiant')
             ->add('niveau') */
+            ->add('montant', TextType::class, ['attr' => ['class' => 'input-money input-mnt total']])
+            ->add(
+                'fraisInscriptions',
+                CollectionType::class,
+                [
+                    'label'         => false,
+                    'entry_type'    => FraisInscriptionType::class,
+                    //'label'         => false,
+                    'allow_add'     => true,
+                    'allow_delete'  => true,
+                    'by_reference'  => false,
+
+                    'entry_options' => ['label' => false],
+                ]
+            )
             ->add(
                 'echeanciers',
                 CollectionType::class,
@@ -34,7 +52,7 @@ class InscriptionAdminType extends AbstractType
                     'entry_options' => ['label' => false],
                 ]
             );
-
+        $builder->get('montant')->addModelTransformer(new ThousandNumberTransformer());
 
         /*  $builder->add('annuler', SubmitType::class, ['label' => 'Annuler', 'attr' => ['class' => 'btn btn-primary btn-sm', 'data-bs-dismiss' => 'modal']])
             ->add('save', SubmitType::class, ['label' => 'Enregister', 'attr' => ['class' => 'btn btn-main btn-ajax btn-sm']])

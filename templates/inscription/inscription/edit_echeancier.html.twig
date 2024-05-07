@@ -11,7 +11,7 @@
             </span>
         </div>
     </div>
-    {% from '_macros/inscription.html.twig' import prototype_ligne_echeancier %}
+    {% from '_macros/macro_edit_admin_echeancier.html.twig' import prototype_ligne_echeancier %}
     {{ form_start(form, {'attr': {'role':'form', 'class': 'form'}}) }}
     <div class="modal-body">
         {{ include('_includes/ajax/response.html.twig') }}
@@ -40,14 +40,29 @@
     {{ form_end(form, {render_rest: false}) }}
 {% endblock %}
 {% block java %}
+<script src="{{ asset('assets/parcours/frais_admin.js')}}"></script>
     <script>
    
 
 
 
-
-
         $(function () {
+
+
+        $('.autre_frais').on('update-value', function (e, val, element) {
+      
+             total = 0;
+           $('.autre_frais').each(function(e){
+         const $this = $(this);
+             //somme = somme +parseInt($this.val())
+              total = total + parseInt($this.val().replaceAll(' ', ''));
+           })
+
+            $('.total').val(total)
+            
+        })
+
+
             
                update_totaux()
 
