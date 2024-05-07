@@ -505,10 +505,6 @@ class Service
                             $this->em->remove($fraisInscription);
                             $this->em->flush();
                         }
-                        foreach ($value->getFraisBlocs() as $key => $bloc) {
-                            $this->em->remove($bloc);
-                            $this->em->flush();
-                        }
 
                         $inscription->setTotalPaye('0');
                         foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
