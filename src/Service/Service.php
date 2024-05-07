@@ -615,7 +615,7 @@ class Service
                     $this->em->flush();
                 }
             }
-            if ($inscription->getEcheanciers() != null) {
+            if ($this->echeancierRepository->findBy(['inscription' => $inscription])) {
 
                 foreach ($inscription->getEcheanciers() as $key => $echeancierInscription) {
                     $this->em->remove($echeancierInscription);
