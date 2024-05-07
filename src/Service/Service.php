@@ -623,7 +623,7 @@ class Service
                 }
             }
 
-            if ($inscription->getInfoInscriptions() != null) {
+            if ((int)$inscription->getTotalPaye() != 0) {
 
                 foreach ($inscription->getInfoInscriptions() as $key => $infoInscription) {
                     $this->em->remove($infoInscription);
