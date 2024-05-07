@@ -608,18 +608,27 @@ class Service
             }
 
             $inscription = $this->inscriptionRepository->findOneBy(['classe' => $value->getClasse(), 'etudiant' => $etudiant]);
+            if ($inscription->getFraisInscriptions()) {
 
-            foreach ($inscription->getFraisInscriptions() as $key => $fraisInscription) {
-                $this->em->remove($fraisInscription);
-                $this->em->flush();
+                foreach ($inscription->getFraisInscriptions() as $key => $fraisInscription) {
+                    $this->em->remove($fraisInscription);
+                    $this->em->flush();
+                }
             }
-            foreach ($inscription->getEcheanciers() as $key => $echeancierInscription) {
-                $this->em->remove($echeancierInscription);
-                $this->em->flush();
+            if ($inscription->getEcheanciers()) {
+
+                foreach ($inscription->getEcheanciers() as $key => $echeancierInscription) {
+                    $this->em->remove($echeancierInscription);
+                    $this->em->flush();
+                }
             }
-            foreach ($inscription->getInfoInscriptions() as $key => $infoInscription) {
-                $this->em->remove($infoInscription);
-                $this->em->flush();
+
+            if ($inscription->getInfoInscriptions()) {
+
+                foreach ($inscription->getInfoInscriptions() as $key => $infoInscription) {
+                    $this->em->remove($infoInscription);
+                    $this->em->flush();
+                }
             }
             /*  foreach ($value->getFraisBlocs() as $key => $fraisBloc) {
                 $this->em->remove($fraisBloc);
