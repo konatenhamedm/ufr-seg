@@ -676,8 +676,9 @@ class HomeController extends AbstractController
 
                         'actions' => [
                             'deliberation' => [
+                                'target' => '#exampleModalSizeSm2',
                                 'url' => $this->generateUrl('site_information_edit', ['id' => $context->getEtudiant()->getId()]),
-                                'ajax' => false,
+                                'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
