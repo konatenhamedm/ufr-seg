@@ -489,7 +489,7 @@ class Service
                     }
                 } else {
                     $versements = $this->infoInscriptionRepository->findOneBy(['inscription' => $inscription->getId()]);
-                    $frais_bloc = $this->fraisInscriptionRepository->findBy(['blocEcheancier' => $value->getId()]);
+                    $frais_bloc = $this->fraisBlocRepository->findBy(['blocEcheancier' => $value->getId()]);
                     if ($versements) {
 
                         foreach ($versements as $key => $versement) {
