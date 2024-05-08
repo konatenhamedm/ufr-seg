@@ -1348,7 +1348,7 @@ class InscriptionController extends AbstractController
 
 
     #[Route('/{id}/paiement/admin/ok', name: 'app_inscription_inscription_paiement_ok', methods: ['GET', 'POST'])]
-    public function paiement(Request $request, TypeFraisRepository $typeFraisRepository, Inscription $inscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, InfoInscriptionRepository $infoInscriptionRepository, FormError $formError, FraisInscriptionRepository $fraisRepository, EcheancierRepository $echeancierRepository, UserInterface $user, NaturePaiementRepository $naturePaiementRepository, Service $service): Response
+    public function paiement(Request $request, FraisInscriptionRepository $fraisInscriptionRepository, TypeFraisRepository $typeFraisRepository, Inscription $inscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, InfoInscriptionRepository $infoInscriptionRepository, FormError $formError, FraisInscriptionRepository $fraisRepository, EcheancierRepository $echeancierRepository, UserInterface $user, NaturePaiementRepository $naturePaiementRepository, Service $service): Response
     {
 
 
@@ -1373,7 +1373,7 @@ class InscriptionController extends AbstractController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_home_timeline_index');
+            $redirect = $this->generateUrl('app_inscription_inscription_frais_index');
             //$ligne = $form->get('echeanciers')->getData();
 
             $workflow_data = $this->workflow->get($inscription, 'inscription');
@@ -1384,9 +1384,21 @@ class InscriptionController extends AbstractController
             $type =  $typeFraisRepository->find($form->get('typeFrais')->getData()->getId());
 
             $montant = (int) $form->get('montant')->getData();
+            $typeFrais =  $form->get('typeFrais')->getData();
+
+            $somme = 0;
+
+            $fraisInscriptionData = $fraisInscriptionRepository->findOneBy(['inscription' => $inscription->getId(), 'typeFrais' => $typeFrais]);
+            $infoInscriptiondata = $infoInscriptionRepository->findBy(['inscription' => $inscription->getId(), 'typeFrais' => $typeFrais]);
+
+            foreach ($infoInscriptiondata as $key => $info) {
+                $somme += (int)$info->getMontant();
+            }
+
+            $resteAPayer = abs((int)$fraisInscriptionData->getMontant() - $somme);
 
 
-            //dd($inscription->getId());
+            /* dd($typeFrais); */
             $allData = [
 
                 'echeanciers' => $echeanciers,
@@ -1406,9 +1418,25 @@ class InscriptionController extends AbstractController
 
 
 
-                $service->paiementInscriptionNew($inscription, $allData);
 
-                $message = sprintf('Opération effectuée avec succès');
+
+                if ($resteAPayer >= $montant) {
+                    $service->paiementInscriptionNew($inscription, $allData);
+
+                    $load_tab = true;
+                    $statut = 1;
+
+                    $message = sprintf('Opération effectuée avec succès');
+                    $this->addFlash('success', $message);
+                } else {
+
+                    $statut = 0;
+
+                    $message = sprintf('Désole échec de paiement car le montant  saisi est superieur au montant  [%s] qui reste à payer pour un montant total de  %s', $resteAPayer, $fraisInscriptionData->getMontant());
+                    $this->addFlash('danger', $message);
+                }
+
+
 
                 $url = [
                     'url' => $this->generateUrl('app_inscription_inscription_paiement_recapitulatif', [
@@ -1428,12 +1456,7 @@ class InscriptionController extends AbstractController
                     $statut = 0;
                 } */
 
-
                 $data = true;
-                $load_tab = true;
-                $statut = 1;
-
-                $this->addFlash('success', $message);
             } else {
                 $message = $formError->all($form);
                 $statut = 0;

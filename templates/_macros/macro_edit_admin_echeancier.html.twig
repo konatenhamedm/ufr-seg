@@ -18,11 +18,11 @@
 
                                         </span>
                                         </h3>
-                                           <div class="proto-container-frais" data-prototype="{{ _self.ligne_frais(form.fraisInscriptions.vars.prototype)|e }}"></div>
+                                        {#    <div class="proto-container-frais" data-prototype="{{ _self.ligne_frais(form.fraisInscriptions.vars.prototype)|e }}"></div>
                                   <button type="button" data-protoname="__name__" class="btn btn-primary add-collection-frais add-frais btn-xs" id="add_ligne" data-protoclass=".proto-container-frais" data-container=".row-container-frais">
                                     <i class="fa fa-plus"></i>
                                     Ajouter une ligne
-                                </button>
+                                </button> #}
 
                                     </div>
 
@@ -34,9 +34,9 @@
                                                 </div>
                                                     <div class="row">
                                                         
-                                                        <div class="col-md-7 mb-4">Total</div>
-                                                         <div class="col-md-4 mb-4" style="color:red">{{ form_widget(form.montant,{'attr':{'readonly':'readonly'}}) }}</div>
-                                                         <div class="col-md-1 p-0 mb-4"></div>
+                                                        <div class="col-md-7 mb-4" style="color:red;;font-size: 18px;">Total</div>
+                                                         <div class="col-md-5 mb-4" style="color:red;;font-size: 18px;">{{ form_widget(form.montant,{'attr':{'readonly':'readonly'}}) }}</div>
+                                                         {# <div class="col-md-1 p-0 mb-4"></div> #}
                                                     </div>
                                     </div>
                                 </div>
@@ -82,8 +82,8 @@
                                             </tbody>
                                             <tfoot>
                                                     <tr>
-                                                        <th class="text-end p-2 col "  style="color:red;font-weight:bolder"  >Montant total</th>
-                                                        <th class="total text-end p-2 fw-bolder col-total" style="color:red;font-weight:bolder"  data-class="col-total">0</td>
+                                                        <th class="text-end p-2 col "  style="color:red;font-weight:bolder;font-size: 18px;"  >Montant total</th>
+                                                        <th class="total text-end p-2 fw-bolder col-total" style="color:red;font-weight:bolder;font-size: 18px;"  data-class="col-total">0</td>
                                                         <th class="total text-center p-2 fw-bolder " ></td>
                                                     </tr>
                                                 
@@ -116,12 +116,12 @@
         <div class="col-md-7 mb-4">
         {{ form_widget(data.typeFrais,{'attr':{'class':'form-control numero ','id':'userinput16','placeholder':'Numéro étape'}}) }}
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
         {{ form_widget(data.montant) }}
         </div>
-        <div class="col-md-1 p-0 del-col">
+        {# <div class="col-md-1 p-0 del-col">
         <a href="#" class="btn btn-danger btn-sm"><span class="bi bi-trash"></span></a>
-        </div>
+        </div> #}
     
     </div>
 {% endmacro %}
