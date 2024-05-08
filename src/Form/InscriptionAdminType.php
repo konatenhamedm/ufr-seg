@@ -2,9 +2,11 @@
 
 namespace App\Form;
 
+use App\Entity\Classe;
 use App\Entity\FraisInscription;
 use App\Entity\Inscription;
 use App\Form\DataTransformer\ThousandNumberTransformer;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -23,6 +25,10 @@ class InscriptionAdminType extends AbstractType
             ->add('niveauEtudiant')
             ->add('etudiant')
             ->add('niveau') */
+            ->add('classe', EntityType::class, [
+                'class' => Classe::class,
+                'choice_label' => 'libelle',
+            ])
             ->add('montant', TextType::class, ['attr' => ['class' => 'input-money input-mnt total']])
             ->add(
                 'fraisInscriptions',

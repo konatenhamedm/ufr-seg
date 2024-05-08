@@ -1186,6 +1186,10 @@ class InscriptionController extends AbstractController
 
         $form->handleRequest($request);
 
+        //$classeOlde = $inscription->getClasse();
+
+        //dd($classeOlde);
+
         if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_inscription_etudiant_admin_index');
@@ -1193,6 +1197,9 @@ class InscriptionController extends AbstractController
             $versements = $infoInscriptionRepository->findOneBy(['inscription' => $inscription->getId()]);
             $echeanciers = $form->get('echeanciers')->getData();
             $fraisInscription = $form->get('fraisInscriptions')->getData();
+            $classe = $form->get('classe')->getData();
+
+            $allInscriptions = $inscriptionRepository->findOneBy(['etudiant' => $inscription->getEtudiant(), 'classe' => $classe]);
 
             $somme = 0;
             $sommeFraisInscription = 0;
@@ -1203,29 +1210,33 @@ class InscriptionController extends AbstractController
                 $sommeFraisInscription += (int)$frais->getMontant();
             }
 
-            // dd($sommeFraisInscription, $somme);
+            // dd($allInscriptions->getId(), $inscription->getId());
+
 
             if ($form->isValid()) {
-
                 if ((int)$inscription->getMontant() == $somme) {
 
                     $inscription->setMontant($somme);
                     $inscription->setTotalPaye('0');
-                    $entityManager->persist($inscription);
-                    $entityManager->flush();
 
+                    if (($allInscriptions->getId() == $inscription->getId()) || ($$allInscriptions == null)) {
+                        $entityManager->persist($inscription);
+                        $entityManager->flush();
 
-                    if ($versements) {
+                        if ($versements) {
 
-                        foreach ($versements as $key => $versement) {
-                            $entityManager->remove($versement);
-                            $entityManager->flush();
+                            foreach ($versements as $key => $versement) {
+                                $entityManager->remove($versement);
+                                $entityManager->flush();
+                            }
                         }
+
+                        $statut = 1;
+                        $message       = 'Opération effectuée avec succès';
+                    } else {
+                        $statut = 0;
+                        $message       = 'Opération échouée ';
                     }
-
-
-                    $statut = 1;
-                    $message       = 'Opération effectuée avec succès';
                 } else {
 
                     $statut = 0;

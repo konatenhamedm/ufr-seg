@@ -27,17 +27,21 @@
                                     </div>
 
                                     <div class="card-body py-3 " style="padding: 0px;">
+                                                 <div class="row">
+                                                    <div class="col-md-7 mb-4"> Classe :</div>
+                                                    <div class="col-md-5 mb-4">{{ form_widget(form.classe) }}</div>
+                                                </div>
                                                 <div class="place_frais_deux row-container-frais" >
                                                 {% for item in form.fraisInscriptions %}
                                                             {{ _self.ligne_frais(item|e) }}
                                                         {% endfor %}
                                                 </div>
-                                                    <div class="row">
+                                                <div class="row">
                                                         
                                                         <div class="col-md-7 mb-4" style="color:red;;font-size: 18px;">Total</div>
                                                          <div class="col-md-5 mb-4" style="color:red;;font-size: 18px;">{{ form_widget(form.montant,{'attr':{'readonly':'readonly'}}) }}</div>
                                                          {# <div class="col-md-1 p-0 mb-4"></div> #}
-                                                    </div>
+                                                </div>
                                     </div>
                                 </div>
                 </div>
