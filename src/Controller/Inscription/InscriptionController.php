@@ -1235,7 +1235,7 @@ class InscriptionController extends AbstractController
                         $message       = 'Opération effectuée avec succès';
                     } else {
                         $statut = 0;
-                        $message       = 'Opération échouée ';
+                        $message       = 'Opération échouée car cet étudaiant à deja une inscription pour cette classe';
                     }
                 } else {
 
