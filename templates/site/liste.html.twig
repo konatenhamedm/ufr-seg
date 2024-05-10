@@ -149,7 +149,7 @@ tr:nth-child(even) {
           <th style="vertical-align:middle;">NOM ET PRÉNOMS</th>
           <th style="vertical-align:middle;">NIVEAU</th>
           <th style="vertical-align:middle;">DATE PAIEMENT</th>
-          <th style="vertical-align:middle;">COUT DE LA FORMATION</th>
+          <th style="vertical-align:middle;">COUT DE LA PREINSCRIPTION</th>
           <th style="vertical-align:middle;">MODE PAIEMENT</th>
           <th style="vertical-align:middle;">{{'Caissière' | upper}}</th>
           {# <th style="vertical-align:middle;">TAUX DE PAIEMNET</th> #}
@@ -164,45 +164,36 @@ tr:nth-child(even) {
          
           <tr>
             <td style="vertical-align:middle;text-align:center;">{{key+1}}</td>
-            <td style="vertical-align:middle;text-align:center;" >{{ ligne.code }}</td>
-            <td style="vertical-align:middle;text-align:center;" >{{ ligne.etudiant.nom ~ ' ' ~ ligne.etudiant.prenom }}</td>
-             <td style="vertical-align:middle;text-align:center;" >{{ ligne.niveau.getSigle }}</td>
-             <td style="vertical-align:middle;text-align:center;" >{{ ligne.infoPreinscription.datePaiement | date('d/m/Y') }}</td>
-            <td style="vertical-align:middle;text-align:center;">{{ligne.infoPreinscription.montant |number_format(0, '.', '.') }}</td>
-             <td style="vertical-align:middle;text-align:center;" >{{ ligne.infoPreinscription.modePaiement.libelle }}</td>
-             <td style="vertical-align:middle;text-align:center;" >{{ ligne.caissiere ? ligne.caissiere.getNomComplet :'' }}</td>
-        {#     <td style="vertical-align:middle;text-align:center;" ><span style="font-size:15px;color:#FF2E2E">{% if ligne.etat == "valide" %} {{ligne.montant_preinscription  |number_format(0, '.', '.') }} {% else %} {{ '0'|number_format(0, '.', '.') }} {% endif %}</span ></td>
-            <td style="vertical-align:middle;text-align:center;" >{% if ligne.etat in ["paiement_confirmation","attente_paiement"] %} {{ligne.montant_preinscription  |number_format(0, '.', '.') }} {% else %} {{ '0'|number_format(0, '.', '.') }} {% endif %}</td>
-            <td style="vertical-align:middle;text-align:center;" >{% if ligne.etat in ["paiement_confirmation","attente_paiement"]  %} {{ligne.montant_preinscription  |number_format(0, '.', '.') }} {% else %} {{ '0'|number_format(0, '.', '.') }} {% endif %}</td>
-           #}
-           {# {% set total = total + ligne.montant_preinscription %} #}
-            {# <td style="vertical-align:middle;text-align:center;" >{{ menu.existeContrat(ligne.id) ?  menu.existeContrat(ligne.id).locataire.NPrenoms  : 'Appartement libre'  }}</td>
-            <td style="vertical-align:middle;text-align:center;" >{{ menu.existeContrat(ligne.id) ?  (menu.existeContrat(ligne.id).DateEntree)|date("m/d/Y")  : 'Appartement libre' }}</td>
-             #}
-            {# {{ dump(ligne.getInfo )}} #}
-           {#  {{ dump(ligne.getInfo ? ligne.getInfo.locataire.NPrenoms :'fff' )}} #}
+            <td style="vertical-align:middle;text-align:center;" >{{ ligne.preinscription.code }}</td>
+            <td style="vertical-align:middle;text-align:center;" >{{ ligne.preinscription.etudiant.nom ~ ' ' ~ ligne.preinscription.etudiant.prenom }}</td>
+             <td style="vertical-align:middle;text-align:center;" >{{ ligne.preinscription.niveau.getSigle }}</td>
+             <td style="vertical-align:middle;text-align:center;" >{{ ligne.datePaiement | date('d/m/Y') }}</td>
+            <td style="vertical-align:middle;text-align:center;">{{ligne.montant |number_format(0, '.', '.') }}</td>
+             <td style="vertical-align:middle;text-align:center;" >{{ ligne.modePaiement.libelle }}</td>
+             <td style="vertical-align:middle;text-align:center;" >{{ ligne.preinscription.caissiere ? ligne.preinscription.caissiere.getNomComplet :'' }}</td>
+        
+          </tr>
+          {% set total = total + ligne.montant %}
+          {% else %}
+        
+          <tr>
+           <td colspan="8">
+             <h2>Il n'y a aucune données dans cette recherche</h2>
+           </td>
           </tr>
          {% endfor %}
 
-        {#  <tr>
-           <td style="vertical-align:middle;text-align:center;font-family:"Gill Sans Extrabold", sans-serif;" colspan="2">
-              <h3 class="text-center">Total</h3>
-           </td>
+           <tfoot>
+                  <tr>
+                    <th class="text-end p-2 col " colspan="5" style="horizontal-align:left;text-align: right;color:red;font-size:18px">Total montant</th>
+                    <th class="total text-center p-2 fw-bolder col-total" style="vertical-align:middle;text-align:center;color:red;font-size:18px" data-class="col-total">{{ total |number_format(0, '.', '.') }}</td>
+                    <th class="total text-center p-2 fw-bolder "></td>
+                    <th class="total text-center p-2 fw-bolder "></td>
+                  </tr>
+                                        
+          </tfoot>
 
-           <td style="vertical-align:middle;text-align:center;font-family:"Gill Sans Extrabold", sans-serif;" >
-         <h3 class="text-center">{{ total |number_format(0, '.', '.') }}</h3>
-           </td>
-            
-           <td style="vertical-align:middle;text-align:center;font-family:"Gill Sans Extrabold", sans-serif;" > 
-           <h3 class="text-center">{{ total_payer |number_format(0, '.', '.')  }}</h3>
-           </td>
-           <td style="vertical-align:middle;text-align:center;font-family:"Gill Sans Extrabold", sans-serif;" > 
-          <h3 class="text-center">{{ total_impaye |number_format(0, '.', '.')  }}</h3>
-           </td>
-           <td style="vertical-align:middle;text-align:center;font-family:"Gill Sans Extrabold", sans-serif;" > 
-           <h3 class="text-center">{{ total_impaye |number_format(0, '.', '.')  }}</h3>
-           </td>
-         </tr> #}
+       
         
     </table>
      

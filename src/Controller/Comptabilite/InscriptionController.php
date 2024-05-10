@@ -26,6 +26,7 @@ use App\Controller\FileTrait;
 use App\Entity\Classe;
 use App\Entity\Filiere;
 use App\Entity\InfoInscription;
+use App\Entity\InfoPreinscription;
 use App\Entity\NaturePaiement;
 use App\Entity\Niveau;
 use App\Entity\TypeFrais;
@@ -125,21 +126,21 @@ class InscriptionController extends AbstractController
             ->add('datePaiement', DateTimeColumn::class, ['label' => 'Date paiement', 'format' => 'd-m-Y', 'field' => 'info.datePaiement'])
             ->add('montantPaiement', NumberFormatColumn::class, ['label' => 'Montant', 'field' => 'info.montant'])
             /*  ->add('montant', NumberFormatColumn::class, ['label' => 'Montant', 'field' => 'info.montant']) */
-            ->add('mode', TextColumn::class, ['label' => 'Mode de paiement', 'render' => function ($value, Preinscription $context) {
-                return $context->getInfoPreinscription() ? $context->getInfoPreinscription()->getModePaiement()->getLibelle() : 'En attente de paiement';
+            ->add('mode', TextColumn::class, ['label' => 'Mode de paiement', 'render' => function ($value, InfoPreinscription $context) {
+                return $context->getModePaiement() ? $context->getModePaiement()->getLibelle() : 'En attente de paiement';
             }])
             ->add('caissiere', TextColumn::class, ['label' => 'Caissière', 'field' => 'ca.getNomComplet'])
             ->createAdapter(ORMAdapter::class, [
-                'entity' => Preinscription::class,
+                'entity' => InfoPreinscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode) {
                     $qb->select(['p', 'niveau', 'filiere', 'etudiant', 'info,ca,res'])
-                        ->from(Preinscription::class, 'p')
+                        ->from(InfoPreinscription::class, 'info')
+                        ->leftJoin('info.preinscription', 'p')
                         ->join('p.niveau', 'niveau')
                         ->leftJoin('p.caissiere', 'ca')
                         ->join('niveau.filiere', 'filiere')
                         ->join('niveau.responsable', 'res')
                         ->join('p.etudiant', 'etudiant')
-                        ->leftJoin('p.infoPreinscription', 'info')
                         ->leftJoin('info.modePaiement', 'mode')
                         ->andWhere('p.etat = :etat')
                         ->setParameter('etat', 'valide')
@@ -229,14 +230,14 @@ class InscriptionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, InfoPreinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
 
                         'actions' => [
                             'edit' => [
-                                'url' => $this->generateUrl('app_comptabilite_versement_index', ['id' => $value]),
+                                'url' => $this->generateUrl('app_comptabilite_versement_index', ['id' => $context->getPreinscription()->getid()]),
                                 'ajax' => false,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-cash',
@@ -247,7 +248,7 @@ class InscriptionController extends AbstractController
                                 'url' => $this->generateUrl('default_print_iframe', [
                                     'r' => 'app_comptabilite_print',
                                     'params' => [
-                                        'id' => $value,
+                                        'id' => $context->getPreinscription()->getid(),
                                     ]
                                 ]),
                                 'ajax' => true,
@@ -524,11 +525,11 @@ class InscriptionController extends AbstractController
     /**
      * @throws MpdfException
      */
-    #[Route('/imprime/all', name: 'app_comptabilite_print_all', methods: ['GET', 'POST'])]
-    public function imprimerAll(Request $request, InfoPreinscriptionRepository $infoPreinscriptionRepository, NiveauRepository $niveauRepository, PreinscriptionRepository $preinscriptionRepository): Response
+    #[Route('/imprime/all/{niveau}/{caissiere}/{dateDebut}/{dateFin}/{mode}/point des versements', name: 'app_comptabilite_print_all', methods: ['GET', 'POST'])]
+    public function imprimerAll(Request $request, $niveau, $caissiere, $dateDebut, $dateFin, $mode, InfoPreinscriptionRepository $infoPreinscriptionRepository, NiveauRepository $niveauRepository, PreinscriptionRepository $preinscriptionRepository): Response
     {
 
-        $niveau = $request->query->get('niveau');
+        // $niveau = $request->query->get('niveau');
 
 
         $totalImpaye = 0;
@@ -561,12 +562,13 @@ class InscriptionController extends AbstractController
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
         return $this->renderPdf("site/liste.html.twig", [
             'total_payer' => $totalPayer,
-            'data' => $preinscriptionRepository->findBy(['etat' => 'valide']),
+            'data' => $infoPreinscriptionRepository->searchResult($niveau, $caissiere, $dateDebut, $dateFin, $mode),
             'total_impaye' => $totalImpaye
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
         ], [
             'orientation' => 'p',
             'protected' => true,
+            'file_name' => "point_versments",
 
             'format' => 'A4',
 
@@ -581,7 +583,7 @@ class InscriptionController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
-    #[Route('/tester/imprime/uuu/{niveau}/{caissiere}/{dateDebut}/{dateFin}/{mode}/{classe}/{typeFrais}/{filiere}', name: 'imprime_retour_achat_points', methods: ['GET', 'POST'], options: ['expose' => true])]
+    #[Route('/tester/imprime/uuu/{niveau}/{caissiere}/{dateDebut}/{dateFin}/{mode}/{classe}/{typeFrais}/{filiere}/point des versements', name: 'imprime_retour_achat_points', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function imprimerkk(Request $request, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $classe, $typeFrais, $filiere, InfoInscriptionRepository $infoInscriptionRepository, NiveauRepository $niveauRepository, InscriptionRepository $inscriptionRepository): Response
     {
 
@@ -599,6 +601,7 @@ class InscriptionController extends AbstractController
         ], [
             'orientation' => 'p',
             'protected' => true,
+            'file_name' => 'point_versements',
 
             'format' => 'A4',
 

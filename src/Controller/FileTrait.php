@@ -107,7 +107,7 @@ trait FileTrait
         }
 
 
-        $data = $mpdf->Output($fileName, $destination);
+        $data = $mpdf->Output("$fileName", $destination);
 
         if ($showResponse) {
             return new Response();

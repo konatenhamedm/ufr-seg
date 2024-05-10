@@ -83,6 +83,53 @@ SQL;
         return $stmt->fetchAllAssociative();
     }
 
+    public function searchResult($niveau, $caissiere, $dateDebut, $dateFin, $mode)
+    {
+        $sql = $this->createQueryBuilder('i')
+            ->leftJoin('i.preinscription', 'p')
+            ->join('p.niveau', 'niveau')
+            ->leftJoin('p.caissiere', 'ca')
+            ->join('niveau.filiere', 'filiere')
+            ->join('niveau.responsable', 'res')
+            ->join('p.etudiant', 'etudiant')
+            ->leftJoin('i.modePaiement', 'mode')
+            ->andWhere('p.etat = :etat')
+            ->setParameter('etat', 'valide');
+
+        if ($niveau  || $caissiere || $dateDebut || $dateFin || $mode) {
+
+            if ($niveau != "null") {
+                $sql->andWhere('niveau.id = :niveau')
+                    ->setParameter('niveau', $niveau);
+            }
+            if ($mode != "null") {
+                $sql->andWhere('mode.id = :mode')
+                    ->setParameter('mode', $mode);
+            }
+            if ($caissiere != "null") {
+                $sql->andWhere('ca.id = :caissiere')
+                    ->setParameter('caissiere', $caissiere);
+            }
+
+            //dd($dateDebut);
+
+            if ($dateDebut != "null" && $dateFin == "null") {
+                $sql->andWhere('i.datePaiement = :dateDebut')
+                    ->setParameter('dateDebut', $dateDebut);
+            }
+            if ($dateFin != "null" && $dateDebut == "null") {
+                $sql->andWhere('i.datePaiement  = :dateFin')
+                    ->setParameter('dateFin', $dateFin);
+            }
+            if ($dateDebut != "null" && $dateFin != "null") {
+                $sql->andWhere('i.datePaiement BETWEEN :dateDebut AND :dateFin')
+                    ->setParameter('dateDebut', $dateDebut)
+                    ->setParameter("dateFin", $dateFin);
+            }
+        }
+
+        return $sql->getQuery()->getResult();
+    }
 
     //    /**
     //     * @return InfoPreinscription[] Returns an array of InfoPreinscription objects

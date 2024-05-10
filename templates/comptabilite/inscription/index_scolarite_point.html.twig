@@ -174,7 +174,7 @@
       });
 
       function exexuteUrl(niveau,caissiere,dateDebut,dateFin,mode,classe,typeFrais,filiere){
-      window.open('https://localhost:8000/admin/comptabilite/inscription/tester/imprime/uuu/'+niveau+'/'+caissiere+'/'+dateDebut+'/'+dateFin+'/'+mode+'/'+classe+'/'+typeFrais+'/'+filiere, '_blank')
+      window.open('http://ufrseg.logicielspourtous.com/admin/comptabilite/inscription/tester/imprime/uuu/'+niveau+'/'+caissiere+'/'+dateDebut+'/'+dateFin+'/'+mode+'/'+classe+'/'+typeFrais+'/'+filiere+'/'+'point des versements', '_blank')
       }
 
       $filiere.on('change', function (e) {
@@ -193,7 +193,6 @@
 
 
       function load_content_filiere(id) {
-             
                  $.ajax({
                     url:  '/liste/niveau/par/filiere/'+id,
                     method: 'GET',
