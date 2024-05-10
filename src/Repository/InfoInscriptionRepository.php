@@ -51,6 +51,63 @@ class InfoInscriptionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+    public function searchResult($niveau, $caissiere, $dateDebut, $dateFin, $mode, $classe, $typeFrais, $filiere)
+    {
+        $sql = $this->createQueryBuilder('i')
+            ->join('i.inscription', 'p')
+            ->join('i.modePaiement', 'mode')
+            ->join('p.niveau', 'niveau')
+            ->join('i.typeFrais', 'typeFrais')
+            ->join('p.classe', 'classe')
+            ->leftJoin('i.caissiere', 'ca')
+            ->join('niveau.filiere', 'filiere')
+            ->join('p.etudiant', 'etudiant');
+
+        if ($niveau  || $caissiere || $dateDebut || $dateFin || $mode || $filiere || $classe || $typeFrais) {
+            if ($filiere != "null") {
+                $sql->andWhere('filiere.id = :filiere')
+                    ->setParameter('filiere', $filiere);
+            }
+            if ($classe != "null") {
+                $sql->andWhere('classe.id = :classe')
+                    ->setParameter('classe', $classe);
+            }
+            if ($typeFrais != "null") {
+                $sql->andWhere('typeFrais.id = :typeFrais')
+                    ->setParameter('typeFrais', $typeFrais);
+            }
+            if ($niveau != "null") {
+                $sql->andWhere('niveau.id = :niveau')
+                    ->setParameter('niveau', $niveau);
+            }
+            if ($mode != "null") {
+                $sql->andWhere('mode.id = :mode')
+                    ->setParameter('mode', $mode);
+            }
+            if ($caissiere != "null") {
+                $sql->andWhere('ca.id = :caissiere')
+                    ->setParameter('caissiere', $caissiere);
+            }
+
+            //dd($dateDebut);
+
+            if ($dateDebut != "null" && $dateFin == "null") {
+                $sql->andWhere('i.datePaiement = :dateDebut')
+                    ->setParameter('dateDebut', $dateDebut);
+            }
+            if ($dateFin != "null" && $dateDebut == "null") {
+                $sql->andWhere('i.datePaiement  = :dateFin')
+                    ->setParameter('dateFin', $dateFin);
+            }
+            if ($dateDebut != "null" && $dateFin != "null") {
+                $sql->andWhere('i.datePaiement BETWEEN :dateDebut AND :dateFin')
+                    ->setParameter('dateDebut', $dateDebut)
+                    ->setParameter("dateFin", $dateFin);
+            }
+        }
+
+        return $sql->getQuery()->getResult();
+    }
     public function getDataPaiementEffectue($id)
     {
         return $this->createQueryBuilder('e')

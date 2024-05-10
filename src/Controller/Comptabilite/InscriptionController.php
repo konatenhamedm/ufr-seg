@@ -2,6 +2,7 @@
 
 namespace App\Controller\Comptabilite;
 
+use App\Attribute\Search;
 use App\Entity\Inscription;
 use App\Entity\Preinscription;
 use App\Form\InscriptionType;
@@ -29,6 +30,7 @@ use App\Entity\NaturePaiement;
 use App\Entity\Niveau;
 use App\Entity\TypeFrais;
 use App\Entity\Utilisateur;
+use App\Form\SearchType;
 use App\Repository\InfoInscriptionRepository;
 use App\Repository\NiveauRepository;
 use App\Repository\PreinscriptionRepository;
@@ -36,6 +38,7 @@ use App\Service\Omines\Column\NumberFormatColumn;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 
@@ -297,87 +300,30 @@ class InscriptionController extends AbstractController
         $mode = $request->query->get('mode');
         $classe = $request->query->get('classe');
         $typeFrais = $request->query->get('typeFrais');
-        // dd($niveau);
 
-        $builder = $this->createFormBuilder(null, [
+        $search = new Search();
+
+        $builder = $this->createForm(SearchType::class, $search, [
             'method' => 'GET',
             'action' => $this->generateUrl('app_comptabilite_paiement_scolarite_index', compact('niveau', 'caissiere', 'dateDebut', 'dateFin', 'mode', 'filiere', 'classe', 'typeFrais')),
-        ])->add('niveau', EntityType::class, [
-            'class' => Niveau::class,
-            'choice_label' => 'libelle',
-            'label' => 'Niveau',
-            'placeholder' => '---',
-            'required' => false,
-            'attr' => ['class' => 'form-control-sm has-select2']
-        ])
-            ->add('filiere', EntityType::class, [
-                'class' => Filiere::class,
-                'choice_label' => 'libelle',
-                'label' => 'Filiere',
-                'placeholder' => '---',
-                'required' => false,
-                'attr' => ['class' => 'form-control-sm has-select2']
-            ])
-            ->add('classe', EntityType::class, [
-                'class' => Classe::class,
-                'choice_label' => 'libelle',
-                'label' => 'Classe',
-                'placeholder' => '---',
-                'required' => false,
-                'attr' => ['class' => 'form-control-sm has-select2']
-            ])
-            ->add('typeFrais', EntityType::class, [
-                'class' => TypeFrais::class,
-                'choice_label' => 'libelle',
-                'label' => 'Type frais',
-                'placeholder' => '---',
-                'required' => false,
-                'attr' => ['class' => 'form-control-sm has-select2']
-            ])
-            ->add('mode', EntityType::class, [
-                'class' => NaturePaiement::class,
-                'choice_label' => 'libelle',
-                'label' => 'Mode de paiement',
-                'placeholder' => '---',
-                'required' => false,
-                'attr' => ['class' => 'form-control-sm has-select2']
-            ])
-            ->add('dateDebut', DateType::class, [
-                'widget' => 'single_text',
-                'label'   => 'Date début',
-                'format'  => 'dd/MM/yyyy',
-                'required' => false,
-                'html5' => false,
-                'attr'    => ['autocomplete' => 'off', 'class' => 'form-control-sm datepicker no-auto'],
-            ])
-            ->add('dateFin', DateType::class, [
-                'widget' => 'single_text',
-                'label'   => 'Date fin',
-                'format'  => 'dd/MM/yyyy',
-                'required' => false,
-                'html5' => false,
-                'attr'    => ['autocomplete' => 'off', 'class' => 'form-control-sm datepicker no-auto'],
-            ])
-            ->add('caissiere', EntityType::class, [
-                'class' => Utilisateur::class,
-                'choice_label' => 'getNomComplet',
-                'label' => 'Caissière',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('c')
-                        ->join('c.personne', 'p')
-                        ->join('p.fonction', 'f')
-                        ->andWhere('f.code = :caissiere')
-                        ->setParameter('caissiere', 'CAI')
-                        ->orderBy('c.id', 'DESC');
-                },
-                'placeholder' => '---',
-                'choice_attr' => function (Utilisateur $user) {
-                    return ['data-type' => $user->getId()];
-                },
-                'required' => false,
-                'attr' => ['class' => 'form-control-sm has-select2']
-            ]);
 
+        ]);
+
+        $builder->handleRequest($request);
+
+
+        if ($builder->isSubmitted()) {
+
+
+            if ($builder->get('imprime')->isClicked()) {
+                $redirect = $this->generateUrl('imprime_retour_achat_points', [
+                    'niveau' => $builder->get('niveau')->getData()->getId()
+                ]);
+
+
+                return $this->redirect($redirect);
+            }
+        }
 
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'i.code'])
@@ -391,9 +337,10 @@ class InscriptionController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => InfoInscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $filiere, $classe, $typeFrais) {
-                    $qb->select(['p', 'i', 'niveau', 'filiere', 'etudiant', 'ca', 'classe', 'typeFrais'])
+                    $qb->select(['p', 'i', 'niveau', 'filiere', 'etudiant', 'ca', 'classe', 'typeFrais', 'mode'])
                         ->from(InfoInscription::class, 'i')
                         ->join('i.inscription', 'p')
+                        ->innerJoin('i.modePaiement', 'mode')
                         ->join('p.niveau', 'niveau')
                         ->join('i.typeFrais', 'typeFrais')
                         ->join('p.classe', 'classe')
@@ -450,7 +397,6 @@ class InscriptionController extends AbstractController
 
                             $truc = explode('-', str_replace("/", "-", $dateFin));
                             $new_date_fin = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
-                            // dd($new_date_debut, $new_date_fin);
 
                             $qb->andWhere('i.datePaiement BETWEEN :dateDebut AND :dateFin')
                                 ->setParameter('dateDebut', $new_date_debut)
@@ -541,7 +487,7 @@ class InscriptionController extends AbstractController
 
         return $this->render('comptabilite/inscription/index_scolarite_point.html.twig', [
             'datatable' => $table,
-            'form' => $builder->getForm(),
+            'form' => $builder->createView(),
             'grid_id' => $gridId
         ]);
     }
@@ -635,13 +581,62 @@ class InscriptionController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
-    #[Route('/imprime/versement/inscription/all', name: 'app_comptabilite_print_versement_inscription_all', methods: ['GET', 'POST'], options: ['expose' => true])]
+    #[Route('/tester/imprime/uuu/{niveau}/{caissiere}/{dateDebut}/{dateFin}/{mode}/{classe}/{typeFrais}/{filiere}', name: 'imprime_retour_achat_points', methods: ['GET', 'POST'], options: ['expose' => true])]
+    public function imprimerkk(Request $request, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $classe, $typeFrais, $filiere, InfoInscriptionRepository $infoInscriptionRepository, NiveauRepository $niveauRepository, InscriptionRepository $inscriptionRepository): Response
+    {
+
+        $totalImpaye = 0;
+        $totalPayer = 0;
+
+
+
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("site/liste_versement.html.twig", [
+            'total_payer' => $totalPayer,
+            'data' => $infoInscriptionRepository->searchResult($niveau, $caissiere, $dateDebut, $dateFin, $mode, $classe, $typeFrais, $filiere),
+            'total_impaye' => $totalImpaye,
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'p',
+            'protected' => true,
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+        /* $html = $this->renderView("site/tester.html.twig", [
+            'niveau' => $niveau,
+            'filiere' => $niveau,
+
+        ]);
+
+        $mpdf = new \Mpdf\Mpdf([
+
+            'mode' => 'utf-8', 'format' => 'A5'
+        ]);
+        $mpdf->PageNumSubstitutions[] = [
+            'from' => 1,
+            'reset' => 0,
+            'type' => 'I',
+            'suppress' => 'on'
+        ];
+
+        $mpdf->WriteHTML($html);
+        $mpdf->SetFontSize(6);
+        $mpdf->Output();
+        exit; */
+    }
+    #[Route('/imprime/versement/inscription/all', name: 'app_comptabilite_print_versement_inscription_all', methods: ['GET', 'POST'])]
     public function pointVersementInscription(Request $request, InfoInscriptionRepository $infoInscriptionRepository, NiveauRepository $niveauRepository, InscriptionRepository $inscriptionRepository): Response
     {
 
-        $niveau = $request->query->get('niveau');
 
-        // dd($request->query, $niveau);
 
 
         $totalImpaye = 0;
@@ -663,7 +658,8 @@ class InscriptionController extends AbstractController
         return $this->renderPdf("site/liste_versement.html.twig", [
             'total_payer' => $totalPayer,
             'data' => $infoInscriptionRepository->findAll(),
-            'total_impaye' => $totalImpaye
+            'total_impaye' => $totalImpaye,
+            'niveau' => 'eau'
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
         ], [
             'orientation' => 'p',

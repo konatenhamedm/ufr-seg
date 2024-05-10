@@ -37,15 +37,20 @@
                 <div class="col-md-3">{{ form_row(form.caissiere) }}</div>
                 <div class="col-md-1 pt-5">
                   <button class="btn btn-main btn-filter btn-sm" type="button">Rechercher</button>
+                
+                  {# {{ form_widget(form.imprime) }} #}
+                 
                 </div>
                 <div class="col-md-2 p-5">
-                <a  id='btn-imprimer' style="height: 35px;" title="Point des paiements" href="{{ path('default_print_iframe',{
+               {#  <a   style="height: 35px;" title="Point des paiements" href="{{ path('default_print_iframe',{
                     'r':'app_comptabilite_print_versement_inscription_all'
                   }) }}" class="btn btn-warning btn-sm btn-imprimer" 
                 data-bs-toggle="modal" data-bs-target="#exampleModalSizeSm2">
                 <i class="fa fa-print text-light"></i>
-                
                  </a>
+                <a href="#" style="height: 35px;margin-top:-8px" class="btn btn-success btn-sm"   id='btn-imprimer' target="_blank"><i class="fa fa-print text-light"></i></a> 
+#}
+                 <a href="" target="_blank" type="sbmit" style="height: 35px;margin-top:0px" class="btn btn-success btn-sm imprimer" name="search[imprime]"><i class="fa fa-print text-light"></i></a>
                 {# <a style="height: 35px;" title="Etat des versements" href="{{ path('default_print_iframe',{
                                 'r':'app_comptabilite_print_etat_versement_alll' title="Point des paiements"
                               }) }}" class="btn btn-primary btn-sm btn-imprimer" 
@@ -72,9 +77,6 @@
 {% block java %}
   <script src="{{ asset('assets/js/datatables.js') }}"></script>
   <script>
-
-  
-    
     $(function () {
 
             $('.no-auto').each(function () {
@@ -155,15 +157,25 @@
         //alert($dateDebut.val());
         load_grid_data($form, $this, $niveau.val(),$caissiere.val(),$dateDebut.val(),$dateFin.val(),$mode.val(),$classe.val(),$typeFrais.val(),$filiere.val());
       });
-
-
-      $('.btn-imprimer').on('click', function (e) {
-        e.preventDefault();
-        const $this = $(this);
-        const $form = $this.closest('form');
-
+      $('.imprimer').on('click', function (e) {
+        let niveau_data = $niveau.val() ? $niveau.val()  : null
+        let caissiere_data = $caissiere.val() ? $caissiere.val()  : null
+        let dateDebut_data = $dateDebut.val() ? $dateDebut.val().toString().replace(/\//g, "-")  : null
+        let dateFin_data = $dateFin.val() ? $dateFin.val().toString().replace(/\//g, "-")  : null
+        let mode_data = $mode.val() ? $mode.val()  : null
+        let classe_data = $classe.val() ? $classe.val()  : null
+        let typeFrais_data = $typeFrais.val() ? $typeFrais.val()  : null
+        let filiere_data = $filiere.val() ? $filiere.val()  : null
       
+      
+      
+       exexuteUrl(niveau_data,caissiere_data,dateDebut_data,dateFin_data,mode_data,classe_data,typeFrais_data,filiere_data)
+     
       });
+
+      function exexuteUrl(niveau,caissiere,dateDebut,dateFin,mode,classe,typeFrais,filiere){
+      window.open('https://localhost:8000/admin/comptabilite/inscription/tester/imprime/uuu/'+niveau+'/'+caissiere+'/'+dateDebut+'/'+dateFin+'/'+mode+'/'+classe+'/'+typeFrais+'/'+filiere, '_blank')
+      }
 
       $filiere.on('change', function (e) {
       
@@ -223,24 +235,6 @@
                 });
         }
 
-        $('#btn-imprimer').on('click',function(e){
-           e.preventDefault();
-        const $this = $(this);
-        const $form = $this.closest('form');
- console.log($form)
-            $.ajax({
-              url: '/admin/comptabilite/inscription/paiement/scolarite',
-                      type: 'GET',
-                      data: {
-                        niveau: 1,
-                        
-                      },
-            })
-
-            
-          })
-
-
       function load_grid_data($form, $button, niveau,caissiere,dateDebut,dateFin,mode,classe,typeFrais,filiere) {
         const id = $old_grid.find('table').attr('id');
         const $table = $old_grid.find(`#${id}`);
@@ -293,6 +287,7 @@
           }
         });
       }
+      
 
     });
   </script>

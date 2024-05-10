@@ -112,7 +112,7 @@ tr:nth-child(even) {
             <div style="text-align:center;"  class="">
                     <b>UFR-SEG</b><br>
                   BP V 43 ABIDJAN ,TEL :01 01 15 44 44  ufrseg-filierespro-ufhb.ci <br>
-                  Abidjan-Cocody
+                  Abidjan-Cocody 
                <div style="border-top:1px solid #000"></div>
               </div>
            
@@ -172,27 +172,25 @@ tr:nth-child(even) {
              <td style="vertical-align:middle;text-align:center;" >{{ ligne.caissiere ? ligne.caissiere.getNomComplet :'' }}</td>
        
           </tr>
+          {% set total = total + ligne.montant %}
+          {% else %}
+
+          <tr>
+           <td colspan="7">
+             <h2>Il n'y a aucune données dans cette recherche</h2>
+           </td>
+          </tr>
          {% endfor %}
 
-        {#  <tr>
-           <td style="vertical-align:middle;text-align:center;font-family:"Gill Sans Extrabold", sans-serif;" colspan="2">
-              <h3 class="text-center">Total</h3>
-           </td>
+           <tfoot>
+                  <tr>
+                    <th class="text-end p-2 col " colspan="5" style="horizontal-align:left;text-align: right;color:red;font-size:18px">Total montant</th>
+                    <th class="total text-center p-2 fw-bolder col-total" style="vertical-align:middle;text-align:center;color:red;font-size:18px" data-class="col-total">{{ total |number_format(0, '.', '.') }}</td>
+                    <th class="total text-center p-2 fw-bolder "></td>
+                  </tr>
+                                        
+          </tfoot>
 
-           <td style="vertical-align:middle;text-align:center;font-family:"Gill Sans Extrabold", sans-serif;" >
-         <h3 class="text-center">{{ total |number_format(0, '.', '.') }}</h3>
-           </td>
-            
-           <td style="vertical-align:middle;text-align:center;font-family:"Gill Sans Extrabold", sans-serif;" > 
-           <h3 class="text-center">{{ total_payer |number_format(0, '.', '.')  }}</h3>
-           </td>
-           <td style="vertical-align:middle;text-align:center;font-family:"Gill Sans Extrabold", sans-serif;" > 
-          <h3 class="text-center">{{ total_impaye |number_format(0, '.', '.')  }}</h3>
-           </td>
-           <td style="vertical-align:middle;text-align:center;font-family:"Gill Sans Extrabold", sans-serif;" > 
-           <h3 class="text-center">{{ total_impaye |number_format(0, '.', '.')  }}</h3>
-           </td>
-         </tr> #}
         
     </table>
      

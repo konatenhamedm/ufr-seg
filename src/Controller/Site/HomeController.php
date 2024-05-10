@@ -63,6 +63,7 @@ use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -603,6 +604,8 @@ class HomeController extends AbstractController
                 'required' => false,
                 'attr' => ['class' => 'form-control-sm has-select2']
             ]);
+
+
 
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
