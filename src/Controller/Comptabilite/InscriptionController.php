@@ -47,6 +47,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class InscriptionController extends AbstractController
 {
     use FileTrait;
+
     #[Route('/', name: 'app_comptabilite_inscription_index',  methods: ['GET', 'POST'], options: ['expose' => true])]
     public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
     {

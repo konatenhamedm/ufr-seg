@@ -108,6 +108,96 @@ class InfoInscriptionRepository extends ServiceEntityRepository
 
         return $sql->getQuery()->getResult();
     }
+
+    public function searchResultConfirmation($niveau, $caissiere, $dateDebut, $dateFin)
+    {
+        $sql = $this->createQueryBuilder('i')
+            ->join('i.inscription', 'p')
+            ->join('p.niveau', 'niveau')
+            ->join('p.classe', 'classe')
+            ->leftJoin('i.caissiere', 'ca')
+            ->join('niveau.filiere', 'filiere')
+            ->join('p.etudiant', 'etudiant')
+            ->andWhere('i.etat = :etat')
+            ->setParameter('etat', 'attente_confirmation');
+
+        if ($niveau  || $caissiere || $dateDebut || $dateFin) {
+
+            if ($niveau != "null") {
+                $sql->andWhere('niveau.id = :niveau')
+                    ->setParameter('niveau', $niveau);
+            }
+
+            if ($caissiere != "null") {
+                $sql->andWhere('ca.id = :caissiere')
+                    ->setParameter('caissiere', $caissiere);
+            }
+
+            //dd($dateDebut);
+
+            if ($dateDebut != "null" && $dateFin == "null") {
+                $sql->andWhere('i.datePaiement = :dateDebut')
+                    ->setParameter('dateDebut', $dateDebut);
+            }
+            if ($dateFin != "null" && $dateDebut == "null") {
+                $sql->andWhere('i.datePaiement  = :dateFin')
+                    ->setParameter('dateFin', $dateFin);
+            }
+            if ($dateDebut != "null" && $dateFin != "null") {
+                $sql->andWhere('i.datePaiement BETWEEN :dateDebut AND :dateFin')
+                    ->setParameter('dateDebut', $dateDebut)
+                    ->setParameter("dateFin", $dateFin);
+            }
+        }
+
+        return $sql->getQuery()->getResult();
+    }
+    public function searchResultConfirmationConfirmer($niveau, $caissiere, $dateDebut, $dateFin)
+    {
+        $sql = $this->createQueryBuilder('i')
+            ->join('i.inscription', 'p')
+            ->join('i.modePaiement', 'mode')
+            ->join('p.niveau', 'niveau')
+            ->join('p.classe', 'classe')
+            ->leftJoin('i.caissiere', 'ca')
+            ->join('niveau.filiere', 'filiere')
+            ->join('p.etudiant', 'etudiant')
+            ->andWhere('i.etat = :etat')
+            ->andWhere('mode.code = :code')
+            ->setParameter('code', 'CHQ')
+            ->setParameter('etat', 'payer');
+
+        if ($niveau  || $caissiere || $dateDebut || $dateFin) {
+
+            if ($niveau != "null") {
+                $sql->andWhere('niveau.id = :niveau')
+                    ->setParameter('niveau', $niveau);
+            }
+
+            if ($caissiere != "null") {
+                $sql->andWhere('ca.id = :caissiere')
+                    ->setParameter('caissiere', $caissiere);
+            }
+
+            //dd($dateDebut);
+
+            if ($dateDebut != "null" && $dateFin == "null") {
+                $sql->andWhere('i.datePaiement = :dateDebut')
+                    ->setParameter('dateDebut', $dateDebut);
+            }
+            if ($dateFin != "null" && $dateDebut == "null") {
+                $sql->andWhere('i.datePaiement  = :dateFin')
+                    ->setParameter('dateFin', $dateFin);
+            }
+            if ($dateDebut != "null" && $dateFin != "null") {
+                $sql->andWhere('i.datePaiement BETWEEN :dateDebut AND :dateFin')
+                    ->setParameter('dateDebut', $dateDebut)
+                    ->setParameter("dateFin", $dateFin);
+            }
+        }
+
+        return $sql->getQuery()->getResult();
+    }
     public function getDataPaiementEffectue($id)
     {
         return $this->createQueryBuilder('e')

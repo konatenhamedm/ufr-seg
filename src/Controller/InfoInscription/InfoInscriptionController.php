@@ -175,13 +175,48 @@ class InfoInscriptionController extends AbstractController
 
 
 
-    #[Route('/imprime/all/{etat}', name: 'app_comptabilite_print_all_point_cheque', methods: ['GET', 'POST'])]
-    public function imprimerAll(Request $request, $etat, InfoInscriptionRepository $infoInscription, InscriptionRepository $inscriptionRepository, NiveauRepository $niveauRepository): Response
+    #[Route('/imprime/all/{niveau}/{caissiere}/{dateDebut}/{dateFin}/point des versements', name: 'app_comptabilite_print_all_point_cheque', methods: ['GET', 'POST'])]
+    public function imprimerAll(Request $request, $niveau, $caissiere, $dateDebut, $dateFin, InfoInscriptionRepository $infoInscription, InscriptionRepository $inscriptionRepository, NiveauRepository $niveauRepository): Response
     {
 
 
 
-        $preinscriptions = $infoInscription->getData($etat);
+        $preinscriptions = $infoInscription->searchResultConfirmation($niveau, $caissiere, $dateDebut, $dateFin);
+
+
+        //dd($preinscriptions);
+
+        //$data = $preinscriptions;
+
+
+        // }
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("infoinscription/info_inscription/imprime.html.twig", [
+            'data' => $preinscriptions,
+
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'p',
+            'protected' => true,
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+    }
+
+    #[Route('/imprime/all/{niveau}/{caissiere}/{dateDebut}/{dateFin}/confirmer_payer/point des versements', name: 'app_comptabilite_print_all_point_cheque_confirmer', methods: ['GET', 'POST'])]
+    public function imprimerAllConfirmer(Request $request, $niveau, $caissiere, $dateDebut, $dateFin, InfoInscriptionRepository $infoInscription, InscriptionRepository $inscriptionRepository, NiveauRepository $niveauRepository): Response
+    {
+
+
+
+        $preinscriptions = $infoInscription->searchResultConfirmationConfirmer($niveau, $caissiere, $dateDebut, $dateFin);
 
 
         //dd($preinscriptions);
@@ -426,33 +461,6 @@ class InfoInscriptionController extends AbstractController
                         'target' => '#modal-lg',
 
                         'actions' => [
-
-                            /*  'imprime' => [
-                                'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_comptabilite_print',
-                                    'params' => [
-                                        'id' => $value,
-                                    ]
-                                ]),
-                                'ajax' => true,
-                                'target' =>  '#exampleModalSizeSm2',
-                                'icon' => '%icon% bi bi-printer',
-                                'attrs' => ['class' => 'btn-main btn-stack']
-                                //, 'render' => new ActionRender(fn() => $source || $etat != 'cree')
-                            ], */
-                            /*    'imprime_recu_confirmation' => [
-                                'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_comptabilite_inscription_print_attente_confirmation',
-                                    'params' => [
-                                        'id' => $context->getInscription()->getId(),
-                                    ]
-                                ]),
-                                'ajax' => true,
-                                'target' =>  '#exampleModalSizeSm2',
-                                'icon' => '%icon% bi bi-printer',
-                                'attrs' => ['class' => 'btn-primary btn-stack'],
-
-                            ], */
                             'show' => [
                                 'url' => $this->generateUrl('app_infoinscription_info_inscription_edit', ['id' => $value]),
                                 'ajax' => true,
