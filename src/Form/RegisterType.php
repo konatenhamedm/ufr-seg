@@ -7,6 +7,7 @@ use App\Entity\Civilite;
 use App\Entity\Genre;
 use App\Entity\Niveau;
 use App\Entity\Utilisateur;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -25,7 +26,7 @@ class RegisterType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('niveau', EntityType::class, [
+            /*  ->add('niveau', EntityType::class, [
                 'class' => Niveau::class,
                 'mapped' => true,
                 'required' => false,
@@ -34,6 +35,21 @@ class RegisterType extends AbstractType
                 'choice_label' => 'getFullLibelleSigle',
                 'label' => 'Niveau',
                 'attr' => ['class' => 'has-select2']
+            ]) */
+
+            ->add('niveau', EntityType::class, [
+                'class' => Niveau::class,
+                'choice_label' => 'getFullLibelleSigle',
+                'required' => false,
+                'attr' => ['class' => 'matiere has-select2 form-select'],
+                'placeholder' => '----',
+                'label' => 'Niveau',
+                'label_attr' => ['class' => 'label-required'],
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('c')
+                        /* ->join('c.filiere', 'f')
+                        ->groupBy('f') */;
+                },
             ])
             /* ->add('dateNaissance',  DateType::class,  [
                 'mapped' => true,
