@@ -30,7 +30,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class NiveauController extends AbstractController
 {
     #[Route('/', name: 'app_parametre_niveau_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
     {
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
@@ -39,11 +39,16 @@ class NiveauController extends AbstractController
             ->add('responsable', TextColumn::class, ['label' => 'Responsable', 'field' => 'res.getNomComplet'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Niveau::class,
-                'query' => function (QueryBuilder $qb) {
+                'query' => function (QueryBuilder $qb) use ($user) {
                     $qb->select('niveau,filiere,res')
                         ->from(Niveau::class, 'niveau')
                         ->leftJoin('niveau.filiere', 'filiere')
                         ->leftJoin('niveau.responsable', 'res');
+
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
+                    }
                 },
             ])
             ->setName('dt_app_parametre_niveau');

@@ -146,6 +146,9 @@ class Etudiant extends Personne
     #[ORM\OneToMany(mappedBy: 'etudiant', targetEntity: BlocEcheancier::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $blocEcheanciers;
 
+    #[ORM\ManyToOne(inversedBy: 'etudiants')]
+    private ?Nationalite $nationalite = null;
+
 
 
     public function getNoms()
@@ -802,6 +805,18 @@ class Etudiant extends Personne
                 $blocEcheancier->setEtudiant(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNationalite(): ?Nationalite
+    {
+        return $this->nationalite;
+    }
+
+    public function setNationalite(?Nationalite $nationalite): static
+    {
+        $this->nationalite = $nationalite;
 
         return $this;
     }

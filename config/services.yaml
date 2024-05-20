@@ -55,6 +55,10 @@ services:
         arguments: ["@knp_menu.factory"]
         tags:
             - { name: knp_menu.menu_builder, method: createMainMenu, alias: config }
+    App\Menu\ConfigMenuDirecteurBuilder:
+        arguments: ["@knp_menu.factory"]
+        tags:
+            - { name: knp_menu.menu_builder, method: createMainMenu, alias: config_directeur }
     
     App\Menu\DirectionMenuBuilder:
         arguments: ["@knp_menu.factory"]

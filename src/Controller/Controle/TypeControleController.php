@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/admin/controle/type/controle')]
 class TypeControleController extends AbstractController
@@ -66,7 +67,7 @@ class TypeControleController extends AbstractController
     }
 
     #[Route('/', name: 'app_controle_type_controle_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
     {
         $table = $dataTableFactory->create()
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
@@ -136,8 +137,15 @@ class TypeControleController extends AbstractController
             return $table->getResponse();
         }
 
+        if ($user->getPersonne()->getFonction()->getCode() == "DR") {
 
-        return $this->render('controle/type_controle/index.html.twig', [
+            $template = 'index_';
+        } else {
+            $template = 'index';
+        }
+
+
+        return $this->render('controle/type_controle/' . $template . '.html.twig', [
             'datatable' => $table
         ]);
     }

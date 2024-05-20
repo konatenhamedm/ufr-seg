@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 
 #[Route('/admin/parametre/dashboard')]
 #[Module(name: 'config', excludes: ['liste'])]
@@ -17,23 +19,45 @@ class DashboardController extends AbstractController
 
     #[Route(path: '/', name: 'app_parametre_dashboard_index', methods: ['GET', 'POST'])]
     #[RoleMethod(title: 'Gestion des Paramètres', as: 'index')]
-    public function index(Request $request, Breadcrumb $breadcrumb): Response
+    public function index(Request $request, Breadcrumb $breadcrumb, UserInterface $user): Response
     {
+
+
+
+        // dd($user->getPersonne()->getFonction()->getCode());
         $module = $request->query->get('module');
-        $modules = [
-            [
-                'label' => 'Général',
-                'icon' => 'bi bi-list',
-                'module' => 'general',
-                'href' => $this->generateUrl('app_parametre_dashboard_ls', ['module' => 'general'])
-            ],
-            [
-                'label' => 'Gestion',
-                'icon' => 'bi bi-list',
-                'module' => 'gestion',
-                'href' => $this->generateUrl('app_parametre_dashboard_ls', ['module' => 'gestion'])
-            ],
-        ];
+        if ($user->getPersonne()->getFonction()->getCode() == "DR") {
+            $modules = [
+
+                [
+                    'label' => 'Gestion',
+                    'icon' => 'bi bi-list',
+                    'module' => 'gestion',
+                    'href' => $this->generateUrl('app_parametre_dashboard_ls', ['module' => 'gestion_directeur'])
+                ],
+                [
+                    'label' => 'Evaluations',
+                    'icon' => 'bi bi-list',
+                    'module' => 'general',
+                    'href' => $this->generateUrl('app_parametre_dashboard_ls', ['module' => 'evaluation'])
+                ],
+            ];
+        } else {
+            $modules = [
+                [
+                    'label' => 'Général',
+                    'icon' => 'bi bi-list',
+                    'module' => 'general',
+                    'href' => $this->generateUrl('app_parametre_dashboard_ls', ['module' => 'general'])
+                ],
+                [
+                    'label' => 'Gestion',
+                    'icon' => 'bi bi-list',
+                    'module' => 'gestion',
+                    'href' => $this->generateUrl('app_parametre_dashboard_ls', ['module' => 'gestion'])
+                ],
+            ];
+        }
 
         $breadcrumb->addItem([
             [
@@ -151,6 +175,61 @@ class DashboardController extends AbstractController
 
 
             ],
+            'gestion_directeur' => [
+
+                [
+                    'label' => 'Filières',
+                    'id' => 'param_filiere',
+                    'href' => $this->generateUrl('app_parametre_filiere_index')
+                ],
+                [
+                    'label' => 'Niveaux',
+                    'id' => 'param_niveau',
+                    'href' => $this->generateUrl('app_parametre_niveau_index')
+                ],
+                [
+                    'label' => 'Classes',
+                    'id' => 'param_classe',
+                    'href' => $this->generateUrl('app_parametre_classe_index')
+                ],
+                [
+                    'label' => 'Type de matière',
+                    'id' => 'param_type_matiere',
+                    'href' => $this->generateUrl('app_parametre_type_matiere_index')
+                ],
+                [
+                    'label' => 'Matières',
+                    'id' => 'param_matiere',
+                    'href' => $this->generateUrl('app_parametre_matiere_ue_index')
+                ],
+                [
+                    'label' => "Unité d'enseigenement",
+                    'id' => 'param_ue',
+                    'href' => $this->generateUrl('app_parametre_unite_enseignement_index')
+                ]
+
+
+            ],
+
+            'evaluation' => [
+                [
+                    'label' => 'Type de Controles',
+                    'id' => 'param_evaluation_type',
+                    'href' => $this->generateUrl('app_controle_type_controle_index')
+                ],
+
+                [
+                    'label' => 'Sessions',
+                    'id' => 'param_evaluation_session',
+                    'href' => $this->generateUrl('app_parametre_session_index')
+                ],
+                [
+                    'label' => 'Cours',
+                    'id' => 'param_evaluation_cour',
+                    'href' => $this->generateUrl('app_controle_cours_index')
+                ],
+
+            ]
         ];
 
 

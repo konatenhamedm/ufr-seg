@@ -7,7 +7,7 @@ use Knp\Menu\ItemInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bundle\SecurityBundle\Security;
 
-class ConfigMenuBuilder
+class ConfigMenuDirecteurBuilder
 {
     private $factory;
     private $security;
@@ -31,20 +31,15 @@ class ConfigMenuBuilder
     {
         $menu = $this->factory->createItem('root');
         $menu->setExtra('module', self::MODULE_NAME);
-        if ($this->user->hasRoleIn('ROLE_SECRETAIRE') || $this->user->hasRoleIn('ROLE_DIRECTEUR')) {
+        if ($this->user->hasRole('ROLE_DIRECTEUR')) {
             $menu->addChild(self::MODULE_NAME, ['label' => 'Configuration']);
         }
 
         if (isset($menu[self::MODULE_NAME])) {
             $menu->addChild('parametre.index', ['route' => 'app_parametre_dashboard_index', 'label' => 'Paramètres'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_SECRETAIRE');
-            if ($this->user->getPersonne()->getFonction()->getCode() == "DR") {
-
-                // $menu->addChild('cheque_secretaire', ['route' => 'app_config_preinscription_point_paiement_cheque_index', 'label' => 'Paiements à confirmer'])->setExtra('icon', 'bi bi-cash')->setExtra('role', 'ROLE_COMPTABLE');
-                $menu->addChild('parametredirecteur.index', ['route' => 'app_parametre_dashboard_index', 'label' => 'Paramètres'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_DIRECTEUR');
-            }
-            $menu->addChild('personne.index', ['route' => 'app_utilisateur_personne_index', 'label' => 'Personnels'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_SECRETAIRE');
+            /* $menu->addChild('personne.index', ['route' => 'app_utilisateur_personne_index', 'label' => 'Personnels'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_SECRETAIRE');
             $menu->addChild('groupe.index', ['route' => 'app_utilisateur_groupe_index', 'label' => 'Groupes'])->setExtra('icon', 'bi bi-people-fill')->setExtra('role', 'ROLE_SECRETAIRE');
-            $menu->addChild('utilisateur.index', ['route' => 'app_config_utilisateur_index', 'label' => 'Utilisateurs'])->setExtra('icon', 'bi bi-person-fill')->setExtra('role', 'ROLE_SECRETAIRE');
+            $menu->addChild('utilisateur.index', ['route' => 'app_config_utilisateur_index', 'label' => 'Utilisateurs'])->setExtra('icon', 'bi bi-person-fill')->setExtra('role', 'ROLE_SECRETAIRE'); */
         }
 
         return $menu;

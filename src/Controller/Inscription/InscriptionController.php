@@ -831,9 +831,9 @@ class InscriptionController extends AbstractController
                     $qb->andWhere('p.etat = :etat')
                         ->setParameter('etat', $etat);
                 }
-                if ($this->isGranted('ROLE_DIRECTEUR')) {
-                    $qb->andWhere('res.id = :id')
-                        ->setParameter('id', $user->getPersonne()->getId());
+                if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                    $qb->andWhere("res = :user")
+                        ->setParameter('user', $user->getPersonne());
                 }
             }
         ])

@@ -121,9 +121,9 @@ class DeliberationController extends AbstractController
                         ->innerJoin('n.filiere', 'f')
                         ->orderBy('d.id', 'DESC');
 
-                    if ($this->isGranted('ROLE_DIRECTEUR')) {
-                        $qb->andWhere('res.id = :id')
-                            ->setParameter('id', $user->getPersonne()->getId());
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
                     }
                 }
             ])

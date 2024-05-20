@@ -31,7 +31,7 @@ class ComptabiliteComptableMenuBuilder
     {
         $menu = $this->factory->createItem('root');
         $menu->setExtra('module', self::MODULE_NAME);
-        if ($this->user->hasRole("ROLE_COMPTABLE")) {
+        if ($this->user->hasRole("ROLE_COMPTABLE") || $this->user->hasRole('ROLE_DIRECTEUR')) {
             $menu->addChild(self::MODULE_NAME, ['label' => 'Comptabilité']);
         }
 
@@ -51,6 +51,12 @@ class ComptabiliteComptableMenuBuilder
             if (!$this->user->hasRoleIn("ROLE_COMPTABLE")) {
 
                 $menu->addChild('cheque_secretaire', ['route' => 'app_config_preinscription_point_paiement_cheque_index', 'label' => 'Paiements à confirmer'])->setExtra('icon', 'bi bi-cash')->setExtra('role', 'ROLE_COMPTABLE');
+            }
+
+            if ($this->user->getPersonne()->getFonction()->getCode() == "DR") {
+                $menu->addChild('paiement', ['route' => 'app_config_preinscription_point_paiement_index', 'label' => 'Point des paiements'])->setExtra('icon', 'bi bi-person')->setExtra('role', 'ROLE_DIRECTEUR');
+
+                //$menu->addChild('examen.index', ['route' => 'app_direction_examen_index', 'label' => 'Gestion des examens'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_DIRECTEUR');
             }
         }
 

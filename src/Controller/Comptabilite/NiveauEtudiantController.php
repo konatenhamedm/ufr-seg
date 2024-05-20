@@ -348,10 +348,15 @@ class NiveauEtudiantController extends AbstractController
                                 ->andWhere('etudiant.etat = :etat')
                                 ->setParameter('etat', 'complete');
                         }
-                        if ($this->isGranted('ROLE_DIRECTEUR')) {
+
+                        if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                            $qb->andWhere("res = :user")
+                                ->setParameter('user', $user->getPersonne());
+                        }
+                        /* if ($this->isGranted('ROLE_DIRECTEUR')) {
                             $qb->andWhere('res.id = :id')
                                 ->setParameter('id', $user->getPersonne()->getId());
-                        }
+                        } */
                     }
                 ])
                 ->setName('dt_app_comptabilite_niveau_etudiant_preinscription' . $etat);
@@ -604,9 +609,9 @@ class NiveauEtudiantController extends AbstractController
                         $qb->andWhere('e.etudiant = :etudiant')
                             ->setParameter('etudiant', $user->getPersonne());
                     }
-                    if ($this->isGranted('ROLE_DIRECTEUR')) {
-                        $qb->andWhere('res.id = :id')
-                            ->setParameter('id', $user->getPersonne()->getId());
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
                     }
                 }
             ])
@@ -657,6 +662,7 @@ class NiveauEtudiantController extends AbstractController
                                 //, 'render' => new ActionRender(fn() => $source || $etat != 'cree')
                             ],
                             'edit' => [
+                                'target' => '#exampleModalSizeLg2',
                                 'url' => $this->generateUrl('app_comptabilite_paiement_etudiant_edit', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,

@@ -35,7 +35,7 @@ class HomeController extends AbstractController
 
     protected const UPLOAD_PATH = 'media_etudiant';
     #[Route('/workflow/timeline', name: 'app_home_timeline_index')]
-    public function index(): Response
+    public function index(UserInterface $user): Response
     {
 
         $modules = [

@@ -21,12 +21,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/admin/parametre/classe')]
 class ClasseController extends AbstractController
 {
     #[Route('/', name: 'app_parametre_classe_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
     {
         $table = $dataTableFactory->create()
             ->add('libelle', TextColumn::class, ['label' => 'Libelle'])
@@ -34,11 +35,17 @@ class ClasseController extends AbstractController
             ->add('annee', TextColumn::class, ['label' => 'Année', 'field' => 'annee.libelle'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Classe::class,
-                'query' => function (QueryBuilder $qb) {
-                    $qb->select('u, niveau, annee')
+                'query' => function (QueryBuilder $qb) use ($user) {
+                    $qb->select('u, niveau, annee,res')
                         ->from(Classe::class, 'u')
                         ->join('u.niveau', 'niveau')
+                        ->leftJoin('niveau.responsable', 'res')
                         ->join('u.anneeScolaire', 'annee');
+
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
+                    }
                 }
             ])
             ->setName('dt_app_parametre_classe');

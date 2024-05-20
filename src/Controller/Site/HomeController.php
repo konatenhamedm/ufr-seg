@@ -441,8 +441,6 @@ class HomeController extends AbstractController
                 $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
             }
 
-
-
             if ($form->isValid()) {
                 $etudiant->setNom(strtoupper($form->get('nom')->getData()));
                 $etudiant->setPrenom($prenoms);
@@ -616,12 +614,13 @@ class HomeController extends AbstractController
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Inscription::class,
-                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau) {
+                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau, $user) {
                     $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
-                        ->join('p.classe', 'classe')
+                        ->join('p.classe', 'classe', 'res')
                         ->join('p.niveau', 'niveau')
                         ->join('niveau.filiere', 'filiere')
+                        ->join('niveau.responsable', 'res')
                         ->join('p.etudiant', 'etudiant')
                         ->leftJoin('p.caissiere', 'c')
                         ->andWhere('p.classe is not null')
@@ -642,6 +641,11 @@ class HomeController extends AbstractController
                             $qb->andWhere('filiere.id = :filiere')
                                 ->setParameter('filiere', $filiere);
                         }
+                    }
+
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
                     }
                 }
 

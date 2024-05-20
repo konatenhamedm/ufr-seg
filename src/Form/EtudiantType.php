@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Civilite;
 use App\Entity\Etudiant;
 use App\Entity\Genre;
+use App\Entity\Nationalite;
 use App\Entity\Pays;
 use App\Entity\Personne;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -95,6 +96,15 @@ class EtudiantType extends AbstractType
                     'label_attr' => ['class' => 'label-required'],
                     'choice_label' => 'libelle',
                     'label' => 'Genre',
+                    'attr' => ['class' => 'has-select2']
+                ])
+                ->add('nationalite', EntityType::class, [
+                    'class' => Nationalite::class,
+                    'required' => false,
+                    'placeholder' => '----',
+                    'label_attr' => ['class' => 'label-required'],
+                    'choice_label' => 'libelle',
+                    'label' => 'Nationalité',
                     'attr' => ['class' => 'has-select2']
                 ])
                 /*  ->add('civilite', EntityType::class, [

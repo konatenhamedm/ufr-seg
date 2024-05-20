@@ -69,10 +69,15 @@ class ExamenController extends AbstractController
                         }
                     }
 
-                    if ($this->isGranted('ROLE_DIRECTEUR')) {
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
+                    }
+
+                    /* if ($this->isGranted('ROLE_DIRECTEUR')) {
                         $qb->andWhere('res.id = :id')
                             ->setParameter('id', $user->getPersonne()->getId());
-                    }
+                    } */
                 }
             ])
             ->setName('dt_app_direction_examen_' . $filiere);
@@ -104,7 +109,7 @@ class ExamenController extends AbstractController
                 'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Examen $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
-                        'target' => '#modal-lg',
+                        'target' => '#exampleModalSizeLg2',
 
                         'actions' => [
                             'edit' => [

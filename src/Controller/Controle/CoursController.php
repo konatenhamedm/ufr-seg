@@ -33,12 +33,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/admin/controle/cours')]
 class CoursController extends AbstractController
 {
     #[Route('/', name: 'app_controle_cours_index', methods: ['GET', 'POST'], options: ['expose' => true])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
     {
         $matiere = $request->query->get('matiere');
         $classe = $request->query->get('classe');
@@ -69,10 +70,12 @@ class CoursController extends AbstractController
             ->add('annee', TextColumn::class, ['label' => 'Année scolaire', 'field' => 'a.libelle'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Cours::class,
-                'query' => function (QueryBuilder $qb) use ($matiere, $classe) {
-                    $qb->select(['co', 'c', 'm', 'a'])
+                'query' => function (QueryBuilder $qb) use ($matiere, $classe, $user) {
+                    $qb->select(['co', 'c', 'm', 'a', 'res', 'niveau'])
                         ->from(Cours::class, 'co')
                         ->innerJoin('co.classe', 'c')
+                        ->leftJoin('c.niveau', 'niveau')
+                        ->leftJoin('niveau.responsable', 'res')
                         ->join('co.matiere', 'm')
                         ->join('co.anneeScolaire', 'a')
                         ->orderBy('co.id', 'DESC');
@@ -89,10 +92,10 @@ class CoursController extends AbstractController
                         }
                     }
 
-                    /*  if ($this->isGranted('ROLE_DIRECTEUR')) {
-                        $qb->andWhere('res.id = :id')
-                            ->setParameter('id', $user->getPersonne()->getId());
-                    } */
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
+                    }
                 }
             ])
             ->setName('dt_app_controle_cours_'  . $classe . '_' . $matiere);
@@ -157,9 +160,15 @@ class CoursController extends AbstractController
         if ($table->isCallback()) {
             return $table->getResponse();
         }
+        if ($user->getPersonne()->getFonction()->getCode() == "DR") {
+
+            $template = 'index_';
+        } else {
+            $template = 'index';
+        }
 
 
-        return $this->render('controle/cours/index.html.twig', [
+        return $this->render('controle/cours/' . $template . '.html.twig', [
             'datatable' => $table,
             'form' => $builder->getForm(),
             'grid_id' => $gridId

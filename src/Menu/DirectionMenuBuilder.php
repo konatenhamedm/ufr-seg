@@ -31,12 +31,16 @@ class DirectionMenuBuilder
     {
         $menu = $this->factory->createItem('root');
         $menu->setExtra('module', self::MODULE_NAME);
-        if ($this->user->hasRoleIn('ROLE_SECRETAIRE')) {
+        if ($this->user->hasRoleIn('ROLE_SECRETAIRE') || $this->user->hasRoleIn('ROLE_DIRECTEUR')) {
             $menu->addChild(self::MODULE_NAME, ['label' => 'Direction']);
         }
 
         if (isset($menu[self::MODULE_NAME])) {
             $menu->addChild('examen.index', ['route' => 'app_direction_examen_index', 'label' => 'Gestion des examens'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_SECRETAIRE');
+            if ($this->user->getPersonne()->getFonction()->getCode() == "DR") {
+
+                $menu->addChild('examen.index', ['route' => 'app_direction_examen_index', 'label' => 'Gestion des examens'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_DIRECTEUR');
+            }
             // $menu->addChild('deliberation.index', ['route' => 'app_direction_deliberation_index', 'label' => 'GESTION DE EXAMENS'])->setExtra('icon', 'bi bi-gear');
         }
 

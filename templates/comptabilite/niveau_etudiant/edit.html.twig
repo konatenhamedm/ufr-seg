@@ -16,12 +16,7 @@
         {{ include('_includes/ajax/response.html.twig') }}
 
             <table class="table table-bordered table-custom">
-       {#  <thead class="thead-dark">
-            <tr>
-                <th width="70%" class="p-2">Code pré-inscription</th>
-                <th width="30%" class="p-2">Montant</th>
-            </tr>
-        </thead> #}
+       
         <tbody  class="row-container">
              <tr class="row-colonne even pointer table-light">
                 <td class="p-2">
@@ -59,12 +54,7 @@
                  <td class="p-2"> <b>{{ preinscription.niveau.filiere.libelle }}</b></td>
             </tr>
         </tbody>
-       {#  <tfoot>
-            <tr>
-                <th class="text-end p-2">TOTAL</th>
-                <th class="total text-end p-2 fw-bolder">0</td>
-            </tr>
-        </tfoot> #}
+       
     </table><br>
 
 
@@ -137,8 +127,8 @@
 
 {% block java %}
     <script>
-        $(function () {
-            init_select2('select', null, '.corp');
+          $(function () {
+             init_select2('select', null, '#exampleModalSizeLg2');
             $('.no-auto').each(function () {
                 const $this = $(this);
                 const $id = $('#' + $this.attr('id'));
@@ -151,6 +141,7 @@
                 });
             });
         });
+       
 
     </script>
 {% endblock %}

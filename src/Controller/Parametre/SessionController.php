@@ -17,12 +17,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/admin/parametre/session')]
 class SessionController extends AbstractController
 {
     #[Route('/', name: 'app_parametre_session_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
     {
         $table = $dataTableFactory->create()
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
@@ -91,8 +92,14 @@ class SessionController extends AbstractController
             return $table->getResponse();
         }
 
+        if ($user->getPersonne()->getFonction()->getCode() == "DR") {
 
-        return $this->render('parametre/session/index.html.twig', [
+            $template = 'index_';
+        } else {
+            $template = 'index';
+        }
+
+        return $this->render('parametre/session/' . $template . '.html.twig', [
             'datatable' => $table
         ]);
     }

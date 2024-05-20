@@ -8,6 +8,7 @@ use App\Repository\MatiereUeRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\BoolColumn;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
@@ -17,18 +18,34 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/admin/parametre/matiere/ue')]
 class MatiereUeController extends AbstractController
 {
     #[Route('/', name: 'app_parametre_matiere_ue_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
     {
         $table = $dataTableFactory->create()
-        ->createAdapter(ORMAdapter::class, [
-            'entity' => MatiereUe::class,
-        ])
-        ->setName('dt_app_parametre_matiere_ue');
+            ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'matiere.code'])
+            ->add('libelle', TextColumn::class, ['label' => 'Libellé', 'field' => 'matiere.code'])
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => MatiereUe::class,
+                'query' => function (QueryBuilder $qb) use ($user) {
+                    $qb->select('u, niveau, unite,res,matiere')
+                        ->from(MatiereUe::class, 'u')
+                        ->join('u.matiere', 'matiere')
+                        ->join('u.uniteEnseignement', 'unite')
+                        ->join('unite.niveau', 'niveau')
+                        ->leftJoin('niveau.responsable', 'res');
+
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
+                    }
+                }
+            ])
+            ->setName('dt_app_parametre_matiere_ue');
 
         $renders = [
             'edit' =>  new ActionRender(function () {
@@ -44,18 +61,14 @@ class MatiereUeController extends AbstractController
 
         foreach ($renders as $_ => $cb) {
             if ($cb->execute()) {
-                $hasActions = true;
+                $hasActions = false;
                 break;
             }
         }
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions'
-                , 'orderable' => false
-                ,'globalSearchable' => false
-                ,'className' => 'grid_row_actions'
-                , 'render' => function ($value, MatiereUe $context) use ($renders) {
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, MatiereUe $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -68,17 +81,17 @@ class MatiereUeController extends AbstractController
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
-                        ],
-                        'delete' => [
-                            'target' => '#modal-small',
-                            'url' => $this->generateUrl('app_parametre_matiere_ue_delete', ['id' => $value]),
-                            'ajax' => true,
-                            'stacked' => false,
-                            'icon' => '%icon% bi bi-trash',
-                            'attrs' => ['class' => 'btn-danger'],
-                            'render' => $renders['delete']
+                            ],
+                            'delete' => [
+                                'target' => '#modal-small',
+                                'url' => $this->generateUrl('app_parametre_matiere_ue_delete', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-danger'],
+                                'render' => $renders['delete']
+                            ]
                         ]
-                    ]
 
                     ];
                     return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
@@ -131,28 +144,23 @@ class MatiereUeController extends AbstractController
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
                 $statutCode = 500;
                 if (!$isAjax) {
-                  $this->addFlash('warning', $message);
+                    $this->addFlash('warning', $message);
                 }
-
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
                 }
             }
-
-
         }
 
         return $this->render('parametre/matiere_ue/new.html.twig', [
@@ -176,7 +184,7 @@ class MatiereUeController extends AbstractController
         $form = $this->createForm(MatiereUeType::class, $matiereUe, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_parametre_matiere_ue_edit', [
-                    'id' =>  $matiereUe->getId()
+                'id' =>  $matiereUe->getId()
             ])
         ]);
 
@@ -188,7 +196,7 @@ class MatiereUeController extends AbstractController
 
         $form->handleRequest($request);
 
-       if ($form->isSubmitted()) {
+        if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_parametre_matiere_ue_index');
 
@@ -204,26 +212,22 @@ class MatiereUeController extends AbstractController
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
                 $statutCode = 500;
                 if (!$isAjax) {
-                  $this->addFlash('warning', $message);
+                    $this->addFlash('warning', $message);
                 }
-
             }
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
                 }
             }
-
         }
 
         return $this->render('parametre/matiere_ue/edit.html.twig', [
@@ -238,14 +242,14 @@ class MatiereUeController extends AbstractController
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
-                'app_parametre_matiere_ue_delete'
-                ,   [
+                    'app_parametre_matiere_ue_delete',
+                    [
                         'id' => $matiereUe->getId()
                     ]
                 )
             )
             ->setMethod('DELETE')
-        ->getForm();
+            ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = true;

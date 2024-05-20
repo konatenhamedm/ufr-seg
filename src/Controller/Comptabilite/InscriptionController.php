@@ -197,9 +197,10 @@ class InscriptionController extends AbstractController
                             ->setParameter('etudiant', $user->getPersonne());
                     }
 
-                    if ($this->isGranted('ROLE_DIRECTEUR')) {
-                        $qb->andWhere('res.id = :id')
-                            ->setParameter('id', $user->getPersonne()->getId());
+
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
                     }
                 }
             ])
@@ -339,7 +340,7 @@ class InscriptionController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => InfoInscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $filiere, $classe, $typeFrais) {
-                    $qb->select(['p', 'i', 'niveau', 'filiere', 'etudiant', 'ca', 'classe', 'typeFrais', 'mode'])
+                    $qb->select(['p', 'i', 'res', 'niveau', 'filiere', 'etudiant', 'ca', 'classe', 'typeFrais', 'mode'])
                         ->from(InfoInscription::class, 'i')
                         ->join('i.inscription', 'p')
                         ->innerJoin('i.modePaiement', 'mode')
@@ -348,6 +349,7 @@ class InscriptionController extends AbstractController
                         ->join('p.classe', 'classe')
                         ->leftJoin('i.caissiere', 'ca')
                         ->join('niveau.filiere', 'filiere')
+                        ->join('niveau.responsable', 'res')
                         ->join('p.etudiant', 'etudiant')
                         ->orderBy('i.datePaiement', 'DESC');
 
@@ -403,6 +405,11 @@ class InscriptionController extends AbstractController
                             $qb->andWhere('i.datePaiement BETWEEN :dateDebut AND :dateFin')
                                 ->setParameter('dateDebut', $new_date_debut)
                                 ->setParameter("dateFin", $new_date_fin);
+                        }
+
+                        if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                            $qb->andWhere("res = :user")
+                                ->setParameter('user', $user->getPersonne());
                         }
                     }
                 }

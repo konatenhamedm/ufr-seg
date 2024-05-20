@@ -20,12 +20,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/admin/parametre/unite/enseignement')]
 class UniteEnseignementController extends AbstractController
 {
     #[Route('/', name: 'app_parametre_unite_enseignement_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
     {
         $table = $dataTableFactory->create()
             ->add('niveau', TextColumn::class, ['label' => 'Niveaux', 'field' => 'n.libelle'])
@@ -38,13 +39,19 @@ class UniteEnseignementController extends AbstractController
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => UniteEnseignement::class,
-                'query' => function (QueryBuilder $builder) {
+                'query' => function (QueryBuilder $builder) use ($user) {
                     $builder->resetDQLPart('join');
                     $builder
-                        ->select('e,n,s')
+                        ->select('e,n,s,res')
                         ->from(UniteEnseignement::class, 'e')
                         ->join('e.niveau', 'n')
+                        ->leftJoin('n.responsable', 'res')
                         ->join('e.semestre', 's');
+
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $builder->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
+                    }
                 },
             ])
             ->setName('dt_app_parametre_unite_enseignement');
