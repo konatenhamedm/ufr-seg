@@ -1,12 +1,13 @@
 {% block page_content %}
-   {% from '_macros/macro_document.html.twig' import prototype_ligne_colonne_document %}
+
+{% from '_macros/macro_document.html.twig' import prototype_ligne_colonne_document %}
      {% from '_macros/macro_info.html.twig' import prototype_ligne_colonne_info %}
    {% from '_macros/macro_cursus_universitaire.html.twig' import prototype_ligne_colonne %}
    {% from '_macros/macro_cursus_professionnel.html.twig' import prototype_ligne_colonne_professionnel %}
    {% from '_macros/macro_cursus_stage.html.twig' import prototype_ligne_colonne_stage %}
+      {% from '_macros/macro_encart_bac.html.twig' import prototype_ligne_encart %}
     {% form_theme form 'widget/fields-block.html.twig' %}
     <div class="modal-header">
-        
         <h5 class="modal-title" id="exampleModalLabel">Informations etudiant   {{preinscription.etudiant.getNomComplet| upper ~' | '~ preinscription.niveau.code }}</h5>
         <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
             <span class="svg-icon svg-icon-2x text-white">
@@ -17,12 +18,10 @@
             </span>
         </div>
     </div>
-     {{ form_start(form, {'attr': {'role':'form', 'class': 'form'}}) }}
+    {{ form_start(form, {'attr': {'role':'form', 'class': 'form'}}) }}
     <div class="modal-body">
-            {% form_theme form 'widget/fields-block.html.twig' %}
-            {{ form_start(form, {'attr': {'role':'form', 'class': 'form','enctype':'multipart/form-data'}}) }}
-
-                {{ include('_includes/ajax/response.html.twig') }}
+        {{ include('_includes/ajax/response.html.twig') }}
+       
             <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
                 <li class="nav-item">
                     <a class="nav-link active" data-bs-toggle="tab" href="#kt_tab_pane_1">ETAT CIVIL</a>
@@ -116,6 +115,7 @@
                 </div> 
                 
                 <div class="tab-pane fade" id="kt_tab_pane_4" role="tabpanel">
+                  {{ prototype_ligne_encart(form) }}
                     <div class="row mb-4">
                         <h6>CURSUS UNIVERSITAIRE DEPUIS LE BAC </h6>
                     </div>
@@ -161,51 +161,59 @@
 
             </div>
 
-          {#   <div class="row">
-                <div class="col-md-8"><button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal">Annuler</button>
-                     {{ form_widget(form.save) }}
-                        {% if etudiant.etat =="pas_complet" %}
-                        
-                        {{ form_widget(form.valider) }}
-                        {% endif %}
-                        </div>
-                <div class="col-md-4">
-
-                </div>
-            </div> #}
-
-
-        </div>
-
-
-  
+    </div>
     <div class="modal-footer">
         {# {{ include('_includes/ajax/loader.html.twig') }} #}
-        <button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal">Annuler</button>
-          {# {{ form_widget(form.save) }} #}
+       {#  <button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal">Annuler</button> #}
                         {% if etudiant.etat =="pas_complet" %}
-                        
                         {{ form_widget(form.valider) }}
                         {% endif %}
         
-             <a title="Traiter la demande" href="{{ path('site_information_validation_direct_after_demande',{'id':etudiant.id }) }}" class="btn btn-primary btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2">Valider inscription</a>
+             <a title="Traiter la demande" href="{{ path('site_information_validation_direct_after_demande',{'id':etudiant.id }) }}" class="btn btn-primary btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2" >Valider inscription</a>
              <a title="Traiter la demande" href="{{ path('app_demande_rejeter',{'id':preinscription.id }) }}" class="btn btn-main btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2">Traiter la demande</a>
              
         
-        {# <button type="submit" class="btn btn-main btn-ajax btn-sm"><span class="spinner-border d-none  spinner-ajax spinner-border-sm" role="status" aria-hidden="true"></span> Valider</button> #}
     </div>
-    {{ form_widget(form._token) }}
+  {{ form_widget(form._token) }}
     {{ form_end(form, {render_rest: false}) }}
 {% endblock %}
 
 {% block javascripts_inline %}
-<script src="{{ asset('assets/parcours/universitaitre.js') }}"></script>
+<script src="{{ asset('assets/parcours/universitaire.js') }}"></script>
 <script src="{{ asset('assets/parcours/professionnel.js') }}"></script>
 <script src="{{ asset('assets/parcours/stage.js') }}"></script>
 <script src="{{ asset('assets/parcours/info.js') }}"></script>
     <script>
+    
+
 
     (function ($) {
+
+        
+          var elements = Array.from(document.querySelectorAll("[data-bs-stacked-modal]"));
+
+            if (elements && elements.length > 0) {
+                elements.forEach((element) => {
+                    if (element.getAttribute("data-kt-initialized") === "1" ) {
+                        return;
+                    }
+
+                    const url = element.getAttribute('href');
+                    element.setAttribute("data-kt-initialized", "1");
+
+
+                    element.addEventListener("click", function(e) {
+                        e.preventDefault();
+
+                        const modalEl = document.querySelector(this.getAttribute("data-bs-stacked-modal"));
+
+                        if (modalEl) {
+                            const modal = new bootstrap.Modal(modalEl);
+                            modal.show(element);
+                        }
+                    });
+                });
+            }
     $.fn.extend({
 
     // With every keystroke capitalize first letter of ALL words in the text
@@ -302,33 +310,7 @@ $('#etudiant_prenom').upperFirstAll()
                 $(this).val(picker.startDate.format('DD/MM/YYYY'));
             });*/
         });
-           //$("#modal-xl2").find('.modal-header').css("background","red");
-            var elements = Array.from(document.querySelectorAll("[data-bs-stacked-modal]"));
-
-            if (elements && elements.length > 0) {
-                elements.forEach((element) => {
-                    if (element.getAttribute("data-kt-initialized") === "1" ) {
-                        return;
-                    }
-
-                    const url = element.getAttribute('href');
-                    element.setAttribute("data-kt-initialized", "1");
-
-
-                    element.addEventListener("click", function(e) {
-                        e.preventDefault();
-
-                        const modalEl = document.querySelector(this.getAttribute("data-bs-stacked-modal"));
-
-                        if (modalEl) {
-                            const modal = new bootstrap.Modal(modalEl);
-                            modal.show(element);
-                        }
-                    });
-                });
-            }
-
-
+         
         });
 
           if($("#etudiant_statutTravail_0").checked){

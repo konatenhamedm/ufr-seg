@@ -9,7 +9,9 @@ use App\Entity\Classe;
 use App\Entity\Echeancier;
 use App\Entity\EcheancierProvisoire;
 use App\Entity\Employe;
+use App\Entity\EncartBac;
 use App\Entity\Etudiant;
+use App\Entity\Fichier;
 use App\Entity\Filiere;
 use App\Entity\Fonction;
 use App\Entity\FraisBloc;
@@ -64,6 +66,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -110,6 +113,37 @@ class HomeController extends AbstractController
             $nb = $nb + 1;
         }
         return ($code . '-' . date("y") . '-' . str_pad($nb, 3, '0', STR_PAD_LEFT));
+    }
+
+
+    #[Route('/{id}', name: 'fichier_index', methods: ['GET'])]
+    public function show(Request $request, Fichier $fichier)
+    {
+
+        $fileName = $fichier->getFileName();
+        $filePath = $fichier->getPath();
+        $download = $request->query->get('download');
+
+        $file = $this->getUploadDir($filePath . '/' . $fileName);
+
+
+        /*try {
+            $file = $this->getUploadDir($filePath . '/' . $fileName);
+        } catch (FileNotFoundException $e) {
+            $file = $this->getUploadDir($fileName);
+        } catch (FileNotFoundException $e) {
+            $file = null;
+        }*/
+
+        if (!file_exists($file)) {
+            return new Response('Fichier invalide');
+        }
+
+        if ($download) {
+            return $this->file($file);
+        }
+
+        return new BinaryFileResponse($file);
     }
 
 
@@ -384,6 +418,7 @@ class HomeController extends AbstractController
         $info = new InfoEtudiant();
 
 
+
         //$etudiant->getInf
 
 
@@ -404,6 +439,17 @@ class HomeController extends AbstractController
             $info->setCorresEmail('');
 
             $etudiant->addInfoEtudiant($info);
+        }
+
+        if (count($etudiant->getEncartBacs()) == 0) {
+            $encart = new EncartBac();
+            $encart->setMatricule('');
+            $encart->setNumero('');
+            $encart->setSerie('');
+            $encart->setAnnee('');
+            //$encart->setBac('');
+
+            $etudiant->addEncartBac($encart);
         }
 
 

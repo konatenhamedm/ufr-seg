@@ -50,6 +50,9 @@ class CursusUniversitaire
     #[ORM\JoinColumn(nullable: true)]
     private ?Fichier $releve = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $dernierDiplome = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -181,6 +184,18 @@ class CursusUniversitaire
     public function setNumeroMatricule(string $numeroMatricule): static
     {
         $this->numeroMatricule = $numeroMatricule;
+
+        return $this;
+    }
+
+    public function isDernierDiplome(): ?bool
+    {
+        return $this->dernierDiplome;
+    }
+
+    public function setDernierDiplome(?bool $dernierDiplome): static
+    {
+        $this->dernierDiplome = $dernierDiplome;
 
         return $this;
     }

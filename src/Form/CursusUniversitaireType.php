@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\CursusUniversitaire;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -44,6 +45,7 @@ class CursusUniversitaireType extends AbstractType
                     new NotNull(null, "S'il vous veillez renseigner le champ pays")
                 )
             ])
+            ->add('dernierDiplome', CheckboxType::class, ['label' => 'Der. diplôme', 'required' => false])
             ->add('diplome', TextType::class, [
                 'label' => 'Diplôme et série',
                 "constraints" => array(

@@ -149,6 +149,11 @@ class Etudiant extends Personne
     #[ORM\ManyToOne(inversedBy: 'etudiants')]
     private ?Nationalite $nationalite = null;
 
+    #[ORM\OneToMany(mappedBy: 'etudiant', targetEntity: EncartBac::class, orphanRemoval: true, cascade: ['persist'])]
+    private Collection $encartBacs;
+
+
+
 
 
     public function getNoms()
@@ -173,6 +178,7 @@ class Etudiant extends Personne
         $this->cursusProfessionnels = new ArrayCollection();
         $this->stages = new ArrayCollection();
         $this->blocEcheanciers = new ArrayCollection();
+        $this->encartBacs = new ArrayCollection();
     }
 
     /**
@@ -817,6 +823,36 @@ class Etudiant extends Personne
     public function setNationalite(?Nationalite $nationalite): static
     {
         $this->nationalite = $nationalite;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EncartBac>
+     */
+    public function getEncartBacs(): Collection
+    {
+        return $this->encartBacs;
+    }
+
+    public function addEncartBac(EncartBac $encartBac): static
+    {
+        if (!$this->encartBacs->contains($encartBac)) {
+            $this->encartBacs->add($encartBac);
+            $encartBac->setEtudiant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEncartBac(EncartBac $encartBac): static
+    {
+        if ($this->encartBacs->removeElement($encartBac)) {
+            // set the owning side to null (unless already changed)
+            if ($encartBac->getEtudiant() === $this) {
+                $encartBac->setEtudiant(null);
+            }
+        }
 
         return $this;
     }

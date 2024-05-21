@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Civilite;
 use App\Entity\Etudiant;
 use App\Entity\Genre;
+use App\Entity\Nationalite;
 use App\Entity\Pays;
 use App\Entity\Personne;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -55,6 +56,15 @@ class EtudiantVerificationType extends AbstractType
                     'label_attr' => ['class' => 'label-required'],
                     'choice_label' => 'libelle',
                     'label' => 'Sexe',
+                    'attr' => ['class' => 'has-select2']
+                ])
+                ->add('nationalite', EntityType::class, [
+                    'class' => Nationalite::class,
+                    'required' => false,
+                    'placeholder' => '----',
+                    'label_attr' => ['class' => 'label-required'],
+                    'choice_label' => 'libelle',
+                    'label' => 'Nationalité',
                     'attr' => ['class' => 'has-select2']
                 ])
                 ->add('civilite', EntityType::class, [
@@ -138,6 +148,20 @@ class EtudiantVerificationType extends AbstractType
 
                 ->add('cursusUniversitaires', CollectionType::class, [
                     'entry_type' => CursusUniversitaireType::class,
+                    'entry_options' => [
+                        'label' => false,
+                        'doc_options' => $options['doc_options'],
+                        'doc_required' => $options['doc_required'],
+                        'validation_groups' => $options['validation_groups'],
+                    ],
+                    'allow_add' => true,
+                    'label' => false,
+                    'by_reference' => false,
+                    'allow_delete' => true,
+                    'prototype' => true,
+                ])
+                ->add('encartBacs', CollectionType::class, [
+                    'entry_type' => EncartBacType::class,
                     'entry_options' => [
                         'label' => false,
                         'doc_options' => $options['doc_options'],

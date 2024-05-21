@@ -196,6 +196,20 @@ class EtudiantType extends AbstractType
                     'allow_delete' => true,
                     'prototype' => true,
                 ])
+                ->add('encartBacs', CollectionType::class, [
+                    'entry_type' => EncartBacType::class,
+                    'entry_options' => [
+                        'label' => false,
+                        'doc_options' => $options['doc_options'],
+                        'doc_required' => $options['doc_required'],
+                        'validation_groups' => $options['validation_groups'],
+                    ],
+                    'allow_add' => true,
+                    'label' => false,
+                    'by_reference' => false,
+                    'allow_delete' => true,
+                    'prototype' => true,
+                ])
                 ->add('cursusUniversitaires', CollectionType::class, [
                     'entry_type' => CursusUniversitaireType::class,
                     'entry_options' => [

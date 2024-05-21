@@ -34,6 +34,12 @@ $(function () {
 
 
         e.preventDefault(); // évite qu'un # apparaisse dans l'URL
+
+        /*$(".checkAll").change(function () {
+
+            alert('')
+            $("input:checkbox").prop('checked', $(this).prop("checked"));
+        });*/
     });
 
     if (index > 0) {
