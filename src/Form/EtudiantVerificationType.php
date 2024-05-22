@@ -317,6 +317,7 @@ class EtudiantVerificationType extends AbstractType
                 ]);
         }
         $builder->add('valider', SubmitType::class, ['label' => 'ENVOYER A LA VALIDATION', 'attr' => ['class' => 'btn btn-danger btn-ajax']]);
+        // $builder->add('valider', Link::class, ['label' => 'ENVOYER A LA VALIDATION', 'attr' => ['class' => 'btn btn-danger btn-ajax']]);
         //$builder->add('save', SubmitType::class, ['label' => 'Valider inscription', 'attr' => ['class' => 'btn btn-main btn-ajax']]);
     }
 

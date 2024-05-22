@@ -145,6 +145,7 @@
                 });
 
                
+           $('.col-total').text(setValue(total));
                 $('.total-saisi').text(setValue(total));
 
 
@@ -192,7 +193,8 @@
                 });
 
                
-                $('.total-saisi').text(setValue(total));
+                $('.col-total').text(setValue(total));
+                //$('.total-saisi').text(setValue(total));
                 
             });
            
@@ -269,8 +271,35 @@
                     if (index > 0) {
                         index -= 1;
                     }
-
+                        total = 0;
                     e.preventDefault(); // évite qu'un # apparaisse dans l'URL
+                     $('.montant-input').each(function () {
+                                $ligne = $(this);
+
+                                total = total + parseInt($ligne.val().replaceAll(' ', ''));
+                                //total = +$ligne.val().replaceAll(' ', '');
+                            });
+
+                             $('.col-total').text(setValue(total));
+                        //$('.total-saisi').text(setValue(total));
+
+                      $('.montant-input').on('update-value',  (e, val, element)  => {
+                            const $this = $(this);
+    
+                            total2 = 0;
+
+                            $('.montant-input').each(function () {
+                                $ligne = $(this);
+
+                                total2 = total2 + parseInt($ligne.val().replaceAll(' ', ''));
+                                //total = +$ligne.val().replaceAll(' ', '');
+                            });
+
+               
+                             $('.col-total').text(setValue(total2));
+                        
+                
+                    });
                 });
             }
 

@@ -21,6 +21,8 @@
     {{ form_start(form, {'attr': {'role':'form', 'class': 'form'}}) }}
     <div class="modal-body">
         {{ include('_includes/ajax/response.html.twig') }}
+
+        {# {{ preinscription.etat }} #}
        
             <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
                 <li class="nav-item">
@@ -42,6 +44,25 @@
                 </li>
                 
             </ul>
+          {% if preinscription.etat == 'attente_informations' %}
+            <div class="alert alert-danger d-flex align-items-center p-5">
+                <!--begin::Icon-->
+                <span class="svg-icon svg-icon-2hx svg-icon-primary me-3">...</span>
+                <!--end::Icon-->
+
+                <!--begin::Wrapper-->
+                <div class="d-flex flex-column">
+                    <!--begin::Title-->
+                    <h4 class="mb-1 text-dark">Alerte informations</h4>
+                    <!--end::Title-->
+                    <!--begin::Content-->
+                    <span>{{ preinscription.commentaire }}.</span>
+                    <!--end::Content-->
+                </div>
+                <!--end::Wrapper-->
+            </div>   
+          {% endif %}
+             
 
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="kt_tab_pane_1" role="tabpanel">
@@ -168,29 +189,29 @@
                         {% if etudiant.etat =="pas_complet" %}
                         {{ form_widget(form.valider) }}
                         {% endif %}
-        
+
+                        {% if preinscription.etat != 'attente_informations' %}
              <a title="Traiter la demande" href="{{ path('site_information_validation_direct_after_demande',{'id':etudiant.id }) }}" class="btn btn-primary btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2" >Valider inscription</a>
              <a title="Traiter la demande" href="{{ path('app_demande_rejeter',{'id':preinscription.id }) }}" class="btn btn-main btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2">Traiter la demande</a>
              
+                        
+                        {% endif %}
+                        
+        
         
     </div>
   {{ form_widget(form._token) }}
     {{ form_end(form, {render_rest: false}) }}
 {% endblock %}
 
-{% block javascripts_inline %}
+{% block java %}
 <script src="{{ asset('assets/parcours/universitaire.js') }}"></script>
 <script src="{{ asset('assets/parcours/professionnel.js') }}"></script>
 <script src="{{ asset('assets/parcours/stage.js') }}"></script>
-<script src="{{ asset('assets/parcours/info.js') }}"></script>
+{# <script src="{{ asset('assets/parcours/info.js') }}"></script> #}
     <script>
     
-
-
-    (function ($) {
-
-        
-          var elements = Array.from(document.querySelectorAll("[data-bs-stacked-modal]"));
+   var elements = Array.from(document.querySelectorAll("[data-bs-stacked-modal]"));
 
             if (elements && elements.length > 0) {
                 elements.forEach((element) => {
@@ -214,72 +235,6 @@
                     });
                 });
             }
-    $.fn.extend({
-
-    // With every keystroke capitalize first letter of ALL words in the text
-    upperFirstAll: function() {
-        $(this).keyup(function(event) {
-            var box = event.target;
-            var txt = $(this).val();
-            var start = box.selectionStart;
-            var end = box.selectionEnd;
-
-            $(this).val(txt.toLowerCase().replace(/^(.)|(\s|\-)(.)/g,
-            function(c) {
-                return c.toUpperCase();
-            }));
-            box.setSelectionRange(start, end);
-        });
-        return this;
-    },
-
-    // With every keystroke capitalize first letter of the FIRST word in the text
-    upperFirst: function() {
-        $(this).keyup(function(event) {
-            var box = event.target;
-            var txt = $(this).val();
-            var start = box.selectionStart;
-            var end = box.selectionEnd;
-
-            $(this).val(txt.toLowerCase().replace(/^(.)/g,
-            function(c) {
-                return c.toUpperCase();
-            }));
-            box.setSelectionRange(start, end);
-        });
-        return this;
-    },
-
-    // Converts with every keystroke the hole text to lowercase
-    lowerCase: function() {
-        $(this).keyup(function(event) {
-            var box = event.target;
-            var txt = $(this).val();
-            var start = box.selectionStart;
-            var end = box.selectionEnd;
-
-            $(this).val(txt.toLowerCase());
-            box.setSelectionRange(start, end);
-        });
-        return this;
-    },
-
-    // Converts with every keystroke the hole text to uppercase
-    upperCase: function() {
-        $(this).keyup(function(event) {
-            var box = event.target;
-            var txt = $(this).val();
-            var start = box.selectionStart;
-            var end = box.selectionEnd;
-
-            $(this).val(txt.toUpperCase());
-            box.setSelectionRange(start, end);
-        });
-        return this;
-    }
-
-    });
-}(jQuery));
 
 $('#etudiant_prenom').upperFirstAll()
       $(function() { 
@@ -297,8 +252,6 @@ $('#etudiant_prenom').upperFirstAll()
         
   $(function () {
         
-           
-
            $('.no-auto').each(function () {
             const $this = $(this);
             const $id = $('#' + $this.attr('id'));

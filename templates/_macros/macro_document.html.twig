@@ -10,7 +10,7 @@
                 {{ form_row(colonne.fichier) }}
             </div>
             <div class="col-md-1 ">
-                  {% if colonne.vars.value and colonne.vars.value.fichier %}
+                  {% if colonne.vars.value and colonne.vars.value.fichier is not null %}
               
            {#  <a class="btn btn-dark btn-sm" target="_blank" href="{{ path('fichier_index', {id:  colonne.vars.value.path.id}) }}" download> <i class="bi bi-upload"></i>
                 </a> #}

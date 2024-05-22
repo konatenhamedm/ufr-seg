@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\InfoInscription;
+use App\Entity\Preinscription;
 use App\Repository\AnneeScolaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -54,5 +55,16 @@ class Menu
     {
         $data = $this->em->getRepository(InfoInscription::class)->sommeTotal($etudiant, $niveau);
         return $data ? $data['somme'] : 0;
+    }
+
+    public function nombrePreinscriptionEtudiant($etat, $utilisateur)
+    {
+        $repo = $this->em->getRepository(Preinscription::class)->nombrePreinscriptionEtudiant($etat, $utilisateur);
+        return $repo;
+    }
+    public function nombrePreinscriptionAdmin($etat)
+    {
+        $repo = $this->em->getRepository(Preinscription::class)->nombrePreinscriptionAdmin($etat);
+        return $repo;
     }
 }

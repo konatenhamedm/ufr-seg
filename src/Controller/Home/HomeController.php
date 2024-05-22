@@ -3,12 +3,14 @@
 namespace App\Controller\Home;
 
 use App\Controller\FileTrait;
+use App\Entity\Decision;
 use App\Entity\Etudiant;
 use App\Entity\Inscription;
 use App\Entity\Preinscription;
 use App\Form\EtudiantType;
 use App\Form\EtudiantVerificationType;
 use App\Form\PreinscriptionValidationType;
+use App\Repository\DecisionRepository;
 use App\Repository\EtudiantRepository;
 use App\Repository\NiveauRepository;
 use App\Repository\PersonneRepository;
@@ -18,11 +20,13 @@ use App\Service\ActionRender;
 use App\Service\FormError;
 use App\Service\Omines\Adapter\ORMAdapter;
 use App\Service\Omines\Column\NumberFormatColumn;
+use DateTime;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -234,6 +238,11 @@ class HomeController extends AbstractController
         //dd($niveauRepository->findNiveauDisponible(21));
 
         //dd($preinscription);
+
+
+
+
+
         $validationGroups = ['Default', 'FileRequired', 'autre'];
         $form = $this->createForm(EtudiantVerificationType::class, $etudiant, [
             'method' => 'POST',
@@ -257,16 +266,20 @@ class HomeController extends AbstractController
         if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_home_timeline_index');
-
+            $preinscriptionData = $preinscriptionRepository->find($preinscription);
 
 
 
             if ($form->isValid()) {
 
-                /* if ($form->getClickedButton()->getName() === 'valider') {
+                if ($form->getClickedButton()->getName() === 'valider') {
+                    $preinscriptionData->setEtat('attente_validation');
                     $etudiant->setEtat('complete');
-                } */
+                    $preinscriptionRepository->add($preinscriptionData, true);
+                }
+
                 $personneRepository->add($etudiant, true);
+
                 //$entityManager->flush();
 
                 $data = true;
@@ -301,9 +314,21 @@ class HomeController extends AbstractController
     }
 
     #[Route('/{id}/rejeter', name: 'app_demande_rejeter', methods: ['GET', 'POST'])]
-    public function Rejeter(Request $request, Preinscription $preinscription, PreinscriptionRepository $preinscriptionRepository, FormError $formError, Registry $workflow, EtudiantRepository $etudiantRepository): Response
+    public function Rejeter(Request $request, Security $security, DecisionRepository $decisionRepository, Preinscription $preinscription, PreinscriptionRepository $preinscriptionRepository, FormError $formError, Registry $workflow, EtudiantRepository $etudiantRepository): Response
     {
         //dd();
+
+        /*  foreach ($preinscription->getDecisions() as $key => $value) {
+
+            $preinscription->clearDecision($value);
+        } */
+        $decision = new Decision();
+
+        $decision->setDateCreation(new DateTime());
+        $decision->setUtilisateur($security->getUser());
+        $decision->setCommentaire('RAS');
+        $decision->setDecision('null');
+        $preinscription->addDecision($decision);
 
         $preinscription->setDateValidation(new \DateTime());
         $form = $this->createForm(PreinscriptionValidationType::class, $preinscription, [
@@ -323,7 +348,9 @@ class HomeController extends AbstractController
 
         if ($form->isSubmitted()) {
 
-            $etat = $form->get('etat')->getData();
+            $decisions = $form->get('decisions')->getData();
+
+            //dd($decision);
 
             // dd($etat);
             $response = [];
@@ -333,19 +360,24 @@ class HomeController extends AbstractController
 
             if ($form->isValid()) {
 
+                foreach ($decisions as $key => $decision) {
+                    if ($decision->getDecision() == 'Valider') {
+                        $preinscription->setEtat('attente_paiement');
+                    } elseif ($decision->getDecision() == 'Recaler') {
+                        $preinscription->setEtat('rejete');
+                    } else {
+                        $preinscription->setEtat('attente_informations');
 
-                if ($etat == 'Valider') {
-                    $preinscription->setEtat('attente_paiement');
-                } elseif ($etat == 'Recaler') {
-                    $preinscription->setEtat('rejete');
-                } else {
-                    $preinscription->setEtat('attente_informations');
+                        $etudiant = $preinscription->getEtudiant();
 
-                    $etudiant = $preinscription->getEtudiant();
+                        $etudiant->setEtat('pas_complet');
+                        $etudiantRepository->add($etudiant, true);
+                    }
 
-                    $etudiant->setEtat('pas_complet');
-                    $etudiantRepository->add($etudiant, true);
+                    $preinscription->setCommentaire($decision->getCommentaire());
                 }
+
+                /*  */
                 $preinscriptionRepository->add($preinscription, true);
                 // $demandeRepository->save($demande, true);
 
@@ -380,6 +412,7 @@ class HomeController extends AbstractController
             'preinscription' => $preinscription,
             // 'fichiers' => $repository->findOneBySomeFields($demande),
             'form' => $form->createView(),
+            'decisions' => $decisionRepository->findBy(['preinscription' => $preinscription]),
         ]);
     }
 

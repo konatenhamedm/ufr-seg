@@ -1,4 +1,5 @@
 {% block page_content %}
+{% from '_macros/macro_decision.html.twig' import prototype_ligne_colonne_decision %}
     {% form_theme form 'widget/fields-block.html.twig' %}
     <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">TRAITEMENT DE LA DEMANDE</h5>
@@ -14,15 +15,35 @@
     {{ form_start(form, {'attr': {'role':'form', 'class': 'form'}}) }}
     <div class="modal-body">
         {{ include('_includes/ajax/response.html.twig') }}
-          <div class="row">
-                        <div class="form-group col-md-6 mb-4">{{ form_row(form.dateValidation,{attr:{'readonly':'readonly'}}) }}</div>
-                        <div class="form-group  col-md-6 mb-4">{{ form_row(form.etat) }}
-                        </div>
-         </div>
-          <div class="row">
-                        <div class="form-group col-md-12 mb-7">{{ form_row(form.commentaire) }}</div>
-                        
-         </div>
+
+        <div class="alert alert-dismissible bg-light-primary border border-info border-1 border-dashed p-5 mb-5" >
+
+            <table class="table table-bordered table-custom">
+        <thead class="thead-dark">
+            <tr>
+                <th width="20%" class="p-2">Date</th>
+                <th width="20%" class="p-2">Dossier suivi par</th>
+                <th width="10%" class="p-2">Décision</th>
+                <th width="50%" class="p-2">Commentaire</th>
+            </tr>
+        </thead>
+        <tbody  class="row-container">
+            {% for item in decisions %}
+               <tr>
+                 <td>{{ item.dateCreation | date('d/m/y')}}</td>
+                 <td>{{ item.utilisateur.getNomComplet }}</td>
+                 <td>{{ item.decision }}</td>
+                 <td>{{ item.commentaire }}</td>
+               </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        
+        </div>
+        <div style="border-bottom:3px solid #000">
+        </div>
+        
+            {{ prototype_ligne_colonne_decision(form) }} 
     </div>
     <div class="modal-footer">
         {# {{ include('_includes/ajax/loader.html.twig') }} #}
@@ -34,9 +55,9 @@
 
 {% block javascripts_inline %}
     <script>
-        {# $(function () {
-            init_select2('select');
-        });  #}
+        $(function () {
+            init_select2('select',null,'#modal-xl2');
+        }); 
 
         
 

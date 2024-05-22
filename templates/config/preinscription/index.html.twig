@@ -73,6 +73,12 @@
                 </span>
                 <span class="nav-text">
                   {{ module.label }}
+                </span>&nbsp;
+               {% set user = app.user %}
+              
+                <span class="menu-badge" ><span class="badge badge-danger" >
+                   {{ menu.nombrePreinscriptionEtudiant(module.etat,user)  }}
+                
                 </span>
 
               </a>

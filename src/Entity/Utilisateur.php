@@ -59,11 +59,15 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, 
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: InfoInscription::class)]
     private Collection $infoInscriptions;
 
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Decision::class)]
+    private Collection $decisions;
+
     public function __construct()
     {
         $this->utilisateurGroupes = new ArrayCollection();
         $this->groupes = new ArrayCollection();
         $this->infoInscriptions = new ArrayCollection();
+        $this->decisions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -527,6 +531,36 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface, 
     public function setResetToken(?string $resetToken): static
     {
         $this->resetToken = $resetToken;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Decision>
+     */
+    public function getDecisions(): Collection
+    {
+        return $this->decisions;
+    }
+
+    public function addDecision(Decision $decision): static
+    {
+        if (!$this->decisions->contains($decision)) {
+            $this->decisions->add($decision);
+            $decision->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecision(Decision $decision): static
+    {
+        if ($this->decisions->removeElement($decision)) {
+            // set the owning side to null (unless already changed)
+            if ($decision->getUtilisateur() === $this) {
+                $decision->setUtilisateur(null);
+            }
+        }
 
         return $this;
     }

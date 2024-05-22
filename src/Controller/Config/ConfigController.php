@@ -46,12 +46,14 @@ class ConfigController extends AbstractController
                 'label' => 'Dossiers en attente de transmission',
                 'icon' => 'bi bi-list',
                 'module' => 'general',
+                'etat' => 'all',
                 'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_preinscription_index', ['etat' => 'all'])
             ],
             [
                 'label' => 'Dossiers transmis pour traitement',
                 'icon' => 'bi bi-list',
                 'module' => 'gestion',
+                'etat' => 'attente_validation',
                 'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_preinscription_index', ['etat' => 'attente_validation'])
             ]
         ];

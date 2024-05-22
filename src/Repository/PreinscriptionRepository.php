@@ -75,6 +75,34 @@ class PreinscriptionRepository extends ServiceEntityRepository
     }
 
 
+    public function nombrePreinscriptionEtudiant($etat, $utilisateur)
+    {
+        return $this->createQueryBuilder('d')
+            ->select('count(d.id)')
+            ->join('d.utilisateur', 'u')
+            ->join('d.etudiant', 'e')
+            ->andWhere('u =:utilisateur')
+            ->andWhere("d.etat =:etat")
+            ->setParameter('etat', $etat)
+            ->setParameter('utilisateur', $utilisateur)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+    public function nombrePreinscriptionAdmin($etat)
+    {
+        $sql = $this->createQueryBuilder('d')
+            ->select('count(d.id)');
+
+        if ($etat != 'all') {
+            $sql->andWhere("d.etat =:etat")
+                ->setParameter('etat', $etat);
+        }
+
+        return  $sql->getQuery()
+            ->getSingleScalarResult();
+    }
+
+
     //    /**
     //     * @return Preinscription[] Returns an array of Preinscription objects
     //     */

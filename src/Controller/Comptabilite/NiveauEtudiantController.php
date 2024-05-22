@@ -286,7 +286,7 @@ class NiveauEtudiantController extends AbstractController
     #[Route('/{etat}', name: 'app_comptabilite_niveau_etudiant_preinscription_index', methods: ['GET', 'POST'])]
     public function indexPreinscription(Request $request, DataTableFactory $dataTableFactory, $etat, UtilisateurGroupeRepository $utilisateurGroupeRepository, UserInterface $user): Response
     {
-        // dd($etat);
+        //dd($etat);
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
         $titre = '';
         if ($etat == "attente_paiement") {
@@ -457,6 +457,13 @@ class NiveauEtudiantController extends AbstractController
                     return false;
                 }
             }),
+            'show_attente_information' => new ActionRender(function () use ($etat, $isEtudiant) {
+                if ($etat == 'attente_informations' && $isEtudiant == true) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }),
 
             'show_etudiant' => new ActionRender(function () use ($etat, $isEtudiant) {
                 if ($etat == 'attente_validation' &&  $isEtudiant == true) {
@@ -492,6 +499,16 @@ class NiveauEtudiantController extends AbstractController
                                 'icon' => '%icon% bi bi-eye',
                                 'attrs' => ['class' => 'btn-primary'],
                                 'render' => $renders['show']
+                            ],
+                            'show_attente_information' => [
+                                'target' => '#modal-xl',
+                                'url' => $this->generateUrl('verification_validation_dossier', ['id' => $context->getEtudiant()->getId(), 'preinscription' => $value]),
+                                // 'url' => $this->generateUrl('app_comptabilite_preinscription_show', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-eye',
+                                'attrs' => ['class' => 'btn-primary'],
+                                'render' => $renders['show_attente_information']
                             ],
                             'show_etudiant' => [
                                 'url' => $this->generateUrl('site_information'),
@@ -549,6 +566,8 @@ class NiveauEtudiantController extends AbstractController
             'titre' => $titre,
         ]);
     }
+
+
 
     #[Route('/{id}/imprime/comptabilite', name: 'app_comptabilite_comptabilite_print', methods: ['GET'])]
     public function imprimerComptabilite($id, Preinscription $preinscription, EcheancierRepository $echeancierRepository): Response

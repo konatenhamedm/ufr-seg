@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PreinscriptionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
@@ -75,6 +77,14 @@ class Preinscription
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $commentaire = null;
+
+    #[ORM\OneToMany(mappedBy: 'preinscription', targetEntity: Decision::class, orphanRemoval: true, cascade: ['persist'])]
+    private Collection $decisions;
+
+    public function __construct()
+    {
+        $this->decisions = new ArrayCollection();
+    }
 
 
 
@@ -264,6 +274,55 @@ class Preinscription
     public function setCommentaire(?string $commentaire): static
     {
         $this->commentaire = $commentaire;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Decision>
+     */
+    public function getDecisions(): Collection
+    {
+
+
+
+        $data = $this->decisions->filter(function (Decision $decision) {
+            return $decision->getDecision() == "null";
+        });
+
+        //dd($data);
+        return   $data;
+    }
+
+    public function addDecision(Decision $decision): static
+    {
+        if (!$this->decisions->contains($decision)) {
+            $this->decisions->add($decision);
+            $decision->setPreinscription($this);
+        }
+
+        return $this;
+    }
+
+
+    public function removeDecision(Decision $decision): static
+    {
+        if ($this->decisions->removeElement($decision)) {
+            // set the owning side to null (unless already changed)
+            if ($decision->getPreinscription() === $this) {
+                $decision->setPreinscription(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function clearDecision(Decision $decision): static
+    {
+        if ($this->decisions->clear($decision)) {
+            // set the owning side to null (unless already changed)
+            $this->decisions->clear($decision);
+        }
 
         return $this;
     }

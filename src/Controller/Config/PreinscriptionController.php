@@ -22,27 +22,31 @@ class PreinscriptionController extends AbstractController
         $module = $request->query->get('module');
         $modules = [
             [
-                'label' => 'En attente de traitement ',
+                'label' => 'Attente de traitement ',
                 'icon' => 'bi bi-list',
                 'module' => 'general',
+                'etat' => 'attente_validation',
                 'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_preinscription_index', ['etat' => 'attente_validation'])
             ],
             [
-                'label' => 'En attente de paiement',
+                'label' => 'Attente de paiement',
                 'icon' => 'bi bi-list',
                 'module' => 'gestion',
+                'etat' => 'attente_paiement',
                 'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_index')
             ],
             [
-                'label' => 'Préinscriptions payées',
+                'label' => 'Préinscr. payées',
                 'icon' => 'bi bi-list',
                 'module' => 'gestiono',
+                'etat' => 'valide',
                 'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_preinscription_solde_index')
             ],
             [
-                'label' => 'En attente de complement',
+                'label' => 'Attente de complement',
                 'icon' => 'bi bi-list',
                 'module' => 'gestionk',
+                'etat' => 'attente_informations',
                 'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_preinscription_index', ['etat' => 'attente_informations'])
             ],
         ];
