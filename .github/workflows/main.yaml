@@ -21,6 +21,6 @@ jobs:
           sshpass -e ssh -o stricthostkeychecking=no ${{ secrets.APP_USER }}@${{ secrets.APP_HOST }}
           "cd ../var/www/clients/client1/web55/web/ &&
          git add . &&
-         git commit -m "save des modifs sur la branch du serveur" &&
+         git commit -m"save des modifs sur la branch du serveur" &&
          git pull origin main 
          "  
