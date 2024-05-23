@@ -790,7 +790,15 @@ class Etudiant extends Personne
      */
     public function getBlocEcheanciers(): Collection
     {
-        return $this->blocEcheanciers;
+
+        $data = $this->blocEcheanciers->filter(function (BlocEcheancier $blocEcheancier) {
+            return $blocEcheancier->getInscription() == null;
+        });
+
+        //dd($data);
+        return   $data;
+
+        //return $this->blocEcheanciers;
     }
 
     public function addBlocEcheancier(BlocEcheancier $blocEcheancier): static

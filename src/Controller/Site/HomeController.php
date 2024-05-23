@@ -1635,6 +1635,158 @@ class HomeController extends AbstractController
 
         //return $this->render('site/admin/pages/informations.html.twig');
     }
+    #[Route(path: '/site/information/validation/direct/after/demande/{id}/{precription}', name: 'site_information_validation_direct_after_demande_since_precription', methods: ['GET', 'POST'])]
+    public function informationAdminNewDirectAfterDemandeEtudiantSincePreinscription(
+        Request $request,
+        EtudiantRepository $etudiantRepository,
+        PersonneRepository $personneRepository,
+        FormError $formError,
+        NiveauRepository $niveauRepository,
+        UtilisateurRepository $utilisateurRepository,
+        PreinscriptionRepository $preinscriptionRepository,
+        $id,
+        $precription,
+        SendMailService $sendMailService,
+        UserPasswordHasherInterface $userPasswordHasher,
+        ClasseRepository $classeRepository,
+        InscriptionRepository $inscriptionRepository,
+        EcheancierRepository $echeancierRepository,
+        EntityManagerInterface $entityManager,
+        Service $service,
+        PreinscriptionRepository $preinscriptionRepository2
+    ): Response {
+
+        $etudiant = new Etudiant();
+
+
+        if (count($etudiant->getBlocEcheanciers()) == 0) {
+
+            /* foreach ($frais as $key => $value) {
+            $sommeFrais += (int)$value->getMontant();
+        } */
+            $bloc_echeancier = new BlocEcheancier();
+
+            $bloc_echeancier->setClasse($classeRepository->find(1));
+            $bloc_echeancier->setDateInscription(new DateTime());
+            $bloc_echeancier->setTotal('0');
+
+
+            $etudiant->addBlocEcheancier($bloc_echeancier);
+            $echeancierProvisoire = new EcheancierProvisoire();
+            $echeancierProvisoire->setDateVersement(new DateTime());
+            $echeancierProvisoire->setNumero('1');
+            $echeancierProvisoire->setMontant('0');
+
+            $bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
+        }
+        $info = new InfoEtudiant();
+
+        if (count($etudiant->getInfoEtudiants()) == 0) {
+            $info->setTuteurNomPrenoms('');
+            $info->setTuteurFonction('');
+            $info->setTuteurContact('');
+            $info->setTuteurDomicile('');
+            $info->setTuteurEmail('');
+
+            $info->setCorresNomPrenoms('');
+            $info->setCorresFonction('');
+            $info->setCorresContacts('');
+            $info->setCorresDomicile('');
+            $info->setCorresEmail('');
+
+            $etudiant->addInfoEtudiant($info);
+        }
+
+
+
+        $validationGroups = ['Default', 'FileRequired', 'autre'];
+        //dd($niveauRepository->findNiveauDisponible(21));
+
+        $form = $this->createForm(EtudiantAdminNewType::class, $etudiant, [
+            'method' => 'POST',
+            'doc_options' => [
+                'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
+                'attrs' => ['class' => 'filestyle'],
+            ],
+            'validation_groups' => $validationGroups,
+            'action' => $this->generateUrl('site_information_validation_direct_after_demande', [
+                'id' =>  $id,
+
+            ])
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_inscription_etudiant_admin_index');
+
+            $user = $utilisateurRepository->findOneBy(['personne' => $etudiant]);
+            $blocEcheanciers = $form->get('blocEcheanciers')->getData();
+
+            $prenoms = '';
+            $explodePrenom = explode(" ", $form->get('prenom')->getData());
+            for ($i = 0; $i < count($explodePrenom); $i++) {
+                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
+            }
+
+            if ($form->isValid()) {
+
+                //dd(filter_var($etudiant->getEmail(), FILTER_VALIDATE_EMAIL));
+                $etudiant->setNom(strtoupper($form->get('nom')->getData()));
+                $etudiant->setPrenom($prenoms);
+                $responseRegister = $service->registerEcheancierAdmin($blocEcheanciers, $etudiantRepository->find($id));
+
+                if ($responseRegister) {
+                    $etudiantRepository->add($etudiantRepository->find($id), true);
+                    $preinscriptionData = $preinscriptionRepository->find($precription);
+                    $preinscriptionData->setEtat('Valide');
+
+                    $preinscriptionRepository->add($precription, true);
+                    $statut = 1;
+                    $message       = 'Opération effectuée avec succès';
+                    $this->addFlash('success', $message);
+                } else {
+                    $statut = 0;
+                    $message       = "Opération échouée car le montant total à payer est different du montant total de l 'échanece";
+                    $this->addFlash('danger', $message);
+                }
+
+
+                $data = true;
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->render('site/admin/new_validation.html.twig', [
+            'etudiant' => $etudiant,
+            'etat' => 'ok',
+            'form' => $form->createView(),
+            'frais' => 3,
+        ]);
+
+        //return $this->render('site/admin/pages/informations.html.twig');
+    }
 
 
     #[Route('/site/admin/paiement/admin/ok', name: 'app_inscription_inscription_site_admin_paiement_ok', methods: ['GET', 'POST'])]

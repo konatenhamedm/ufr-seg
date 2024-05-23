@@ -94,7 +94,11 @@ class PreinscriptionRepository extends ServiceEntityRepository
             ->select('count(d.id)');
 
         if ($etat != 'all') {
-            $sql->andWhere("d.etat =:etat")
+            $sql
+                ->join('d.etudiant', 'e')
+                ->andWhere('e.etat =:etatEtudiant')
+                ->andWhere("d.etat =:etat")
+                ->setParameter('etatEtudiant', 'complete')
                 ->setParameter('etat', $etat);
         }
 
