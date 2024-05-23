@@ -1635,7 +1635,7 @@ class HomeController extends AbstractController
 
         //return $this->render('site/admin/pages/informations.html.twig');
     }
-    #[Route(path: '/site/information/validation/direct/after/demande/{id}/{precription}', name: 'site_information_validation_direct_after_demande_since_precription', methods: ['GET', 'POST'])]
+    #[Route(path: '/site/information/validation/direct/after/demande/{id}/{preinscription}', name: 'site_information_validation_direct_after_demande_since_precription', methods: ['GET', 'POST'])]
     public function informationAdminNewDirectAfterDemandeEtudiantSincePreinscription(
         Request $request,
         EtudiantRepository $etudiantRepository,
@@ -1644,8 +1644,8 @@ class HomeController extends AbstractController
         NiveauRepository $niveauRepository,
         UtilisateurRepository $utilisateurRepository,
         PreinscriptionRepository $preinscriptionRepository,
-        $id,
-        $precription,
+        Etudiant $etudiant,
+        $preinscription,
         SendMailService $sendMailService,
         UserPasswordHasherInterface $userPasswordHasher,
         ClasseRepository $classeRepository,
@@ -1656,46 +1656,28 @@ class HomeController extends AbstractController
         PreinscriptionRepository $preinscriptionRepository2
     ): Response {
 
-        $etudiant = new Etudiant();
 
 
-        if (count($etudiant->getBlocEcheanciers()) == 0) {
 
-            /* foreach ($frais as $key => $value) {
+
+
+        /* foreach ($frais as $key => $value) {
             $sommeFrais += (int)$value->getMontant();
         } */
-            $bloc_echeancier = new BlocEcheancier();
+        $bloc_echeancier = new BlocEcheancier();
 
-            $bloc_echeancier->setClasse($classeRepository->find(1));
-            $bloc_echeancier->setDateInscription(new DateTime());
-            $bloc_echeancier->setTotal('0');
+        $bloc_echeancier->setClasse($classeRepository->find(1));
+        $bloc_echeancier->setDateInscription(new DateTime());
+        $bloc_echeancier->setTotal('0');
 
 
-            $etudiant->addBlocEcheancier($bloc_echeancier);
-            $echeancierProvisoire = new EcheancierProvisoire();
-            $echeancierProvisoire->setDateVersement(new DateTime());
-            $echeancierProvisoire->setNumero('1');
-            $echeancierProvisoire->setMontant('0');
+        $etudiant->addBlocEcheancier($bloc_echeancier);
+        $echeancierProvisoire = new EcheancierProvisoire();
+        $echeancierProvisoire->setDateVersement(new DateTime());
+        $echeancierProvisoire->setNumero('1');
+        $echeancierProvisoire->setMontant('0');
 
-            $bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
-        }
-        $info = new InfoEtudiant();
-
-        if (count($etudiant->getInfoEtudiants()) == 0) {
-            $info->setTuteurNomPrenoms('');
-            $info->setTuteurFonction('');
-            $info->setTuteurContact('');
-            $info->setTuteurDomicile('');
-            $info->setTuteurEmail('');
-
-            $info->setCorresNomPrenoms('');
-            $info->setCorresFonction('');
-            $info->setCorresContacts('');
-            $info->setCorresDomicile('');
-            $info->setCorresEmail('');
-
-            $etudiant->addInfoEtudiant($info);
-        }
+        $bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
 
 
 
@@ -1709,8 +1691,9 @@ class HomeController extends AbstractController
                 'attrs' => ['class' => 'filestyle'],
             ],
             'validation_groups' => $validationGroups,
-            'action' => $this->generateUrl('site_information_validation_direct_after_demande', [
-                'id' =>  $id,
+            'action' => $this->generateUrl('site_information_validation_direct_after_demande_since_precription', [
+                'id' =>  $etudiant->getId(),
+                'preinscription' => $preinscription,
 
             ])
         ]);
@@ -1725,30 +1708,24 @@ class HomeController extends AbstractController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_inscription_etudiant_admin_index');
+            $redirect = $this->generateUrl('app_home_timeline_index');
 
             $user = $utilisateurRepository->findOneBy(['personne' => $etudiant]);
             $blocEcheanciers = $form->get('blocEcheanciers')->getData();
 
-            $prenoms = '';
-            $explodePrenom = explode(" ", $form->get('prenom')->getData());
-            for ($i = 0; $i < count($explodePrenom); $i++) {
-                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
-            }
+
 
             if ($form->isValid()) {
 
-                //dd(filter_var($etudiant->getEmail(), FILTER_VALIDATE_EMAIL));
-                $etudiant->setNom(strtoupper($form->get('nom')->getData()));
-                $etudiant->setPrenom($prenoms);
-                $responseRegister = $service->registerEcheancierAdmin($blocEcheanciers, $etudiantRepository->find($id));
+
+                $responseRegister = $service->registerEcheancierAdmin($blocEcheanciers, $etudiant);
 
                 if ($responseRegister) {
-                    $etudiantRepository->add($etudiantRepository->find($id), true);
-                    $preinscriptionData = $preinscriptionRepository->find($precription);
+                    $etudiantRepository->add($etudiant, true);
+                    $preinscriptionData = $preinscriptionRepository->find($preinscription);
                     $preinscriptionData->setEtat('Valide');
 
-                    $preinscriptionRepository->add($precription, true);
+                    $preinscriptionRepository->add($preinscriptionData, true);
                     $statut = 1;
                     $message       = 'Opération effectuée avec succès';
                     $this->addFlash('success', $message);

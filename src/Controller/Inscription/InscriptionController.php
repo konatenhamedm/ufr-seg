@@ -83,6 +83,33 @@ class InscriptionController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
+    #[Route('/{id}/imprime/etudiant', name: 'app_comptabilite_inscription_print_etudiant', methods: ['GET'])]
+    public function imprimerEtudiant(Inscription $inscription, EcheancierRepository $echeancierRepository): Response
+    {
+        //dd($echeancierRepository->findAllEcheanceDateFirst($id));
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'test.png';
+        return $this->renderPdf("inscription/inscription/recu_etudiant.html.twig", [
+            'data' => $inscription,
+            'info' => $inscription->getInfoInscriptions(),
+            'nombre' => count($inscription->getEcheanciers()),
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'p',
+            'protected' => true,
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' =>  $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
     #[Route('/{id}/imprime/seconde', name: 'app_comptabilite_inscription_print_seconde', methods: ['GET'])]
     public function imprimerSecondeExemple($id, Inscription $inscription, EcheancierRepository $echeancierRepository): Response
     {
@@ -664,7 +691,7 @@ class InscriptionController extends AbstractController
                             ],
                             'recu' => [
                                 'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_comptabilite_inscription_print',
+                                    'r' => 'app_comptabilite_inscription_print_etudiant',
                                     'params' => [
                                         'id' => $value,
                                     ]
@@ -692,7 +719,7 @@ class InscriptionController extends AbstractController
                             ],
                             'imprime_recu_confirmation_ok' => [
                                 'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_comptabilite_inscription_print',
+                                    'r' => 'app_comptabilite_inscription_print_etudiant',
                                     'params' => [
                                         'id' => $value,
                                     ]
