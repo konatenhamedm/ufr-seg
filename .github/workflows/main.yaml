@@ -21,8 +21,7 @@ jobs:
           sshpass -e ssh -o stricthostkeychecking=no ${{ secrets.APP_USER }}@${{ secrets.APP_HOST }}
           "cd ../var/www/clients/client1/web55/web/ &&
           git add . &&
-         git commit -m'update du 23/05' &&
+         git commit -m'update du 23/0775' &&
          git push origin main &&
-         git pull origin main &&
-         php bin/console d:s:u --force
+         git pull origin main 
          "  
