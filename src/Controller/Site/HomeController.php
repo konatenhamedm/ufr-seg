@@ -242,12 +242,188 @@ class HomeController extends AbstractController
         $value = new DateTime();
         $value->setDate(1900, 1, 1);
 
+        //dd($value);
         //$inscriptionDTO->setDateNaissance(new \DateTime('01/01/1993'));
         //$inscriptionDTO->setDateNaissance($value());
         $form = $this->createForm(RegisterType::class, $inscriptionDTO, [
             'method' => 'POST',
             //'type'=>'autre',
             'action' => $this->generateUrl('site_register'),
+        ]);
+
+        $form->handleRequest($request);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+        $redirect = $this->generateUrl($loginFormAuthenticator::DEFAULT_INFORMATION);
+        $fullRedirect = false;
+        if ($form->isSubmitted()) {
+
+            //dd($inscriptionDTO->getDateNaissance());
+            $prenoms = '';
+            $explodePrenom = explode(" ", $inscriptionDTO->getPrenom());
+            for ($i = 0; $i < count($explodePrenom); $i++) {
+                $prenoms = $prenoms . ' ' . ucfirst($explodePrenom[$i]);
+            }
+            $response = [];
+            $fonction = $entityManager->getRepository(Fonction::class)->findOneByCode('ETD');
+            $user = $utilisateurRepository->findOneByEmail($inscriptionDTO->getEmail());
+            if ($form->isValid()) {
+
+                if (!$user) {
+                    $etudiant = new Etudiant();
+
+
+                    $etudiant->setNom(strtoupper($inscriptionDTO->getNom()));
+                    $etudiant->setPrenom($prenoms);
+                    $etudiant->setDateNaissance($inscriptionDTO->getDateNaissance());
+                    // $etudiant->setCivilite($inscriptionDTO->getCivilite());
+                    $etudiant->setGenre($inscriptionDTO->getGenre());
+                    $etudiant->setFonction($fonctionRepository->findOneBy(['code' => 'ETD']));
+                    $etudiant->setLieuNaissance('');
+                    $etudiant->setEtat('pas_complet');
+                    $etudiant->setEmail($inscriptionDTO->getEmail());
+                    $etudiant->setContact($inscriptionDTO->getContact());
+                    $etudiant->setFonction($fonction);
+                    $entityManager->persist($etudiant);
+
+                    $utilisateur = new Utilisateur();
+                    $utilisateur->setPassword($userPasswordHasher->hashPassword($utilisateur, $inscriptionDTO->getPlainPassword()));
+                    $utilisateur->addRole('ROLE_ETUDIANT');
+                    $utilisateur->setEmail($inscriptionDTO->getEmail());
+                    $utilisateur->setPersonne($etudiant);
+                    $utilisateur->setUsername($inscriptionDTO->getEmail());
+
+                    $entityManager->persist($utilisateur);
+
+                    $entityManager->flush();
+
+                    $groupe = new UtilisateurGroupe();
+
+                    $groupe->setUtilisateur($utilisateur);
+                    $groupe->setGroupe($groupeRepository->findOneBy(['libelle' => 'Etudiants']));
+                    $utilisateurGroupeRepository->add($groupe, true);
+
+                    $userAuthenticator->authenticateUser(
+                        $utilisateur,
+                        $loginFormAuthenticator,
+                        $request
+                    );
+                    $preinscription = new Preinscription();
+                    $preinscription->setEtat('attente_validation');
+                    $preinscription->setEtatDeliberation('pas_deliberer');
+                    $preinscription->setEtudiant($etudiant);
+                    $preinscription->setDatePreinscription(new \DateTime());
+                    $preinscription->setNiveau($inscriptionDTO->getNiveau());
+                    $preinscription->setUtilisateur($utilisateur);
+                    $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
+                    $preinscriptionRepository->add($preinscription, true);
+
+
+                    $info_user = [
+                        'login' => $inscriptionDTO->getEmail(),
+                        'password' => $inscriptionDTO->getPlainPassword()
+                    ];
+
+                    $context = compact('info_user');
+
+                    // TO DO
+                    $sendMailService->send(
+                        'konatenhamed@ufrseg.enig-sarl.com',
+                        $inscriptionDTO->getEmail(),
+                        'Informations',
+                        'content_mail',
+                        $context
+                    );
+
+                    $statut = 1;
+                    $message = 'Compte crée avec succès';
+                    $this->addFlash('success', 'Votre compte a été crée avec succès. Veuillez vous connecter pour continuer l\'opération vous pouvez consulter votre email');
+                } else {
+
+                    $existe = $preinscriptionRepository->findOneBy(['niveau' => $inscriptionDTO->getNiveau()]);
+                    if ($existe) {
+                        $statut = 1;
+                        $message = 'cet étudiant  existe  déjà dans cette filière,veillez vous connecter';
+                        $this->addFlash('danger', $message);
+                    } else {
+
+                        $preinscription = new Preinscription();
+                        $preinscription->setEtat('attente_validation');
+                        $preinscription->setEtatDeliberation('pas_deliberer');
+                        $preinscription->setEtudiant($user->getPersonne());
+                        $preinscription->setDatePreinscription(new \DateTime());
+                        $preinscription->setNiveau($inscriptionDTO->getNiveau());
+                        $preinscription->setUtilisateur($user);
+                        $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
+                        $preinscriptionRepository->add($preinscription, true);
+                        $userAuthenticator->authenticateUser(
+                            $user,
+                            $loginFormAuthenticator,
+                            $request
+                        );
+                    }
+                }
+
+                $fullRedirect = true;
+                /* $statut = 1;
+                $message = 'Compte crée avec succès';
+                $this->addFlash('success', 'Votre compte a été crée avec succès. Veuillez vous connecter pour continuer l\'opération');*/
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'fullRedirect'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+
+        return $this->render('security/register.html.twig', [
+            'form' => $form
+        ]);
+    }
+    #[Route(path: '/inscription/etudiant', name: 'site_register_etudiant', methods: ['GET', 'POST'])]
+    public function inscriptionLogin(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        UserPasswordHasherInterface $userPasswordHasher,
+        UserAuthenticatorInterface $userAuthenticator,
+        LoginFormAuthenticator $loginFormAuthenticator,
+        NiveauRepository $niveauRepository,
+        PreinscriptionRepository $preinscriptionRepository,
+        FormError $formError,
+        UtilisateurGroupeRepository $utilisateurGroupeRepository,
+        GroupeRepository $groupeRepository,
+        FonctionRepository $fonctionRepository,
+        UtilisateurRepository $utilisateurRepository,
+        SendMailService $sendMailService
+        //PreinscriptionRepository $preinscriptionRepository
+    ): Response {
+        $inscriptionDTO = new InscriptionDTO();
+        $value = new DateTime();
+        $value->setDate(1900, 1, 1);
+
+        // dd($value);
+        //$inscriptionDTO->setDateNaissance(new \DateTime('01/01/1993'));
+        //$inscriptionDTO->setDateNaissance($value());
+        $form = $this->createForm(RegisterType::class, $inscriptionDTO, [
+            'method' => 'POST',
+            //'type'=>'autre',
+            'action' => $this->generateUrl('site_register_etudiant'),
         ]);
 
         $form->handleRequest($request);

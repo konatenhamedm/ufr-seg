@@ -2,6 +2,7 @@
 
 namespace App\Controller\Utilisateur;
 
+use App\Controller\FileTrait;
 use App\Entity\Employe;
 use App\Entity\Personne;
 use App\Form\PersonneType;
@@ -23,6 +24,34 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/admin/utilisateur/personne')]
 class PersonneController extends AbstractController
 {
+    use FileTrait;
+
+    #[Route('/{id}/imprime', name: 'app_certificate_imprime', methods: ['GET'])]
+    public function imprimer($id): Response
+    {
+
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("utilisateur/personne/certificat.html.twig", [
+            'data' => [],
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'P',
+            'protected' => true,
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
+
     #[Route('/', name: 'app_utilisateur_personne_index', methods: ['GET', 'POST'])]
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
     { //je suis en mode test
@@ -80,6 +109,19 @@ class PersonneController extends AbstractController
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
+                            ],
+                            'imprime' => [
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_certificate_imprime',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'target' =>  '#exampleModalSizeSm2',
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-main btn-stack']
+                                //, 'render' => new ActionRender(fn() => $source || $etat != 'cree')
                             ],
                             'delete' => [
                                 'target' => '#modal-small',
