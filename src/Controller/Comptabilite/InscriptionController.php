@@ -248,7 +248,7 @@ class InscriptionController extends AbstractController
                             ],
                             'imprime' => [
                                 'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_comptabilite_print',
+                                    'r' => 'app_comptabilite_print_preinscription',
                                     'params' => [
                                         'id' => $context->getPreinscription()->getid(),
                                     ]
@@ -510,6 +510,34 @@ class InscriptionController extends AbstractController
 
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
         return $this->renderPdf("site/recu.html.twig", [
+            'data' => $preinscription,
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'L',
+            'protected' => true,
+
+            'format' => 'A5',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
+    /**
+     * @throws MpdfException
+     */
+    #[Route('/{id}/imprime/preinscription', name: 'app_comptabilite_print_preinscription', methods: ['GET'])]
+    public function imprimerPreinscription($id, Preinscription $preinscription, InfoPreinscriptionRepository $infoPreinscriptionRepository): Response
+    {
+
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("site/recu_preinscription.html.twig", [
             'data' => $preinscription,
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
         ], [
