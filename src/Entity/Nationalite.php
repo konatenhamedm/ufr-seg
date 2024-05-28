@@ -5,11 +5,12 @@ namespace App\Entity;
 use App\Repository\NationaliteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
 
 #[ORM\Entity(repositoryClass: NationaliteRepository::class)]
-#[Table(name: 'param_nationalie')]
+#[Table(name: 'param_nationalite')]
 class Nationalite
 {
     #[ORM\Id]
@@ -25,6 +26,12 @@ class Nationalite
 
     #[ORM\OneToMany(mappedBy: 'nationalite', targetEntity: Etudiant::class)]
     private Collection $etudiants;
+
+    #[ORM\Column(length: 255)]
+    private ?string $pays = null;
+
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $observations = null;
 
     public function __construct()
     {
@@ -86,6 +93,30 @@ class Nationalite
                 $etudiant->setNationalite(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPays(): ?string
+    {
+        return $this->pays;
+    }
+
+    public function setPays(string $pays): static
+    {
+        $this->pays = $pays;
+
+        return $this;
+    }
+
+    public function getObservations(): ?string
+    {
+        return $this->observations;
+    }
+
+    public function setObservations(string $observations): static
+    {
+        $this->observations = $observations;
 
         return $this;
     }
