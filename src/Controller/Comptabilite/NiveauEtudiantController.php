@@ -395,8 +395,8 @@ class NiveauEtudiantController extends AbstractController
                     return   $preinscription->getEtudiant()->getNomComplet();
                 }])
                 ->add('datePreinscription', DateTimeColumn::class, ['label' => 'Date de demande', 'format' => 'd-m-Y', 'searchable' => false])
-                ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.libelle'])
-                /*   ->add('niveau', TextColumn::class, ['label' => 'Niveau', 'field' => 'niveau.libelle']) */
+                /* ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.libelle']) */
+                ->add('niveau', TextColumn::class, ['label' => 'Niveau', 'field' => 'niveau.libelle'])
                 ->add('montant', NumberFormatColumn::class, ['label' => 'Mnt. Préinscr.', 'field' => 'filiere.montantPreinscription'])
                 ->createAdapter(ORMAdapter::class, [
                     'entity' => Preinscription::class,
