@@ -39,7 +39,7 @@ class RegisterType extends AbstractType
 
             ->add('niveau', EntityType::class, [
                 'class' => Niveau::class,
-                'choice_label' => 'getFullLibelleSigle',
+                'choice_label' => 'getFullSigle',
                 'required' => false,
                 'attr' => ['class' => 'matiere has-select2 form-select'],
                 'placeholder' => '----',
