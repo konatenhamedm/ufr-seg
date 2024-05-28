@@ -30,7 +30,7 @@ class Nationalite
     #[ORM\Column(length: 255)]
     private ?string $pays = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $observations = null;
 
     public function __construct()
