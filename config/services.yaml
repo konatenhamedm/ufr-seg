@@ -6,7 +6,7 @@
 parameters:
     upload_dir: "%kernel.project_dir%/public/uploads"
     font_dir: "%kernel.project_dir%/public/fonts"
-
+    #je viens faire une sauvegarde importante
 imports:
     # glob expressions are also supported to load multiple files
     - { resource: './modules/*.yaml' }
