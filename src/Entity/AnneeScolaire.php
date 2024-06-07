@@ -45,6 +45,9 @@ class AnneeScolaire
     #[ORM\OneToMany(mappedBy: 'anneeScolaire', targetEntity: Controle::class)]
     private Collection $controles;
 
+    #[ORM\OneToMany(mappedBy: 'anneeScolaire', targetEntity: Promotion::class)]
+    private Collection $promotions;
+
 
     public function __construct()
     {
@@ -52,6 +55,7 @@ class AnneeScolaire
         $this->cours = new ArrayCollection();
         $this->classes = new ArrayCollection();
         $this->controles = new ArrayCollection();
+        $this->promotions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -189,27 +193,7 @@ class AnneeScolaire
         return $this->classes;
     }
 
-    public function addClass(Classe $class): static
-    {
-        if (!$this->classes->contains($class)) {
-            $this->classes->add($class);
-            $class->setAnneeScolaire($this);
-        }
 
-        return $this;
-    }
-
-    public function removeClass(Classe $class): static
-    {
-        if ($this->classes->removeElement($class)) {
-            // set the owning side to null (unless already changed)
-            if ($class->getAnneeScolaire() === $this) {
-                $class->setAnneeScolaire(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Controle>
@@ -235,6 +219,36 @@ class AnneeScolaire
             // set the owning side to null (unless already changed)
             if ($controle->getAnneeScolaire() === $this) {
                 $controle->setAnneeScolaire(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Promotion>
+     */
+    public function getPromotions(): Collection
+    {
+        return $this->promotions;
+    }
+
+    public function addPromotion(Promotion $promotion): static
+    {
+        if (!$this->promotions->contains($promotion)) {
+            $this->promotions->add($promotion);
+            $promotion->setAnneeScolaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removePromotion(Promotion $promotion): static
+    {
+        if ($this->promotions->removeElement($promotion)) {
+            // set the owning side to null (unless already changed)
+            if ($promotion->getAnneeScolaire() === $this) {
+                $promotion->setAnneeScolaire(null);
             }
         }
 

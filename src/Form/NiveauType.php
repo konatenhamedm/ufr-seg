@@ -30,7 +30,7 @@ class NiveauType extends AbstractType
                 'label' => 'Filière',
                 'attr' => ['class' => 'has-select2']
             ])
-            ->add(
+            /* ->add(
                 'frais',
                 CollectionType::class,
                 [
@@ -43,7 +43,7 @@ class NiveauType extends AbstractType
 
                     'entry_options' => ['label' => false],
                 ]
-            )
+            ) */
             ->add(
                 'infoNiveaux',
                 CollectionType::class,
@@ -58,7 +58,7 @@ class NiveauType extends AbstractType
                     'entry_options' => ['label' => false],
                 ]
             )
-            ->add('responsable', EntityType::class, [
+            /* ->add('responsable', EntityType::class, [
                 'class' => Employe::class,
                 'required' => false,
                 'placeholder' => '----',
@@ -73,7 +73,7 @@ class NiveauType extends AbstractType
                 'choice_label' => 'nomComplet',
                 'label' => 'Reponsable de niveau',
                 'attr' => ['class' => 'has-select2']
-            ])
+            ]) */
             /*  ->add(
                 'cours',
                 CollectionType::class,

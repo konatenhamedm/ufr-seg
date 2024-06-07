@@ -228,9 +228,10 @@ class InscriptionController extends AbstractController
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
             'query' => function (QueryBuilder $qb) use ($user, $etat, $id) {
-                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant'])
+                $qb->select(['p'])
                     ->from(Inscription::class, 'p')
-                    ->join('p.niveau', 'niveau')
+                    ->join('p.promotion', 'promotion')
+                    ->join('promotion.niveau', 'niveau')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant')
                     ->leftJoin('p.caissiere', 'c')
@@ -380,9 +381,10 @@ class InscriptionController extends AbstractController
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
             'query' => function (QueryBuilder $qb) use ($user) {
-                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant'])
+                $qb->select(['p'])
                     ->from(Inscription::class, 'p')
-                    ->join('p.niveau', 'niveau')
+                    ->join('p.promotion', 'promotion')
+                    ->join('promotion.niveau', 'niveau')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant')
                     ->leftJoin('p.caissiere', 'c');
@@ -606,9 +608,10 @@ class InscriptionController extends AbstractController
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
             'query' => function (QueryBuilder $qb) use ($user, $etat) {
-                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                $qb->select(['p'])
                     ->from(Inscription::class, 'p')
-                    ->join('p.niveau', 'niveau')
+                    ->join('p.promotion', 'promotion')
+                    ->join('promotion.niveau', 'niveau')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant')
                     ->leftJoin('p.classe', 'classe')
@@ -752,12 +755,13 @@ class InscriptionController extends AbstractController
                                 'render' => $renders['payer']
                             ],
                             'payer' => [
-                                'target' => '#modal-xl2',
-                                'url' => $this->generateUrl('app_config_paiement_inscription_index', ['id' => $value]),
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('app_config_inscription_frais_scolarite_index', ['id' => $value]),
+                                /*  'url' => $this->generateUrl('app_config_paiement_inscription_index', ['id' => $value]), */
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-cash',
-                                'attrs' => ['class' => 'btn-warning'],
+                                'attrs' => ['class' => 'btn-warning', 'title' => 'Payer'],
                                 'render' => $renders['payer']
                             ],
                             'edit_etudiant' => [
@@ -811,6 +815,7 @@ class InscriptionController extends AbstractController
     #[Route('/{etat}', name: 'app_inscription_inscription_list_ls', methods: ['GET', 'POST'])]
     public function indexListe(Request $request, UserInterface $user, string $etat, DataTableFactory $dataTableFactory): Response
     {
+        //dd("kkk");
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
 
         $table = $dataTableFactory->create()
@@ -838,11 +843,12 @@ class InscriptionController extends AbstractController
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
             'query' => function (QueryBuilder $qb) use ($user, $etat) {
-                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant,res'])
+                $qb->select(['p'])
                     ->from(Inscription::class, 'p')
-                    ->join('p.niveau', 'niveau')
+                    ->join('p.promotion', 'promotion')
+                    ->join('promotion.niveau', 'niveau')
                     ->join('niveau.filiere', 'filiere')
-                    ->join('niveau.responsable', 'res')
+                    ->join('promotion.responsable', 'res')
                     ->join('p.etudiant', 'etudiant')
                     ->leftJoin('p.caissiere', 'c');
                 if ($this->isGranted('ROLE_ETUDIANT')) {
@@ -911,7 +917,9 @@ class InscriptionController extends AbstractController
                                 //, 'render' => new ActionRender(fn() => $source || $etat != 'cree')
                             ],
                             'payer' => [
-                                'url' => $this->generateUrl('app_inscription_inscription_paiement_ok', ['id' => $value]),
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('app_config_inscription_frais_scolarite_index', ['id' => $value]),
+                                //  'url' => $this->generateUrl('app_inscription_inscription_paiement_ok', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-cash',
@@ -1419,7 +1427,9 @@ class InscriptionController extends AbstractController
             $echeanciers = $echeancierRepository->findAllEcheance($inscription->getId());
             $date = $form->get('datePaiement')->getData();
             $mode =  $naturePaiementRepository->find($form->get('modePaiement')->getData()->getId());
-            $type =  $typeFraisRepository->find($form->get('typeFrais')->getData()->getId());
+            // dd($form);
+
+            // $type =  $typeFraisRepository->find($form->get('typeFrais')->getData()->getId());
 
             $montant = (int) $form->get('montant')->getData();
             $typeFrais =  $form->get('typeFrais')->getData();
@@ -1436,13 +1446,13 @@ class InscriptionController extends AbstractController
             $resteAPayer = abs((int)$fraisInscriptionData->getMontant() - $somme);
 
 
-            /* dd($typeFrais); */
+
             $allData = [
 
                 'echeanciers' => $echeanciers,
                 'date' => $date,
                 'modePaiement' => $mode,
-                'typeFrais' => $type,
+                'typeFrais' => $typeFrais,
                 'montant' => $montant,
                 'numeroCheque' => $form->get('numeroCheque')->getData(),
                 'banque' => $form->get('banque')->getData(),

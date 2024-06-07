@@ -18,11 +18,6 @@ class Classe
     #[ORM\Column(length: 255)]
     private ?string $libelle = null;
 
-    #[ORM\ManyToOne(inversedBy: 'classes')]
-    private ?Niveau $niveau = null;
-
-    #[ORM\ManyToOne(inversedBy: 'classes')]
-    private ?AnneeScolaire $anneeScolaire = null;
 
     #[ORM\OneToMany(mappedBy: 'classe', targetEntity: Cours::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
@@ -40,7 +35,9 @@ class Classe
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $blocEcheanciers;
 
-
+    #[ORM\ManyToOne(inversedBy: 'classes')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Promotion $promotion = null;
 
     public function __construct()
     {
@@ -63,30 +60,6 @@ class Classe
     public function setLibelle(string $libelle): static
     {
         $this->libelle = $libelle;
-
-        return $this;
-    }
-
-    public function getNiveau(): ?Niveau
-    {
-        return $this->niveau;
-    }
-
-    public function setNiveau(?Niveau $niveau): static
-    {
-        $this->niveau = $niveau;
-
-        return $this;
-    }
-
-    public function getAnneeScolaire(): ?AnneeScolaire
-    {
-        return $this->anneeScolaire;
-    }
-
-    public function setAnneeScolaire(?AnneeScolaire $anneeScolaire): static
-    {
-        $this->anneeScolaire = $anneeScolaire;
 
         return $this;
     }
@@ -207,6 +180,18 @@ class Classe
                 $blocEcheancier->setClasse(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPromotion(): ?Promotion
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?Promotion $promotion): static
+    {
+        $this->promotion = $promotion;
 
         return $this;
     }

@@ -1,7 +1,7 @@
 {% block page_content %}
     {% form_theme form 'widget/fields-block.html.twig' %}
     <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Nouvel Examen</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Nouvel Examenddd</h5>
         <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
             <span class="svg-icon svg-icon-2x text-white">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -17,7 +17,7 @@
         {{ include('_includes/ajax/response.html.twig') }}
         <div class="row">
             <div class="col-md-3">{{ form_row(form.code) }}</div>
-            <div class="col-md-9">{{ form_row(form.niveau) }}</div>
+            <div class="col-md-9">{{ form_row(form.promotion) }}</div>
         </div>
         <div class="row">
             <div class="col-md-3">{{ form_row(form.dateExamen) }}</div>
@@ -35,9 +35,10 @@
 
 {% block java %}
     <script>
-        $(function () {
-            init_select2('select','','#exampleModalSizeLg2');
-             $('.no-auto').each(function () {
+         $(function () {
+             init_select2('select', null, '#modal-lg225');
+
+              $('.no-auto').each(function () {
                 const $this = $(this);
                 const $id = $('#' + $this.attr('id'));
                 init_date_picker($id,  'down', (start, e) => {
@@ -48,9 +49,9 @@
                     $(this).val(picker.startDate.format('DD/MM/YYYY'));
                 });
             });
+        });
 
-
-
+           $(function () {
            
             const $container = $('.row-container');
 
@@ -62,13 +63,12 @@
             $addLink.click(function (e) {
 
                 addLine($container);
+             init_select2('select', null, '#modal-lg225');
+
 
                 e.preventDefault(); // évite qu'un # apparaisse dans l'URL
             });
-        // On ajoute un premier champ automatiquement s'il n'en existe pas déjà un (cas d'une nouvelle annonce par exemple).
-        /*if (index == 0) {
-                addimputation($container);
-                } else {*/
+      
             if (index > 0) {
                 $container.children('.row-colonne').each(function () {
                     const $this = $(this);
@@ -123,6 +123,7 @@
             }
 
         });
+     
        
     </script>
 {% endblock %}

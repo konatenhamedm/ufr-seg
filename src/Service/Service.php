@@ -34,6 +34,7 @@ use App\Repository\MoyenneMatiereRepository;
 use App\Repository\NoteRepository;
 use App\Repository\SemestreRepository;
 use App\Repository\SessionRepository;
+use App\Repository\UniteEnseignementRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -60,6 +61,7 @@ class Service
     private $fraisInscriptionRepository;
     private $infoInscriptionRepository;
     private $fraisBlocRepository;
+    private $ueRepository;
 
 
     public function __construct(
@@ -80,6 +82,7 @@ class Service
         InscriptionRepository $inscriptionRepository,
         FraisInscriptionRepository $fraisInscriptionRepository,
         FraisBlocRepository $fraisBlocRepository,
+        UniteEnseignementRepository $uniteEnseignementRepository,
     ) {
         $this->em = $em;
         $this->security = $security;
@@ -99,6 +102,7 @@ class Service
         $this->fraisInscriptionRepository = $fraisInscriptionRepository;
         $this->infoInscriptionRepository = $infoInscriptionRepository;
         $this->fraisBlocRepository = $fraisBlocRepository;
+        $this->ueRepository = $uniteEnseignementRepository;
 
         //$this->verifieIfFile2(15,2);
     }
@@ -362,8 +366,8 @@ class Service
 
                     $inscription->setCaissiere($this->getUser());
                     $inscription->setMontant($value->getTotal());
-                    $inscription->setNiveau($this->classeRepository->find($value->getClasse())->getNiveau());
-                    $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getNiveau()->getCode()));
+                    $inscription->setPromotion($this->classeRepository->find($value->getClasse())->getPromotion());
+                    $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getPromotion()->getNiveau()->getCode()));
                     $inscription->setClasse($value->getClasse());
                     $inscription->setCodeUtilisateur($this->getUser()->getEmail());
                     $inscription->setEtudiant($etudiant);
@@ -426,8 +430,8 @@ class Service
                         if ($somme == (int)$value->getTotal()) {
 
                             $inscription->setMontant($value->getTotal());
-                            $inscription->setNiveau($this->classeRepository->find($value->getClasse())->getNiveau());
-                            $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getNiveau()->getCode()));
+                            $inscription->setPromotion($this->classeRepository->find($value->getClasse())->getPromotion());
+                            $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getPromotion()->getNiveau()->getCode()));
                             $inscription->setClasse($value->getClasse());
 
                             if ($inscription->getTotalPaye() == "0") {
@@ -553,8 +557,8 @@ class Service
                 if (count($newInscriptionCount) == 0) {
                     if ($somme == (int)$value->getTotal()) {
                         $inscription->setMontant($value->getTotal());
-                        $inscription->setNiveau($this->classeRepository->find($value->getClasse())->getNiveau());
-                        $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getNiveau()->getCode()));
+                        $inscription->setPromotion($this->classeRepository->find($value->getClasse())->getPromotion());
+                        $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getPromotion()->getNiveau()->getCode()));
                         $inscription->setClasse($value->getClasse());
                         if ($inscription->getTotalPaye() == "0") {
 
@@ -721,25 +725,36 @@ class Service
                 $nbreTour = 0;
                 foreach ($groupeTypes as $key => $groupe) {
                     //$note = 0;
-                    if ($key1 == $key) {
+                    /*  if ($key1 == $key) {
 
                         $note = (int)$groupe->getCoef() == 10 ? $value->getNote() * 2 * (int)$groupe->getType()->getCoef() : $value->getNote() * (int)$groupe->getType()->getCoef();
 
+
+                        $note2 = 
                         if ($value->getNote() > 10 && $groupe->getCoef() == 10) {
                             $compteIfNoteSuperieurMax++;
                         }
                     }
                     if ($groupe->getType())
-                        $coef = $coef + (int)$groupe->getType()->getCoef();
-                    $nbreTour++;
+                        $coef = $coef + (int)$groupe->getType()->getCoef(); */
+
+                    if ((int)$groupe->getCoef() == 10)
+                        $nbreTour += 0.5;
+                    if ((int)$groupe->getCoef() == 20)
+                        $nbreTour += 1;
+                    if ((int)$groupe->getCoef() == 40)
+                        $nbreTour += 2;
                 }
 
-                $somme = $somme + $note;
+
+
+                $somme = $somme + $value->getNote();
                 // dd()
 
             }
             //dd($somme / ($coef / 2), $note, $coef);
-            $moyenneEtudiant = $somme / ($nbreTour == 1 ? $coef : $coef / 2);
+            $moyenneEtudiant = $somme / $nbreTour;
+            // $moyenneEtudiant = $somme / ($nbreTour == 1 ? $coef : $coef / 2);
             $row->setMoyenneMatiere($moyenneEtudiant);
 
             $moyenneMatiere = $this->moyenneMatiereRepository->findOneBy(['matiere' => $data['matiere'], 'etudiant' => $row->getEtudiant()]);
@@ -758,8 +773,9 @@ class Service
 
                 $matiereUeValide = $this->matiereUeRepository->findOneBy(['matiere' => $data['matiere']]);
 
-                $newMoyenneMatiere->setValide($moyenneEtudiant  >= $matiereUeValide->getMoyenneValidation() ? 'Oui' : 'Non');
-                $newMoyenneMatiere->setSession($this->sessionRepository->find($data['session']));
+                $newMoyenneMatiere->setValide('seelater');
+                //$newMoyenneMatiere->setValide($moyenneEtudiant  >= $matiereUeValide->getMoyenneValidation() ? 'Oui' : 'Non'); TODO
+                $newMoyenneMatiere->setUe($this->ueRepository->find($data['ue']));
                 $this->em->persist($newMoyenneMatiere);
                 $this->em->flush();
             }
@@ -772,7 +788,7 @@ class Service
             $controleVefication->setAnneeScolaire($this->semestreRepository->find($data['semestre'])->getAnneeScolaire());
             $controleVefication->setClasse($this->classeRepository->find($data['classe']));
             $controleVefication->setMatiere($this->matiereRepository->find($data['matiere']));
-            $controleVefication->setSession($this->sessionRepository->find($data['session']));
+            $controleVefication->setUe($this->ueRepository->find($data['ue']));
             $controleVefication->setSemestre($this->semestreRepository->find($data['semestre']));
             $this->em->persist($controleVefication);
         } else {
@@ -780,7 +796,7 @@ class Service
             $controle->setAnneeScolaire($this->semestreRepository->find($data['semestre'])->getAnneeScolaire());
             $controle->setMatiere($this->matiereRepository->find($data['matiere']));
             $controle->setClasse($this->classeRepository->find($data['classe']));
-            $controle->setSession($this->sessionRepository->find($data['session']));
+            $controle->setUe($this->ueRepository->find($data['ue']));
             $controle->setSemestre($this->semestreRepository->find($data['semestre']));
             $this->em->persist($controle);
         }

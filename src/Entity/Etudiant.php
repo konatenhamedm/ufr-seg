@@ -152,6 +152,15 @@ class Etudiant extends Personne
     #[ORM\OneToMany(mappedBy: 'etudiant', targetEntity: EncartBac::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $encartBacs;
 
+    #[ORM\OneToMany(mappedBy: 'etudiant', targetEntity: NoteExamen::class)]
+    private Collection $noteExamens;
+
+    #[ORM\OneToMany(mappedBy: 'etudiant', targetEntity: Decision::class)]
+    private Collection $decisions;
+
+    #[ORM\OneToMany(mappedBy: 'etudiant', targetEntity: DecisionExamen::class)]
+    private Collection $decisionExamens;
+
 
 
 
@@ -179,6 +188,9 @@ class Etudiant extends Personne
         $this->stages = new ArrayCollection();
         $this->blocEcheanciers = new ArrayCollection();
         $this->encartBacs = new ArrayCollection();
+        $this->noteExamens = new ArrayCollection();
+        $this->decisions = new ArrayCollection();
+        $this->decisionExamens = new ArrayCollection();
     }
 
     /**
@@ -859,6 +871,96 @@ class Etudiant extends Personne
             // set the owning side to null (unless already changed)
             if ($encartBac->getEtudiant() === $this) {
                 $encartBac->setEtudiant(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, NoteExamen>
+     */
+    public function getNoteExamens(): Collection
+    {
+        return $this->noteExamens;
+    }
+
+    public function addNoteExamen(NoteExamen $noteExamen): static
+    {
+        if (!$this->noteExamens->contains($noteExamen)) {
+            $this->noteExamens->add($noteExamen);
+            $noteExamen->setEtudiant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNoteExamen(NoteExamen $noteExamen): static
+    {
+        if ($this->noteExamens->removeElement($noteExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($noteExamen->getEtudiant() === $this) {
+                $noteExamen->setEtudiant(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Decision>
+     */
+    public function getDecisions(): Collection
+    {
+        return $this->decisions;
+    }
+
+    public function addDecision(Decision $decision): static
+    {
+        if (!$this->decisions->contains($decision)) {
+            $this->decisions->add($decision);
+            $decision->setEtudiant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecision(Decision $decision): static
+    {
+        if ($this->decisions->removeElement($decision)) {
+            // set the owning side to null (unless already changed)
+            if ($decision->getEtudiant() === $this) {
+                $decision->setEtudiant(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DecisionExamen>
+     */
+    public function getDecisionExamens(): Collection
+    {
+        return $this->decisionExamens;
+    }
+
+    public function addDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if (!$this->decisionExamens->contains($decisionExamen)) {
+            $this->decisionExamens->add($decisionExamen);
+            $decisionExamen->setEtudiant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if ($this->decisionExamens->removeElement($decisionExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($decisionExamen->getEtudiant() === $this) {
+                $decisionExamen->setEtudiant(null);
             }
         }
 

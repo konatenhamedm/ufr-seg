@@ -22,6 +22,7 @@ use App\Repository\NoteRepository;
 use App\Repository\SemestreRepository;
 use App\Repository\SessionRepository;
 use App\Repository\TypeControleRepository;
+use App\Repository\TypeEvaluationRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use App\Service\Service;
@@ -35,6 +36,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+
+use function PHPSTORM_META\map;
 
 #[Route('/admin/controle/controle')]
 class ControleController extends AbstractController
@@ -116,9 +119,112 @@ class ControleController extends AbstractController
         ]);
     }
 
+    #[Route('/new/saisie/simple', name: 'app_controle_controle_new_saisie_simple', methods: ['GET', 'POST'], options: ['expose' => true])]
+    public function newSaisieSimple(
+        Request $request,
+        InscriptionRepository $inscriptionRepository,
+        EntityManagerInterface $entityManager,
+        TypeControleRepository $typeControleRepository,
+        FormError $formError,
+        EtudiantRepository $etudiantRepository,
+        ControleRepository $controleRepository,
+        CoursRepository $coursRepository,
+        MatiereRepository $matiereRepository,
+        ClasseRepository $classeRepository,
+        SemestreRepository $semestreRepository,
+        SessionRepository $sessionRepository,
+        TypeEvaluationRepository $typeEvaluationRepository,
+    ): Response {
+
+        $semestre = $request->query->get('semestre');
+        $classe = $request->query->get('classe');
+        $ue = $request->query->get('ue');
+        $matiere = $request->query->get('matiere');
+
+        //dd($semestre);
+        $controleVefication = $controleRepository->findOneBy(['classe' => $classe, 'matiere' => $matiere, 'semestre' => $semestre, 'ue' => $ue]);
+        // dd($controleVefication, $semestre);
+        if ($controleVefication) {
+            $form = $this->createForm(ControleType::class, $controleVefication, [
+                'method' => 'POST',
+                'action' => $this->generateUrl('app_controle_controle_new_saisie_simple')
+            ]);
+        } else {
+            // dd('ppp');
+            $controle = new Controle();
+            $controle->setTypeControle($typeControleRepository->findOneBy(['code' => 'CC']));
+
+            $groupe = new GroupeType();
+            $groupe->setTypeEvaluation($typeEvaluationRepository->findOneBy(['code' => 'DT']));
+            $groupe->setDateNote(new \DateTime());
+            if (count($inscriptionRepository->findBy(['classe' => $classe])) > 0)
+                $controle->addGroupeType($groupe);
+
+            foreach ($inscriptionRepository->findBy(['classe' => $classe]) as $inscription) {
+                $note = new Note();
+                $note->setEtudiant($inscription->getEtudiant());
+                //$note->setNote('');
+                $note->setMoyenneMatiere('0');
+
+                $controle->addNote($note);
+                $valeurNote = new ValeurNote();
+                $valeurNote->setNote("0");
+                $note->addValeurNote($valeurNote);
+            }
+
+            $form = $this->createForm(ControleType::class, $controle, [
+                'method' => 'POST',
+                'action' => $this->generateUrl('app_controle_controle_new_saisie_simple')
+            ]);
+        }
+        $form->handleRequest($request);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+        $showAlert = false;
+        $isAjax = $request->isXmlHttpRequest();
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_controle_controle_new_saisie_simple');
+
+            if ($form->isValid()) {
+
+                $data = true;
+
+                //$this->addFlash('success', $message);
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
 
 
-    #[Route('/new/load/{semestre}/{classe}/{matiere}/{session}', name: 'app_controle_controle_new_load', methods: ['GET', 'POST'], options: ['expose' => true])]
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'showAlert'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+
+
+        return $this->render('controle/controle/index_new.html.twig', [
+            'controle' => $controleVefication ?? $controle,
+            'nombre' => $controleVefication ? $controleVefication->getGroupeTypes()->count() : (count($inscriptionRepository->findBy(['classe' => $classe])) > 0 ? 1 : 0),
+            'form' => $form->createView(),
+            'title' => 'Gestion des contrôles',
+        ]);
+    }
+
+
+
+    #[Route('/new/load/{semestre}/{classe}/{matiere}/{ue}', name: 'app_controle_controle_new_load', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function new_load(
         Request $request,
         InscriptionRepository $inscriptionRepository,
@@ -127,18 +233,21 @@ class ControleController extends AbstractController
         FormError $formError,
         EtudiantRepository $etudiantRepository,
         ControleRepository $controleRepository,
+        TypeEvaluationRepository $typeEvaluationRepository,
         $semestre = null,
         $classe = null,
         $matiere = null,
-        $session = null,
+        $ue = null,
         Service $service
     ): Response {
 
+
+
         $all = $request->query->all();
 
-        $controleVefication = $controleRepository->findOneBy(['classe' => $classe, 'matiere' => $matiere, 'semestre' => $semestre, 'session' => $session]);
+        $controleVefication = $controleRepository->findOneBy(['classe' => $classe, 'matiere' => $matiere, 'semestre' => $semestre, 'ue' => $ue]);
+
         //dd($controleVefication);
-        // dd($controleVefication->getGroupeTypes()->count());
 
 
         if ($controleVefication) {
@@ -149,16 +258,17 @@ class ControleController extends AbstractController
                     'semestre' => $semestre,
                     'classe' => $classe,
                     'matiere' => $matiere,
-                    'session' => $session,
+                    'ue' => $ue,
                 ])
             ]);
         } else {
-
+            // dd('');
             $controle = new Controle();
+            $controle->setTypeControle($typeControleRepository->findOneBy(['code' => 'CC']));
 
             $groupe = new GroupeType();
             $groupe->setCoef('10');
-            $groupe->setType($typeControleRepository->findOneBy(['code' => 'DS']));
+            $groupe->setTypeEvaluation($typeEvaluationRepository->findOneBy(['code' => 'TD']));
             $groupe->setDateNote(new \DateTime());
             if (count($inscriptionRepository->findBy(['classe' => $classe])) > 0)
                 $controle->addGroupeType($groupe);
@@ -181,7 +291,7 @@ class ControleController extends AbstractController
                     'semestre' => $semestre,
                     'classe' => $classe,
                     'matiere' => $matiere,
-                    'session' => $session,
+                    'ue' => $ue,
                 ])
             ]);
         }
@@ -207,7 +317,7 @@ class ControleController extends AbstractController
                 //dd($this->Rangeleve(1, $tableau, 1));
 
 
-                $compteIfNoteSuperieurMax = $service->gestionNotes($dataNotes, $groupeTypes, ['classe' => $classe, 'matiere' => $matiere, 'semestre' => $semestre, 'session' => $session], $controleVefication ?? null, !$controleVefication ? $controle : null);
+                $compteIfNoteSuperieurMax = $service->gestionNotes($dataNotes, $groupeTypes, ['classe' => $classe, 'matiere' => $matiere, 'semestre' => $semestre, 'ue' => $ue], $controleVefication ?? null, !$controleVefication ? $controle : null);
 
                 $service->rangExposant($dataNotes);
 
@@ -249,14 +359,14 @@ class ControleController extends AbstractController
 
 
     #[Route('/new', name: 'app_controle_controle_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, TypeControleRepository $typeControleRepository, FormError $formError, EtudiantRepository $etudiantRepository, ControleRepository $controleRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, TypeEvaluationRepository $typeEvaluationRepository, TypeControleRepository $typeControleRepository, FormError $formError, EtudiantRepository $etudiantRepository, ControleRepository $controleRepository): Response
     {
 
         $controle = new Controle();
 
         $groupe = new GroupeType();
         $groupe->setCoef('10');
-        $groupe->setType($typeControleRepository->find(1));
+        $groupe->setTypeEvaluation($typeEvaluationRepository->findOneBy(['code' => "TD"]));
         $groupe->setDateNote(new \DateTime());
         $controle->addGroupeType($groupe);
 
@@ -370,105 +480,7 @@ class ControleController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-    #[Route('/new/saisie/simple', name: 'app_controle_controle_new_saisie_simple', methods: ['GET', 'POST'], options: ['expose' => true])]
-    public function newSaisieSimple(
-        Request $request,
-        InscriptionRepository $inscriptionRepository,
-        EntityManagerInterface $entityManager,
-        TypeControleRepository $typeControleRepository,
-        FormError $formError,
-        EtudiantRepository $etudiantRepository,
-        ControleRepository $controleRepository,
-        CoursRepository $coursRepository,
-        MatiereRepository $matiereRepository,
-        ClasseRepository $classeRepository,
-        SemestreRepository $semestreRepository,
-        SessionRepository $sessionRepository
-    ): Response {
 
-        $semestre = $request->query->get('semestre');
-        $classe = $request->query->get('classe');
-        $session = $request->query->get('session');
-        $matiere = $request->query->get('matiere');
-
-        /// dd($semestre);
-        $controleVefication = $controleRepository->findOneBy(['classe' => $classe, 'matiere' => $matiere, 'semestre' => $semestre, 'session' => $session]);
-
-        if ($controleVefication) {
-            $form = $this->createForm(ControleType::class, $controleVefication, [
-                'method' => 'POST',
-                'action' => $this->generateUrl('app_controle_controle_new_saisie_simple')
-            ]);
-        } else {
-            $controle = new Controle();
-            $groupe = new GroupeType();
-            $groupe->setCoef('10');
-            $groupe->setType($typeControleRepository->findOneBy(['code' => 'DS']));
-            $groupe->setDateNote(new \DateTime());
-            if (count($inscriptionRepository->findBy(['classe' => $classe])) > 0)
-                $controle->addGroupeType($groupe);
-
-            foreach ($inscriptionRepository->findBy(['classe' => $classe]) as $inscription) {
-                $note = new Note();
-                $note->setEtudiant($inscription->getEtudiant());
-                //$note->setNote('');
-                $note->setMoyenneMatiere('0');
-
-                $controle->addNote($note);
-                $valeurNote = new ValeurNote();
-                $valeurNote->setNote("0");
-                $note->addValeurNote($valeurNote);
-            }
-
-            $form = $this->createForm(ControleType::class, $controle, [
-                'method' => 'POST',
-                'action' => $this->generateUrl('app_controle_controle_new_saisie_simple')
-            ]);
-        }
-        $form->handleRequest($request);
-
-        $data = null;
-        $statutCode = Response::HTTP_OK;
-        $showAlert = false;
-        $isAjax = $request->isXmlHttpRequest();
-
-        if ($form->isSubmitted()) {
-            $response = [];
-            $redirect = $this->generateUrl('app_controle_controle_new_saisie_simple');
-
-            if ($form->isValid()) {
-
-                $data = true;
-
-                //$this->addFlash('success', $message);
-            } else {
-                $message = $formError->all($form);
-                $statut = 0;
-                $statutCode = 500;
-                if (!$isAjax) {
-                    $this->addFlash('warning', $message);
-                }
-            }
-
-
-            if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data', 'showAlert'), $statutCode);
-            } else {
-                if ($statut == 1) {
-                    return $this->redirect($redirect, Response::HTTP_OK);
-                }
-            }
-        }
-
-
-
-        return $this->render('controle/controle/index_new.html.twig', [
-            'controle' => $controleVefication ?? $controle,
-            'nombre' => $controleVefication ? $controleVefication->getGroupeTypes()->count() : (count($inscriptionRepository->findBy(['classe' => $classe])) > 0 ? 1 : 0),
-            'form' => $form->createView(),
-            'title' => 'Gestion des contrôles',
-        ]);
-    }
 
     #[Route('/{id}/show', name: 'app_controle_controle_show', methods: ['GET'])]
     public function show(Controle $controle): Response

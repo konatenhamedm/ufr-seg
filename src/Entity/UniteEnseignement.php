@@ -36,15 +36,29 @@ class UniteEnseignement
     #[ORM\Column]
     private ?int $totalCredit = null;
 
-    #[ORM\ManyToOne(inversedBy: 'uniteEnseignements')]
-    private ?Niveau $niveau = null;
+
 
     #[ORM\OneToMany(mappedBy: 'uniteEnseignement', targetEntity: MatiereUe::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $matiereUes;
 
+    #[ORM\ManyToOne(inversedBy: 'uniteEnseignements')]
+    private ?Promotion $promotion = null;
+
+    #[ORM\OneToMany(mappedBy: 'ue', targetEntity: Controle::class)]
+    private Collection $controles;
+
+    #[ORM\OneToMany(mappedBy: 'ue', targetEntity: MoyenneMatiere::class)]
+    private Collection $moyenneMatieres;
+
+    #[ORM\OneToMany(mappedBy: 'ue', targetEntity: ControleExamen::class)]
+    private Collection $controleExamens;
+
     public function __construct()
     {
         $this->matiereUes = new ArrayCollection();
+        $this->controles = new ArrayCollection();
+        $this->moyenneMatieres = new ArrayCollection();
+        $this->controleExamens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -136,17 +150,7 @@ class UniteEnseignement
         return $this;
     }
 
-    public function getNiveau(): ?Niveau
-    {
-        return $this->niveau;
-    }
 
-    public function setNiveau(?Niveau $niveau): static
-    {
-        $this->niveau = $niveau;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, MatiereUe>
@@ -172,6 +176,108 @@ class UniteEnseignement
             // set the owning side to null (unless already changed)
             if ($matiereUe->getUniteEnseignement() === $this) {
                 $matiereUe->setUniteEnseignement(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPromotion(): ?Promotion
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?Promotion $promotion): static
+    {
+        $this->promotion = $promotion;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Controle>
+     */
+    public function getControles(): Collection
+    {
+        return $this->controles;
+    }
+
+    public function addControle(Controle $controle): static
+    {
+        if (!$this->controles->contains($controle)) {
+            $this->controles->add($controle);
+            $controle->setUe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeControle(Controle $controle): static
+    {
+        if ($this->controles->removeElement($controle)) {
+            // set the owning side to null (unless already changed)
+            if ($controle->getUe() === $this) {
+                $controle->setUe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MoyenneMatiere>
+     */
+    public function getMoyenneMatieres(): Collection
+    {
+        return $this->moyenneMatieres;
+    }
+
+    public function addMoyenneMatiere(MoyenneMatiere $moyenneMatiere): static
+    {
+        if (!$this->moyenneMatieres->contains($moyenneMatiere)) {
+            $this->moyenneMatieres->add($moyenneMatiere);
+            $moyenneMatiere->setUe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMoyenneMatiere(MoyenneMatiere $moyenneMatiere): static
+    {
+        if ($this->moyenneMatieres->removeElement($moyenneMatiere)) {
+            // set the owning side to null (unless already changed)
+            if ($moyenneMatiere->getUe() === $this) {
+                $moyenneMatiere->setUe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ControleExamen>
+     */
+    public function getControleExamens(): Collection
+    {
+        return $this->controleExamens;
+    }
+
+    public function addControleExamen(ControleExamen $controleExamen): static
+    {
+        if (!$this->controleExamens->contains($controleExamen)) {
+            $this->controleExamens->add($controleExamen);
+            $controleExamen->setUe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeControleExamen(ControleExamen $controleExamen): static
+    {
+        if ($this->controleExamens->removeElement($controleExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($controleExamen->getUe() === $this) {
+                $controleExamen->setUe(null);
             }
         }
 

@@ -16,11 +16,12 @@
         {{ include('_includes/ajax/response.html.twig') }}
        
         <div class="alert alert-dismissible bg-light-primary border border-info border-1 border-dashed p-5 mb-5">
+       {% if info != null %}
         <div class="row p-0 m-0 mb-4 ">
 
 
             <div class="col">
-                Niveau: <b>{{ info.niveau.libelle }}</b>
+                Niveau: <b>{{ info.promotion.niveau.libelle }}</b>
             </div>
             <div class="col">
                 Date préinscription: <b>{{ info.datePreinscription |date("m/d/Y") }}</b>
@@ -35,6 +36,8 @@
                     Etat: <b>{% if info.etat == "attente_paiement"%} Attente de paiement {% else%} {{ info.etat }} {% endif %} </b>
                 </div>
             </div>
+       {% endif %}
+       
     </div>
         {{ form_widget(form) }}
     </div>

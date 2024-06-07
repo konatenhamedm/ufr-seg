@@ -1,7 +1,7 @@
 {% extends 'base-layout.html.twig' %}
 
 {% block title %}Suivi{% endblock %}
-{% block header %}Workflow de suivi de dossier : {{ inscription.code ~'|'~ inscription.niveau.filiere.libelle }} {% endblock %}
+{% block header %}Workflow de suivi de dossier : {{ inscription.code ~'|'~ inscription.promotion.niveau.filiere.libelle }} {% endblock %}
 {% block breadcrumb %}{% endblock %}
 
 {% block inline_stylesheets %}

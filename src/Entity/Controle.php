@@ -8,12 +8,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-#[UniqueEntity(fields: 'cour', message: 'Impossible car ce cour existe deja')]
 #[ORM\Entity(repositoryClass: ControleRepository::class)]
+//#[UniqueEntity(fields: 'cour', message: 'Impossible car ce cour existe deja')]
+#[UniqueConstraint(name: "classe_matiere", fields: ['classe', 'matiere', 'cour'])]
+#[UniqueEntity(fields: ['classe', 'matiere', 'cour'], message: 'Impossible car ce cour existe deja')]
+#[Table(name: 'evaluation_controle')]
 class Controle
 {
     #[ORM\Id]
@@ -24,9 +29,6 @@ class Controle
     #[ORM\ManyToOne(inversedBy: 'controles')]
     private ?Cours $cour = null;
 
-
-    #[ORM\ManyToOne(inversedBy: 'controles')]
-    private ?Session $session = null;
 
     #[ORM\ManyToOne(inversedBy: 'controles')]
     private ?Semestre $semestre = null;
@@ -62,6 +64,12 @@ class Controle
     #[ORM\ManyToOne(inversedBy: 'controles')]
     private ?AnneeScolaire $anneeScolaire = null;
 
+    #[ORM\ManyToOne(inversedBy: 'controles')]
+    private ?UniteEnseignement $ue = null;
+
+    #[ORM\ManyToOne(inversedBy: 'controles')]
+    private ?TypeControle $typeControle = null;
+
     public function __construct()
     {
         $this->notes = new ArrayCollection();
@@ -83,20 +91,6 @@ class Controle
     public function setCour(?Cours $cour): static
     {
         $this->cour = $cour;
-
-        return $this;
-    }
-
-
-
-    public function getSession(): ?Session
-    {
-        return $this->session;
-    }
-
-    public function setSession(?Session $session): static
-    {
-        $this->session = $session;
 
         return $this;
     }
@@ -251,6 +245,30 @@ class Controle
     public function setAnneeScolaire(?AnneeScolaire $anneeScolaire): static
     {
         $this->anneeScolaire = $anneeScolaire;
+
+        return $this;
+    }
+
+    public function getUe(): ?UniteEnseignement
+    {
+        return $this->ue;
+    }
+
+    public function setUe(?UniteEnseignement $ue): static
+    {
+        $this->ue = $ue;
+
+        return $this;
+    }
+
+    public function getTypeControle(): ?TypeControle
+    {
+        return $this->typeControle;
+    }
+
+    public function setTypeControle(?TypeControle $typeControle): static
+    {
+        $this->typeControle = $typeControle;
 
         return $this;
     }

@@ -6,7 +6,9 @@ use App\DTO\InscriptionDTO;
 use App\Entity\Civilite;
 use App\Entity\Genre;
 use App\Entity\Niveau;
+use App\Entity\Promotion;
 use App\Entity\Utilisateur;
+use DateTime;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -23,8 +25,10 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class RegisterType extends AbstractType
 {
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $date = new DateTime();
         $builder
             /*  ->add('niveau', EntityType::class, [
                 'class' => Niveau::class,
@@ -37,18 +41,23 @@ class RegisterType extends AbstractType
                 'attr' => ['class' => 'has-select2']
             ]) */
 
-            ->add('niveau', EntityType::class, [
-                'class' => Niveau::class,
+            ->add('promotion', EntityType::class, [
+                'class' => Promotion::class,
                 'choice_label' => 'getFullSigle',
                 'required' => false,
                 'attr' => ['class' => 'matiere has-select2 form-select'],
                 'placeholder' => '----',
                 'label' => 'Niveau',
                 'label_attr' => ['class' => 'label-required'],
-                'query_builder' => function (EntityRepository $er) {
+                'query_builder' => function (EntityRepository $er) use ($date) {
                     return $er->createQueryBuilder('c')
-                        /* ->join('c.filiere', 'f')
-                        ->groupBy('f') */;
+                        ->join('c.anneeScolaire', 'a')
+                        ->where('a.dateDebut   <= :dateDebut')
+                        ->andWhere('a.dateFin >= :dateFin')
+                        ->andWhere('a.verrou = :verrou')
+                        ->setParameter('dateDebut', $date->format('Y-m-d'))
+                        ->setParameter('dateFin', $date->format('Y-m-d'))
+                        ->setParameter('verrou', 0);
                 },
             ])
             /* ->add('dateNaissance',  DateType::class,  [

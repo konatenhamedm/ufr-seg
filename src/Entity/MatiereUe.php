@@ -21,14 +21,6 @@ class MatiereUe
     #[ORM\ManyToOne(inversedBy: 'matiereUes')]
     private ?Matiere $matiere = null;
 
-    #[ORM\Column]
-    private ?int $coef = null;
-
-
-
-    #[ORM\Column]
-    private ?int $nombreCredit = null;
-
     #[ORM\Column(length: 255)]
     private ?string $noteEliminatoire = null;
 
@@ -73,31 +65,6 @@ class MatiereUe
         return $this;
     }
 
-    public function getCoef(): ?int
-    {
-        return $this->coef;
-    }
-
-    public function setCoef(int $coef): static
-    {
-        $this->coef = $coef;
-
-        return $this;
-    }
-
-
-
-    public function getNombreCredit(): ?int
-    {
-        return $this->nombreCredit;
-    }
-
-    public function setNombreCredit(int $nombreCredit): static
-    {
-        $this->nombreCredit = $nombreCredit;
-
-        return $this;
-    }
 
     public function getNoteEliminatoire(): ?string
     {

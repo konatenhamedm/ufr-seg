@@ -34,7 +34,7 @@ class UniteEnseignementController extends AbstractController
             ->add('codeUe', TextColumn::class, ['label' => 'Code Ue'])
             ->add('libelle', TextColumn::class, ['label' => 'libelle'])
             ->add('attribut', TextColumn::class, ['label' => 'Attribut Ue'])
-            ->add('coef', TextColumn::class, ['label' => 'Coefficient'])
+            ->add('coef', TextColumn::class, ['label' => 'Total crédit'])
 
 
             ->createAdapter(ORMAdapter::class, [
@@ -42,10 +42,11 @@ class UniteEnseignementController extends AbstractController
                 'query' => function (QueryBuilder $builder) use ($user) {
                     $builder->resetDQLPart('join');
                     $builder
-                        ->select('e,n,s,res')
+                        ->select('e')
                         ->from(UniteEnseignement::class, 'e')
-                        ->join('e.niveau', 'n')
-                        ->leftJoin('n.responsable', 'res')
+                        ->join('e.promotion', 'promotion')
+                        ->join('promotion.niveau', 'n')
+                        ->leftJoin('promotion.responsable', 'res')
                         ->join('e.semestre', 's');
 
                     if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
@@ -143,16 +144,16 @@ class UniteEnseignementController extends AbstractController
             $response = [];
             $redirect = $this->generateUrl('app_parametre_unite_enseignement_index');
 
-            $data = $form->get('matiereUes')->getData();
+            //$data = $form->get('matiereUes')->getData();
 
             $somme = 0;
 
             if ($form->isValid()) {
 
-                foreach ($data as $key => $matiereUe) {
+                /*  foreach ($data as $key => $matiereUe) {
                     $somme += $matiereUe->getNombreCredit();
-                }
-                $uniteEnseignement->setTotalCredit($somme);
+                }*/
+                $uniteEnseignement->setTotalCredit($form->get('coef')->getData());
 
                 $entityManager->persist($uniteEnseignement);
                 $entityManager->flush();
@@ -258,7 +259,7 @@ class UniteEnseignementController extends AbstractController
 
 
             if ($form->isValid()) {
-
+                $uniteEnseignement->setTotalCredit($form->get('coef')->getData());
                 $entityManager->persist($uniteEnseignement);
                 $entityManager->flush();
 

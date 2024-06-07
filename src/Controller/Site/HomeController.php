@@ -4,6 +4,7 @@ namespace App\Controller\Site;
 
 use App\Controller\FileTrait;
 use App\DTO\InscriptionDTO;
+use App\Entity\AnneeScolaire;
 use App\Entity\BlocEcheancier;
 use App\Entity\Classe;
 use App\Entity\Echeancier;
@@ -34,6 +35,7 @@ use App\Form\RegisterType;
 use App\Form\UtilisateurInscriptionSimpleType;
 use App\Form\UtilisateurInscriptionType;
 use App\Form\UtilisateurType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\ClasseRepository;
 use App\Repository\EcheancierRepository;
 use App\Repository\EmployeRepository;
@@ -69,6 +71,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
@@ -113,6 +116,25 @@ class HomeController extends AbstractController
             $nb = $nb + 1;
         }
         return ($code . '-' . date("y") . '-' . str_pad($nb, 3, '0', STR_PAD_LEFT));
+    }
+
+    #[Route(path: 'panier/ajouter/{id}', name: 'ajouter_au_panier', methods: ['POST'])]
+    public function addSession($id, AnneeScolaireRepository $anneeScolaireRepository, SessionInterface $session, Request $request)
+    {
+        $panier = $session->get('panier', []);
+
+        if (empty($panier[$id])) {
+            $panier[$id] = 0;
+        }
+
+
+
+        return $this->json([
+            'data' =>
+            [
+                "pannier" => $panier,
+            ]
+        ]);
     }
 
 
@@ -316,9 +338,9 @@ class HomeController extends AbstractController
                     $preinscription->setEtatDeliberation('pas_deliberer');
                     $preinscription->setEtudiant($etudiant);
                     $preinscription->setDatePreinscription(new \DateTime());
-                    $preinscription->setNiveau($inscriptionDTO->getNiveau());
+                    $preinscription->setPromotion($inscriptionDTO->getPromotion());
                     $preinscription->setUtilisateur($utilisateur);
-                    $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
+                    $preinscription->setCode($this->numero($inscriptionDTO->getPromotion()->getNiveau()->getCode()));
                     $preinscriptionRepository->add($preinscription, true);
 
 
@@ -343,7 +365,7 @@ class HomeController extends AbstractController
                     $this->addFlash('success', 'Votre compte a été crée avec succès. Veuillez vous connecter pour continuer l\'opération vous pouvez consulter votre email');
                 } else {
 
-                    $existe = $preinscriptionRepository->findOneBy(['niveau' => $inscriptionDTO->getNiveau()]);
+                    $existe = $preinscriptionRepository->findOneBy(['promotion' => $inscriptionDTO->getPromotion()]);
                     if ($existe) {
                         $statut = 1;
                         $message = 'cet étudiant  existe  déjà dans cette filière,veillez vous connecter';
@@ -355,9 +377,9 @@ class HomeController extends AbstractController
                         $preinscription->setEtatDeliberation('pas_deliberer');
                         $preinscription->setEtudiant($user->getPersonne());
                         $preinscription->setDatePreinscription(new \DateTime());
-                        $preinscription->setNiveau($inscriptionDTO->getNiveau());
+                        $preinscription->setPromotion($inscriptionDTO->getPromotion());
                         $preinscription->setUtilisateur($user);
-                        $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
+                        $preinscription->setCode($this->numero($inscriptionDTO->getPromotion()->getNiveau()->getCode()));
                         $preinscriptionRepository->add($preinscription, true);
                         $userAuthenticator->authenticateUser(
                             $user,
@@ -491,9 +513,9 @@ class HomeController extends AbstractController
                     $preinscription->setEtatDeliberation('pas_deliberer');
                     $preinscription->setEtudiant($etudiant);
                     $preinscription->setDatePreinscription(new \DateTime());
-                    $preinscription->setNiveau($inscriptionDTO->getNiveau());
+                    $preinscription->setPromotion($inscriptionDTO->getPromotion());
                     $preinscription->setUtilisateur($utilisateur);
-                    $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
+                    $preinscription->setCode($this->numero($inscriptionDTO->getPromotion()->getNiveau()->getCode()));
                     $preinscriptionRepository->add($preinscription, true);
 
 
@@ -518,7 +540,7 @@ class HomeController extends AbstractController
                     $this->addFlash('success', 'Votre compte a été crée avec succès. Veuillez vous connecter pour continuer l\'opération vous pouvez consulter votre email');
                 } else {
 
-                    $existe = $preinscriptionRepository->findOneBy(['niveau' => $inscriptionDTO->getNiveau()]);
+                    $existe = $preinscriptionRepository->findOneBy(['niveau' => $inscriptionDTO->getPromotion()->getNiveau()]);
                     if ($existe) {
                         $statut = 1;
                         $message = 'cet étudiant  existe  déjà dans cette filière,veillez vous connecter';
@@ -530,9 +552,9 @@ class HomeController extends AbstractController
                         $preinscription->setEtatDeliberation('pas_deliberer');
                         $preinscription->setEtudiant($user->getPersonne());
                         $preinscription->setDatePreinscription(new \DateTime());
-                        $preinscription->setNiveau($inscriptionDTO->getNiveau());
+                        $preinscription->setPromotion($inscriptionDTO->getPromotion());
                         $preinscription->setUtilisateur($user);
-                        $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
+                        $preinscription->setCode($this->numero($inscriptionDTO->getPromotion()->getNiveau()->getCode()));
                         $preinscriptionRepository->add($preinscription, true);
                         $userAuthenticator->authenticateUser(
                             $user,
@@ -837,12 +859,13 @@ class HomeController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Inscription::class,
                 'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau, $user) {
-                    $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                    $qb->select(['p', 'c', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
-                        ->join('p.classe', 'classe', 'res')
-                        ->join('p.niveau', 'niveau')
+                        ->join('p.classe', 'classe')
+                        ->join('p.promotion', 'promotion')
+                        ->join('promotion.niveau', 'niveau')
                         ->join('niveau.filiere', 'filiere')
-                        ->join('niveau.responsable', 'res')
+                        ->join('promotion.responsable', 'res')
                         ->join('p.etudiant', 'etudiant')
                         ->leftJoin('p.caissiere', 'c')
                         ->andWhere('p.classe is not null')
@@ -978,10 +1001,11 @@ class HomeController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Etudiant::class,
                 'query' => function (QueryBuilder $qb) {
-                    $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                    $qb->select(['p'])
                         ->from(Inscription::class, 'p')
                         ->join('p.classe', 'classe')
-                        ->join('p.niveau', 'niveau')
+                        ->join('p.promotion', 'promotion')
+                        ->join('promotion.niveau', 'niveau')
                         ->join('niveau.filiere', 'filiere')
                         ->join('p.etudiant', 'etudiant')
                         ->leftJoin('p.caissiere', 'c')
@@ -1045,7 +1069,7 @@ class HomeController extends AbstractController
 
 
     #[Route('/all/frais/niveau/{id}', name: 'get_frais', methods: ['GET'])]
-    public function getmatiere(Request $request, FraisRepository  $fraisRepository, $id)
+    public function getMatiere(Request $request, FraisRepository  $fraisRepository, $id, ClasseRepository $classeRepository)
     {
         $response = new Response();
         $tabFrais = array();
@@ -1056,7 +1080,7 @@ class HomeController extends AbstractController
         if ($id) {
 
 
-            $frais = $fraisRepository->findBy(['niveau' => $id]);
+            $frais = $fraisRepository->findBy(['promotion' => $classeRepository->find($id)->getPromotion()->getId()]);
             // dd($frais);
 
             $i = 0;
@@ -1876,7 +1900,7 @@ class HomeController extends AbstractController
 
         $data = null;
         $statutCode = Response::HTTP_OK;
-
+        $fullRedirect = false;
         $isAjax = $request->isXmlHttpRequest();
 
 
@@ -1913,6 +1937,7 @@ class HomeController extends AbstractController
 
 
                 $data = true;
+                $fullRedirect = true;
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
@@ -1923,7 +1948,7 @@ class HomeController extends AbstractController
             }
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'fullRedirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);

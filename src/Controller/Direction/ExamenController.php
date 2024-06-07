@@ -55,10 +55,11 @@ class ExamenController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Examen::class,
                 'query' => function (QueryBuilder $qb) use ($filiere, $user) {
-                    $qb->select(['d', 'n', 'f', 'res'])
+                    $qb->select(['d'])
                         ->from(Examen::class, 'd')
-                        ->innerJoin('d.niveau', 'n')
-                        ->join('n.responsable', 'res')
+                        ->innerJoin('d.promotion', 'promotion')
+                        ->innerJoin('promotion.niveau', 'n')
+                        ->join('promotion.responsable', 'res')
                         ->innerJoin('n.filiere', 'f')
                         ->orderBy('d.id', 'DESC');
 

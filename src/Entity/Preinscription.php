@@ -37,10 +37,7 @@ class Preinscription
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $datePreinscription = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank(message: 'Veuillez choisir un niveau')]
-    private ?Niveau $niveau = null;
+
 
     #[ORM\ManyToOne(inversedBy: 'preinscriptions')]
     #[ORM\JoinColumn(nullable: false)]
@@ -81,6 +78,11 @@ class Preinscription
     #[ORM\OneToMany(mappedBy: 'preinscription', targetEntity: Decision::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $decisions;
 
+    #[ORM\ManyToOne(inversedBy: 'preinscriptions')]
+    private ?Promotion $promotion = null;
+
+
+
     public function __construct()
     {
         $this->decisions = new ArrayCollection();
@@ -105,17 +107,7 @@ class Preinscription
         return $this;
     }
 
-    public function getNiveau(): ?Niveau
-    {
-        return $this->niveau;
-    }
 
-    public function setNiveau(?Niveau $niveau): static
-    {
-        $this->niveau = $niveau;
-
-        return $this;
-    }
 
     public function getEtudiant(): ?Etudiant
     {
@@ -193,7 +185,7 @@ class Preinscription
 
     public function getFiliere()
     {
-        return $this->getNiveau()->getFiliere();
+        return $this->getPromotion()->getNiveau()->getFiliere();
     }
 
     public function getDeliberation(): ?DeliberationPreinscription
@@ -323,6 +315,18 @@ class Preinscription
             // set the owning side to null (unless already changed)
             $this->decisions->clear($decision);
         }
+
+        return $this;
+    }
+
+    public function getPromotion(): ?Promotion
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?Promotion $promotion): static
+    {
+        $this->promotion = $promotion;
 
         return $this;
     }

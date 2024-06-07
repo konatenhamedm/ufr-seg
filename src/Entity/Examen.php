@@ -36,8 +36,8 @@ class Examen
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank(message: 'Veuillez sélectionner un niveau')]
-    private ?Niveau $niveau = null;
+    #[Assert\NotBlank(message: 'Veuillez sélectionner un promotion')]
+    private ?Promotion $promotion = null;
 
     #[ORM\OneToMany(mappedBy: 'examen', targetEntity: MatiereExamen::class, orphanRemoval: true, cascade: ['persist'])]
     #[Assert\Valid()]
@@ -89,14 +89,14 @@ class Examen
         return $this;
     }
 
-    public function getNiveau(): ?Niveau
+    public function getPromotion(): ?Promotion
     {
-        return $this->niveau;
+        return $this->promotion;
     }
 
-    public function setNiveau(?Niveau $niveau): static
+    public function setPromotion(?Promotion $promotion): static
     {
-        $this->niveau = $niveau;
+        $this->promotion = $promotion;
 
         return $this;
     }

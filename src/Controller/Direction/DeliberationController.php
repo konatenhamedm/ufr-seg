@@ -114,10 +114,11 @@ class DeliberationController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Examen::class,
                 'query' => function (QueryBuilder $qb) use ($user) {
-                    $qb->select(['d', 'n', 'f', 'res'])
+                    $qb->select(['d'])
                         ->from(Examen::class, 'd')
-                        ->innerJoin('d.niveau', 'n')
-                        ->join('n.responsable', 'res')
+                        ->innerJoin('d.promotion', 'promotion')
+                        ->innerJoin('promotion.niveau', 'n')
+                        ->join('promotion.responsable', 'res')
                         ->innerJoin('n.filiere', 'f')
                         ->orderBy('d.id', 'DESC');
 
@@ -160,6 +161,7 @@ class DeliberationController extends AbstractController
 
                         'actions' => [
                             'edit' => [
+                                'target' => '#modal-lg225',
                                 'url' => $this->generateUrl('app_direction_examen_edit', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
@@ -230,7 +232,7 @@ class DeliberationController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Deliberation::class,
                 'query' => function (QueryBuilder $qb) use ($user, $id) {
-                    $qb->select(['d', 'ex', 'n', 'm', 'dp', 'p', 'res'])
+                    $qb->select(['d'])
                         ->from(Deliberation::class, 'd')
                         ->join('d.infoPreinscription', 'dp')
                         ->join('dp.preinscription', 'p')

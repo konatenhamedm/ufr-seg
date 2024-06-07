@@ -6,8 +6,10 @@ use App\Repository\NoteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
 
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
+#[Table(name: 'evaluation_note')]
 class Note
 {
     #[ORM\Id]
@@ -33,9 +35,13 @@ class Note
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $exposant = null;
 
+    #[ORM\OneToMany(mappedBy: 'note', targetEntity: ValeurNoteExamen::class)]
+    private Collection $valeurNoteExamens;
+
     public function __construct()
     {
         $this->valeurNotes = new ArrayCollection();
+        $this->valeurNoteExamens = new ArrayCollection();
     }
 
     public function getId(): ?int

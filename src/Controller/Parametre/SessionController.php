@@ -8,6 +8,7 @@ use App\Repository\SessionRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\BoolColumn;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
@@ -27,9 +28,19 @@ class SessionController extends AbstractController
     {
         $table = $dataTableFactory->create()
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
-            ->add('dateSession', DateTimeColumn::class, ['label' => 'Date session', 'format' => 'd-m-Y'])
+            ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date session', 'format' => 'd-m-Y'])
+            ->add('dateFin', DateTimeColumn::class, ['label' => 'Date session', 'format' => 'd-m-Y'])
+            ->add('promotion', TextColumn::class, ['label' => 'Promotion', 'field' => 'p.libelle'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Session::class,
+                'query' => function (QueryBuilder $qb) {
+                    $qb->select(['s', 'p'])
+                        ->from(Session::class, 's')
+                        ->innerJoin('s.promotion', 'p')
+                        ->innerJoin('p.niveau', 'niveau')
+
+                        ->orderBy('s.id', 'DESC');
+                }
             ])
             ->setName('dt_app_parametre_session');
 
@@ -57,7 +68,7 @@ class SessionController extends AbstractController
                 'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Session $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
-                        'target' => '#modal-lg',
+                        'target' => '#modal-lg225',
 
                         'actions' => [
                             'edit' => [

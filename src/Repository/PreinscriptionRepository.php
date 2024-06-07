@@ -62,8 +62,10 @@ class PreinscriptionRepository extends ServiceEntityRepository
             ->andWhere('d.examen = :examen');
 
         $qb->select('p')
+            ->join('p.promotion', 'promotion')
+            ->join('promotion.niveau', 'niveau')
             ->andWhere($qb->expr()->not($qb->expr()->exists($stmtExists->getDQL())))
-            ->andWhere('p.niveau = :niveau')
+            ->andWhere('niveau = :niveau')
             ->andWhere('p.etat = :etat')
             ->andWhere('p.etatDeliberation = :deliberation')
             ->setParameter('niveau', $examen->getNiveau())

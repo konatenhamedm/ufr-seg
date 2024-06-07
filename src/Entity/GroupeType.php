@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\GroupeTypeRepository;
+use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
 
 #[ORM\Entity(repositoryClass: GroupeTypeRepository::class)]
+#[Table(name: 'evaluation_groupe_type')]
 class GroupeType
 {
     #[ORM\Id]
@@ -17,14 +20,24 @@ class GroupeType
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateNote = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $coef = null;
 
     #[ORM\ManyToOne(inversedBy: 'groupeTypes')]
     private ?Controle $controle = null;
 
     #[ORM\ManyToOne(inversedBy: 'groupeTypes')]
-    private ?TypeControle $type = null;
+    private ?TypeEvaluation $typeEvaluation = null;
+
+    #[ORM\Column]
+    private ?int $coef = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateSaisie = null;
+
+
+    public function __construct()
+    {
+        $this->dateSaisie = new DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -43,18 +56,6 @@ class GroupeType
         return $this;
     }
 
-    public function getCoef(): ?string
-    {
-        return $this->coef;
-    }
-
-    public function setCoef(string $coef): static
-    {
-        $this->coef = $coef;
-
-        return $this;
-    }
-
     public function getControle(): ?Controle
     {
         return $this->controle;
@@ -67,14 +68,38 @@ class GroupeType
         return $this;
     }
 
-    public function getType(): ?TypeControle
+    public function getTypeEvaluation(): ?TypeEvaluation
     {
-        return $this->type;
+        return $this->typeEvaluation;
     }
 
-    public function setType(?TypeControle $type): static
+    public function setTypeEvaluation(?TypeEvaluation $typeEvaluation): static
     {
-        $this->type = $type;
+        $this->typeEvaluation = $typeEvaluation;
+
+        return $this;
+    }
+
+    public function getCoef(): ?int
+    {
+        return $this->coef;
+    }
+
+    public function setCoef(int $coef): static
+    {
+        $this->coef = $coef;
+
+        return $this;
+    }
+
+    public function getDateSaisie(): ?\DateTimeInterface
+    {
+        return $this->dateSaisie;
+    }
+
+    public function setDateSaisie(\DateTimeInterface $dateSaisie): static
+    {
+        $this->dateSaisie = $dateSaisie;
 
         return $this;
     }

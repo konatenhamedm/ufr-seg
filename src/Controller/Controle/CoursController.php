@@ -8,6 +8,7 @@ use App\Entity\Cours;
 use App\Entity\GroupeType;
 use App\Entity\Matiere;
 use App\Entity\Note;
+use App\Entity\UniteEnseignement;
 use App\Entity\ValeurNote;
 use App\Form\ControleType;
 use App\Form\Cours1Type;
@@ -18,6 +19,8 @@ use App\Repository\CoursRepository;
 use App\Repository\InscriptionRepository;
 use App\Repository\MatiereRepository;
 use App\Repository\TypeControleRepository;
+use App\Repository\TypeEvaluationRepository;
+use App\Repository\UniteEnseignementRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use Doctrine\ORM\EntityManagerInterface;
@@ -71,11 +74,12 @@ class CoursController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Cours::class,
                 'query' => function (QueryBuilder $qb) use ($matiere, $classe, $user) {
-                    $qb->select(['co', 'c', 'm', 'a', 'res', 'niveau'])
+                    $qb->select(['co'])
                         ->from(Cours::class, 'co')
                         ->innerJoin('co.classe', 'c')
-                        ->leftJoin('c.niveau', 'niveau')
-                        ->leftJoin('niveau.responsable', 'res')
+                        ->leftJoin('c.promotion', 'promotion')
+                        ->leftJoin('promotion.niveau', 'niveau')
+                        ->leftJoin('promotion.responsable', 'res')
                         ->join('co.matiere', 'm')
                         ->join('co.anneeScolaire', 'a')
                         ->orderBy('co.id', 'DESC');
@@ -347,7 +351,7 @@ class CoursController extends AbstractController
 
 
     #[Route('/liste/matiere', name: 'get_matiere', methods: ['GET'])]
-    public function getmatiere(Request $request, CoursRepository $coursRepository)
+    public function getMatiere(Request $request, CoursRepository $coursRepository)
     {
         $response = new Response();
         $tabMatieres = array();
@@ -378,11 +382,74 @@ class CoursController extends AbstractController
         return $response;
     }
 
+    #[Route('/liste/ue', name: 'get_ue', methods: ['GET'])]
+    public function getUe(Request $request, ClasseRepository $classeRepository, UniteEnseignementRepository $uniteEnseignementRepository)
+    {
+        $response = new Response();
+        $tabUnite = array();
+
+
+        $idClasse = $request->get('id');
+
+        if ($idClasse) {
+
+
+            $uniteEnseigenments = $uniteEnseignementRepository->findby(['promotion' => $classeRepository->find($idClasse)->getPromotion()]);
+
+            $i = 0;
+
+            foreach ($uniteEnseigenments as $e) {
+                // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
+                $tabUnite[$i]['id'] = $e->getId();
+                $tabUnite[$i]['libelle'] = $e->getLibelle();
+
+                $i++;
+            }
+
+            $dataService = json_encode($tabUnite); // formater le résultat de la requête en json
+
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent($dataService);
+        }
+        return $response;
+    }
+    #[Route('/liste/ue/matiere', name: 'get_ue_matiere', methods: ['GET'])]
+    public function getUeMatiere(Request $request, ClasseRepository $classeRepository, UniteEnseignementRepository $uniteEnseignementRepository)
+    {
+        $response = new Response();
+        $tabUnite = array();
+
+
+        $idUe = 4;
+
+        if ($idUe) {
+
+
+            $matieresUe = $uniteEnseignementRepository->find($idUe);
+
+            $i = 0;
+
+            foreach ($matieresUe->getMatiereUes() as $e) {
+                // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
+                $tabUnite[$i]['id'] = $e->getMatiere()->getId();
+                $tabUnite[$i]['libelle'] = $e->getMatiere()->getLibelle();
+
+                $i++;
+            }
+
+            $dataService = json_encode($tabUnite); // formater le résultat de la requête en json
+
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent($dataService);
+        }
+        return $response;
+    }
+
 
 
     #[Route('/edit/new', name: 'app_controle_controle_cours_edit_new', methods: ['GET', 'POST'])]
     #[Route('/{classe}/{matiere}/edit', name: 'app_controle_controle_cours_edit', methods: ['GET', 'POST'])]
-    public function editCOntrole(Request $request, TypeControleRepository $typeControleRepository, CoursRepository $coursRepository, MatiereRepository $matiereRepository, ClasseRepository $classeRepository, InscriptionRepository $inscriptionRepository, ControleRepository $controleRepository, EntityManagerInterface $entityManager, FormError $formError, $matiere, $classe): Response
+    public function editCOntrole(Request $request, TypeControleRepository $typeControleRepository, TypeEvaluationRepository $typeEvaluationRepository, CoursRepository $coursRepository, MatiereRepository $matiereRepository, ClasseRepository $classeRepository, InscriptionRepository $inscriptionRepository, ControleRepository $controleRepository, EntityManagerInterface $entityManager, FormError $formError, $matiere, $classe): Response
     {
 
         $controleVefication = $controleRepository->findOneBy(['classe' => $classe, 'matiere' => $matiere]);
@@ -399,7 +466,7 @@ class CoursController extends AbstractController
             $controle = new Controle();
             $groupe = new GroupeType();
             $groupe->setCoef('10');
-            $groupe->setType($typeControleRepository->findOneBy(['code' => 'DS']));
+            $groupe->setTypeEvaluation($typeEvaluationRepository->findOneBy(['code' => "TD"]));
             $groupe->setDateNote(new \DateTime());
             $controle->addGroupeType($groupe);
 

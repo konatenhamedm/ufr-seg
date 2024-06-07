@@ -37,7 +37,7 @@
                <b>Montant à payer</b>
                     
                 </td>
-                 <td class="p-2 total" style="color: red;"> <b> {{ preinscription.niveau.filiere.montantPreinscription }} Frcfa</b></td>
+                 <td class="p-2 total" style="color: red;"> <b> {{ preinscription.promotion.niveau.filiere.montantPreinscription }} Frcfa</b></td>
             </tr>
              <tr class="row-colonne even pointer table-light">
                 <td class="p-2">
@@ -51,7 +51,7 @@
                 Filière
                     
                 </td>
-                 <td class="p-2"> <b>{{ preinscription.niveau.filiere.libelle }}</b></td>
+                 <td class="p-2"> <b>{{ preinscription.promotion.niveau.filiere.libelle }}</b></td>
             </tr>
         </tbody>
        
@@ -71,13 +71,13 @@
         </div>
             <div class="row p-0 m-0">
                 <div class="col">
-                    <b>Montant à payer</b>: <b> {{ preinscription.niveau.filiere.montantPreinscription }} Frcfa</b>
+                    <b>Montant à payer</b>: <b> {{ preinscription.promotion.niveau.filiere.montantPreinscription }} Frcfa</b>
                 </div>
                 <div class="col">
                     Date de naissance: <b>{{ etudiant.dateNaissance |date("m/d/Y") }}</b>
                 </div>
                 <div class="col">
-                    Filière : <b>{{ preinscription.niveau.filiere.libelle }}</b>
+                    Filière : <b>{{ preinscription.promotion.niveau.filiere.libelle }}</b>
                 </div>
                 
             </div>

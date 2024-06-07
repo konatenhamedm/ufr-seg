@@ -87,7 +87,8 @@ SQL;
     {
         $sql = $this->createQueryBuilder('i')
             ->leftJoin('i.preinscription', 'p')
-            ->join('p.niveau', 'niveau')
+            ->join('p.promotion', 'promotion')
+            ->join('promotion.niveau', 'niveau')
             ->leftJoin('p.caissiere', 'ca')
             ->join('niveau.filiere', 'filiere')
             ->join('niveau.responsable', 'res')

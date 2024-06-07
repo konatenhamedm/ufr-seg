@@ -1,19 +1,21 @@
-function refresh() {
+function refresh()
+ {
     let index = 0
     $('.row-colonne-row').each(function () {
         index++;
         $(this).attr('data-numberKey', index)
         $(this).find('.numero:first').val(index);
     })
-    }
-    function refreshColone() {
+}
+function refreshColone() 
+{
     let index = 0
     $('.row-type').each(function () {
         index++;
         $(this).attr('data-numberKey', index)
         $(this).find('.numero:first').val(index);
     })
-    }
+}
 
 
      $(function () {
@@ -50,10 +52,11 @@ function refresh() {
 
     
         $addLink.click(function (e) {
-       
+            
             addLine($container);
             e.preventDefault(); // évite qu'un # apparaisse dans l'URL
             refreshColone();
+        
         });
     // On ajoute un premier champ automatiquement s'il n'en existe pas déjà un (cas d'une nouvelle annonce par exemple).
     /*if (index == 0) {
@@ -82,11 +85,34 @@ function refresh() {
             // On ajoute le prototype modifié à la fin de la balise <div>
            // $container.append($prototype);
          //alert(__name__)
-
+        
+     
         
 
             nombre_note++;
             nombre_note_groupe++;
+
+           // alert('')
+
+           var resIntervention;
+                $.ajax({
+                    url:  "/admin/controle/type/evaluation/liste/type/evaluation",
+                    type:  'get',
+                    async: false,
+                    dataType:   'json',
+                    success: function(json){
+                       
+                        $.each(json, function(index, value) {      
+                      
+                            resIntervention += ` 
+                           
+                            <option value="${value.id}"  >${value.libelle}</option>
+                        `;
+                      
+
+                          });
+                    }
+                });
 
             
             $('#tutorial').find('.ligne').each(function(){ 
@@ -107,31 +133,12 @@ function refresh() {
                // $(this).find('.source').eq(-3).after('<td width="10%" class="p-2">ffff</td>'); 
                 //$(this).find('th').eq(-3).after('<th width="10%" class="p-2">Note '+nombre_note+'</th>'); 
 
-                var resIntervention;
-                $.ajax({
-                    url:  '/admin/controle/type/controle/liste/type/controle',
-                    type:  'get',
-                    async: false,
-                    dataType:   'json',
-                    success: function(json){
-
-                     // $('#'+ $('.matiere').attr("id")).html(''); //je vide la 2ème list
-                      //$('#'+ $('.matiere').attr("id")).append('<option value selected="default" >Choisissez</option>');
-
-                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
-                              
-                          //  $("#"+ $('.matiere').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
-                         // <option value="2" data-select2-id="select2-data-16283-qrxgsx">TP</option>
-                            resIntervention += ` 
-                           
-                            <option value="${value.id}"  >${value.libelle}</option>
-                        `;
-                      
-
-                          });
-                    }
-                });
-
+                 
+ 
+               /*  ${
+                    resIntervention
+                 } */
+              
 
                 $(this).find('th').eq(-3).after(`<th class="p-2  row-colonne" style="background-color:white !important" data-select2-id="select2-data-${nombre_note_groupe}-ebse"> 
                        <table width="100%">
@@ -151,19 +158,19 @@ function refresh() {
                          <tr>
                             <td>
                            <select  class="form-control form-control-sm has-select2 select2-hidden-accessible" id="controle_groupeTypes_${nombre_note_groupe}_type" name="controle[groupeTypes][${nombre_note_groupe}][type]" required="required" tabindex="-1" aria-hidden="true" >
-                             ${
-                                resIntervention
-                             }
-                          
-                       
+                            
+                           ${
+                            resIntervention
+                         }
                            </select>
                             </td>
                         </tr>
                         <tr>
                             <td >
                                <select class="form-control form-control-sm has-select2 select2-hidden-accessible" id="controle_groupeTypes_${nombre_note_groupe}_coef" name="controle[groupeTypes][${nombre_note_groupe}][coef]" required="required" tabindex="-1" aria-hidden="true" >
-                               <option value="20" data-select2-id="select2-data-20008-yq4g55">20</option>
-                               <option value="10" selected="selected" data-select2-id="select2-data-20009-wthh00">10</option>
+                               <option value="10" data-select2-id="select2-data-20008-yq4g55">10</option>
+                               <option value="20" selected="selected" data-select2-id="select2-data-20009-wthh00">20</option>
+                               <option value="40" selected="selected" data-select2-id="select2-data-20009-wthh00">40</option>
                                </select>
                              </td>
                         </tr>
@@ -228,6 +235,8 @@ function refresh() {
 
         $(".del-col").on("click", function(){
            // alert('ok');
+
+           
             $("table tbody tr").find("td:eq(-3)").remove();
             $("table thead tr").find("th:eq(-3)").remove();
           });

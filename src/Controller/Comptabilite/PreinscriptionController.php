@@ -11,6 +11,7 @@ use App\Form\PreinscriptionEudiantConnecteType;
 use App\Form\PreinscriptionType;
 use App\Repository\NiveauRepository;
 use App\Repository\PreinscriptionRepository;
+use App\Repository\PromotionRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use App\Service\Omines\Column\NumberFormatColumn;
@@ -68,7 +69,8 @@ class PreinscriptionController extends AbstractController
             'query' => function (QueryBuilder $qb) use ($user) {
                 $qb->select(['p', 'niveau', 'filiere', 'etudiant'])
                     ->from(Preinscription::class, 'p')
-                    ->join('p.niveau', 'niveau')
+                    ->join('p.promotion', 'promotion')
+                    ->join('promotion.niveau', 'niveau')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant');
                 if ($this->isGranted('ROLE_ETUDIANT')) {
@@ -164,9 +166,10 @@ class PreinscriptionController extends AbstractController
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Preinscription::class,
             'query' => function (QueryBuilder $qb) use ($user) {
-                $qb->select(['p', 'niveau', 'filiere', 'etudiant'])
+                $qb->select(['p',  'etudiant'])
                     ->from(Preinscription::class, 'p')
-                    ->join('p.niveau', 'niveau')
+                    ->leftJoin('p.promotion', 'promotion')
+                    ->join('promotion.niveau', 'niveau')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant');
                 if ($this->isGranted('ROLE_ETUDIANT')) {
@@ -286,11 +289,12 @@ class PreinscriptionController extends AbstractController
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Preinscription::class,
             'query' => function (QueryBuilder $qb) use ($user, $etat) {
-                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant,res'])
+                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant,res,promotion'])
                     ->from(Preinscription::class, 'p')
-                    ->join('p.niveau', 'niveau')
+                    ->join('p.promotion', 'promotion')
+                    ->join('promotion.niveau', 'niveau')
                     ->join('niveau.filiere', 'filiere')
-                    ->join('niveau.responsable', 'res')
+                    ->join('promotion.responsable', 'res')
                     ->join('p.etudiant', 'etudiant')
                     ->leftJoin('p.caissiere', 'c')
                     ->andWhere('p.etat = :etat')
@@ -430,7 +434,7 @@ class PreinscriptionController extends AbstractController
 
                 $data = true;
                 $showAlert = true;
-                $message       = sprintf('Votre demande pour le niveau [%s] a été enregistrée. Elle sera traitée par nos services pour la suite de votre parcours', $preinscription->getNiveau()->getLibelle());
+                $message       = sprintf('Votre demande pour le niveau [%s] a été enregistrée. Elle sera traitée par nos services pour la suite de votre parcours', $preinscription->getPromotion()->getNiveau()->getLibelle());
                 $statut = 1;
                 $this->addFlash('success', $message);
             } else {
@@ -475,7 +479,7 @@ class PreinscriptionController extends AbstractController
     }
 
     #[Route('/demande/new', name: 'app_comptabilite_preinscription_demande_new', methods: ['GET', 'POST'])]
-    public function demanddNew(Request $request, NiveauRepository $niveauRepository, UserInterface $user, EntityManagerInterface $entityManager, FormError $formError, PreinscriptionRepository $preinscriptionRepository): Response
+    public function demanddNew(Request $request, NiveauRepository $niveauRepository, PromotionRepository $promotionRepository, UserInterface $user, EntityManagerInterface $entityManager, FormError $formError, PreinscriptionRepository $preinscriptionRepository): Response
     {
         $preinscription = new Preinscription();
         //dd();
@@ -487,6 +491,8 @@ class PreinscriptionController extends AbstractController
 
         $data = null;
         $statutCode = Response::HTTP_OK;
+
+        // dd($preinscriptionRepository->getLastRecord()[0]);
 
         $isAjax = $request->isXmlHttpRequest();
         $showAlert = false;
@@ -501,7 +507,7 @@ class PreinscriptionController extends AbstractController
                 $preinscription->setDatePreinscription(new \DateTime());
                 $preinscription->setEtudiant($this->getUser()->getPersonne());
                 $preinscription->setUtilisateur($this->getUser());
-                $preinscription->setCode($this->numero($niveauRepository->find($form->get('niveau')->getData()->getId())->getCode()));
+                $preinscription->setCode($this->numero($promotionRepository->find($form->get('promotion')->getData()->getId())->getNiveau()->getCode()));
                 $preinscription->setEtat('attente_validation');
                 $preinscription->setEtatDeliberation('pas_deliberer');
                 $entityManager->persist($preinscription);
@@ -509,7 +515,7 @@ class PreinscriptionController extends AbstractController
 
                 $data = true;
                 $showAlert = true;
-                $message       = sprintf('Votre demande pour le niveau [%s] a été enregistrée. Elle sera traitée par nos services pour la suite de votre parcours', $preinscription->getNiveau()->getLibelle());
+                $message       = sprintf('Votre demande pour le niveau [%s] a été enregistrée. Elle sera traitée par nos services pour la suite de votre parcours', $preinscription->getPromotion()->getNiveau()->getLibelle());
 
                 $statut = 1;
                 $this->addFlash('success', $message);
@@ -535,7 +541,7 @@ class PreinscriptionController extends AbstractController
         return $this->render('comptabilite/preinscription/demande_new.html.twig', [
             'preinscription' => $preinscription,
             'form' => $form->createView(),
-            'info' => $preinscriptionRepository->getLastRecord()[0]
+            'info' =>  $preinscriptionRepository->getLastRecord() ? $preinscriptionRepository->getLastRecord()[0] : null
         ]);
     }
 

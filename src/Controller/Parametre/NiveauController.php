@@ -36,19 +36,20 @@ class NiveauController extends AbstractController
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
             ->add('filiere', TextColumn::class, ['label' => 'Filière', 'field' => 'filiere.libelle'])
-            ->add('responsable', TextColumn::class, ['label' => 'Responsable', 'field' => 'res.getNomComplet'])
+            /*  ->add('responsable', TextColumn::class, ['label' => 'Responsable', 'field' => 'res.getNomComplet']) */
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Niveau::class,
                 'query' => function (QueryBuilder $qb) use ($user) {
-                    $qb->select('niveau,filiere,res')
+                    $qb->select('niveau,filiere')
                         ->from(Niveau::class, 'niveau')
                         ->leftJoin('niveau.filiere', 'filiere')
-                        ->leftJoin('niveau.responsable', 'res');
+                        /* ->leftJoin('u.promotion', 'promotion')
+                        ->leftJoin('niveau.responsable', 'res') */;
 
-                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                    /*  if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
                         $qb->andWhere("res = :user")
                             ->setParameter('user', $user->getPersonne());
-                    }
+                    } */
                 },
             ])
             ->setName('dt_app_parametre_niveau');
@@ -130,7 +131,7 @@ class NiveauController extends AbstractController
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
             ->add('filiere', TextColumn::class, ['label' => 'Filière', 'field' => 'filiere.libelle'])
-            ->add('responsable', TextColumn::class, ['label' => 'Responsable', 'field' => 'res.getNomComplet'])
+            /*  ->add('responsable', TextColumn::class, ['label' => 'Responsable', 'field' => 'res.getNomComplet']) */
             /* ->add('responsable', TextColumn::class, ['label' => 'Responsable', 'render' => fn ($value, Niveau $niveau) => $niveau->getResponsable()->getNomComplet()]) */
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Niveau::class,
@@ -140,12 +141,12 @@ class NiveauController extends AbstractController
                         ->select('niveau,filiere,res')
                         ->from(Niveau::class, 'niveau')
                         ->join('niveau.filiere', 'filiere')
-                        ->join('niveau.responsable', 'res');
+                        /*  ->join('niveau.responsable', 'res') */;
 
-                    if ($this->isGranted('ROLE_DIRECTEUR')) {
+                    /*  if ($this->isGranted('ROLE_DIRECTEUR')) {
                         $qb->andWhere('res.id = :id')
                             ->setParameter('id', $user->getPersonne()->getId());
-                    }
+                    } */
                 },
             ])
             ->setName('dt_app_parametre_niveau');
@@ -222,13 +223,13 @@ class NiveauController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError): Response
     {
         $niveau = new Niveau();
-        $typeFrais = $entityManager->getRepository(TypeFrais::class)->findAll();
+        /*  $typeFrais = $entityManager->getRepository(TypeFrais::class)->findAll();
         foreach ($typeFrais as $type) {
             $frais = new Frais();
             $frais->setTypeFrais($type);
             $niveau->addFrai($frais);
         }
-
+ */
         $form = $this->createForm(NiveauType::class, $niveau, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_parametre_niveau_new')
@@ -293,7 +294,7 @@ class NiveauController extends AbstractController
     public function edit(Request $request, Niveau $niveau, EntityManagerInterface $entityManager, FormError $formError): Response
     {
         $typeFrais = $entityManager->getRepository(TypeFrais::class)->findAll();
-        $oldFrais = $niveau->getFrais();
+        /*   $oldFrais = $niveau->getFrais();
         foreach ($typeFrais as $type) {
             $frais = $oldFrais->filter(fn (Frais $frais) => $frais->getTypeFrais() == $type)->current();
             if (!$frais) {
@@ -302,7 +303,7 @@ class NiveauController extends AbstractController
 
             $frais->setTypeFrais($type);
             $niveau->addFrai($frais);
-        }
+        } */
 
         $form = $this->createForm(NiveauType::class, $niveau, [
             'method' => 'POST',

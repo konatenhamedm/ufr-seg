@@ -20,10 +20,10 @@
             <div class="col-md-10">{{ form_row(form.libelle) }}</div>
         </div>
          <div class="row">
-            <div class="col-md-4">{{ form_row(form.filiere) }}</div>
-            <div class="col-md-8">{{ form_row(form.responsable) }}</div>
+            <div class="col-md-12">{{ form_row(form.filiere) }}</div>
+            {# <div class="col-md-8">{{ form_row(form.responsable) }}</div> #}
         </div>
-        {{ prototype_ligne_frais(form) }}
+       {#  {{ prototype_ligne_frais(form) }} #}
     </div>
     <div class="modal-footer">
         {# {{ include('_includes/ajax/loader.html.twig') }} #}
@@ -37,7 +37,8 @@
 
 {% block java %}
     <script>
-        $(function () {
+    init_select2('select', null, '#modal-lg');
+       /* $(function () {
             init_select2('select', null, '#modal-lg');
             //let total = 0;
             $('.input-mnt').on('update-value',  (e, val, element)  => {
@@ -56,7 +57,7 @@
 
             
 
-        });
+        });*/
        
     </script>
 {% endblock %}

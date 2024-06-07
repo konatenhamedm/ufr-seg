@@ -12,7 +12,7 @@
         </div>
     </div>
     {{ form_start(form, {'attr': {'role':'form', 'class': 'form'}}) }}
-    <div class="modal-body">
+    <div class="modal-body content-doc">
         {{ include('_includes/ajax/response.html.twig') }}
               <div class="row">
             <div class="col-md-2">{{ form_row(form.actif) }}</div>
@@ -48,8 +48,13 @@
 
 {% block javascripts_inline %}
     <script>
+     $(function () {
+                            init_select2('select', null, '#modal-lg225');
+
+        });
        $(function () {
-            init_select2('select');
+                
+
               $('.no-auto').each(function () {
                 const $this = $(this);
                 const $id = $('#' + $this.attr('id'));

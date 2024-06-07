@@ -134,13 +134,14 @@ class InscriptionController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => InfoPreinscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode) {
-                    $qb->select(['p', 'niveau', 'filiere', 'etudiant', 'info,ca,res'])
+                    $qb->select(['info'])
                         ->from(InfoPreinscription::class, 'info')
                         ->leftJoin('info.preinscription', 'p')
-                        ->join('p.niveau', 'niveau')
+                        ->join('p.promotion', 'promotion')
+                        ->join('promotion.niveau', 'niveau')
                         ->leftJoin('p.caissiere', 'ca')
                         ->join('niveau.filiere', 'filiere')
-                        ->join('niveau.responsable', 'res')
+                        ->join('promotion.responsable', 'res')
                         ->join('p.etudiant', 'etudiant')
                         ->leftJoin('info.modePaiement', 'mode')
                         ->andWhere('p.etat = :etat')
@@ -340,16 +341,17 @@ class InscriptionController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => InfoInscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $filiere, $classe, $typeFrais) {
-                    $qb->select(['p', 'i', 'res', 'niveau', 'filiere', 'etudiant', 'ca', 'classe', 'typeFrais', 'mode'])
+                    $qb->select(['i'])
                         ->from(InfoInscription::class, 'i')
                         ->join('i.inscription', 'p')
                         ->innerJoin('i.modePaiement', 'mode')
-                        ->join('p.niveau', 'niveau')
+                        ->join('p.promotion', 'promotion')
+                        ->join('promotion.niveau', 'niveau')
                         ->join('i.typeFrais', 'typeFrais')
                         ->join('p.classe', 'classe')
                         ->leftJoin('i.caissiere', 'ca')
                         ->join('niveau.filiere', 'filiere')
-                        ->join('niveau.responsable', 'res')
+                        ->join('promotion.responsable', 'res')
                         ->join('p.etudiant', 'etudiant')
                         ->orderBy('i.datePaiement', 'DESC');
 

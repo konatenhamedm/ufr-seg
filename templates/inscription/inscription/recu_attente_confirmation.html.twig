@@ -146,12 +146,12 @@ tr:nth-child(even) {
                   <tr style=" border: 0px !important;">
                     <th style=" border: 0px !important;">Code : {{ data.code }}</th>
                     <th style=" border: 0px !important;">Nom :{{ data.etudiant.nom }}</th>
-                    <th style=" border: 0px !important;">Filière :{{ data.niveau.filiere.libelle }}</th>
+                    <th style=" border: 0px !important;">Filière :{{ data.promotion.niveau.filiere.libelle }}</th>
                   </tr>
                   <tr style=" border: 0px !important;">
                     <td style=" border: 0px !important;">Date inscription :{{ data.dateInscription | date('d/m/Y') }}</td>
                     <td style=" border: 0px !important;">Prénoms :{{ data.etudiant.prenom  }}</td>
-                    <td style=" border: 0px !important;">Niveau :{{ data.niveau.libelle }}</td>
+                    <td style=" border: 0px !important;">Niveau :{{ data.promotion.niveau.libelle }}</td>
                   </tr>
                 
                  

@@ -90,13 +90,14 @@ class NiveauEtudiantController extends AbstractController
                 ->createAdapter(ORMAdapter::class, [
                     'entity' => Preinscription::class,
                     'query' => function (QueryBuilder $qb) use ($etat, $utilisateurGroupeRepository, $id, $user) {
-                        $qb->select('e, filiere, etudiant,niveau,res')
+                        $qb->select('e, filiere, etudiant,niveau,res,promotion')
                             ->from(Preinscription::class, 'e')
                             ->join('e.etudiant', 'etudiant')
                             /*   ->join('e.filiere', 'filiere') */
                             /*  ->leftJoin('e.caissiere', 'c') */
-                            ->join('e.niveau', 'niveau')
-                            ->join('niveau.responsable', 'res')
+                            ->join('e.promotion', 'promotion')
+                            ->join('promotion.niveau', 'niveau')
+                            ->join('promotion.responsable', 'res')
                             ->join('niveau.filiere', 'filiere')
 
                             ->andWhere('e.id = :id')
@@ -144,12 +145,13 @@ class NiveauEtudiantController extends AbstractController
                 ->createAdapter(ORMAdapter::class, [
                     'entity' => Preinscription::class,
                     'query' => function (QueryBuilder $qb) use ($etat, $utilisateurGroupeRepository, $id, $user) {
-                        $qb->select('e, filiere, etudiant,niveau,res')
+                        $qb->select('e, filiere, etudiant,niveau,res,promotion')
                             ->from(Preinscription::class, 'e')
                             ->join('e.etudiant', 'etudiant')
                             /*   ->join('e.filiere', 'filiere') */
-                            ->join('e.niveau', 'niveau')
-                            ->join('niveau.responsable', 'res')
+                            ->join('e.promotion', 'promotion')
+                            ->join('promotion.niveau', 'niveau')
+                            ->join('promotion.responsable', 'res')
                             ->join('niveau.filiere', 'filiere')
 
                             ->andWhere('e.id = :id')
@@ -316,13 +318,14 @@ class NiveauEtudiantController extends AbstractController
                 ->createAdapter(ORMAdapter::class, [
                     'entity' => Preinscription::class,
                     'query' => function (QueryBuilder $qb) use ($etat, $utilisateurGroupeRepository, $user) {
-                        $qb->select('e, filiere, etudiant,niveau,res')
+                        $qb->select('e')
                             ->from(Preinscription::class, 'e')
                             ->join('e.etudiant', 'etudiant')
                             /*   ->join('e.filiere', 'filiere') */
                             /*  ->leftJoin('e.caissiere', 'c') */
-                            ->join('e.niveau', 'niveau')
-                            ->join('niveau.responsable', 'res')
+                            ->join('e.promotion', 'promotion')
+                            ->join('promotion.niveau', 'niveau')
+                            ->join('promotion.responsable', 'res')
                             ->join('niveau.filiere', 'filiere');
 
                         /* ->andWhere('e.etat = :statut')
@@ -373,12 +376,13 @@ class NiveauEtudiantController extends AbstractController
                 ->createAdapter(ORMAdapter::class, [
                     'entity' => Preinscription::class,
                     'query' => function (QueryBuilder $qb) use ($etat, $utilisateurGroupeRepository, $user) {
-                        $qb->select('e, filiere, etudiant,niveau,res')
+                        $qb->select('e')
                             ->from(Preinscription::class, 'e')
                             ->join('e.etudiant', 'etudiant')
                             /*   ->join('e.filiere', 'filiere') */
-                            ->join('e.niveau', 'niveau')
-                            ->join('niveau.responsable', 'res')
+                            ->join('e.promotion', 'promotion')
+                            ->join('promotion.niveau', 'niveau')
+                            ->join('promotion.responsable', 'res')
                             ->join('niveau.filiere', 'filiere');
 
                         if ($this->isGranted('ROLE_DIRECTEUR')) {
@@ -401,12 +405,13 @@ class NiveauEtudiantController extends AbstractController
                 ->createAdapter(ORMAdapter::class, [
                     'entity' => Preinscription::class,
                     'query' => function (QueryBuilder $qb) use ($etat, $utilisateurGroupeRepository, $user) {
-                        $qb->select('e, filiere, etudiant,niveau,res')
+                        $qb->select('e')
                             ->from(Preinscription::class, 'e')
                             ->join('e.etudiant', 'etudiant')
                             /*   ->join('e.filiere', 'filiere') */
-                            ->join('e.niveau', 'niveau')
-                            ->join('niveau.responsable', 'res')
+                            ->join('e.promotion', 'promotion')
+                            ->join('promotion.niveau', 'niveau')
+                            ->join('promotion.responsable', 'res')
                             ->join('niveau.filiere', 'filiere')
 
                             ->andWhere('e.etat = :statut')
@@ -524,7 +529,7 @@ class NiveauEtudiantController extends AbstractController
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-folder',
-                                'attrs' => ['class' => 'btn-main'],
+                                'attrs' => ['class' => 'btn-main', 'title' => 'Vérification du dossier'],
                                 'render' => $renders['verification']
                             ],
                             'edit' => [
@@ -614,12 +619,13 @@ class NiveauEtudiantController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Preinscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $ver) {
-                    $qb->select('e, filiere, etudiant,niveau,c,res')
+                    $qb->select('e')
                         ->from(Preinscription::class, 'e')
                         ->join('e.etudiant', 'etudiant')
-                        ->join('e.niveau', 'niveau')
+                        ->join('e.promotion', 'promotion')
+                        ->join('promotion.niveau', 'niveau')
                         ->join('niveau.filiere', 'filiere')
-                        ->join('niveau.responsable', 'res')
+                        ->join('promotion.responsable', 'res')
                         ->leftJoin('e.caissiere', 'c')
                         ->andWhere('e.etat = :statut')
                         ->setParameter('statut', 'attente_paiement');
@@ -745,12 +751,13 @@ class NiveauEtudiantController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Preinscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $id) {
-                    $qb->select('e, filiere, etudiant,niveau,c,res')
+                    $qb->select('e')
                         ->from(Preinscription::class, 'e')
                         ->join('e.etudiant', 'etudiant')
-                        ->join('e.niveau', 'niveau')
+                        ->join('e.promotion', 'promotion')
+                        ->join('promotion.niveau', 'niveau')
                         ->join('niveau.filiere', 'filiere')
-                        ->join('niveau.responsable', 'res')
+                        ->join('promotion.responsable', 'res')
                         ->leftJoin('e.caissiere', 'c')
                         ->andWhere('e.id = :id')
                         ->andWhere('e.etat = :statut')
@@ -862,7 +869,7 @@ class NiveauEtudiantController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => NiveauEtudiant::class,
                 'query' => function (QueryBuilder $qb) use ($etat, $user) {
-                    $qb->select('e, filiere, etudiant,res')
+                    $qb->select('e')
                         ->from(NiveauEtudiant::class, 'e')
                         ->join('e.responsable', 'res')
                         ->join('e.etudiant', 'etudiant')
@@ -1066,10 +1073,11 @@ class NiveauEtudiantController extends AbstractController
 
                     $infos = new InfoPreinscription();
                     $infos->setUtilisateur($this->getUser());
-                    $infos->setMontant($preinscription->getNiveau()->getFiliere()->getMontantPreinscription());
+                    $infos->setMontant($preinscription->getPromotion()->getNiveau()->getFiliere()->getMontantPreinscription());
                     $infos->setDatePaiement($form->get('datePaiement')->getData());
                     $infos->setPreinscription($preinscription);
                     $infos->setModePaiement($form->get('modePaiement')->getData());
+                    $preinscription->setCaissiere($this->getUser());
                     $infoPreinscriptionRepository->add($infos, true);
                     // $niveauEtudiant->setCode($niveauEtudiant->getFiliere()->getCode())
                     //  $preinscription->setDatePaiement($form->get('datePaiement')->getData());;
@@ -1077,6 +1085,7 @@ class NiveauEtudiantController extends AbstractController
                 } elseif ($form->getClickedButton()->getName() === 'confirmation') {
 
                     $preinscription->setEtat('valide');
+                    $preinscription->setCaissiere($this->getUser());
                     $preinscriptionRepository->add($preinscription, true);
                 } else {
                     $preinscriptionRepository->add($preinscription, true);
@@ -1084,7 +1093,7 @@ class NiveauEtudiantController extends AbstractController
 
                 /* $entityManager->persist($niveauEtudiant);
                 $entityManager->flush();*/
-                $preinscription->setCaissiere($this->getUser());
+
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;

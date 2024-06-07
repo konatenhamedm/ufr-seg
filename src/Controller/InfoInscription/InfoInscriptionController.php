@@ -42,6 +42,8 @@ class InfoInscriptionController extends AbstractController
     #[Route('liste/versement/{id}/', name: 'app_inscription_liste_versement_index', methods: ['GET', 'POST'])]
     public function indexListeVersement(Request $request, DataTableFactory $dataTableFactory, $id): Response
     {
+
+        /// dd("rr");
         $isRoleAdminFind = $this->isGranted('ROLE_CAISSIERE');
 
         $table = $dataTableFactory->create()
@@ -52,7 +54,7 @@ class InfoInscriptionController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => InfoInscription::class,
                 'query' => function (QueryBuilder $qb) use ($id) {
-                    $qb->select('u, mode,inscription,type')
+                    $qb->select('u')
                         ->from(InfoInscription::class, 'u')
                         ->join('u.modePaiement', 'mode')
                         ->join('u.typeFrais', 'type')
@@ -366,12 +368,13 @@ class InfoInscriptionController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => InfoInscription::class,
                 'query' => function (QueryBuilder $qb) use ($niveau, $caissiere, $dateDebut, $dateFin, $user) {
-                    $qb->select('e, mode, c,i,et,niveau,res')
+                    $qb->select('e')
                         ->from(InfoInscription::class, 'e')
                         ->join('e.modePaiement', 'mode')
                         ->join('e.inscription', 'i')
-                        ->join('i.niveau', 'niveau')
-                        ->join('niveau.responsable', 'res')
+                        ->join('i.promotion', 'promotion')
+                        ->join('promotion.niveau', 'niveau')
+                        ->join('promotion.responsable', 'res')
                         ->join('i.etudiant', 'et')
                         ->join('e.caissiere', 'c')
                         ->andWhere('mode.code = :code')
@@ -580,8 +583,9 @@ class InfoInscriptionController extends AbstractController
                         ->from(InfoInscription::class, 'e')
                         ->join('e.modePaiement', 'mode')
                         ->join('e.inscription', 'i')
-                        ->join('i.niveau', 'niveau')
-                        ->join('niveau.responsable', 'res')
+                        ->join('i.promotion', 'promotion')
+                        ->join('promotion.niveau', 'niveau')
+                        ->join('promotion.responsable', 'res')
                         ->join('i.etudiant', 'et')
                         ->join('e.caissiere', 'c')
                         ->andWhere('mode.code = :code')

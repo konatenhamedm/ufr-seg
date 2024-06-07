@@ -129,7 +129,7 @@ tr:nth-child(even) {
            <div style="text-align:center;margin-top:-45px"  class="">
                     République de COTE D'IVOIRE <br>
                 <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
-               <b style="font-weight: bolder;">Année scolaire : {{ data.classe.anneeScolaire.libelle}}</b>
+               <b style="font-weight: bolder;">Année scolaire : {{ data.classe.promotion.anneeScolaire.libelle}}</b>
               </div>
           
         </div>
@@ -146,7 +146,7 @@ tr:nth-child(even) {
                   <tr style=" border: 0px !important;">
                     <th style=" border: 0px !important;">Code : {{ data.code }}</th>
                     <th style=" border: 0px !important;">Nom :{{ data.etudiant.nom }}</th>
-                    <th style=" border: 0px !important;">Niveau :{{ data.niveau.libelle }}</th>
+                    <th style=" border: 0px !important;">Niveau :{{ data.promotion.niveau.libelle }}</th>
                   </tr>
                   <tr style=" border: 0px !important;">
                     <td style=" border: 0px !important;">Date inscription :{{ data.dateInscription | date('d/m/Y') }}</td>
@@ -220,7 +220,7 @@ tr:nth-child(even) {
                   {% set somme = 0 %}
 
                   {# {% for item in data.echeanciers|filter(v => v.etat == "payer") %} #}
-                  {% for key,item in data.niveau.frais %}
+                  {% for key,item in data.promotion.frais %}
                   {% set somme = somme + item.montant %}
                      <tr>
                        <td>{{ key+1 }}</td>

@@ -48,8 +48,10 @@
 
 {% block java %}
     <script>
+       {# init_select2('select',null,'#modal-xl2'); #}
+                init_select2('select', null, '#modal-lg225');
          $(function () {
-            init_select2('select');
+
               $('.no-auto').each(function () {
                 const $this = $(this);
                 const $id = $('#' + $this.attr('id'));

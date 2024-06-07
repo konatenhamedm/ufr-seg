@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\AnneeScolaire;
+use App\Entity\Classe;
 use App\Entity\Cours;
 use App\Entity\Employe;
 use App\Entity\Matiere;
@@ -24,6 +25,11 @@ class CoursType extends AbstractType
             ]) */
             ->add('matiere', EntityType::class, [
                 'class' => Matiere::class,
+                'choice_label' => 'libelle',
+                'attr' => ['class' => 'has-select2 form-select']
+            ])
+            ->add('classe', EntityType::class, [
+                'class' => Classe::class,
                 'choice_label' => 'libelle',
                 'attr' => ['class' => 'has-select2 form-select']
             ])

@@ -14,7 +14,7 @@ class InfoNiveau
     const NATURES  = [
         'Préinscription' => 'preinscription'
     ];
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -28,7 +28,7 @@ class InfoNiveau
 
     #[ORM\ManyToOne(inversedBy: 'infoNiveaux')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Niveau $niveau = null;
+    private ?Promotion $promotion = null;
 
     public function getId(): ?int
     {
@@ -59,14 +59,14 @@ class InfoNiveau
         return $this;
     }
 
-    public function getNiveau(): ?Niveau
+    public function getPromotion(): ?Promotion
     {
-        return $this->niveau;
+        return $this->promotion;
     }
 
-    public function setNiveau(?Niveau $niveau): static
+    public function setPromotion(?Promotion $promotion): static
     {
-        $this->niveau = $niveau;
+        $this->promotion = $promotion;
 
         return $this;
     }

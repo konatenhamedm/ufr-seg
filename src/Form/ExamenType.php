@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Examen;
 use App\Entity\MatiereExamen;
 use App\Entity\Niveau;
+use App\Entity\Promotion;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -46,8 +47,8 @@ class ExamenType extends AbstractType
                 'attr' => ['class' => 'has-select2']
             ]) */
 
-            ->add('niveau', EntityType::class, [
-                'class' => Niveau::class,
+            ->add('promotion', EntityType::class, [
+                'class' => Promotion::class,
                 'required' => false,
                 'label' => 'Niveau',
                 //'placeholder' => '----',

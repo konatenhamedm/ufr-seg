@@ -22,8 +22,6 @@ class Inscription
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $montant = null;
 
-    #[ORM\ManyToOne(inversedBy: 'inscriptions')]
-    private ?NiveauEtudiant $niveauEtudiant = null;
 
     #[ORM\Column(length: 255)]
     private ?string $codeUtilisateur = null;
@@ -34,8 +32,7 @@ class Inscription
     #[ORM\ManyToOne]
     private ?Etudiant $etudiant = null;
 
-    #[ORM\ManyToOne]
-    private ?Niveau $niveau = null;
+
 
     #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: FraisInscription::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
@@ -71,6 +68,13 @@ class Inscription
     #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: BlocEcheancier::class, orphanRemoval: true,  cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $blocEcheanciers;
+
+    #[ORM\ManyToOne(inversedBy: 'inscriptions')]
+    private ?Promotion $promotion = null;
+
+
+
+
 
     public function __construct()
     {
@@ -125,17 +129,7 @@ class Inscription
         return $this;
     }
 
-    public function getNiveauEtudiant(): ?NiveauEtudiant
-    {
-        return $this->niveauEtudiant;
-    }
 
-    public function setNiveauEtudiant(?NiveauEtudiant $niveauEtudiant): static
-    {
-        $this->niveauEtudiant = $niveauEtudiant;
-
-        return $this;
-    }
 
     public function getCodeUtilisateur(): ?string
     {
@@ -173,17 +167,7 @@ class Inscription
         return $this;
     }
 
-    public function getNiveau(): ?Niveau
-    {
-        return $this->niveau;
-    }
 
-    public function setNiveau(?Niveau $niveau): static
-    {
-        $this->niveau = $niveau;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, FraisInscription>
@@ -361,6 +345,18 @@ class Inscription
                 $blocEcheancier->setInscription(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPromotion(): ?Promotion
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?Promotion $promotion): static
+    {
+        $this->promotion = $promotion;
 
         return $this;
     }

@@ -33,14 +33,16 @@ class ClasseController extends AbstractController
             ->add('libelle', TextColumn::class, ['label' => 'Libelle'])
             ->add('niveau', TextColumn::class, ['label' => 'Niveau', 'field' => 'niveau.libelle'])
             ->add('annee', TextColumn::class, ['label' => 'Année', 'field' => 'annee.libelle'])
+            ->add('promotion', TextColumn::class, ['label' => 'Promotion', 'field' => 'promotion.libelle'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Classe::class,
                 'query' => function (QueryBuilder $qb) use ($user) {
-                    $qb->select('u, niveau, annee,res')
+                    $qb->select('u')
                         ->from(Classe::class, 'u')
-                        ->join('u.niveau', 'niveau')
-                        ->leftJoin('niveau.responsable', 'res')
-                        ->join('u.anneeScolaire', 'annee');
+                        ->join('u.promotion', 'promotion')
+                        ->join('promotion.niveau', 'niveau')
+                        ->leftJoin('promotion.responsable', 'res')
+                        ->join('promotion.anneeScolaire', 'annee');
 
                     if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
                         $qb->andWhere("res = :user")

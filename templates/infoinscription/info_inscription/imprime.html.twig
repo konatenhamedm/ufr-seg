@@ -162,7 +162,7 @@ tr:nth-child(even) {
                      <tr>
                     <td>{{ item.datePaiement | date('d/m/Y')}}</td>
                     <td>{{ item.inscription.etudiant.nom ~ ' ' ~ item.inscription.etudiant.prenom ~' - '~ item.inscription.etudiant.contact }}</td>
-                    <td>{{ item.inscription.niveau.filiere.code }}</td>
+                    <td>{{ item.inscription.promotion.niveau.filiere.code }}</td>
                     <td>{{ item.banque ~ ' - ' ~ item.numeroCheque ~' - '~ item.dateCheque|date('d/m/Y')}}</td>
                     <td>{{ item.tireur ~'-'~ item.contact }}</td>
                     <td>{{ item.montant |number_format(0, '.', ' ') }}</td>

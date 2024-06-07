@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Niveau;
 use App\Entity\Personne;
 use App\Entity\Preinscription;
+use App\Entity\Promotion;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -19,8 +20,8 @@ class PreinscriptionEudiantConnecteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            
-          /*
+
+            /*
             ->add('niveau', EntityType::class, [
                'class' => Niveau::class,
                 'required' => false,
@@ -32,6 +33,17 @@ class PreinscriptionEudiantConnecteType extends AbstractType
             ])*/
 
             ->add(
+                'promotion',
+                EntityType::class,
+                [
+                    'class' => Promotion::class,
+                    'choice_label' => 'fullLibelle',
+                    'query_builder' => function (EntityRepository $er) {
+                        return $er->findNiveauDisponible();
+                    }
+                ]
+            );
+            /*   ->add(
                 'niveau',
                 EntityType::class,
                 [
@@ -41,10 +53,7 @@ class PreinscriptionEudiantConnecteType extends AbstractType
                         return $er->findNiveauDisponible();
                     }
                 ]
-            );
-           
-        ;
-
+            ); */;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

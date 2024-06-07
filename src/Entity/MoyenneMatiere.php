@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use App\Repository\MoyenneMatiereRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
 
 #[ORM\Entity(repositoryClass: MoyenneMatiereRepository::class)]
+#[Table(name: 'evaluation_moyenne_matiere')]
 class MoyenneMatiere
 {
     #[ORM\Id]
@@ -19,14 +21,15 @@ class MoyenneMatiere
     #[ORM\ManyToOne(inversedBy: 'moyenneMatieres')]
     private ?Etudiant $etudiant = null;
 
-    #[ORM\ManyToOne(inversedBy: 'moyenneMatieres')]
-    private ?Session $session = null;
 
     #[ORM\Column(length: 255)]
     private ?string $moyenne = null;
 
     #[ORM\Column(length: 255)]
     private ?string $valide = null;
+
+    #[ORM\ManyToOne(inversedBy: 'moyenneMatieres')]
+    private ?UniteEnseignement $ue = null;
 
     public function getId(): ?int
     {
@@ -57,17 +60,7 @@ class MoyenneMatiere
         return $this;
     }
 
-    public function getSession(): ?Session
-    {
-        return $this->session;
-    }
 
-    public function setSession(?Session $session): static
-    {
-        $this->session = $session;
-
-        return $this;
-    }
 
     public function getMoyenne(): ?string
     {
@@ -89,6 +82,18 @@ class MoyenneMatiere
     public function setValide(string $valide): static
     {
         $this->valide = $valide;
+
+        return $this;
+    }
+
+    public function getUe(): ?UniteEnseignement
+    {
+        return $this->ue;
+    }
+
+    public function setUe(?UniteEnseignement $ue): static
+    {
+        $this->ue = $ue;
 
         return $this;
     }

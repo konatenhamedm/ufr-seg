@@ -7,7 +7,7 @@
         <h3 class="card-title"> Liste des Examens</h3>
         <div class="card-toolbar">
             <a href="{{ path('app_direction_examen_new') }}" class="btn btn-main btn-sm"  
-                data-bs-toggle="modal" data-bs-target="#exampleModalSizeLg2">
+                data-bs-toggle="modal" data-bs-target="#modal-lg225">
                 <i class="bi bi-plus-square text-light"></i>
                 Nouveau
             </a>
@@ -53,7 +53,7 @@
     $(function () {
       const grid_prefix_id = "{{ grid_id }}";
       const $old_grid = $('#grid_app_direction_examen_' + grid_prefix_id);
-      init_select2('.has-select2');
+      init_select2('.has-select2',null, '#modal-lg225');
 
 
 

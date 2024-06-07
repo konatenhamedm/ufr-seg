@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\AnneeScolaire;
 use App\Entity\Classe;
 use App\Entity\Niveau;
+use App\Entity\Promotion;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,16 +17,16 @@ class ClasseType extends AbstractType
     {
         $builder
             ->add('libelle')
-            ->add('niveau', EntityType::class, [
-                'class' => Niveau::class,
+            ->add('promotion', EntityType::class, [
+                'class' => Promotion::class,
                 'required' => false,
                 'placeholder' => '----',
                 'label_attr' => ['class' => 'label-required'],
-                'choice_label' => 'getFullLibelle',
-                'label' => 'Niveau',
+                'choice_label' => 'getFullSigle',
+                'label' => 'Promotion',
                 'attr' => ['class' => 'has-select2']
             ])
-            ->add('anneeScolaire', EntityType::class, [
+            /*   ->add('anneeScolaire', EntityType::class, [
                 'class' => AnneeScolaire::class,
                 'required' => false,
                 'placeholder' => '----',
@@ -33,7 +34,7 @@ class ClasseType extends AbstractType
                 'choice_label' => 'libelle',
                 'label' => 'Année scolaire',
                 'attr' => ['class' => 'has-select2']
-            ]);
+            ]) */;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

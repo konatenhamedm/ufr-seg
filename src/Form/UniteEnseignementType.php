@@ -3,13 +3,16 @@
 namespace App\Form;
 
 use App\Entity\Niveau;
+use App\Entity\Promotion;
 use App\Entity\Semestre;
 use App\Entity\UniteEnseignement;
+use App\Form\DataTransformer\ThousandNumberTransformer;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -20,7 +23,13 @@ class UniteEnseignementType extends AbstractType
         $builder
             ->add('codeUe')
             ->add('libelle')
-            ->add('coef')
+            /*  ->add('coef', TextType::class, [
+                'label' => 'Nombre de crédit'
+            ]) */
+            ->add('coef', TextType::class, [
+                'label' => 'Nombre de crédit',
+                'attr' => ['class' => 'input-money input-note', 'data-max' => 30]
+            ])
             ->add(
                 'attribut',
                 ChoiceType::class,
@@ -38,17 +47,21 @@ class UniteEnseignementType extends AbstractType
                     ]),
                 ]
             )
-
-            ->add('volumeHoraire')
+            ->add('volumeHoraire', TextType::class, [
+                'label' => 'Volume horaire',
+                'attr' => ['class' => 'input-money input-note', 'data-max' => 100]
+            ])
+            /*  ->add('volumeHoraire') */
             /*   ->add('totalCredit') */
             ->add('semestre', EntityType::class, [
                 'class' => Semestre::class,
                 'choice_label' => 'libelle',
                 'attr' => ['class' => 'has-select2 '],
             ])
-            ->add('niveau', EntityType::class, [
-                'class' => Niveau::class,
-                'choice_label' => 'code',
+            ->add('promotion', EntityType::class, [
+                'class' => Promotion::class,
+                'label' => 'Niveau',
+                'choice_label' => 'getFullSigleNiveau',
                 'label_attr' => ['class' => 'label-required'],
                 'attr' => ['class' => 'niveau has-select2 '],
                 'query_builder' => function (EntityRepository $er) {
@@ -70,6 +83,8 @@ class UniteEnseignementType extends AbstractType
                     'entry_options' => ['label' => false],
                 ]
             );
+        $builder->get('coef')->addModelTransformer(new ThousandNumberTransformer());
+        $builder->get('volumeHoraire')->addModelTransformer(new ThousandNumberTransformer());
     }
 
     public function configureOptions(OptionsResolver $resolver): void

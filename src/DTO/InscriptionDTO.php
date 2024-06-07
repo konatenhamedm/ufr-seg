@@ -6,6 +6,7 @@ use App\Entity\Civilite;
 use App\Entity\Filiere;
 use App\Entity\Genre;
 use App\Entity\Niveau;
+use App\Entity\Promotion;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,7 +24,7 @@ class InscriptionDTO
     private ?Civilite $civilite; */
 
     #[Assert\NotBlank(message: 'Veuillez sélectionner un niveau')]
-    private ?Niveau $niveau;
+    private ?Promotion $promotion;
 
     #[Assert\NotBlank(message: 'Veuillez renseigner votre prénom')]
     private ?string $prenom;
@@ -188,21 +189,22 @@ class InscriptionDTO
     }
 
 
-
     /**
-     * Get the value of filiere
+     * Get the value of promotion
      */
-    public function getNiveau(): ?Niveau
+    public function getPromotion()
     {
-        return $this->niveau;
+        return $this->promotion;
     }
 
     /**
-     * Set the value of filiere
+     * Set the value of promotion
+     *
+     * @return  self
      */
-    public function setNiveau(?Niveau $niveau): self
+    public function setPromotion($promotion)
     {
-        $this->niveau = $niveau;
+        $this->promotion = $promotion;
 
         return $this;
     }

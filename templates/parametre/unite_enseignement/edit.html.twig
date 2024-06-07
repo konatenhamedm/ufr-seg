@@ -1,7 +1,7 @@
 {% block page_content %}
     {% form_theme form 'widget/fields-block.html.twig' %}
     <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modification UniteEnseignement</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Modification Unité d'enseignement</h5>
         <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
             <span class="svg-icon svg-icon-2x text-white">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -17,7 +17,7 @@
     <div class="modal-body document">
         {{ include('_includes/ajax/response.html.twig') }}
          <div class="row">
-            <div class="col-md-6">{{ form_row(form.niveau) }}</div>
+            <div class="col-md-6">{{ form_row(form.promotion) }}</div>
             <div class="col-md-6">{{ form_row(form.codeUe) }}</div>
         </div>
          <div class="row">
@@ -60,7 +60,7 @@
 
         refresh();
 
-           const $niveau = $('#{{ form.niveau.vars.id }}');
+           const $niveau = $('#{{ form.promotion.vars.id }}');
             init_select2('select',null,'.document');
              $('.no-auto').each(function () {
                 const $this = $(this);

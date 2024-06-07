@@ -17,7 +17,7 @@
         {{ include('_includes/ajax/response.html.twig') }}
         <div class="row">
             <div class="col-md-3">{{ form_row(form.code) }}</div>
-            <div class="col-md-9">{{ form_row(form.niveau) }}</div>
+            <div class="col-md-9">{{ form_row(form.promotion) }}</div>
         </div>
          <div class="row">
             <div class="col-md-3">{{ form_row(form.dateExamen) }}</div>
@@ -35,7 +35,8 @@
 {% block java %}
     <script>
         $(function () {
-             init_select2('select','','#exampleModalSizeLg2');
+                        init_select2('select',null,'#modal-lg225');
+
              $('.no-auto').each(function () {
                 const $this = $(this);
                 const $id = $('#' + $this.attr('id'));

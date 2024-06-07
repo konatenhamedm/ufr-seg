@@ -192,7 +192,7 @@ License: For each use you must have a valid license purchased only from above li
 											Année scolaire :
 
 											{% set actif = 0 %}
-											<select class="form-select" value={{ actif }}  aria-label="Select example">
+											<select class="form-select all_annee" value={{ actif }}  aria-label="Select example">
 												{% for item in menu.getListeAnnees %}
 													{% if item.actif == true %}
 														{% set actif =  item.id   %}
@@ -367,6 +367,16 @@ License: For each use you must have a valid license purchased only from above li
 
 
           {% block java %}{% endblock %}
+
+
+		  <script>
+		  $(".all_annee").on('change',function(){
+
+			$this = $(this)
+			alert($this.val())
+		  })
+		  
+		  </script>
 
 	</body>
 	
