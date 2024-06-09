@@ -45,11 +45,15 @@ class Session
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: ControleExamen::class)]
     private Collection $controleExamens;
 
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: DecisionExamen::class)]
+    private Collection $decisionExamens;
+
     public function __construct()
     {
 
         $this->moyenneMatieres = new ArrayCollection();
         $this->controleExamens = new ArrayCollection();
+        $this->decisionExamens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -172,6 +176,36 @@ class Session
             // set the owning side to null (unless already changed)
             if ($controleExamen->getSession() === $this) {
                 $controleExamen->setSession(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DecisionExamen>
+     */
+    public function getDecisionExamens(): Collection
+    {
+        return $this->decisionExamens;
+    }
+
+    public function addDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if (!$this->decisionExamens->contains($decisionExamen)) {
+            $this->decisionExamens->add($decisionExamen);
+            $decisionExamen->setSession($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if ($this->decisionExamens->removeElement($decisionExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($decisionExamen->getSession() === $this) {
+                $decisionExamen->setSession(null);
             }
         }
 

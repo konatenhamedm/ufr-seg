@@ -126,7 +126,7 @@ class UniteEnseignementController extends AbstractController
 
 
     #[Route('/new', name: 'app_parametre_unite_enseignement_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError, MatiereUeRepository $matiereUeRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError, MatiereUeRepository $matiereUeRepository, UniteEnseignementRepository $uniteEnseignementRepository): Response
     {
         $uniteEnseignement = new UniteEnseignement();
         $form = $this->createForm(UniteEnseignementType::class, $uniteEnseignement, [
@@ -144,23 +144,34 @@ class UniteEnseignementController extends AbstractController
             $response = [];
             $redirect = $this->generateUrl('app_parametre_unite_enseignement_index');
 
-            //$data = $form->get('matiereUes')->getData();
+            $semestre = $form->get('semestre')->getData();
+            $coef = $form->get('coef')->getData();
 
             $somme = 0;
 
             if ($form->isValid()) {
 
-                /*  foreach ($data as $key => $matiereUe) {
-                    $somme += $matiereUe->getNombreCredit();
-                }*/
-                $uniteEnseignement->setTotalCredit($form->get('coef')->getData());
 
-                $entityManager->persist($uniteEnseignement);
-                $entityManager->flush();
+                foreach ($uniteEnseignementRepository->findBy(['semestre' => $semestre]) as $key => $value) {
+                    $somme += $value->getCoef();
+                }
+                $somme += $coef;
+                if ($somme  > 30) {
+
+                    $message       = sprintf("Opération échouée. Somme %s des credits des unités d\'enseignement du semestre est supérieure à 30.", $somme);
+                    $statut = 0;
+                } else {
+                    $uniteEnseignement->setTotalCredit($form->get('coef')->getData());
+
+                    $entityManager->persist($uniteEnseignement);
+                    $entityManager->flush();
+
+
+                    $message       = 'Opération effectuée avec succès';
+                    $statut = 1;
+                }
 
                 $data = true;
-                $message       = 'Opération effectuée avec succès';
-                $statut = 1;
                 $this->addFlash('success', $message);
             } else {
                 $message = $formError->all($form);
@@ -233,7 +244,7 @@ class UniteEnseignementController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_parametre_unite_enseignement_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, UniteEnseignement $uniteEnseignement, EntityManagerInterface $entityManager, FormError $formError): Response
+    public function edit(Request $request, UniteEnseignement $uniteEnseignement, EntityManagerInterface $entityManager, FormError $formError, UniteEnseignementRepository $uniteEnseignementRepository): Response
     {
 
         $form = $this->createForm(UniteEnseignementType::class, $uniteEnseignement, [
@@ -255,17 +266,34 @@ class UniteEnseignementController extends AbstractController
             $response = [];
             $redirect = $this->generateUrl('app_parametre_unite_enseignement_index');
 
+            $semestre = $form->get('semestre')->getData();
+            $coef = $form->get('coef')->getData();
 
-
+            $somme = 0;
 
             if ($form->isValid()) {
-                $uniteEnseignement->setTotalCredit($form->get('coef')->getData());
-                $entityManager->persist($uniteEnseignement);
-                $entityManager->flush();
+
+
+                foreach ($uniteEnseignementRepository->findBy(['semestre' => $semestre]) as $key => $value) {
+                    $somme += $value->getCoef();
+                }
+                $somme += $coef;
+                if ($somme  > 30) {
+
+                    $message       = sprintf("Opération échouée. Somme %s des credits des unités d\'enseignement du semestre est supérieure à 30.", $somme);
+                    $statut = 0;
+                } else {
+                    $uniteEnseignement->setTotalCredit($form->get('coef')->getData());
+
+                    $entityManager->persist($uniteEnseignement);
+                    $entityManager->flush();
+
+
+                    $message       = 'Opération effectuée avec succès';
+                    $statut = 1;
+                }
 
                 $data = true;
-                $message       = 'Opération effectuée avec succès';
-                $statut = 1;
                 $this->addFlash('success', $message);
             } else {
                 $message = $formError->all($form);

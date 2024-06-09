@@ -3,17 +3,23 @@
 namespace App\Controller\Controle;
 
 use App\Entity\ControleExamen;
+use App\Entity\Decision;
+use App\Entity\DecisionExamen;
 use App\Entity\GroupeTypeExamen;
 use App\Entity\NoteExamen;
 use App\Entity\ValeurNoteExamen;
 use App\Form\ControleExamenType;
 use App\Repository\ControleExamenRepository;
+use App\Repository\DecisionExamenRepository;
 use App\Repository\DecisionRepository;
 use App\Repository\InscriptionRepository;
+use App\Repository\SessionRepository;
 use App\Repository\TypeControleRepository;
 use App\Repository\TypeEvaluationRepository;
+use App\Repository\UniteEnseignementRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
+use App\Service\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\BoolColumn;
@@ -28,6 +34,71 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/admin/controle/controle/examen')]
 class ControleExamenController extends AbstractController
 {
+
+    #[Route('/liste/ue', name: 'get_ue_promotion', methods: ['GET'])]
+    public function getUe(Request $request, UniteEnseignementRepository $uniteEnseignementRepository)
+    {
+        $response = new Response();
+        $tabUnite = array();
+
+
+        $idPromotion = $request->get('id');
+
+        if ($idPromotion) {
+
+
+            $uniteEnseigenments = $uniteEnseignementRepository->findby(['promotion' => $idPromotion]);
+
+            $i = 0;
+
+            foreach ($uniteEnseigenments as $e) {
+                // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
+                $tabUnite[$i]['id'] = $e->getId();
+                $tabUnite[$i]['libelle'] = $e->getLibelle();
+
+                $i++;
+            }
+
+            $dataService = json_encode($tabUnite); // formater le résultat de la requête en json
+
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent($dataService);
+        }
+        return $response;
+    }
+
+    #[Route('/liste/session', name: 'get_session', methods: ['GET'])]
+    public function getSession(Request $request, SessionRepository $sessionRepository)
+    {
+        $response = new Response();
+        $tabUnite = array();
+
+
+        $idPromotion = $request->get('id');
+
+        if ($idPromotion) {
+
+
+            $uniteEnseigenments = $sessionRepository->findby(['promotion' => $idPromotion]);
+
+            $i = 0;
+
+            foreach ($uniteEnseigenments as $e) {
+                // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
+                $tabUnite[$i]['id'] = $e->getId();
+                $tabUnite[$i]['libelle'] = $e->getLibelle();
+
+                $i++;
+            }
+
+            $dataService = json_encode($tabUnite); // formater le résultat de la requête en json
+
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent($dataService);
+        }
+        return $response;
+    }
+
     #[Route('/', name: 'app_controle_controle_examen_index', methods: ['GET', 'POST'])]
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
     {
@@ -103,7 +174,8 @@ class ControleExamenController extends AbstractController
     }
 
 
-    #[Route('/new', name: 'app_controle_controle_examen_new', methods: ['GET', 'POST'], options: ['expose' => true])]
+    //#[Route('/new', name: 'app_controle_controle_examen_new', methods: ['GET', 'POST'], options: ['expose' => true])]
+    #[Route('/new/saisie/simple', name: 'app_controle_controle_examen_new', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -112,16 +184,16 @@ class ControleExamenController extends AbstractController
         InscriptionRepository $inscriptionRepository,
         TypeControleRepository $typeControleRepository,
         DecisionRepository $decisionRepository,
-
+        SessionRepository $sessionRepository,
+        DecisionExamenRepository $decisionExamenRepository,
     ): Response {
 
         $promotion = $request->query->get('promotion');
         $session = $request->query->get('session');
         $ue = $request->query->get('ue');
-        $matiere = $request->query->get('matiere');
+        //dd($promotion, $session, $ue);
 
-
-        $controleVefication = $controleExamenRepository->findOneBy(['promotion' => $promotion, 'matiere' => $matiere, 'session' => $session, 'ue' => $ue]);
+        $controleVefication = $controleExamenRepository->findOneBy(['promotion' => $promotion, 'session' => $session, 'ue' => $ue]);
 
         if ($controleVefication) {
             $form = $this->createForm(ControleExamenType::class, $controleVefication, [
@@ -130,12 +202,16 @@ class ControleExamenController extends AbstractController
             ]);
         } else {
             $controleExaman = new ControleExamen();
+            //dd("");
             $controleExaman->setTypeControle($typeControleRepository->findOneBy(['code' => 'EXA']));
 
             $groupe = new GroupeTypeExamen();
             $groupe->setDateCompo(new \DateTime());
+
+            // dd($inscriptionRepository->findBy(['promotion' => $promotion]), $promotion);
             if (count($inscriptionRepository->findBy(['promotion' => $promotion])) > 0)
                 $controleExaman->addGroupeTypeExamen($groupe);
+
 
             foreach ($inscriptionRepository->findBy(['promotion' => $promotion]) as $inscription) {
                 $note = new NoteExamen();
@@ -149,6 +225,7 @@ class ControleExamenController extends AbstractController
                 $valeurNote->setNote("0");
                 $note->addValeurNoteExamen($valeurNote);
             }
+
             $form = $this->createForm(ControleExamenType::class, $controleExaman, [
                 'method' => 'POST',
                 'action' => $this->generateUrl('app_controle_controle_examen_new')
@@ -172,9 +249,9 @@ class ControleExamenController extends AbstractController
 
 
             if ($form->isValid()) {
-
+                /* 
                 $entityManager->persist($controleExaman);
-                $entityManager->flush();
+                $entityManager->flush(); */
 
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
@@ -200,6 +277,160 @@ class ControleExamenController extends AbstractController
         }
 
         return $this->render('controle/controle_examen/new.html.twig', [
+            'controle' => $controleVefication ?? $controleExaman,
+            'nombre' => $controleVefication ? $controleVefication->getGroupeTypeExamens()->count() : (count($inscriptionRepository->findBy(['promotion' => $promotion])) > 0 ? 1 : 0),
+            'form' => $form->createView(),
+            'title' => 'Gestion des contrôles',
+        ]);
+    }
+    #[Route('/new/load/{session}/{promotion}/{ue}', name: 'app_controle_controle_examen_new_load', methods: ['GET', 'POST'], options: ['expose' => true])]
+    public function newLoad(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        FormError $formError,
+        ControleExamenRepository $controleExamenRepository,
+        InscriptionRepository $inscriptionRepository,
+        TypeControleRepository $typeControleRepository,
+        DecisionRepository $decisionRepository,
+        $promotion = null,
+        $session = null,
+        $ue = null,
+        SessionRepository $sessionRepository,
+        DecisionExamenRepository $decisionExamenRepository,
+        Service $service
+    ): Response {
+
+        $all = $request->query->all();
+
+        // dd();
+        $controleVefication = $controleExamenRepository->findOneBy(['promotion' => $promotion,  'session' => $session, 'ue' => $ue]);
+
+        if ($controleVefication) {
+            $form = $this->createForm(ControleExamenType::class, $controleVefication, [
+                'method' => 'POST',
+                'action' => $this->generateUrl('app_controle_controle_examen_new_load', [
+                    'session' => $session,
+                    'promotion' => $promotion,
+                    'ue' => $ue,
+                ])
+            ]);
+        } else {
+            $controleExaman = new ControleExamen();
+            //dd("");
+            $controleExaman->setTypeControle($typeControleRepository->findOneBy(['code' => 'EXA']));
+
+            $groupe = new GroupeTypeExamen();
+            $groupe->setDateCompo(new \DateTime());
+
+            // dd($inscriptionRepository->findBy(['promotion' => $promotion]), $promotion);
+            if (count($inscriptionRepository->findBy(['promotion' => $promotion])) > 0)
+                $controleExaman->addGroupeTypeExamen($groupe);
+
+            // dd($session);
+            if ($session != "null") {
+                if ((int)$sessionRepository->find($session)->getNumero() == 1) {
+                    foreach ($inscriptionRepository->findBy(['promotion' => $promotion]) as $inscription) {
+                        $note = new NoteExamen();
+                        $note->setEtudiant($inscription->getEtudiant());
+                        //$note->setNote('');
+                        $note->setMoyenneUe('0');
+                        $note->setMoyenneConrole('0');
+
+                        $controleExaman->addNoteExamen($note);
+                        $valeurNote = new ValeurNoteExamen();
+                        $valeurNote->setNote("0");
+                        $note->addValeurNoteExamen($valeurNote);
+                    }
+                } else {
+
+                    foreach ($decisionExamenRepository->findBy(['decision' => DecisionExamen::DECISION['Refuser'], 'promotion' => $promotion]) as $decision) {
+                        $note = new NoteExamen();
+                        $note->setEtudiant($decision->getEtudiant());
+                        //$note->setNote('');
+                        $note->setMoyenneUe('0');
+                        $note->setMoyenneConrole('0');
+
+                        $controleExaman->addNoteExamen($note);
+                        $valeurNote = new ValeurNoteExamen();
+                        $valeurNote->setNote("0");
+                        $note->addValeurNoteExamen($valeurNote);
+                    }
+                }
+            }
+
+
+
+            $form = $this->createForm(ControleExamenType::class, $controleExaman, [
+                'method' => 'POST',
+                'action' => $this->generateUrl('app_controle_controle_examen_new_load', [
+                    'session' => $session,
+                    'promotion' => $promotion,
+                    'ue' => $ue,
+                ])
+            ]);
+        }
+
+
+
+        $form->handleRequest($request);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+        $fullRedirect = false;
+        $showAlert = false;
+        $isAjax = $request->isXmlHttpRequest();
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_controle_controle_examen_new_load', [
+                'session' => $session,
+                'promotion' => $promotion,
+                'ue' => $ue,
+            ]);
+
+            $dataNotes = $form->get('noteExamens')->getData();
+            $groupeTypes = $form->get('groupeTypeExamens')->getData();
+            //dd($dataNotes);
+            if ($form->isValid()) {
+
+
+
+                $compteIfNoteSuperieurMax = $service->gestionNotesExamen($dataNotes, $groupeTypes, ['session' => $session, 'promotion' => $promotion,  'ue' => $ue], $controleVefication ?? null, !$controleVefication ? $controleExaman : null);
+                // dd("");
+                $service->rangExposantExamen($dataNotes);
+
+                if ($compteIfNoteSuperieurMax > 0) {
+                    $showAlert = true;
+                    $statut = 0;
+                    $message       = sprintf('Désolé veillez bien vérifier les notes saisie il y a au moins une note supperieur a la moyenne max de la notes');
+                } else {
+                    $message       = 'Opération effectuée avec succès';
+                    $statut = 1;
+                    $fullRedirect = true;
+                }
+
+                $data = true;
+                $this->addFlash('success', $message);
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'fullRedirect', 'showAlert'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->render('controle/controle_examen/new_load.html.twig', [
             'controle' => $controleVefication ?? $controleExaman,
             'nombre' => $controleVefication ? $controleVefication->getGroupeTypeExamens()->count() : (count($inscriptionRepository->findBy(['promotion' => $promotion])) > 0 ? 1 : 0),
             'form' => $form->createView(),

@@ -44,13 +44,17 @@ class NoteExamenType extends AbstractType
             ->add('etudiant', EntityType::class, [
                 'class' => Etudiant::class,
                 'choice_label' => 'getNomComplet',
-            ]);;
+                'attr' => ['class' => 'has-select2 form-select ue']
+
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => NoteExamen::class,
+            'allow_extra_fields' => true
+
         ]);
     }
 }

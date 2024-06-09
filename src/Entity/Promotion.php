@@ -71,6 +71,9 @@ class Promotion
     #[ORM\OneToMany(mappedBy: 'promotion', targetEntity: ControleExamen::class)]
     private Collection $controleExamens;
 
+    #[ORM\OneToMany(mappedBy: 'promotion', targetEntity: DecisionExamen::class)]
+    private Collection $decisionExamens;
+
     public function __construct()
     {
         $this->infoNiveaux = new ArrayCollection();
@@ -81,6 +84,7 @@ class Promotion
         $this->uniteEnseignements = new ArrayCollection();
         $this->inscriptions = new ArrayCollection();
         $this->controleExamens = new ArrayCollection();
+        $this->decisionExamens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -415,6 +419,36 @@ class Promotion
             // set the owning side to null (unless already changed)
             if ($controleExamen->getPromotion() === $this) {
                 $controleExamen->setPromotion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DecisionExamen>
+     */
+    public function getDecisionExamens(): Collection
+    {
+        return $this->decisionExamens;
+    }
+
+    public function addDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if (!$this->decisionExamens->contains($decisionExamen)) {
+            $this->decisionExamens->add($decisionExamen);
+            $decisionExamen->setPromotion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if ($this->decisionExamens->removeElement($decisionExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($decisionExamen->getPromotion() === $this) {
+                $decisionExamen->setPromotion(null);
             }
         }
 

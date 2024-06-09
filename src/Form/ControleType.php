@@ -12,6 +12,7 @@ use App\Entity\TypeControle;
 use App\Entity\UniteEnseignement;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,8 +20,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ControleType extends AbstractType
 {
+
+    private $user;
+
+    public function __construct(Security $security)
+    {
+        $this->user = $security->getUser();
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        //dd($this->user->getPersonne()->getFonction()->getCode());
         $builder
 
             ->add('classe', EntityType::class, [
@@ -30,19 +39,19 @@ class ControleType extends AbstractType
                 'attr' => ['class' => 'has-select2 form-select classe']
             ])
 
-            /*->add('classe', EntityType::class, [
+            /*  ->add('classe', EntityType::class, [
                 'class' => Classe::class,
                 'required' => false,
-                //'placeholder' => '----',
                 'label_attr' => ['class' => 'label-required'],
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
+
                         ->orderBy('c.id', 'ASC');
                 },
                 'choice_label' => 'libelle',
                 //'label' => 'Reponsable de niveau',
                 'attr' => ['class' => 'has-select2 form-select']
-            ])*/
+            ]) */
             ->add('matiere', EntityType::class, [
                 //'placeholder' => 'choisissez une matiere',
                 'class' => Matiere::class,

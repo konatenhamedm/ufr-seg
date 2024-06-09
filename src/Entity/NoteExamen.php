@@ -23,7 +23,7 @@ class NoteExamen
     #[ORM\ManyToOne(inversedBy: 'noteExamens')]
     private ?Etudiant $etudiant = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $rang = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -35,10 +35,10 @@ class NoteExamen
     #[ORM\Column(length: 255)]
     private ?string $moyenneConrole = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $decision = null;
 
-    #[ORM\OneToMany(mappedBy: 'noteEntity', targetEntity: ValeurNoteExamen::class)]
+    #[ORM\OneToMany(mappedBy: 'noteEntity', targetEntity: ValeurNoteExamen::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $valeurNoteExamens;
 
     public function __construct()

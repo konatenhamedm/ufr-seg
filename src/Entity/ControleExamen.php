@@ -26,13 +26,10 @@ class ControleExamen
     #[ORM\ManyToOne(inversedBy: 'controleExamens')]
     private ?Session $session = null;
 
-    #[ORM\OneToMany(mappedBy: 'controleExamen', targetEntity: GroupeTypeExamen::class)]
+    #[ORM\OneToMany(mappedBy: 'controleExamen', targetEntity: GroupeTypeExamen::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $groupeTypeExamens;
 
-    #[ORM\ManyToOne(inversedBy: 'controleExamens')]
-    private ?Matiere $matiere = null;
-
-    #[ORM\OneToMany(mappedBy: 'controleExamen', targetEntity: NoteExamen::class)]
+    #[ORM\OneToMany(mappedBy: 'controleExamen', targetEntity: NoteExamen::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $noteExamens;
 
     #[ORM\ManyToOne(inversedBy: 'controleExamens')]
@@ -115,17 +112,6 @@ class ControleExamen
         return $this;
     }
 
-    public function getMatiere(): ?Matiere
-    {
-        return $this->matiere;
-    }
-
-    public function setMatiere(?Matiere $matiere): static
-    {
-        $this->matiere = $matiere;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, NoteExamen>

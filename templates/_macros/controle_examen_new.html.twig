@@ -25,17 +25,16 @@
               <tr class="ligne">
               
                 <th width="5%" class="p-2"></th>
-                <th width="30%" class="p-2">Etudiant</th>
+                <th width="40%" class="p-2">Etudiant</th>
 
-                {% if nombre > 0 %}
-                 {% for item in 1..nombre %}
-                <th width="10%" class="p-2"  >Note {{ item }}</th>
-                    
-                {% endfor %}
-                {% endif %}
+                
+                <th width="10%" class="p-2"  >Note examen</th>
 
-                <th width="7%" class="p-2">Moyenne</th>
+                <th width="10%" class="p-2">Moyenne controle</th>
+                <th width="10%" class="p-2 text-center">Moyenne UE</th>
+                <th width="10%" class="p-2 text-center">Decision</th>
                 <th width="5%" class="p-2 text-center">Rang</th>
+               
             </tr>
         </thead>
         <tbody  class="row-container">
@@ -46,22 +45,12 @@
                     {{ _self.ligne_controle_colonne(item|e) }}
                 {% endfor %}
             {% endfor %}
-            <button type="button" data-protoname="__name__" class="btn btn-default add-collection add-ligne btn-xs" id="add_ligne" data-protoclass=".proto-container" data-container=".row-container">
-                <i class="fa fa-plus"></i>
-                Ajouter une ligne
-             </button> &nbsp;
+           
             <button type="button"  class="btn btn-success add-collection imprime btn-xs" >
                 <i class="fa fa-print"></i>
                 Imprime fiche
              </button>&nbsp;
-            {#  {% if nombre > 1 %} #}
-             
-            <button type="button"  class="btn btn-danger add-collection del-col btn-xs" >
-                <i class="fa fa-trash"></i>
-                Supprimer note
-             </button>
-             
-            {#  {% endif %} #}
+       
              
              <div class="row">
              <h1></h1>
@@ -102,14 +91,18 @@
             
          {% endfor %}
            <td class="p-2 text-center">
-           
-           {{ data.moyenneMatiere.vars.value  }} 
-              
-           
-            <div style="display:none">{{ form_widget(data.moyenneMatiere) }}</div>
+           {{ data.moyenneConrole.vars.value  }} 
+            <div style="display:none">{{ form_widget(data.moyenneConrole) }}</div>
            </td>
            <td class="p-2 text-center">
-            {#  {{ form_widget(data.rang) }} #}
+           {{ data.moyenneUe.vars.value  }} 
+            <div style="display:none">{{ form_widget(data.moyenneUe) }}</div>
+           </td>
+           <td class="p-2 text-center">
+           {{ data.decision.vars.value  }} 
+            <div style="display:none">{{ form_widget(data.decision) }}</div>
+           </td>
+           <td class="p-2 text-center">
               {{ data.rang.vars.value  }} {{ data.exposant.vars.value }}
             <div style="display:none">{{ form_widget(data.exposant) }}</div>
             <div style="display:none">{{ form_widget(data.rang) }}</div>
@@ -127,19 +120,15 @@
 							<tbody>
                             <tr class="row-type">
                                 <td>
-                                {{ form_widget(data.dateNote) }}
+                                {{ form_widget(data.dateCompo) }}
                                 </td>
                             </tr>
                              <tr>
                                 <td>
-                                {{ form_widget(data.typeEvaluation) }}
+                                {{ form_widget(data.max) }}
                                 </td>
                             </tr>
-                            <tr>
-                                <td >
-                                    {{ form_widget(data.coef) }}
-                                 </td>
-							</tr>
+                           
 							
 						</tbody>
                     </table>

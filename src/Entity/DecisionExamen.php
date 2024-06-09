@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\DecisionExamenRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
 
@@ -10,6 +12,11 @@ use Doctrine\ORM\Mapping\Table;
 #[Table(name: 'evaluation_examen_decision')]
 class DecisionExamen
 {
+
+    const DECISION = [
+        'Admis' => 'Admis',
+        'Refuser' => 'Refuser',
+    ];
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -31,6 +38,20 @@ class DecisionExamen
 
     #[ORM\Column(length: 255)]
     private ?string $moyenneAnnuelle = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $decision = null;
+
+    #[ORM\ManyToOne(inversedBy: 'decisionExamens')]
+    private ?Promotion $promotion = null;
+
+    #[ORM\ManyToOne(inversedBy: 'decisionExamens')]
+    private ?Session $session = null;
+
+
+    public function __construct()
+    {
+    }
 
     public function getId(): ?int
     {
@@ -93,6 +114,42 @@ class DecisionExamen
     public function setMoyenneAnnuelle(string $moyenneAnnuelle): static
     {
         $this->moyenneAnnuelle = $moyenneAnnuelle;
+
+        return $this;
+    }
+
+    public function getDecision(): ?string
+    {
+        return $this->decision;
+    }
+
+    public function setDecision(string $decision): static
+    {
+        $this->decision = $decision;
+
+        return $this;
+    }
+
+    public function getPromotion(): ?Promotion
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?Promotion $promotion): static
+    {
+        $this->promotion = $promotion;
+
+        return $this;
+    }
+
+    public function getSession(): ?Session
+    {
+        return $this->session;
+    }
+
+    public function setSession(?Session $session): static
+    {
+        $this->session = $session;
 
         return $this;
     }

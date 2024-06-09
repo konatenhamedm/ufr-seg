@@ -50,6 +50,9 @@ class PromotionRepository extends ServiceEntityRepository
         return $qb2;
     }
 
+
+
+
     //    /**
     //     * @return Promotion[] Returns an array of Promotion objects
     //     */

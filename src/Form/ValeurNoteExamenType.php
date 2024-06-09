@@ -15,17 +15,18 @@ class ValeurNoteExamenType extends AbstractType
     {
         $builder
             ->add('note')
-            ->add('noteEntity', EntityType::class, [
+            /*   ->add('noteEntity', EntityType::class, [
                 'class' => NoteExamen::class,
 'choice_label' => 'id',
-            ])
-        ;
+            ]) */;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => ValeurNoteExamen::class,
+            'allow_extra_fields' => true
+
         ]);
     }
 }
