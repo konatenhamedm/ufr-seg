@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Cours;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * @extends ServiceEntityRepository<Cours>
@@ -16,9 +17,11 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CoursRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $user;
+    public function __construct(ManagerRegistry $registry, Security $security)
     {
         parent::__construct($registry, Cours::class);
+        $this->user = $security->getUser();
     }
 
     public function add(Cours $entity, bool $flush = false): void
@@ -36,10 +39,25 @@ class CoursRepository extends ServiceEntityRepository
             ->select('distinct(m.id), m.id,m.libelle')
             ->join('c.classe', 'classe')
             ->join('c.matiere', 'm')
+            ->join('c.employe', 'employe')
             ->where('classe.id = :classe')
             ->setParameter('classe', $classe)
             ->getQuery()
             ->getResult();
+    }
+    public function getClasse()
+    {
+        $sql =  $this->createQueryBuilder('c')
+            ->select('distinct(classe.id),classe.id, classe.libelle')
+            ->join('c.classe', 'classe')
+            ->join('c.matiere', 'm');
+
+        if ($this->user->getPersonne()->getFonction()->getCode() == 'ENS') {
+            $sql->where('employe = :user')
+                ->setParameter('user', $this->user->getPersonne());
+        }
+
+        return $sql->getQuery()->getResult();
     }
 
     //    /**

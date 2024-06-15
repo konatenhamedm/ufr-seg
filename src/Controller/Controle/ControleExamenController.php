@@ -302,7 +302,7 @@ class ControleExamenController extends AbstractController
 
         $all = $request->query->all();
 
-        // dd();
+        //dd("");
         $controleVefication = $controleExamenRepository->findOneBy(['promotion' => $promotion,  'session' => $session, 'ue' => $ue]);
 
         if ($controleVefication) {
@@ -316,7 +316,7 @@ class ControleExamenController extends AbstractController
             ]);
         } else {
             $controleExaman = new ControleExamen();
-            //dd("");
+
             $controleExaman->setTypeControle($typeControleRepository->findOneBy(['code' => 'EXA']));
 
             $groupe = new GroupeTypeExamen();

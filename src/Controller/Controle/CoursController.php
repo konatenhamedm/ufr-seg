@@ -381,6 +381,35 @@ class CoursController extends AbstractController
         }
         return $response;
     }
+    #[Route('/liste/classe', name: 'get_classe', methods: ['GET'])]
+    public function getClasse(Request $request, CoursRepository $coursRepository)
+    {
+        $response = new Response();
+        $tabMatieres = array();
+
+
+
+
+
+        $matieres = $coursRepository->getClasse();
+        //dd($matieres);
+        $i = 0;
+
+        foreach ($matieres as $e) {
+            // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
+            $tabMatieres[$i]['id'] = $e['id'];
+            $tabMatieres[$i]['libelle'] = $e['libelle'];
+
+            $i++;
+        }
+
+        $dataService = json_encode($tabMatieres); // formater le résultat de la requête en json
+
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setContent($dataService);
+
+        return $response;
+    }
 
     #[Route('/liste/ue', name: 'get_ue', methods: ['GET'])]
     public function getUe(Request $request, ClasseRepository $classeRepository, UniteEnseignementRepository $uniteEnseignementRepository)

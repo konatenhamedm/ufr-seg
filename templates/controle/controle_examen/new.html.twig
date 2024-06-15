@@ -76,10 +76,10 @@
                 data:filters,
                 beforeSend: function () {
                     
-                    $form_content.html(`<div class="align-items-center">
-                                <strong>Chargement des données de l'étape</strong>
-                                <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
-                                </div>`);
+                        $form_content.html(`<div class="text-center "> 
+                    <strong>Chargement des données de l'étape</strong><br>
+                                <div class="spinner-border ms-auto" role="status" aria-hidden="true">
+                    </div>`);
                 },
                 success: function (html) {
                     $form_content.html(html);

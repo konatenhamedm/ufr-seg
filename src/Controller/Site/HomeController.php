@@ -815,13 +815,13 @@ class HomeController extends AbstractController
     public function indexInformationAdmin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
     {
         $classe = $request->query->get('classe');
-        $niveau = $request->query->get('niveau');
-        $filiere = $request->query->get('filiere');
+        /*  $niveau = $request->query->get('niveau');
+        $filiere = $request->query->get('filiere'); */
         // dd($niveau, $filiere);
 
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
-            'action' => $this->generateUrl('app_inscription_etudiant_admin_index', compact('classe', 'niveau', 'filiere')),
+            'action' => $this->generateUrl('app_inscription_etudiant_admin_index', compact('classe')),
         ])->add('classe', EntityType::class, [
             'class' => Classe::class,
             'choice_label' => 'libelle',
@@ -829,8 +829,8 @@ class HomeController extends AbstractController
             'placeholder' => '---',
             'required' => false,
             'attr' => ['class' => 'form-control-sm has-select2']
-        ])
-            ->add('niveau', EntityType::class, [
+        ]);
+        /* ->add('niveau', EntityType::class, [
                 'class' => Niveau::class,
                 'choice_label' => 'libelle',
                 'label' => 'Niveau',
@@ -845,7 +845,7 @@ class HomeController extends AbstractController
                 // 'placeholder' => '---',
                 'required' => false,
                 'attr' => ['class' => 'form-control-sm has-select2']
-            ]);
+            ]); */
 
 
 
@@ -858,7 +858,7 @@ class HomeController extends AbstractController
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Inscription::class,
-                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau, $user) {
+                'query' => function (QueryBuilder $qb) use ($classe, $user) {
                     $qb->select(['p', 'c', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
                         ->join('p.classe', 'classe')
@@ -873,19 +873,19 @@ class HomeController extends AbstractController
 
                     //dd($classe, $niveau, $filiere);
 
-                    if ($classe || $niveau || $filiere) {
+                    if ($classe) {
                         if ($classe) {
                             $qb->andWhere('classe.id = :classe')
                                 ->setParameter('classe', $classe);
                         }
-                        if ($niveau) {
+                        /*  if ($niveau) {
                             $qb->andWhere('niveau.id = :niveau')
                                 ->setParameter('niveau', $niveau);
                         }
                         if ($filiere) {
                             $qb->andWhere('filiere.id = :filiere')
                                 ->setParameter('filiere', $filiere);
-                        }
+                        } */
                     }
 
                     if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
@@ -895,7 +895,7 @@ class HomeController extends AbstractController
                 }
 
             ])
-            ->setName('dt_app_inscription_etudiant_admin_' . $classe . '_' . $niveau . '_' . $filiere);
+            ->setName('dt_app_inscription_etudiant_admin_' . $classe);
 
         $renders = [
             'edit' =>  new ActionRender(function () {
@@ -909,7 +909,7 @@ class HomeController extends AbstractController
             }),
         ];
 
-        $gridId = $classe . '_' . $niveau . '_' . $filiere;
+        $gridId = $classe;
         $hasActions = false;
 
         foreach ($renders as $_ => $cb) {

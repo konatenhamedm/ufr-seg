@@ -42,6 +42,8 @@
          const $ue = $('#{{ form.ue.vars.id }}');
          const $matiere = $('#{{ form.matiere.vars.id }}');
 
+         load_classe()
+
          //function load_content(url,semestre,classe,matiere,ue) {
         function load_content(url,filters = []) {
             const $form_content = $(`#form-content`);
@@ -54,10 +56,10 @@
                 data:filters,
                 beforeSend: function () {
                     
-                    $form_content.html(`<div class="align-items-center">
-                                <strong>Chargement des données de l'étape</strong>
-                                <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
-                                </div>`);
+                       $form_content.html(`<div class="text-center "> 
+                    <strong>Chargement des données de l'étape</strong><br>
+                                <div class="spinner-border ms-auto" role="status" aria-hidden="true">
+                    </div>`);
                 },
                 success: function (html) {
                     $form_content.html(html);
@@ -88,6 +90,27 @@
             
             })
 
+        }
+
+        function load_classe(){
+              $.ajax({
+                    url:  "{{ path('get_classe')}}",
+                    type:  'get',
+                    async: false,
+                    data:     {id:classe},
+                    dataType:   'json',
+                    success: function(json){
+
+                      $('#'+ $('.classe').attr("id")).html(''); //je vide la 2ème list
+                      //$('#'+ $('.matiere').attr("id")).append('<option value selected="default" >Choisissez</option>');
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $("#"+ $('.classe').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          });
+                    }
+                });
         }
 
         function load_matiere(classe){

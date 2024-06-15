@@ -23,9 +23,9 @@
              
               <div class="row small" style="position:relative">
                {# <div class="col-md-3"></div> #}
-               <div class="col-md-4">{{ form_row(form.filiere) }}</div>
-               <div class="col-md-4">{{ form_row(form.niveau) }}</div>
-               <div class="col-md-4">{{ form_row(form.classe) }}</div>
+               <div class="col-md-3"></div>
+               <div class="col-md-6">{{ form_row(form.classe) }}</div>
+               <div class="col-md-3"></div>
                {# <div class="col-md-3 pt-5"> <button class="btn btn-main btn-filter btn-sm" type="button">Valider</button></div> #}
                 
                 {# <div class="col-md-1 pt-5">
@@ -57,7 +57,7 @@
       const $old_grid = $('#grid_app_inscription_etudiant_admin_' + grid_prefix_id);
       init_select2('.has-select2');
 
-      function loadDataTable($grid, classe,niveau,filiere ,options = null, contents = '') {
+      function loadDataTable($grid, classe,options = null, contents = '') {
         $grid.initDataTables(
           options
           ? options
@@ -65,8 +65,6 @@
           searching: true,
           ajaxUrl: Routing.generate('app_inscription_etudiant_admin_index', {
             classe: classe,
-            niveau: niveau,
-            filiere: filiere,
             
           }),
           language: {
@@ -78,7 +76,7 @@
           drawCallback: function (row, data) {}
         });
       }
-      function loadDataTableBene($grid, classe,niveau,filiere ,options = null, contents = '') {
+      function loadDataTableBene($grid, classe,options = null, contents = '') {
         $grid.initDataTables(
           options
           ? options
@@ -86,8 +84,6 @@
           searching: true,
           ajaxUrl: Routing.generate('app_inscription_etudiant_admin_index', {
             classe: classe,
-            niveau: niveau,
-            filiere: filiere,
             
           }),
           language: {
@@ -101,14 +97,12 @@
       }
 
       const $classe = $('#{{ form.classe.vars.id }}');
-      const $niveau = $('#{{ form.niveau.vars.id }}');
-      const $filiere = $('#{{ form.filiere.vars.id }}');
       
       
 
      
 
-      loadDataTable($old_grid, null,null,null, {{ datatable_settings(datatable) }});
+      loadDataTable($old_grid, null, {{ datatable_settings(datatable) }});
       //load_content($niveau.val(),false)
       //load_content($filiere.val(),true)
      $classe.on('change', function (e) {
@@ -118,13 +112,13 @@
          
         //alert($dateDebut.val());
          //loadDataTableBene($old_gride, $this.val(),$niveau.val(),$filiere.val(), {{ datatable_settings(datatable) }});
-         load_grid_data(null, $this, $this.val(),$niveau.val(),$filiere.val());
+         load_grid_data(null, $this, $this.val());
          //load_content($filiere.val(),'')
       });
-       $filiere.on('change', function (e) {
+       /*$filiere.on('change', function (e) {
       
         const $this = $(this);
-         load_grid_data(null, $this, $classe.val(),$niveau.val(),$this.val());
+         load_grid_data(null, $this, $classe.val());
          load_content($this.val(),true)
          load_content($niveau.val(),false)
       });
@@ -133,7 +127,7 @@
         const $this = $(this);
          load_grid_data(null, $this, $classe.val(),$this.val(),$filiere.val());
          load_content($this.val(),false)
-      });
+      });*/
 
 
       function load_content(id,type) {
@@ -181,7 +175,7 @@
 
 
 
-      function load_grid_data($form, $button, classe,niveau,filiere) {
+      function load_grid_data($form, $button, classe) {
         const id = $old_grid.find('table').attr('id');
         const $table = $old_grid.find(`#${id}`);
         const table = $table.DataTable();
@@ -192,8 +186,6 @@
           //type: $form.attr('method'),
           data: {
              classe: classe,
-             niveau: niveau,
-             filiere: filiere
             
           },
           beforeSend: function () {
@@ -211,12 +203,12 @@
             }
 
            // let grid_val = `${niveau}_${caissiere}_${dateDebut}_${dateFin}`;
-            let grid_val = `${classe}_${niveau}_${filiere}`;
+            let grid_val = `${classe}`;
 
             //alert(grid_val)
 
             $old_grid.attr('id', `grid_app_inscription_etudiant_admin_${grid_val}`).empty().html(`
-                                    <div class="spinner spinner-track spinner-primary mr-15 text-primary">
+                                    <div class="spinner spinner-track text-center spinner-primary mr-15 text-primary">
                                         <div class="ml-15">Chargement des données de la grille</div>
                                     </div>
                             `);
@@ -227,7 +219,7 @@
 
             console.log(name);
 
-            loadDataTable($old_grid, classe,niveau,filiere ,options)
+            loadDataTable($old_grid, classe ,options)
           }
         });
       }
