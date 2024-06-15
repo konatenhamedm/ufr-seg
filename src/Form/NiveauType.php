@@ -43,7 +43,7 @@ class NiveauType extends AbstractType
 
                     'entry_options' => ['label' => false],
                 ]
-            ) */
+            ) *//* 
             ->add(
                 'infoNiveaux',
                 CollectionType::class,
@@ -57,7 +57,7 @@ class NiveauType extends AbstractType
 
                     'entry_options' => ['label' => false],
                 ]
-            )
+            ) */
             /* ->add('responsable', EntityType::class, [
                 'class' => Employe::class,
                 'required' => false,

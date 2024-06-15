@@ -165,8 +165,8 @@
           load_principal({session: $session.val(),promotion:val,ue: $ue.val()})
           });
 
-           load_ue($promotion.val())
-           load_session($promotion.val())
+        load_ue($promotion.val())
+          load_session($promotion.val())
           load_content(`/admin/controle/controle/examen/new/load/${$session.val()}/${$promotion.val()}/${$ue.val()}`,{ession: $session.val(),promotion:$promotion.val(),ue: $ue.val()})
           load_principal({session: $session.val(),promotion:$promotion.val(),ue: $ue.val()})
 
