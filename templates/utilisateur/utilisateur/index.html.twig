@@ -34,8 +34,32 @@
                   ajaxUrl: "{{ path('app_utilisateur_utilisateur_index',{'role':role}) }}",
                   language: {
                       url: asset_base_path + "/js/i18n/French.json"
-                  }
+                  },
+                  'columnDefs': [{
+                    'targets': 0, // assuming your checkbox column is the third column
+                    'orderable': false,
+                    'searchable': false,
+                    'className': 'dt-body-center',
+                    'render': function(data, type, full, meta){
+                        return '<input type="checkbox" class="row-check" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                }],
+                  
               });
+                // Check/Uncheck all checkboxes
+            $('#checkAll').click(function() {
+                alert('')
+                var isChecked = $(this).is(':checked');
+                $('.row-check').prop('checked', isChecked);
+            });
+
+            // Optionally, update the "check all" checkbox status when individual checkboxes are clicked
+            $(document).on('click', '.row-check', function() {
+                alert('')
+                var totalCheckboxes = $('.row-check').length;
+                var checkedCheckboxes = $('.row-check:checked').length;
+                $('#checkAll').prop('checked', totalCheckboxes === checkedCheckboxes);
+            });
         });
     </script>
 {% endblock %}

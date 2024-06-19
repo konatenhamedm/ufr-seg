@@ -30,18 +30,20 @@ class SecurityController extends AbstractController
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
 
-        if (in_array('ROLE_SUPER_ADMIN', $this->getUser()->getRoles())) {
-            $route = self::DEFAULT_ROUTE_SUIVI;
-        } elseif (in_array('ROLE_ETUDIANT', $this->getUser()->getRoles())) {
-            $route = self::DEFAULT_INFORMATION;
-        } elseif (in_array('ROLE_CAISSIERE', $this->getUser()->getRoles()) || in_array('ROLE_COMPTABLE', $this->getUser()->getRoles())) {
-            $route = self::DEFAULT_LISTE_INSCRIS;
-        } else {
-            $route = self::DEFAULT_ROUTE;
-        }
 
 
         if ($this->getUser()) {
+
+            if (in_array('ROLE_SUPER_ADMIN', $this->getUser()->getRoles())) {
+                $route = self::DEFAULT_ROUTE_SUIVI;
+            } elseif (in_array('ROLE_ETUDIANT', $this->getUser()->getRoles())) {
+                $route = self::DEFAULT_INFORMATION;
+            } elseif (in_array('ROLE_CAISSIERE', $this->getUser()->getRoles()) || in_array('ROLE_COMPTABLE', $this->getUser()->getRoles())) {
+                $route = self::DEFAULT_LISTE_INSCRIS;
+            } else {
+                $route = self::DEFAULT_ROUTE;
+            }
+
 
             return $this->redirectToRoute($route);
         }

@@ -26,6 +26,7 @@ use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Omines\DataTablesBundle\Column\BooleanColumn;
 
 #[Route('/admin/utilisateur/utilisateur')]
 #[Module(name: 'config')]
@@ -37,6 +38,19 @@ class UtilisateurController extends AbstractController
 
         $isEtudiant = $this->isGranted($role);
         $table = $dataTableFactory->create()
+
+            ->add('check', TextColumn::class, [
+                'label' => '<input type="checkbox" id="checkAll">',
+                'raw' => true,
+                'orderable' => false,
+                'searchable' => false,
+                'render' => function ($value, $context) {
+                    return sprintf('<input type="checkbox" class="row-check" value="%s">', $context->getId());
+                },
+            ])
+            /*   ->add('idf', BoolColumn::class, ['className' => 'w-1px', 'field' => 'l.id', 'label' => '', 'render' => function ($value, Utilisateur $context) {
+                return sprintf('<input type="checkbox" name="selectAll" id="selectAll" value="%s">', $value);
+            }]) */
             ->add('email', TextColumn::class, ['label' => 'Pseudo'])
             //->add('email', TextColumn::class, ['label' => 'Email', 'field' => 'e.adresseMail'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'e.nom'])
@@ -49,7 +63,6 @@ class UtilisateurController extends AbstractController
                         ->from(Utilisateur::class, 'u')
                         ->join('u.personne', 'e')
                         ->join('e.fonction', 'f');
-
 
                     if ($role == 'etudiant') {
                         $qb->where('f.code = :etudiant');
