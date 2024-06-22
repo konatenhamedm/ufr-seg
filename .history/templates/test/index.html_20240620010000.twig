@@ -1,0 +1,270 @@
+{# {% set code =facture.typeFacture.code(true) %} #}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{# {{ code =='a' ? 'AVOIR': 'FACTURE' }} {{ facture.numero }} #}dd</title>
+    <style>
+        {
+            % block page_css %
+        }
+
+        @page {
+
+          body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.fiche-de-notes {
+    width: 80%;
+    text-align: center;
+    font-size: 24px;
+    background-color: #beb7b7;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid white;
+    padding: 10px;
+    text-align: center;
+}
+
+.students th, .students td {
+    background-color: #f9f9f9;
+}
+
+.students tbody tr:nth-child(even) {
+    background-color: #f1f1f1;
+}
+
+    </style>
+</head>
+
+<body style="font-size:12px;">
+    <div class="clearfix">
+        <div style="width:10%;text-align:left;float:left;" class="">
+            {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
+            <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180" width="100px" />
+            {# <img src="{{ absolute_url(asset(var)) }}" width="100px" /> #}
+            {# <div style="text-align:left;border: 1px solid #000;padding:8px;width:70%" class="">
+                CC N° 9904215 D<br>
+                Régime d'imposition: Réel Normal<br>
+                Centre des impôts: D G E<br>
+            </div>
+            {{ "facture.typeFacture.libelle" | upper }} N° {{ 'facture.numero' }} #}
+        </div>
+
+        <div style="width:65%;text-align:right;float:center;">
+            <div style="text-align:center;" class="">
+                <b>UFR-SEG</b><br>
+                BP V 43 ABIDJAN ,TEL :01 01 15 44 44 ufrseg-filierespro-ufhb.ci <br>
+                Abidjan-Cocody
+                <div style="border-top:1px solid #000"></div>
+            </div>
+
+        </div>
+        <div style="width:25%;text-align:right;float:right;margin-top:0px,padding:8px">
+
+            <div style="text-align:center;margin-top:-45px" class="">
+                République de COTE D'IVOIRE <br>
+                <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
+                <b style="font-weight: bolder;">Année scolaire : 2021-2022</b>
+            </div>
+
+        </div>
+    </div>
+
+
+    <br>
+
+    <div class="fiche-de-presence">
+        <div class="header">
+            <h1>Fiche de Présence - Classe : 6EME 1</h1>
+        </div>
+        <table class="details">
+            <tr>
+                <th>Matière :</th>
+                <td>..................</td>
+                <th>Coefficient :</th>
+                <td>..................</td>
+            </tr>
+            <tr>
+                <th>Enseignant :</th>
+                <td>..................</td>
+                <th>Trimestre :</th>
+                <td>..................</td>
+            </tr>
+        </table>
+        <table class="students">
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>Nom et Prénoms</th>
+                    <th>Horaires</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>ADJI Marie Anne Lyse</td>
+                    <td>M1 M2 M3 M4 M5 S1 S2 S3 S4 S5</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>ALOU Amoin Ashley Tiffany</td>
+                    <td>M1 M2 M3 M4 M5 S1 S2 S3 S4 S5</td>
+                    <td></td>
+                </tr>
+                <!-- Ajoutez plus de lignes pour les élèves ici -->
+            </tbody>
+        </table>
+    </div>
+
+    <br />
+
+    <div class="clearfix">
+       
+        <div style="width:100%;text-align:right;float:right;">
+
+            {# <div
+                style="margin-top:-25px;text-align:center;bosrder: 1px solid #000;padding:8px;font-size:15px;font-weight:bold"
+                class=""> #}
+                {# <b>DOIT</b><br><br> #}
+                <table>
+                   
+                    <tr style="background-color: #dddddd">
+                        <th style="width:4%;">N</th>
+                        <th style="width:10%;">Matricule</th>
+                        <th style="width:20%;">Nom et Prénoms</th>
+                        <th style="width:10%;">Note 1</th>
+                        <th style="width:10%;">Note 2</th>
+                        <th style="width:10%;">Note 3</th>
+                        <th style="width:10%;">Note 4</th>
+                        <th style="width:10%;">Note 5</th>
+                        <th style="width:10%;">Note 6</th>
+                        <th style="width:10%;">Moy</th>
+                        <th style="width:6%;">Rang</th>
+                      
+                    </tr>
+
+                    <tr>
+                    <td style="width:2%;">N</td>
+                    <td style="width:10%;">Matricule</td>
+                    <td style="width:20%;">Nom et Prénoms</td>
+                    <td style="width:10%;">Note 1</td>
+                    <td style="width:10%;">Note 2</td>
+                    <td style="width:10%;">Note 3</td>
+                    <td style="width:10%;">Note 4</td>
+                    <td style="width:10%;">Note 5</td>
+                    <td style="width:10%;">Note 6</td>
+                    <td style="width:4%;">Moy</td>
+                    <td style="width:4%;">Rang</td>
+
+                    </tr>
+                    
+
+                    <tr>
+                        <td style="width:2%;">N</td>
+                        <td style="width:10%;">Matricule</td>
+                        <td style="width:20%;">Nom et Prénoms</td>
+                        <td style="width:10%;">Note 1</td>
+                        <td style="width:10%;">Note 2</td>
+                        <td style="width:10%;">Note 3</td>
+                        <td style="width:10%;">Note 4</td>
+                        <td style="width:10%;">Note 5</td>
+                        <td style="width:10%;">Note 6</td>
+                        <td style="width:4%;">Moy</td>
+                        <td style="width:4%;">Rang</td>
+                    
+                    </tr>
+
+
+                    <tr>
+                        <td style="width:2%;">N</td>
+                        <td style="width:10%;">Matricule</td>
+                        <td style="width:20%;">Nom et Prénoms</td>
+                        <td style="width:10%;">Note 1</td>
+                        <td style="width:10%;">Note 2</td>
+                        <td style="width:10%;">Note 3</td>
+                        <td style="width:10%;">Note 4</td>
+                        <td style="width:10%;">Note 5</td>
+                        <td style="width:10%;">Note 6</td>
+                        <td style="width:4%;">Moy</td>
+                        <td style="width:4%;">Rang</td>
+                    
+                    </tr>
+
+
+
+                    <tr>
+                        <td style="width:2%;">N</td>
+                        <td style="width:10%;">Matricule</td>
+                        <td style="width:20%;">Nom et Prénoms</td>
+                        <td style="width:10%;">Note 1</td>
+                        <td style="width:10%;">Note 2</td>
+                        <td style="width:10%;">Note 3</td>
+                        <td style="width:10%;">Note 4</td>
+                        <td style="width:10%;">Note 5</td>
+                        <td style="width:10%;">Note 6</td>
+                        <td style="width:4%;">Moy</td>
+                        <td style="width:4%;">Rang</td>
+                    
+                    </tr>
+
+                </table>
+                {#
+            </div> #}
+        </div>
+    </div>
+
+
+    </div>
+
+
+    
+    <br>
+    {# <div style="border-top:20px solid grey"></div> #}<br>
+    </div>
+
+    <htmlpagefooter name="pageFooter">
+        {# <table style="width:100%">
+            <tr>
+                <td style="width:50%;text-align:left;padding-bottom:8px">
+                    <i><b>Client</b></i>
+                </td>
+                <td style="width:50%;text-align:right">
+                    <i><b>Souche</b></i>
+                </td>
+            </tr>
+        </table> #}
+        <div style="border-top:2px solid #000"></div>
+        <p align="center" style="align: center;margin-top:-1px">
+            COCODY ECOLE POLICEI - 01 BP 5889 Abidjan 01 - e-mail:
+            <a href="mailto:ufrseg-filierespro-ufhb.ci">ufrseg-filierespro-ufhb.ci</a><br>
+            TEL :01 01 15 44 44
+        </p>
+    </htmlpagefooter>
+</body>
+
+</html>

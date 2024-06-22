@@ -1,0 +1,398 @@
+{# {% set code =facture.typeFacture.code(true) %} #}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{# {{ code =='a' ? 'AVOIR': 'FACTURE' }} {{ facture.numero }} #}dd</title>
+    <style>
+        {
+            % block page_css %
+        }
+
+        @page {
+
+            margin-footer: 0.5cm;
+
+            /*header: html_headerContent;*/
+            footer: html_pageFooter;
+            margin-top: 0.5cm;
+            margin-header: 0cm;
+
+            /*background: ...
+  background-image: ...
+  background-position ...
+  background-repeat ...
+  background-color ...
+  background-gradient: ...*/
+        }
+
+        .clearfix:after,
+        {
+        % endblock %
+        }
+
+        .clearfix:before {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .mention {
+            position: absolute;
+            bottom: 100px;
+        }
+
+        /*@page :first {
+   header: html_headerContent;
+}*/
+        caption {
+            margin-bottom: 15px;
+        }
+
+        fieldset {
+            border: 1px solid #000 !important;
+            margin: 0;
+            xmin-width: 0;
+            padding: 10px;
+            position: relative;
+            border-radius: 4px;
+            background-color: #fff;
+            padding-left: 10px !important;
+        }
+
+        legend {
+            padding: 0 10px;
+            margin-left: 100px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 0px;
+            width: 35%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #ffffff;
+        }
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {}
+
+        @media all {
+            /*.content { display: block; page-break-inside: avoid; }*/
+        }
+
+        .content {
+            /*margin-top: 18cm;*/
+        }
+
+            {
+            # .table-responsive.table-bordered {
+                border: 0;
+            }
+
+            #
+        }
+
+        .double_underline {
+            text-decoration: underline;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        /* .contenu {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} */
+        .contenu {
+            text-align: center;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body style="font-size:12px;">
+    <div class="clearfix">
+        <div style="width:10%;text-align:left;float:left;" class="">
+            {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
+            <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180" width="100px" />
+            {# <img src="{{ absolute_url(asset(var)) }}" width="100px" /> #}
+            {# <div style="text-align:left;border: 1px solid #000;padding:8px;width:70%" class="">
+                CC N° 9904215 D<br>
+                Régime d'imposition: Réel Normal<br>
+                Centre des impôts: D G E<br>
+            </div>
+            {{ "facture.typeFacture.libelle" | upper }} N° {{ 'facture.numero' }} #}
+        </div>
+
+        <div style="width:65%;text-align:right;float:center;">
+            <div style="text-align:center;" class="">
+                <b>UFR-SEG</b><br>
+                BP V 43 ABIDJAN ,TEL :01 01 15 44 44 ufrseg-filierespro-ufhb.ci <br>
+                Abidjan-Cocody
+                <div style="border-top:1px solid #000"></div>
+            </div>
+
+        </div>
+        <div style="width:25%;text-align:right;float:right;margin-top:0px,padding:8px">
+
+            <div style="text-align:center;margin-top:-45px" class="">
+                République de COTE D'IVOIRE <br>
+                <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
+                <b style="font-weight: bolder;">Année scolaire : 2021-2022</b>
+            </div>
+
+        </div>
+    </div>
+
+
+    <br>
+
+    <form action="/action_page.php">
+        <table style="margin-top:-40px ">
+
+            <tr style=" border: 0px !important;">
+                <th style="width:20%; border: 0px !important;"></th>
+                <th class="contenu" style="width:60%; border: 0px !important;">
+
+                    <div align="center"
+                        style="align: center; font-size: 24px; background-color: #beb7b7; box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.5); border: 3px solid rgb(255, 255, 255); padding: 10px;"
+                        class="text-center">
+                        Liste de Classe : 6EME 1 (Aff/NAff)
+                    </div>
+
+
+
+                </th>
+                <th style="width:20%;border: 0px !important;"></th>
+            </tr>
+
+
+
+
+        </table>
+
+    </form>
+
+    <br />
+
+    <div class="clearfix">
+
+        <div style="width:100%;text-align:right;float:right;">
+
+            {# <div
+                style="margin-top:-25px;text-align:center;bosrder: 1px solid #000;padding:8px;font-size:15px;font-weight:bold"
+                class=""> #}
+                {# <b>DOIT</b><br><br> #}
+                <table>
+
+                    <tr style="background-color: #dddddd">
+                        <th style="width:4%;" rowspan="2">N</th>
+
+                        <th style="width:20%;" rowspan="2">Nom et Prénoms</th>
+                        <th style="width:70%;" colspan="10">Horaires</th>
+                        <th style="">M1</th>
+                        <th style="">M2</th>
+                        <th style="">M3</th>
+                        <th style="">M4</th>
+                        <th style="">M5</th>
+                        <th style="">S1</th>
+                        <th style="">S2</th>
+                        <th style="">S3</th>
+                        <th style="">S4</th>
+                        <th style="">Total</th>
+
+                        <th style="width:6%;" rowspan="2">Total</th>
+
+                    </tr>
+
+                    <tr>
+                        <td style="width:2%;">1</td>
+                        <td style="width:10%;">23560041J</td>
+                        <td style="width:20%;">ADJI Marie Anne Lyse</td>
+
+                        <td style="width:10%;">F</td>
+                        <td style="width:10%;">01/03/2013</td>
+                        <td style="width:10%;">Ivoirienne</td>
+
+                        <td style="width:10%;">Aff</td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+
+                        <td style="width:4%;"></td>
+                        <td style="width:4%;"></td>
+                        <td style="width:4%;"></td>
+
+                    </tr>
+
+
+                    <tr>
+                        <td style="width:2%;">1</td>
+                        <td style="width:10%;">23560041J</td>
+                        <td style="width:20%;">ADJI Marie Anne Lyse</td>
+                        <td style="width:10%;">F</td>
+                        <td style="width:10%;">01/03/2013</td>
+                        <td style="width:10%;">Ivoirienne</td>
+                        <td style="width:10%;">Aff</td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:4%;"></td>
+                        <td style="width:4%;"></td>
+
+                    </tr>
+
+
+                    <tr>
+                        <td style="width:2%;">1</td>
+                        <td style="width:10%;">23560041J</td>
+                        <td style="width:20%;">ADJI Marie Anne Lyse</td>
+                        <td style="width:10%;">F</td>
+                        <td style="width:10%;">01/03/2013</td>
+                        <td style="width:10%;">Ivoirienne</td>
+                        <td style="width:10%;">Aff</td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:4%;"></td>
+                        <td style="width:4%;"></td>
+
+                    </tr>
+
+
+
+                    <tr>
+                        <td style="width:2%;">1</td>
+                        <td style="width:10%;">23560041J</td>
+                        <td style="width:20%;">ADJI Marie Anne Lyse</td>
+                        <td style="width:10%;">F</td>
+                        <td style="width:10%;">01/03/2013</td>
+                        <td style="width:10%;">Ivoirienne</td>
+                        <td style="width:10%;">Aff</td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:4%;"></td>
+                        <td style="width:4%;"></td>
+
+                    </tr>
+
+                </table>
+
+                <br><br>
+
+                <table>
+
+                    <tr style="background-color: #dddddd">
+                        <th class="contenu" style="width:20px !important;  border: 1px solid #898787;" colspan="3">
+                            AFFECTES</th>
+                        <th class="contenu" style="width:20px !important; border: 1px solid #898787;" colspan="3">
+                            REAFFECTES</th>
+                        <th class="contenu" style="width:20px !important;border: 1px solid #898787;" colspan="3">
+                            TRANSFERES</th>
+                        <th class="contenu" style="width:20px !important; border: 1px solid #898787;" colspan="3">NON
+                            AFFECTES</th>
+                        <th class="contenu" style="width:20px !important; border: 1px solid #898787;" colspan="2">TOTAL
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <td style="">Garçons</td>
+                        <td style="">Filles</td>
+                        <td style="">Total</td>
+
+                        <td style="">Garçons</td>
+                        <td style="">Filles</td>
+                        <td style="">Total</td>
+
+                        <td style="">Garçons</td>
+                        <td style="">Filles</td>
+                        <td style="">Total</td>
+
+                        <td style="">Garçons</td>
+                        <td style="">Filles</td>
+                        <td style="">Total</td>
+
+                        <td style="">Garçons</td>
+                        <td style="">Filles</td>
+
+
+
+                    </tr>
+
+                    <tr>
+                        <td style="">10</td>
+                        <td style="">30</td>
+                        <td style="">40</td>
+
+                        <td style="">10</td>
+                        <td style="">30</td>
+                        <td style="">40</td>
+
+                        <td style="">10</td>
+                        <td style="">30</td>
+                        <td style="">40</td>
+
+                        <td style="">10</td>
+                        <td style="">30</td>
+                        <td style="">40</td>
+
+                        <td style="">10</td>
+                        <td style="">30</td>
+
+
+
+
+                    </tr>
+
+
+
+
+
+                </table>
+                {#
+            </div> #}
+        </div>
+    </div>
+
+
+    </div>
+
+
+
+    <br>
+    {# <div style="border-top:20px solid grey"></div> #}<br>
+    </div>
+
+    <htmlpagefooter name="pageFooter">
+        {# <table style="width:100%">
+            <tr>
+                <td style="width:50%;text-align:left;padding-bottom:8px">
+                    <i><b>Client</b></i>
+                </td>
+                <td style="width:50%;text-align:right">
+                    <i><b>Souche</b></i>
+                </td>
+            </tr>
+        </table> #}
+        <div style="border-top:2px solid #000"></div>
+        <p align="center" style="align: center;margin-top:-1px">
+            COCODY ECOLE POLICEI - 01 BP 5889 Abidjan 01 - e-mail:
+            <a href="mailto:ufrseg-filierespro-ufhb.ci">ufrseg-filierespro-ufhb.ci</a><br>
+            TEL :01 01 15 44 44
+        </p>
+    </htmlpagefooter>
+</body>
+
+</html>

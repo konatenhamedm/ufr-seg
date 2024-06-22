@@ -1,0 +1,553 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{# {{ code =='a' ? 'AVOIR': 'FACTURE' }} {{ facture.numero }} #}dd</title>
+    <style>
+        {
+            % block page_css %
+        }
+
+        @page {
+
+            margin-footer: 0.5cm;
+
+            /*header: html_headerContent;*/
+            footer: html_pageFooter;
+            margin-top: 0.5cm;
+            margin-header: 0cm;
+
+            /*background: ...
+  background-image: ...
+  background-position ...
+  background-repeat ...
+  background-color ...
+  background-gradient: ...*/
+        }
+
+        .clearfix:after,
+        {
+        % endblock %
+        }
+
+        .clearfix:before {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .mention {
+            position: absolute;
+            bottom: 100px;
+        }
+
+        /*@page :first {
+   header: html_headerContent;
+}*/
+        caption {
+            margin-bottom: 15px;
+        }
+
+        fieldset {
+            border: 1px solid #000 !important;
+            margin: 0;
+            xmin-width: 0;
+            padding: 10px;
+            position: relative;
+            border-radius: 4px;
+            background-color: #fff;
+            padding-left: 10px !important;
+        }
+
+        legend {
+            padding: 0 10px;
+            margin-left: 100px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 0px;
+            width: 35%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #ffffff;
+        }
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {}
+
+        @media all {
+            /*.content { display: block; page-break-inside: avoid; }*/
+        }
+
+        .content {
+            /*margin-top: 18cm;*/
+        }
+
+            {
+            # .table-responsive.table-bordered {
+                border: 0;
+            }
+
+            
+        }
+
+        .double_underline {
+            text-decoration: underline;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+          .contenu {
+            text-align: center;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body style="font-size:12px;">
+    <div class="clearfix">
+        <div style="width:10%;text-align:left;float:left;" class="">
+            {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
+            {# <img src="{{ var |replace({'/': " \\"}) }}" width="100px" /> #}
+            <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180" width="100px" />
+            {# <img src="{{ absolute_url(asset(var)) }}" width="100px" /> #}
+            {# <div style="text-align:left;border: 1px solid #000;padding:8px;width:70%" class="">
+                CC N° 9904215 D<br>
+                Régime d'imposition: Réel Normal<br>
+                Centre des impôts: D G E<br>
+            </div>
+            {{ "facture.typeFacture.libelle" | upper }} N° {{ 'facture.numero' }} #}
+        </div>
+
+        <div style="width:65%;text-align:right;float:center;">
+            <div style="text-align:center;" class="">
+                <b>UFR-SEG</b><br>
+                BP V 43 ABIDJAN ,TEL :01 01 15 44 44 ufrseg-filierespro-ufhb.ci <br>
+                Abidjan-Cocody
+                <div style="border-top:1px solid #000"></div>
+            </div>
+
+        </div>
+        <div style="width:25%;text-align:right;float:right;margin-top:0px,padding:8px">
+
+            <div style="text-align:center;margin-top:-45px" class="">
+                République de COTE D'IVOIRE <br>
+                <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
+                <b style="font-weight: bolder;">Année scolaire : 2021-2022</b>
+            </div>
+
+        </div>
+    </div>
+
+
+    <br>
+
+    <form action="/action_page.php">
+       
+    </form>
+
+    <br />
+
+    <div class="clearfix">
+       
+        <div style="width:100%;text-align:right;float:right;">
+
+            {# <div
+                style="margin-top:-25px;text-align:center;bosrder: 1px solid #000;padding:8px;font-size:15px;font-weight:bold"
+                class=""> #}
+                {# <b>DOIT</b><br><br> #}
+                <table>
+                    <caption>
+
+                        <b>{{'Liste des paiements en attente de confirmation' | upper}}</b><br>
+                    </caption>
+                    <tr style="background-color: #dddddd">
+                        <th>Date</th>
+                        <th>Mode paiement</th>
+                        <th>Montant versé</th>
+                        <th>Statut</th>
+                    </tr>
+
+                   
+                    <tr>
+                        <td></td>
+                        <td></td><!DOCTYPE html>
+                        <html lang="fr">
+                        
+                        <head>
+                            <meta charset="UTF-8">
+                            <title>Bulletin de Notes</title>
+                            <style>
+                                body {
+                                    font-family: Arial, sans-serif;
+                                    margin: 20px;
+                                }
+                        
+                                .header,
+                                .footer {
+                                    text-align: center;
+                                    margin-bottom: 20px;
+                                }
+                        
+                                .header h1,
+                                .header h2,
+                                .footer p {
+                                    margin: 5px;
+                                }
+                        
+                                .content {
+                                    width: 80%;
+                                    margin: 0 auto;
+                                }
+                        
+                                .details,
+                                .grades {
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                    margin-bottom: 20px;
+                                }
+                        
+                                .details td,
+                                .grades td,
+                                .grades th {
+                                    border: 1px solid #000;
+                                    padding: 8px;
+                                    text-align: center;
+                                }
+                        
+                                .details td {
+                                    border: none;
+                                    text-align: left;
+                                    padding: 5px 10px;
+                                }
+                        
+                                .grades th {
+                                    background-color: #f2f2f2;
+                                }
+                        
+                                .grades tbody tr:nth-child(even) {
+                                    background-color: #f9f9f9;
+                                }
+                            </style>
+                        </head>
+                        
+                        <body>
+                        
+                            <div class="header">
+                                <h1>Institut de Formation Sainte Marie</h1>
+                                <p>BP 2898 Abidjan 10 - Tél : 22 48 92 85 - ifsmcocody@yahoo.fr</p>
+                                <h2>République de COTE D'IVOIRE</h2>
+                                <p>Union - Discipline - Travail</p>
+                            </div>
+                        
+                            <div class="content">
+                                <h3>Année scolaire : 2016 - 2017</h3>
+                                <h2>BULLETIN DE NOTES</h2>
+                        
+                                <table class="details">
+                                    <tr>
+                                        <td><strong>Licence FCAC</strong></td>
+                                        <td><strong>Classe :</strong> Licence3 FC_AG</td>
+                                        <td><strong>Effectif :</strong> 38</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Matricule :</strong> L3FCC3511</td>
+                                        <td colspan="2"><strong>Matricule Nle :</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Nom :</strong> ATTORRA</td>
+                                        <td><strong>Sexe :</strong> M</td>
+                                        <td><strong>Statut :</strong> Non Affecté(e)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Prénoms :</strong> Edgard Lionel Olivier</td>
+                                        <td><strong>Né le :</strong> 27/09/1983 à Treicheville</td>
+                                        <td><strong>Redoublant :</strong></td>
+                                    </tr>
+                                </table>
+                        
+                                <h3>PREMIER SEMESTRE</h3>
+                        
+                                <table class="grades">
+                                    <thead>
+                                        <tr>
+                                            <th>ECUE</th>
+                                            <th>Moy /20</th>
+                                            <th>Coef</th>
+                                            <th>Validé</th>
+                                            <th>Rang</th>
+                                            <th>Appréciations Enseignants</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Anglais (Préparation TOEIC)</td>
+                                            <td>9,50</td>
+                                            <td>2</td>
+                                            <td>Non</td>
+                                            <td>8e</td>
+                                            <td>Insuffisant (YASSI Pierre wango Felix)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Informatique appliquée à la gestion Excel, Powerpoint</td>
+                                            <td>17,00</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>1er</td>
+                                            <td>Très bien (AKA Kanga Réné)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Projet Personnel Professionnel</td>
+                                            <td>13,00</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>2ex</td>
+                                            <td>Assez-bien (BROU Méa Eugène)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Système d'information et Gestion Informatisée</td>
+                                            <td>17,00</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>1er</td>
+                                            <td>Très bien (AKA Kanga Réné)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Bilan UE1</strong></td>
+                                            <td>14,13</td>
+                                            <td>8</td>
+                                            <td>Non</td>
+                                            <td>4e</td>
+                                            <td>Crédits obtenus : 12 Crédits requis : 16</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Droit de la Sécurité Sociale</td>
+                                            <td>11,50</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>14e</td>
+                                            <td>Passable (SARAKA Kouassi Prosper)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Droit Entreprise en Difficulté</td>
+                                            <td>11,75</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>10e</td>
+                                            <td>Passable (SARAKA Kouassi Prosper)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Bilan UE2</strong></td>
+                                            <td>11,63</td>
+                                            <td>4</td>
+                                            <td>Oui</td>
+                                            <td>13e</td>
+                                            <td>Crédits obtenus : 8 Crédits requis : 8</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Diagnostic Financier</td>
+                                            <td>10,83</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>17e</td>
+                                            <td>Passable (LIEPO Guy Aimé)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Valeur en Finance</td>
+                                            <td>9,56</td>
+                                            <td>2</td>
+                                            <td>Non</td>
+                                            <td>25e</td>
+                                            <td>Insuffisant (LIEPO Guy Aimé)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Bilan UE3</strong></td>
+                                            <td>10,20</td>
+                                            <td>4</td>
+                                            <td>Non</td>
+                                            <td>25e</td>
+                                            <td>Crédits obtenus : 3 Crédits requis : 6</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                        
+                                <h3>Moyenne générale 1er Semestre</h3>
+                                <p>00,00 / 20 Rang : 1er / 38 | 1/3 UE Validées</p>
+                        
+                                <h3>DEUXIEME SEMESTRE</h3>
+                        
+                                <table class="grades">
+                                    <thead>
+                                        <tr>
+                                            <th>ECUE</th>
+                                            <th>Moy /20</th>
+                                            <th>Coef</th>
+                                            <th>Validé</th>
+                                            <th>Rang</th>
+                                            <th>Appréciations Enseignants</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Contrôle de gestion I</td>
+                                            <td>13,00</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>5e</td>
+                                            <td>Assez-bien (TOUGBA Kouassi Eric)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Management des Organisations</td>
+                                            <td>14,00</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>2e</td>
+                                            <td>Bien (TOUGBA Kouassi Eric)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Révision et Certification</td>
+                                            <td>12,17</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>7ex</td>
+                                            <td>Assez-bien (SEKA Seka Jean Leonardi)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Bilan UE1</strong></td>
+                                            <td>13,06</td>
+                                            <td>6</td>
+                                            <td>Oui</td>
+                                            <td>2e</td>
+                                            <td>Crédits obtenus : 12 Crédits requis : 12</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Fiscalité I</td>
+                                            <td>12,50</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>22e</td>
+                                            <td>Assez-bien (KOUADIO Alexis Hartmann Yao)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Techniques Comptables Approfondies I</td>
+                                            <td>12,17</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>7ex</td>
+                                            <td>Assez-bien (DJEGRE Kacou Léonce Guy-Michel)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Bilan UE2</strong></td>
+                                            <td>12,34</td>
+                                            <td>4</td>
+                                            <td>Oui</td>
+                                            <td>14e</td>
+                                            <td>Crédits obtenus : 10 Crédits requis : 10</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Gestion de Trésorerie</td>
+                                            <td>10,63</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>15ex</td>
+                                            <td>Passable (LIEPO Guy Aimé)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Politique d'Investissement</td>
+                                            <td>12,67</td>
+                                            <td>2</td>
+                                            <td>Oui</td>
+                                            <td>13e</td>
+                                            <td>Assez-bien (LIEPO Guy Aimé)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Bilan UE3</strong></td>
+                                            <td>11,65</td>
+                                            <td>4</td>
+                                            <td>Oui</td>
+                                            <td>13e</td>
+                                            <td>Crédits obtenus : 8 Crédits requis : 8</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                        
+                                <h3>Moyenne générale 2e Semestre</h3>
+                                <p>00,00 / 20 Rang : 1er / 38 | 3/3 UE Validées</p>
+                        
+                                <h3>MOYENNE GENERALE ANNUELLE</h3>
+                                <p>0,00 / 20 | RANG : 1ex / 38</p>
+                                <p>TOTAL UE : 4/6 UE Validées</p>
+                                <p>TOTAL CREDIT : 53/60</p>
+                            </div>
+                        
+                            <div class="footer">
+                                <p>Appréciations du conseil de classe</p>
+                                <p>Le Directeur des Etudes</p>
+                                <p>Fait à Abidjan, le 06/06/2024</p>
+                                <p>Le Professeur Principal : M. Eric TOUGBA</p>
+                                <p>Année Académique 2016 - 2017 | Edité le 06/06/2024 à 20:06:50</p>
+                                <p>Nb : Aucun duplicata ne sera délivré</p>
+                            </div>
+                        
+                        </body>
+                        
+                        </html>
+
+                        <td>
+                            
+
+                        </td>
+                        <td> Attente confirmation</td>
+
+                    </tr>
+               
+
+
+
+                </table>
+                {#
+            </div> #}
+        </div>
+    </div>
+
+
+    </div>
+
+
+    </div>
+
+    <htmlpagefooter name="pageFooter">
+        {# <table style="width:100%">
+            <tr>
+                <td style="width:50%;text-align:left;padding-bottom:8px">
+                    <i><b>Client</b></i>
+                </td>
+                <td style="width:50%;text-align:right">
+                    <i><b>Souche</b></i>
+                </td>
+            </tr>
+        </table> #}
+        <div style="border-top:2px solid #000"></div>
+        <p align="center" style="align: center;margin-top:-1px">
+            COCODY ECOLE POLICEI - 01 BP 5889 Abidjan 01 - e-mail:
+            <a href="mailto:ufrseg-filierespro-ufhb.ci">ufrseg-filierespro-ufhb.ci</a><br>
+            TEL :01 01 15 44 44
+        </p>
+    </htmlpagefooter>
+</body>
+
+</html>

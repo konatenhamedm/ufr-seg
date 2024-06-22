@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{# {{ code =='a' ? 'AVOIR': 'FACTURE' }} {{ facture.numero }} #}dd</title>
+    <style>
+        {
+            % block page_css %
+        }
+
+        @page {
+
+            margin-footer: 0.5cm;
+
+            /*header: html_headerContent;*/
+            footer: html_pageFooter;
+            margin-top: 0.5cm;
+            margin-header: 0cm;
+
+            /*background: ...
+  background-image: ...
+  background-position ...
+  background-repeat ...
+  background-color ...
+  background-gradient: ...*/
+        }
+
+        .clearfix:after,
+        {
+        % endblock %
+        }
+
+        .clearfix:before {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .mention {
+            position: absolute;
+            bottom: 100px;
+        }
+
+        /*@page :first {
+   header: html_headerContent;
+}*/
+        caption {
+            margin-bottom: 15px;
+        }
+
+        fieldset {
+            border: 1px solid #000 !important;
+            margin: 0;
+            xmin-width: 0;
+            padding: 10px;
+            position: relative;
+            border-radius: 4px;
+            background-color: #fff;
+            padding-left: 10px !important;
+        }
+
+        legend {
+            padding: 0 10px;
+            margin-left: 100px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 0px;
+            width: 35%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #ffffff;
+        }
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+           /* # border: 1px solid #dddddd; */
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {}
+
+        @media all {
+            /*.content { display: block; page-break-inside: avoid; }*/
+        }
+
+        .content {
+            /*margin-top: 18cm;*/
+        }
+
+            {
+            # .table-responsive.table-bordered {
+                border: 0;
+            }
+
+            
+        }
+
+        .double_underline {
+            text-decoration: underline;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+          .contenu {
+            text-align: center;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body style="font-size:12px;">
+    <div class="clearfix">
+        <div style="width:10%;text-align:left;float:left;" class="">
+            {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
+            {# <img src="{{ var |replace({'/': " \\"}) }}" width="100px" /> #}
+            <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180" width="100px" />
+            {# <img src="{{ absolute_url(asset(var)) }}" width="100px" /> #}
+            {# <div style="text-align:left;border: 1px solid #000;padding:8px;width:70%" class="">
+                CC N° 9904215 D<br>
+                Régime d'imposition: Réel Normal<br>
+                Centre des impôts: D G E<br>
+            </div>
+            {{ "facture.typeFacture.libelle" | upper }} N° {{ 'facture.numero' }} #}
+        </div>
+
+        <div style="width:65%;text-align:right;float:center;">
+            <div style="text-align:center;" class="">
+                <b>UFR-SEG</b><br>
+                BP V 43 ABIDJAN ,TEL :01 01 15 44 44 ufrseg-filierespro-ufhb.ci <br>
+                Abidjan-Cocody
+                <div style="border-top:1px solid #000"></div>
+            </div>
+
+        </div>
+        <div style="width:25%;text-align:right;float:right;margin-top:0px,padding:8px">
+
+            <div style="text-align:center;margin-top:-45px" class="">
+                République de COTE D'IVOIRE <br>
+                <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
+                <b style="font-weight: bolder;">Année scolaire : 2021-2022</b>
+            </div>
+
+        </div>
+    </div>
+
+
+    <br>
+
+    <form action="/action_page.php">
+        <table style="margin-top:-40px ">
+        
+            <tr style=" border: 0px !important;">
+              
+                <th class="contenu" style="width:60%; border: 0px !important;">
+        
+                    <div align="center"
+                        style="align: center; font-size: 24px; background-color: #beb7b7; box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.5); border: 3px solid rgb(255, 255, 255); padding: 10px;"
+                        class="text-center">
+                          BULLETIN DE NOTES
+                    </div>
+        
+        
+        
+                </th>
+            </tr>
+        
+        
+        
+        
+        </table>
+        <div class="content">
+                   
+            <table class="details">
+                <tr>
+                    <td colspan="2" class="contenu" style="width: 100%; border-radius: 4px !important; border: 1px solid #000;"><strong>Licence FCAC</strong></td>
+                    
+                </tr>
+                <tr>
+                   
+                    <td class="contenu" style="width: 50%; border: 1px solid #000;"><strong>Classe :</strong> Licence3 FC_AG</td>
+                    <td class="contenu" style="width: 50%; border: 1px solid #000;"><strong>Effectif :</strong> 38</td>
+                </tr>
+                
+            </table>
+<br>
+            <table class="details">
+                
+                <tr>
+                    <td colspan="6" style="width: 50%;  border-left: 1px solid #000; border-top: 1px solid #000;  border-right: 1px solid #000;"class="contenu"><strong>Matricule :</strong> L3FCC3511</td>
+                    <td style="width: 50%;  border-right: 1px solid #000; border-top: 1px solid #000;"class="contenu"><strong>Matricule Nle :</strong></td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="width: 50%;  border-left: 1px solid #000; border-right: 1px solid #000;"class="contenu"><strong>Nom :</strong> ATTORRA</td>
+                    <td style="width: 50%; border-right: 1px solid #000"class="contenu"><strong>Sexe :</strong> M</td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="width: 50%;  border-left: 1px solid #000;  border-right: 1px solid #000;"class="contenu"><strong>Prénoms :</strong> Edgard Lionel Olivier</td>
+                    <td style="width: 50%; border-right: 1px solid #000"class="contenu"><strong>Statut :</strong> Non Affecté(e)</td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="width: 50%;  border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"class="contenu"><strong>Né le :</strong> 27/09/1983 à Treicheville</td>
+                    <td style="width: 50%; border-right: 1px solid #000;border-bottom: 1px solid #000;"class="contenu"><strong>Redoublant :</strong></td>
+                </tr>
+                <tr>
+                    <td 
+                        style="  border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
+                        class="contenu">ECUE</td>
+                    <td style=" border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                        Moy/20</td>
+                        <td style="  border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
+                            class="contenu">Coef</td>
+                        <td style=" border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                            <strong>Validé</strong>
+                        </td>
+                        <td style="  border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
+                            class="contenu"> s</td>
+                        <td style=" border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                            Appréciations
+                        </td>
+                          <td style=" border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                            <strong>Redoublant :</strong>
+                        </td>
+                </tr>
+            </table>
+        {# <fieldset>
+            <legend>Identification Étudiant</legend>
+            <table style=" border: 0px !important;">
+
+                <tr style=" border: 0px !important;">
+                    <th style=" border: 0px !important;">Code :</th>
+                    <th style=" border: 0px !important;">Nom :</th>
+                    <th style=" border: 0px !important;">Filière :</th>
+                </tr>
+                <tr style=" border: 0px !important;">
+                    <td style=" border: 0px !important;">Date inscription </td>
+                    <td style=" border: 0px !important;">Prénoms :</td>
+                    <td style=" border: 0px !important;">Niveau :</td>
+                </tr>
+
+
+            </table>
+        </fieldset> #}
+        <table style=" ">
+        
+        
+            <tr style=" border: 0px !important;">
+            <th colspan="2" class="contenu" style="width:100%;  border: 1px solid #f20a0a !important;">
+            
+                    Fiche de Notes - Classe : 6EME 1
+ 
+            </th>
+            </tr>
+            <tr style=" border: 0px !important;">
+                <th class="contenu" style="width:50% border: 0px !important;">Enseignant :.................</th>
+                <th class="contenu" style="width:50% border: 0px !important;">Trimestre :.................</th>
+            </tr>
+        
+        
+        
+        </table>
+
+        <table style=" ">
+        
+        
+            <tr style=" border: 0px !important;">
+                <th colspan="6" class="contenu" style="width:100%;  border: 1px solid #f20a0a !important;">
+                    Fiche de Notes - Classe : 6EME 1
+                </th>
+                <th colspan="" class="contenu" style="width:100%;  border: 1px solid #f20a0a !important;">
+                    Fiche de Notes - Classe : 6EME 1
+                </th>
+            </tr>
+            <tr style=" border: 0px !important;">
+                <th colspan="6" class="contenu" style="width:100%;  border: 1px solid #f20a0a !important;">
+                    Fiche de Notes - Classe : 6EME 1
+                </th>
+                <th colspan="" class="contenu" style="width:100%;  border: 1px solid #f20a0a !important;">
+                    Fiche de Notes - Classe : 6EME 1
+                </th>
+            </tr>
+            <tr style=" border: 0px !important;">
+                <th colspan="6" class="contenu" style="width:100%;  border: 1px solid #f20a0a !important;">
+                    Fiche de Notes - Classe : 6EME 1
+                </th>
+                <th colspan="" class="contenu" style="width:100%;  border: 1px solid #f20a0a !important;">
+                    Fiche de Notes - Classe : 6EME 1
+                </th>
+            </tr>
+            <tr style=" border: 0px !important;">
+                <th colspan="6" class="contenu" style="width:100%;  border: 1px solid #f20a0a !important;">
+                    Fiche de Notes - Classe : 6EME 1
+                </th>
+                <th colspan="" class="contenu" style="width:100%;  border: 1px solid #f20a0a !important;">
+                    Fiche de Notes - Classe : 6EME 1
+                </th>
+            </tr>
+            <tr style=" border: 0px !important;">
+                <th class="contenu" style="width:50%; border: 0px !important;">Enseignant :.................</th>
+                <th class="contenu" style="width:50%; border: 0px !important;">Trimestre :.................</th>
+                <th class="contenu" style="width:50%; border: 0px !important;">Enseignant :.................</th>
+                <th class="contenu" style="width:50%; border: 0px !important;">Trimestre :.................</th>
+                <th class="contenu" style="width:50%; border: 0px !important;">Enseignant :.................</th>
+                <th class="contenu" style="width:50%; border: 0px !important;">Trimestre :.................</th>
+                <th class="contenu" style="width:50%; border: 0px !important;">Enseignant :.................</th>
+
+            </tr>
+        
+        
+        
+        </table>
+    </form>
+
+    <br />
+
+    <div class="clearfix">
+       
+        <div style="width:100%;text-align:right;float:right;">
+
+            {# <div
+                style="margin-top:-25px;text-align:center;bosrder: 1px solid #000;padding:8px;font-size:15px;font-weight:bold"
+                class=""> #}
+                {# <b>DOIT</b><br><br> #}
+                <table>
+                    <caption>
+
+                        <b>{{'Liste des paiements en attente de confirmation' | upper}}</b><br>
+                    </caption>
+                    <tr style="background-color: #dddddd">
+                        <th>Date</th>
+                        <th>Mode paiement</th>
+                        <th>Montant versé</th>
+                        <th>Statut</th>
+                    </tr>
+
+                   
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            
+
+                        </td>
+                        <td> Attente confirmation</td>
+
+                    </tr>
+               
+
+
+
+                </table>
+                {#
+            </div> #}
+        </div>
+    </div>
+
+
+    </div>
+
+
+    </div>
+
+    <htmlpagefooter name="pageFooter">
+        {# <table style="width:100%">
+            <tr>
+                <td style="width:50%;text-align:left;padding-bottom:8px">
+                    <i><b>Client</b></i>
+                </td>
+                <td style="width:50%;text-align:right">
+                    <i><b>Souche</b></i>
+                </td>
+            </tr>
+        </table> #}
+        <div style="border-top:2px solid #000"></div>
+        <p align="center" style="align: center;margin-top:-1px">
+            COCODY ECOLE POLICEI - 01 BP 5889 Abidjan 01 - e-mail:
+            <a href="mailto:ufrseg-filierespro-ufhb.ci">ufrseg-filierespro-ufhb.ci</a><br>
+            TEL :01 01 15 44 44
+        </p>
+    </htmlpagefooter>
+</body>
+
+</html>

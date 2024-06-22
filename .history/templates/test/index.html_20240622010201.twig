@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{# {{ code =='a' ? 'AVOIR': 'FACTURE' }} {{ facture.numero }} #}dd</title>
+    <style>
+        {
+            % block page_css %
+        }
+
+        @page {
+
+            margin-footer: 0.5cm;
+
+            /*header: html_headerContent;*/
+            footer: html_pageFooter;
+            margin-top: 0.5cm;
+            margin-header: 0cm;
+
+            /*background: ...
+  background-image: ...
+  background-position ...
+  background-repeat ...
+  background-color ...
+  background-gradient: ...*/
+        }
+
+        .clearfix:after,
+        {
+        % endblock %
+        }
+
+        .clearfix:before {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .mention {
+            position: absolute;
+            bottom: 100px;
+        }
+
+        /*@page :first {
+   header: html_headerContent;
+}*/
+        caption {
+            margin-bottom: 15px;
+        }
+
+        fieldset {
+            border: 1px solid #000 !important;
+            margin: 0;
+            xmin-width: 0;
+            padding: 10px;
+            position: relative;
+            border-radius: 4px;
+            background-color: #fff;
+            padding-left: 10px !important;
+        }
+
+        legend {
+            padding: 0 10px;
+            margin-left: 100px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 0px;
+            width: 35%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #ffffff;
+        }
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+            /* # border: 1px solid #dddddd; */
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {}
+
+        @media all {
+            /*.content { display: block; page-break-inside: avoid; }*/
+        }
+
+        .content {
+            /*margin-top: 18cm;*/
+        }
+
+            {
+            # .table-responsive.table-bordered {
+                border: 0;
+            }
+
+
+        }
+
+        .table-container {
+            border: 1px solid #000;
+            border-radius: 15px;
+
+            padding: 20px;
+        }
+
+        .double_underline {
+            text-decoration: underline;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        .contenu {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .gauche {
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .droit {
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        .bordur-gauche {
+            border-left: 1px solid #000;
+
+        }
+
+        .bordur-droit {
+            border-right: 1px solid #000;
+
+        }
+
+        .bordur-haute {
+            border-top: 1px solid #000;
+
+        }
+
+        .bordur-bas {
+            border-bottom: 1px solid #000;
+
+        }
+
+        .bordur-tout {
+            border: 1px solid #000;
+
+        }
+
+        .flex-container {
+            display: flexbox;
+            justify-content: center;
+            /* Centre les éléments horizontalement */
+            align-items: center;
+            /* Centre les éléments verticalement */
+            gap: 20px;
+            /* Espace entre les éléments */
+        }
+
+        .flex-item {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body style="font-size:12px;">
+    <div class="clearfix">
+        <div style="width:10%;text-align:left;float:left;" class="">
+            {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
+            {# <img src="{{ var |replace({'/': " \\"}) }}" width="100px" /> #}
+            <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180" width="100px" />
+            {# <img src="{{ absolute_url(asset(var)) }}" width="100px" /> #}
+            {# <div style="text-align:left;border: 1px solid #000;padding:8px;width:70%" class="">
+                CC N° 9904215 D<br>
+                Régime d'imposition: Réel Normal<br>
+                Centre des impôts: D G E<br>
+            </div>
+            {{ "facture.typeFacture.libelle" | upper }} N° {{ 'facture.numero' }} #}
+        </div>
+
+        <div style="width:65%;text-align:right;float:center;">
+            <div style="text-align:center;" class="">
+                <b>UFR-SEG</b><br>
+                BP V 43 ABIDJAN ,TEL :01 01 15 44 44 ufrseg-filierespro-ufhb.ci <br>
+                Abidjan-Cocody
+                <div style="border-top:1px solid #000"></div>
+            </div>
+
+        </div>
+        <div style="width:25%;text-align:right;float:right;margin-top:0px,padding:8px">
+
+            <div style="text-align:center;margin-top:-45px" class="">
+                République de COTE D'IVOIRE <br>
+                <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
+                <b style="font-weight: bolder;">Année scolaire : 2021-2022</b>
+            </div>
+
+        </div>
+    </div>
+
+
+    <br>
+
+    <form action="/action_page.php">
+        <table style="margin-top:-40px ">
+
+            <tr style=" border: 0px !important;">
+
+                <th class="contenu" style="width:60%; border: 0px !important;">
+
+                    <div align="center"
+                        style="align: center; font-size: 24px; background-color: #beb7b7; box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.5); border: 3px solid rgb(255, 255, 255);"
+                        class="text-center">
+                        BULLETIN DE NOTES
+                    </div>
+
+
+
+                </th>
+            </tr>
+
+
+
+
+        </table>
+        <div class="content">
+
+            <div class="table-container " style="display: flex;padding: 0px;">
+                <table class="details">
+                    <tr>
+                        <td colspan="2" class=" table-container contenu "
+                            style="width: 100%;height: 20px; border-bottom: 1px solid #000; border-left: 0px solid #000;border-top: 0px solid #000;border-right: 0px solid #000; ">
+                            <strong>LICENCE FCAC</strong>
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td class="contenu" style="width: 50%; border: 0px solid #000;"><strong>Classe :</strong>
+                            Licence3 FC_AG</td>
+                        <td class="contenu" style="width: 50%;border: 0px solid #000;"><strong>Effectif :</strong> 38
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+            <br>
+            <table class="details">
+
+                <tr>
+                    <td colspan="6"
+                        style="width: 70%;  border-left: 1px solid #000; border-top: 1px solid #000;  border-right: 1px solid #000;"
+                        class="contenu"><strong>Matricule :</strong> L3FCC3511</td>
+                    <td style="width: 30%;  border-right: 1px solid #000; border-top: 1px solid #000;" class="contenu">
+                        <strong>Matricule Nle :</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="width: 70%;  border-left: 1px solid #000; border-right: 1px solid #000;"
+                        class="contenu"><strong>Nom :</strong> ATTORRA</td>
+                    <td style="width: 30%; border-right: 1px solid #000" class="contenu"><strong>Sexe :</strong> M</td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="width: 70%;  border-left: 1px solid #000;  border-right: 1px solid #000;"
+                        class="contenu"><strong>Prénoms :</strong> Edgard Lionel Olivier</td>
+                    <td style="width: 30%; border-right: 1px solid #000" class="contenu"><strong>Statut :</strong> Non
+                        Affecté(e)</td>
+                </tr>
+                <tr>
+                    <td colspan="6"
+                        style="width: 70%;  border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
+                        class="contenu"><strong>Né le :</strong> 27/09/1983 à Treicheville</td>
+                    <td style="width: 30%; border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                        <strong>Redoublant :</strong>
+                    </td>
+                </tr>
+                <tr style="background-color: #dddddd">
+                    <td style=" width: 40%; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000; padding: 0px;"
+                        class="contenu"><strong>ECUE</strong></td>
+                    <td style="width: 5%; border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                        <strong>Moy/20</strong>
+                    </td>
+                    <td style=" width: 5%; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
+                        class="contenu"><strong>Coef</strong></td>
+                    <td style="width: 5%; border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                        <strong>Validé</strong>
+                    </td>
+                    <td style="width: 5%;  border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
+                        class="contenu"> <strong>Rang</strong></td>
+                    <td style=" width: 10%; border-right: 1px solid #000;border-bottom: 1px solid #000;"
+                        class="contenu">
+                        Appréciations
+                    </td>
+                    <td style="width: 30%; border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                        <strong>Redoublant :</strong>
+                    </td>
+                </tr>
+            </table>
+            <h3 style="background-color: #dddddd;text-align:center;">PREMIER SEMESTRE</h3>
+
+            <div class="clearfix">
+
+                <div style="width:100%;text-align:right;float:right;">
+
+                    {# <div
+                        style="margin-top:-25px;text-align:center;bosrder: 1px solid #000;padding:8px;font-size:15px;font-weight:bold"
+                        class=""> #}
+                        {# <b>DOIT</b><br><br> #}
+                        <table>
+
+                            <thead>
+                                <tr style="background-color: #dddddd">
+                                    <th colspan="6"
+                                        style="width: 70%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        UE1G41LAP : Langues et Autres Atouts Professionnels</th>
+
+                                    <th
+                                        style="width: 30%; border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Nbre Crédits : 16</th>
+                                </tr>
+                            </thead>
+
+
+                            <tbody>
+                                <tr>
+                                    <td
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Langues et Autres Atouts Professionnels</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td
+                                        style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Insuffisant </td>
+                                    <td
+                                        style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        YASSI Pierre wango Felix </td>
+
+                                </tr>
+
+                                <tr>
+                                    <td
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Langues et Autres Atouts Professionnels</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td
+                                        style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Insuffisant </td>
+                                    <td
+                                        style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        YASSI Pierre wango Felix </td>
+
+                                </tr>
+
+                                <tr>
+                                    <td
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Langues et Autres Atouts Professionnels</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td
+                                        style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Insuffisant </td>
+                                    <td
+                                        style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        YASSI Pierre wango Felix </td>
+
+                                </tr>
+
+                                <tr>
+                                    <td
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Langues et Autres Atouts Professionnels</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td
+                                        style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Insuffisant </td>
+                                    <td
+                                        style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        YASSI Pierre wango Felix </td>
+
+                                </tr>
+                                <tr>
+                                    <td
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Langues et Autres Atouts Professionnels</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td
+                                        style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Insuffisant </td>
+                                    <td
+                                        style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        YASSI Pierre wango Felix </td>
+
+                                </tr>
+                                <tr>
+                                    <td class="contenu"
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Bilan UE1</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td class="contenu"
+                                        style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 0px solid #000;border-bottom: 1px solid #000;">
+                                        Crédits obtenus : 12 </td>
+                                    <td class="contenu"
+                                        style="width: 20%;border-top: 1px solid #000; border-left: 0px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Crédits requis : 16 </td>
+
+                                </tr>
+
+                                <!-- Ajoutez d'autres lignes de résultats ici -->
+                            </tbody>
+
+
+
+
+                        </table>
+
+
+                        <table>
+
+                            <thead>
+                                <tr style="background-color: #dddddd">
+                                    <th colspan="6" style="width: 70%;">UE5S6DR : Droit des Sociétés et Sécurité Sociale
+                                    </th>
+
+                                    <th style="width: 30%;">Nbre Crédits : 8</th>
+                                </tr>
+                            </thead>
+
+
+                            <tbody>
+                                <tr>
+                                    <td
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Langues et Autres Atouts Professionnels</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td
+                                        style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Insuffisant </td>
+                                    <td
+                                        style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        YASSI Pierre wango Felix </td>
+
+                                </tr>
+
+                                <tr>
+                                    <td
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Langues et Autres Atouts Professionnels</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td
+                                        style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Insuffisant </td>
+                                    <td
+                                        style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        YASSI Pierre wango Felix </td>
+
+                                </tr>
+
+
+                                <tr>
+                                    <td class="contenu" style="width: 40%;">Bilan UE2</td>
+                                    <td style="width: 5%;">9,50</td>
+                                    <td style="width: 5%;">2</td>
+                                    <td style="width: 5%;">Non</td>
+                                    <td style="width: 5%;">8e</td>
+                                    <td class="contenu" style="width: 20%;">Crédits obtenus : 8 </td>
+                                    <td class="contenu" style="width: 20%;">Crédits requis : 8 </td>
+
+                                </tr>
+
+                                <!-- Ajoutez d'autres lignes de résultats ici -->
+                            </tbody>
+
+                        </table>
+
+
+                        <table>
+
+                            <thead>
+                                <tr style="background-color: #dddddd">
+                                    <th colspan="6" style="width: 70%;">UE4S5F1 : FINANCE 1</th>
+
+                                    <th style="width: 30%;">Nbre Crédits : 6</th>
+                                </tr>
+                            </thead>
+
+
+                            <tbody>
+                                <tr>
+                                    <td
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Langues et Autres Atouts Professionnels</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td
+                                        style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Insuffisant </td>
+                                    <td
+                                        style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        YASSI Pierre wango Felix </td>
+
+                                </tr>
+
+                                <tr>
+                                    <td
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Langues et Autres Atouts Professionnels</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td
+                                        style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Insuffisant </td>
+                                    <td
+                                        style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        YASSI Pierre wango Felix </td>
+
+                                </tr>
+
+
+                                <tr>
+                                    <td class="contenu"
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Bilan UE2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        9,50</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        2</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Non</td>
+                                    <td
+                                        style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        8e</td>
+                                    <td class="contenu"
+                                        style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                        Crédits obtenus : 3 </td>
+                                    <td class="contenu"
+                                        style="width: 20%;border-top: 1px solid #000; border-left: 0px solid #000;  border-right: 0px solid #000;border-bottom: 1px solid #000;">
+                                        Crédits requis : 6 </td>
+
+                                </tr>
+
+                                <!-- Ajoutez d'autres lignes de résultats ici -->
+                            </tbody>
+
+
+
+
+                        </table>
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th class="contenu" colspan="5" style="width: 60%;">Moyenne générale 1er Semestre :
+                                        00,00 / 20</th>
+
+                                    <th class="contenu" style="width: 20%;">Rang : er / 38 </th>
+                                    <th class="contenu" style="width: 20%;">1/3 UE Validées </th>
+
+                                </tr>
+                            </thead>
+
+
+
+
+
+
+
+                        </table>
+
+
+
+
+                        <h3 style="background-color: #dddddd;text-align:center;">DEUXIEME SEMESTRE</h3>
+
+                        <div class="clearfix">
+
+                            <div style="width:100%;text-align:right;float:right;">
+
+                                {# <div
+                                    style="margin-top:-25px;text-align:center;bosrder: 1px solid #000;padding:8px;font-size:15px;font-weight:bold"
+                                    class=""> #}
+                                    {# <b>DOIT</b><br><br> #}
+                                    <table>
+
+                                        <thead>
+                                            <tr style="background-color: #dddddd">
+                                                <th colspan="6" style="width: 70%;">UE1G41LAP : Langues et Autres Atouts
+                                                    Professionnels</th>
+
+                                                <th style="width: 30%;">Nbre Crédits : 16</th>
+                                            </tr>
+                                        </thead>
+
+
+                                        <tbody>
+                                            <tr>
+                                                <td
+                                                    style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Langues et Autres Atouts Professionnels</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    9,50</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    2</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Non</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    8e</td>
+                                                <td
+                                                    style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Insuffisant </td>
+                                                <td
+                                                    style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    YASSI Pierre wango Felix </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td
+                                                    style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Langues et Autres Atouts Professionnels</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    9,50</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    2</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Non</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    8e</td>
+                                                <td
+                                                    style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Insuffisant </td>
+                                                <td
+                                                    style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    YASSI Pierre wango Felix </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td
+                                                    style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Langues et Autres Atouts Professionnels</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    9,50</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    2</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Non</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    8e</td>
+                                                <td
+                                                    style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Insuffisant </td>
+                                                <td
+                                                    style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    YASSI Pierre wango Felix </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td
+                                                    style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Langues et Autres Atouts Professionnels</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    9,50</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    2</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Non</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    8e</td>
+                                                <td
+                                                    style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Insuffisant </td>
+                                                <td
+                                                    style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    YASSI Pierre wango Felix </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td
+                                                    style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Langues et Autres Atouts Professionnels</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    9,50</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    2</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Non</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    8e</td>
+                                                <td
+                                                    style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Insuffisant </td>
+                                                <td
+                                                    style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    YASSI Pierre wango Felix </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td class="contenu" style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Bilan UE1</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">9,50</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">2</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Non</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">8e</td>
+                                                <td class="contenu" style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Crédits obtenus : 12 </td>
+                                                <td class="contenu" style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Crédits requis : 16 </td>
+
+                                            </tr>
+
+                                            <!-- Ajoutez d'autres lignes de résultats ici -->
+                                        </tbody>
+
+
+
+
+                                    </table>
+
+
+                                    <table>
+
+                                        <thead>
+                                            <tr style="background-color: #dddddd">
+                                                <th colspan="6" style="width: 70%;">UE5S6DR : Droit des Sociétés et
+                                                    Sécurité Sociale</th>
+
+                                                <th style="width: 30%;">Nbre Crédits : 8</th>
+                                            </tr>
+                                        </thead>
+
+
+                                        <tbody>
+                                            <tr>
+                                                <td
+                                                    style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Langues et Autres Atouts Professionnels</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    9,50</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    2</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Non</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    8e</td>
+                                                <td
+                                                    style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Insuffisant </td>
+                                                <td
+                                                    style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    YASSI Pierre wango Felix </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td
+                                                    style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Langues et Autres Atouts Professionnels</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    9,50</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    2</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Non</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    8e</td>
+                                                <td
+                                                    style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Insuffisant </td>
+                                                <td
+                                                    style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    YASSI Pierre wango Felix </td>
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td class="contenu" style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Bilan UE2</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">9,50</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">2</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Non</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">8e</td>
+                                                <td class="contenu" style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Crédits obtenus : 8 </td>
+                                                <td class="contenu" style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Crédits requis : 8 </td>
+
+                                            </tr>
+
+                                            <!-- Ajoutez d'autres lignes de résultats ici -->
+                                        </tbody>
+
+                                    </table>
+
+
+                                    <table>
+
+                                        <thead>
+                                            <tr style="background-color: #dddddd">
+                                                <th colspan="6" style="width: 70%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">UE4S5F1 : FINANCE 1</th>
+
+                                                <th style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Nbre Crédits : 6</th>
+                                            </tr>
+                                        </thead>
+
+
+                                        <tbody>
+                                            <tr>
+                                                <td
+                                                    style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Langues et Autres Atouts Professionnels</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    9,50</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    2</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Non</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    8e</td>
+                                                <td
+                                                    style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Insuffisant </td>
+                                                <td
+                                                    style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    YASSI Pierre wango Felix </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td
+                                                    style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Langues et Autres Atouts Professionnels</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    9,50</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    2</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Non</td>
+                                                <td
+                                                    style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    8e</td>
+                                                <td
+                                                    style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    Insuffisant </td>
+                                                <td
+                                                    style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
+                                                    YASSI Pierre wango Felix </td>
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td class="contenu" style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Bilan UE2</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">9,50</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">2</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Non</td>
+                                                <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">8e</td>
+                                                <td class="contenu" style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Crédits obtenus : 3 </td>
+                                                <td class="contenu" style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Crédits requis : 6 </td>
+
+                                            </tr>
+
+                                            <!-- Ajoutez d'autres lignes de résultats ici -->
+                                        </tbody>
+
+
+
+
+                                    </table>
+
+                                    <table>
+
+                                        <thead>
+
+                                            <tr>
+                                                <th class="contenu" colspan="5" style="width: 60%;">Moyenne générale 1er
+                                                    Semestre : 00,00 / 20
+                                                </th>
+
+                                                <th class="contenu" style="width: 20%;">Rang : er / 38 </th>
+                                                <th class="contenu" style="width: 20%;">1/3 UE Validées </th>
+
+                                            </tr>
+                                        </thead>
+
+
+
+
+
+
+
+                                    </table>
+
+                                    <table>
+
+                                        <thead>
+
+                                            <tr>
+                                                <th class="contenu" colspan="5" style="width: 50%;">Moyenne générale 1er
+                                                    Semestre : 00,00 / 20
+                                                </th>
+
+                                                <th class="contenu" colspan="5" style="width: 10%;">RANG : 1ex / 38
+                                                </th>
+
+                                                <th class="contenu" style="width: 20%;">TOTAL UE : 4/6 UE Validées </th>
+                                                <th class="contenu" style="width: 20%;">TOTAL CREDIT : 53/60</th>
+
+                                            </tr>
+                                        </thead>
+
+
+
+
+
+
+
+                                    </table>
+
+                                    <table>
+
+                                        <thead>
+
+                                            <tr>
+
+                                                <th class="contenu" style="width: 50%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Appréciations du conseil de
+                                                    classe </th>
+                                                <th class="contenu" style="width: 50%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Le Directeur des Etudes</th>
+
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+
+
+                                            <tr>
+                                                <td style=""></td>
+
+                                                <td class="gauche">YASSI Pierre wango Felix </td>
+
+                                            </tr>
+
+
+                                            <tr>
+
+                                                <td class="droit">Crédits obtenus : 3 </td>
+                                                <td class="droit">Crédits requis : 6 </td>
+
+                                            </tr>
+
+                                            <!-- Ajoutez d'autres lignes de résultats ici -->
+                                        </tbody>
+
+
+
+
+
+                                    </table>
+                                    {#
+                                </div> #}
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+                <htmlpagefooter name="pageFooter">
+                    {# <table style="width:100%">
+                        <tr>
+                            <td style="width:50%;text-align:left;padding-bottom:8px">
+                                <i><b>Client</b></i>
+                            </td>
+                            <td style="width:50%;text-align:right">
+                                <i><b>Souche</b></i>
+                            </td>
+                        </tr>
+                    </table> #}
+                    <div style="border-top:2px solid #000"></div>
+                    <p align="center" style="align: center;margin-top:-1px">
+                        COCODY ECOLE POLICEI - 01 BP 5889 Abidjan 01 - e-mail:
+                        <a href="mailto:ufrseg-filierespro-ufhb.ci">ufrseg-filierespro-ufhb.ci</a><br>
+                        TEL :01 01 15 44 44
+                    </p>
+                </htmlpagefooter>
+</body>
+
+</html>
