@@ -15,7 +15,17 @@
         </div>
     </div>
     <div class="card-body">
+
+    <div class="row" style="margin-top: 55px;position:relative">
+     <div>
+        <input type="checkbox" id="check-all">
+        <label for="check-all">Tout cocher</label>
+     </div>
+     <div></div>
+     <div></div>
+    </div>
         <div class="row">
+     
             <div class="col-sm-12">
                 <div id="grid_app_utilisateur_utilisateur" class="grid-dt-wrapper">Chargement....</div>
             </div>
@@ -47,19 +57,16 @@
                   
               });
                 // Check/Uncheck all checkboxes
-            $('#checkAll').click(function() {
-                alert('')
-                var isChecked = $(this).is(':checked');
-                $('.row-check').prop('checked', isChecked);
-            });
+            $('#check-all').click(function() {
+                $('.row-check').prop('checked', $(this).prop('checked'));
+             });
 
-            // Optionally, update the "check all" checkbox status when individual checkboxes are clicked
-            $(document).on('click', '.row-check', function() {
-                alert('')
-                var totalCheckboxes = $('.row-check').length;
-                var checkedCheckboxes = $('.row-check:checked').length;
-                $('#checkAll').prop('checked', totalCheckboxes === checkedCheckboxes);
-            });
+    // Lorsqu'une des cases à cocher est cochée/décochée
+    $(document).on('change', '.row-check', function() {
+        // Vérifiez si toutes les cases à cocher sont cochées pour cocher "Check All"
+        var allChecked = $('.row-check:checked').length === $('.row-check').length;
+        $('#check-all').prop('checked', allChecked);
+    });
         });
     </script>
 {% endblock %}

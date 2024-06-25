@@ -40,7 +40,7 @@ class UtilisateurController extends AbstractController
         $table = $dataTableFactory->create()
 
             ->add('check', TextColumn::class, [
-                'label' => '<input type="checkbox" id="checkAll">',
+                'label' => '',
                 'raw' => true,
                 'orderable' => false,
                 'searchable' => false,

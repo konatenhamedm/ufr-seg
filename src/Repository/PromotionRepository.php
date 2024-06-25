@@ -19,6 +19,7 @@ use Symfony\Bundle\SecurityBundle\Security;
  */
 class PromotionRepository extends ServiceEntityRepository
 {
+
     private $em;
     private $user;
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager, Security $security)
@@ -77,4 +78,5 @@ class PromotionRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
 }

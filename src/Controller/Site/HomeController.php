@@ -850,11 +850,26 @@ class HomeController extends AbstractController
 
 
         $table = $dataTableFactory->create()
+
+            ->add('check', TextColumn::class, [
+                'label' => '',
+                'raw' => true,
+                'orderable' => false,
+                'searchable' => false,
+                'render' => function ($value, $context) {
+                    return sprintf('<input type="checkbox" class="row-check" value="%s">', $context->getId());
+                },
+            ])
             ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'etudiant.nom'])
             ->add('prenom', TextColumn::class, ['label' => 'Prénoms', 'field' => 'etudiant.prenom'])
-            ->add('contact', TextColumn::class, ['label' => 'Contact', 'field' => 'etudiant.contact'])
             ->add('classe', TextColumn::class, ['label' => 'Classe', 'field' => 'classe.libelle'])
+            ->add('moyenne', TextColumn::class, ['label' => 'Moyenne ', 'className' => 'text-end w-50px', 'render' => function ($value, $context) {
+                return '14';
+            }])
+            ->add('nombreCredit', TextColumn::class, ['label' => 'Nombre crédits ', 'className' => 'text-end w-70px', 'render' => function ($value, $context) {
+                return '14';
+            }])
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Inscription::class,
@@ -905,6 +920,18 @@ class HomeController extends AbstractController
                 return true;
             }),
             'delete' => new ActionRender(function () {
+                return true;
+            }),
+            'first_print' => new ActionRender(function () {
+                return true;
+            }),
+            'seconde_print' => new ActionRender(function () {
+                return true;
+            }),
+            'third_print' => new ActionRender(function () {
+                return true;
+            }),
+            'fourth_print' => new ActionRender(function () {
                 return true;
             }),
         ];
@@ -963,7 +990,64 @@ class HomeController extends AbstractController
                                 'icon' => '%icon% bi bi-trash',
                                 'attrs' => ['class' => 'btn-danger'],
                                 'render' => $renders['delete']
-                            ]
+                            ],
+
+                            'first_print' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_test',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-warning '],
+                                'render' => $renders['first_print']
+                            ],
+                            'fourth_print' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_test2',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-info '],
+                                'render' => $renders['fourth_print']
+                            ],
+                            'seconde_print' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_test4',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-danger '],
+                                'render' => $renders['seconde_print']
+                            ],
+                            'third_print' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_test1',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-primary '],
+                                'render' => $renders['third_print']
+                            ],
                         ]
 
                     ];

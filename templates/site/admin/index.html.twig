@@ -37,6 +37,15 @@
             </fieldset>
             {{ form_end(form, {render_rest: false}) }}
       </div>
+      
+    <div class="row" style="margin-top: 55px;position:relative">
+     <div>
+        <input type="checkbox" id="check-all">
+        <label for="check-all">Tout cocher</label>
+     </div>
+     <div></div>
+     <div></div>
+    </div>
         <div class="row">
             <div class="col-sm-12">
                 <div id="grid_app_inscription_etudiant_admin_{{ grid_id }}" class="grid-dt-wrapper">Chargement....</div>
@@ -75,6 +84,18 @@
         
           drawCallback: function (row, data) {}
         });
+                   // Check/Uncheck all checkboxes
+            $('#check-all').click(function() {
+              //alert('')
+                $('.row-check').prop('checked', $(this).prop('checked'));
+             });
+
+    // Lorsqu'une des cases à cocher est cochée/décochée
+    $(document).on('change', '.row-check', function() {
+        // Vérifiez si toutes les cases à cocher sont cochées pour cocher "Check All"
+        var allChecked = $('.row-check:checked').length === $('.row-check').length;
+        $('#check-all').prop('checked', allChecked);
+    });
       }
       function loadDataTableBene($grid, classe,options = null, contents = '') {
         $grid.initDataTables(
@@ -93,7 +114,20 @@
           initComplete: function (e, oSettings, json) {},
         
           drawCallback: function (row, data) {}
+        
         });
+                   // Check/Uncheck all checkboxes
+            $('#check-all').click(function() {
+              //alert('')
+                $('.row-check').prop('checked', $(this).prop('checked'));
+             });
+
+    // Lorsqu'une des cases à cocher est cochée/décochée
+    $(document).on('change', '.row-check', function() {
+        // Vérifiez si toutes les cases à cocher sont cochées pour cocher "Check All"
+        var allChecked = $('.row-check:checked').length === $('.row-check').length;
+        $('#check-all').prop('checked', allChecked);
+    });
       }
 
       const $classe = $('#{{ form.classe.vars.id }}');
