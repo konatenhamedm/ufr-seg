@@ -51,6 +51,15 @@ class PromotionRepository extends ServiceEntityRepository
         return $qb2;
     }
 
+    public function findLatestPromotion(): ?Promotion
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.id', 'DESC')
+            ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
 
 
 

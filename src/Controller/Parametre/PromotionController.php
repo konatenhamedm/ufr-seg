@@ -114,10 +114,12 @@ class PromotionController extends AbstractController
 
 
     #[Route('/new', name: 'app_parametre_promotion_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError, PromotionRepository $promotionRepository): Response
     {
+
         $promotion = new Promotion();
         $typeFrais = $entityManager->getRepository(TypeFrais::class)->findAll();
+        $promotion->setNumero($promotionRepository->findLatestPromotion()->getNumero() + 1);
         foreach ($typeFrais as $type) {
             $frais = new Frais();
             $frais->setTypeFrais($type);
@@ -137,9 +139,6 @@ class PromotionController extends AbstractController
         if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_parametre_promotion_index');
-
-
-
 
             if ($form->isValid()) {
 

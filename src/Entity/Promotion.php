@@ -14,8 +14,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Entity(repositoryClass: PromotionRepository::class)]
 #[Table(name: 'param_promotion')]
 #[UniqueEntity(fields: 'code', message: 'Ce code est déjà utilisé')]
-#[UniqueConstraint(name: "numero_niveau", fields: ["numero", "niveau"])]
-#[UniqueEntity(fields: ['numero', 'niveau'], message: 'cette promotion existe deja')]
+#[UniqueEntity(fields: 'numero', message: 'Ce numero est déjà utilisé')]
+#[UniqueConstraint(name: "numero_niveau", fields: ['anneeScolaire', 'niveau'])]
+#[UniqueEntity(fields: ['anneeScolaire', 'niveau'], message: 'Cette promotion existe deja')]
 class Promotion
 {
     #[ORM\Id]
@@ -36,7 +37,7 @@ class Promotion
     #[ORM\Column(length: 255)]
     private ?string $libelle = null;
 
-    #[ORM\Column]
+    #[ORM\Column(unique: true)]
     private ?int $numero = null;
 
     #[ORM\OneToMany(mappedBy: 'promotion', targetEntity: Preinscription::class)]
@@ -106,7 +107,7 @@ class Promotion
     public function getFullSigle()
     {
 
-        return sprintf('%s %s', $this->getNiveau()->getFullSigle(), $this->getNumero());
+        return sprintf('%s %s %s', $this->getNiveau()->getFullSigle(), '-', $this->getNumero());
     }
     public function getFullSigleNiveau()
     {

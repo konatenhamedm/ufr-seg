@@ -77,7 +77,7 @@ class AnneeScolaireController extends AbstractController
                 'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, AnneeScolaire $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
-                        'target' => '#modal-lg',
+                        'target' => '#modal-lg225',
 
                         'actions' => [
                             'edit' => [

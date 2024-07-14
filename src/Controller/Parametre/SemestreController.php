@@ -138,18 +138,16 @@ class SemestreController extends AbstractController
         if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_parametre_semestre_index');
-            $data = $semestreRepository->findAll();
+            $data = $semestreRepository->findByExampleField($form->get('anneeScolaire')->getData());
+            //dd($data);
 
             $actif = $form->get('actif')->getData();
 
-
-
             if ($form->isValid()) {
                 if ($actif) {
-
-                    foreach ($data as $key => $semestre) {
-                        $semestre->setActif(false);
-                        $entityManager->persist($semestre);
+                    foreach ($data as $key => $semestreData) {
+                        $semestreData->setActif(false);
+                        $entityManager->persist($semestreData);
                         $entityManager->flush();
                     }
                 }

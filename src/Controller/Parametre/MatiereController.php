@@ -25,12 +25,12 @@ class MatiereController extends AbstractController
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
     {
         $table = $dataTableFactory->create()
-        ->add('code', TextColumn::class, ['label' => 'Code'])
-        ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
-        ->createAdapter(ORMAdapter::class, [
-            'entity' => Matiere::class,
-        ])
-        ->setName('dt_app_parametre_matiere');
+            ->add('code', TextColumn::class, ['label' => 'Code'])
+            ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => Matiere::class,
+            ])
+            ->setName('dt_app_parametre_matiere');
 
         $renders = [
             'edit' =>  new ActionRender(function () {
@@ -53,11 +53,7 @@ class MatiereController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions'
-                , 'orderable' => false
-                ,'globalSearchable' => false
-                ,'className' => 'grid_row_actions'
-                , 'render' => function ($value, Matiere $context) use ($renders) {
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Matiere $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -70,17 +66,17 @@ class MatiereController extends AbstractController
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
-                        ],
-                        'delete' => [
-                            'target' => '#modal-small',
-                            'url' => $this->generateUrl('app_parametre_matiere_delete', ['id' => $value]),
-                            'ajax' => true,
-                            'stacked' => false,
-                            'icon' => '%icon% bi bi-trash',
-                            'attrs' => ['class' => 'btn-danger'],
-                            'render' => $renders['delete']
+                            ],
+                            'delete' => [
+                                'target' => '#modal-small',
+                                'url' => $this->generateUrl('app_parametre_matiere_delete', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-danger'],
+                                'render' => $renders['delete']
+                            ]
                         ]
-                    ]
 
                     ];
                     return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
@@ -103,9 +99,11 @@ class MatiereController extends AbstractController
 
 
     #[Route('/new', name: 'app_parametre_matiere_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError, MatiereRepository $matiereRepository): Response
     {
         $matiere = new Matiere();
+
+        $matiere->setOrdre($matiereRepository->findLatestMatiere()->getOrdre() + 1);
         $form = $this->createForm(MatiereType::class, $matiere, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_parametre_matiere_new')
@@ -133,28 +131,23 @@ class MatiereController extends AbstractController
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
                 $statutCode = 500;
                 if (!$isAjax) {
-                  $this->addFlash('warning', $message);
+                    $this->addFlash('warning', $message);
                 }
-
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
                 }
             }
-
-
         }
 
         return $this->render('parametre/matiere/new.html.twig', [
@@ -178,7 +171,7 @@ class MatiereController extends AbstractController
         $form = $this->createForm(MatiereType::class, $matiere, [
             'method' => 'POST',
             'action' => $this->generateUrl('app_parametre_matiere_edit', [
-                    'id' =>  $matiere->getId()
+                'id' =>  $matiere->getId()
             ])
         ]);
 
@@ -190,7 +183,7 @@ class MatiereController extends AbstractController
 
         $form->handleRequest($request);
 
-       if ($form->isSubmitted()) {
+        if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_parametre_matiere_index');
 
@@ -206,26 +199,22 @@ class MatiereController extends AbstractController
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
                 $statutCode = 500;
                 if (!$isAjax) {
-                  $this->addFlash('warning', $message);
+                    $this->addFlash('warning', $message);
                 }
-
             }
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
                 }
             }
-
         }
 
         return $this->render('parametre/matiere/edit.html.twig', [
@@ -240,14 +229,14 @@ class MatiereController extends AbstractController
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
-                'app_parametre_matiere_delete'
-                ,   [
+                    'app_parametre_matiere_delete',
+                    [
                         'id' => $matiere->getId()
                     ]
                 )
             )
             ->setMethod('DELETE')
-        ->getForm();
+            ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = true;

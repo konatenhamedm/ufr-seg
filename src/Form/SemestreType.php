@@ -40,6 +40,23 @@ class SemestreType extends AbstractType
             ])
             ->add('coef', NumberType::class)
             ->add(
+                'numero',
+                ChoiceType::class,
+                [
+                    'placeholder' => 'Choisir un numero',
+                    'label' => 'Numéro',
+                    'required'     => false,
+                    'expanded'     => false,
+                    'attr' => ['class' => 'has-select2'],
+                    'multiple' => false,
+                    'choices'  => array_flip([
+                        '1' => '1',
+                        '2' => '2',
+
+                    ]),
+                ]
+            )
+            ->add(
                 'bloque',
                 ChoiceType::class,
                 [

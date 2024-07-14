@@ -21,11 +21,11 @@
         </div>
         <div class="row">
             <div class="col-md-4">{{ form_row(form.code) }}</div>
-            <div class="col-md-4">{{ form_row(form.numero) }}</div>
+            <div class="col-md-4">{{ form_row(form.niveau) }}</div>
             <div class="col-md-4">{{ form_row(form.anneeScolaire) }}</div>
         </div>
          <div class="row">
-            <div class="col-md-4">{{ form_row(form.niveau) }}</div>
+            <div class="col-md-4">{{ form_row(form.numero) }}</div>
              <div class="col-md-8">{{ form_row(form.responsable) }}</div> 
         </div>
          {{ prototype_ligne_frais(form) }} 
@@ -41,6 +41,7 @@
 {% endblock %}
 
 {% block java %}
+    <script src="{{ asset('promotion.js') }}"></script>
     <script>
     init_select2('select', null, '#modal-lg');
         $(function () {
@@ -63,6 +64,8 @@
             
 
         });
+
+        
        
     </script>
 {% endblock %}

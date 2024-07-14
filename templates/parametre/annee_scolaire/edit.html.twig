@@ -41,9 +41,11 @@
 {% endblock %}
 
 {% block javascripts_inline %}
-    <script>
-        $(function () {
-            init_select2('select');
+     <script>
+       {# init_select2('select',null,'#modal-xl2'); #}
+                init_select2('select', null, '#modal-lg225');
+         $(function () {
+
               $('.no-auto').each(function () {
                 const $this = $(this);
                 const $id = $('#' + $this.attr('id'));
@@ -56,6 +58,5 @@
                 });
             });
         }); 
-        
     </script>
 {% endblock %}

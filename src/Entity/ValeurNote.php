@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\Table;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: ValeurNoteRepository::class)]
-#[Table(name: 'evaluation_valeur_note')]
+#[Table(name: 'evaluation_valeur_notes')]
 class ValeurNote
 {
     #[ORM\Id]
