@@ -78,7 +78,7 @@
                {% set user = app.user %}
               
                 <span class="menu-badge" ><span class="badge badge-danger" >
-                     {{ menu.nombrePreinscriptionAdmin(module.etat)  }}
+                     {{ menu.nombrePreinscriptionAdmin(module.etat,app.session.get('anneeScolaire'))  }}
                 
                 </span>
 

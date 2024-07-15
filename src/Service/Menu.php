@@ -62,9 +62,9 @@ class Menu
         $repo = $this->em->getRepository(Preinscription::class)->nombrePreinscriptionEtudiant($etat, $utilisateur);
         return $repo;
     }
-    public function nombrePreinscriptionAdmin($etat)
+    public function nombrePreinscriptionAdmin($etat, $annee)
     {
-        $repo = $this->em->getRepository(Preinscription::class)->nombrePreinscriptionAdmin($etat);
+        $repo = $this->em->getRepository(Preinscription::class)->nombrePreinscriptionAdmin($etat, $annee);
         return $repo;
     }
 }

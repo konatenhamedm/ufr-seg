@@ -88,7 +88,7 @@ class PreinscriptionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
-    public function nombrePreinscriptionAdmin($etat)
+    public function nombrePreinscriptionAdmin($etat, $anneeScolaire = null)
     {
         $sql = $this->createQueryBuilder('d')
             ->select('count(d.id)');
@@ -100,6 +100,15 @@ class PreinscriptionRepository extends ServiceEntityRepository
                 ->andWhere("d.etat =:etat")
                 ->setParameter('etatEtudiant', 'complete')
                 ->setParameter('etat', $etat);
+        }
+
+        if ($anneeScolaire != null) {
+
+            $sql
+                ->join('d.niveau', 'niveau')
+                ->join('niveau.anneeScolaire', 'anneeScolaire')
+                ->andWhere('anneeScolaire.id = :anneeScolaire')
+                ->setParameter('anneeScolaire', $anneeScolaire);
         }
 
         return  $sql->getQuery()
