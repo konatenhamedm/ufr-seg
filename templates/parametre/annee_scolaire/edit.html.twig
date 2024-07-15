@@ -43,7 +43,7 @@
 {% block javascripts_inline %}
     <script>
         $(function () {
-            init_select2('select');
+            init_select2('select', null, '#modal-lg');
               $('.no-auto').each(function () {
                 const $this = $(this);
                 const $id = $('#' + $this.attr('id'));

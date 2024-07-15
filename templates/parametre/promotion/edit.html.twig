@@ -35,12 +35,10 @@
     {{ form_end(form) }}
 {% endblock %}
 
-{% block java %}
+{% block javascripts_inline %}
     <script>
-      {#   $(function () {
-            init_select2('select');
-        }); #}
-          init_select2('select', null, '#modal-lg225');
+      
+         
         $(function () {
             init_select2('select', null, '#modal-lg');
             //let total = 0;
