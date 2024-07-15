@@ -3,6 +3,7 @@
 namespace App\Controller\Home;
 
 use App\Controller\FileTrait;
+use App\Entity\AnneeScolaire;
 use App\Entity\Decision;
 use App\Entity\Etudiant;
 use App\Entity\Inscription;
@@ -10,6 +11,7 @@ use App\Entity\Preinscription;
 use App\Form\EtudiantType;
 use App\Form\EtudiantVerificationType;
 use App\Form\PreinscriptionValidationType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\DecisionRepository;
 use App\Repository\EtudiantRepository;
 use App\Repository\NiveauRepository;
@@ -29,6 +31,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Workflow\Registry;
@@ -36,6 +39,16 @@ use Symfony\Component\Workflow\Registry;
 class HomeController extends AbstractController
 {
     use FileTrait;
+
+
+    #[Route(path: '/update-annee-scolaire/{id}', name: 'update_annee_scolaire', methods: ['POST'])]
+    public function updateAnneeScolaire(Request $request, SessionInterface $session, $id, AnneeScolaireRepository $anneeScolaireRepository)
+    {
+
+        $session->set('anneeScolaire', $anneeScolaireRepository->find($id));
+
+        return  $this->json(['status' => 'success']);
+    }
 
     protected const UPLOAD_PATH = 'media_etudiant';
     #[Route('/workflow/timeline', name: 'app_home_timeline_index')]

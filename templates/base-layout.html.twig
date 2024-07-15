@@ -192,7 +192,7 @@ License: For each use you must have a valid license purchased only from above li
 											Année scolaire :
 
 											{% set actif = 0 %}
-											<select class="form-select" value={{ actif }}  aria-label="Select example">
+											<select class="form-select all_annee" value={{ actif }}  aria-label="Select example">
 												{% for item in menu.getListeAnnees %}
 													{% if item.actif == true %}
 														{% set actif =  item.id   %}
@@ -367,6 +367,38 @@ License: For each use you must have a valid license purchased only from above li
 
 
           {% block java %}{% endblock %}
+
+
+		  <script>
+		  $(".all_annee").on('change',function(){
+
+			var anneeScolaire = this.value;
+			  var url = "{{ path('update_annee_scolaire', {id: 'id'}) }}".replace('id', anneeScolaire);
+			   $.ajax({
+                    url: url,
+                    method: 'POST',
+                    dataType: 'json',
+                    /*beforeSend: function () {
+                        
+                        $form_content.html(`<div class="d-flex align-items-center">
+                                    <strong>Chargement des données de l'étape</strong>
+                                    <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+                                    </div>`);
+                    },*/
+                    success: function (json) {
+                        
+                      console.log("suecccccccc")
+                    },
+                   
+                    error: function () {
+                      console.log("echecccc")
+                        
+                    }
+                })
+
+		  })
+		  
+		  </script>
 
 	</body>
 	

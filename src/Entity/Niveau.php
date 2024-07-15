@@ -13,8 +13,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: NiveauRepository::class)]
 #[Table(name: 'param_niveau')]
-#[UniqueConstraint(name: "code_niveau", fields: ["code", "filiere"])]
-#[UniqueEntity(fields: ['code', 'filiere'], message: 'Ce code est déjà utilisé pour cette filière')]
+/* #[UniqueConstraint(name: "code_niveau", fields: ["code", "filiere"])]
+#[UniqueEntity(fields: ['code', 'filiere'], message: 'Ce code est déjà utilisé pour cette filière')] */
 class Niveau
 {
     #[ORM\Id]

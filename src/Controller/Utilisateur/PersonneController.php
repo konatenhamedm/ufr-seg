@@ -19,6 +19,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/utilisateur/personne')]
@@ -53,8 +54,13 @@ class PersonneController extends AbstractController
     }
 
     #[Route('/', name: 'app_utilisateur_personne_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     { //je suis en mode test
+
+        $anneeScolaire = $session->get('anneeScolaire');
+
+        // dd($anneeScolaire);
+
         $table = $dataTableFactory->create()
             ->add('nom', TextColumn::class, ['label' => 'Nom'])
             ->add('prenom', TextColumn::class, ['label' => 'Prénoms'])

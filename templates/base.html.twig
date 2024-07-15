@@ -12,5 +12,36 @@
     </head>
     <body>
         {% block body %}{% endblock %}
+
+         <script>
+		{#   $(".all_annee").on('clic',function(){
+
+			$this = $(this)
+			alert($this.val())
+		  }) #}
+
+
+          document.getElementsByClassName('all_annee').addEventListener('change', function() {
+    var anneeScolaire = this.value;
+
+    fetch('/update-annee-scolaire', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-Token': '{{ csrf_token("update_annee_scolaire") }}'
+        },
+        body: JSON.stringify({ anneeScolaire: anneeScolaire })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            console.log('Session updated successfully');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+		  
+		  </script>
     </body>
 </html>
