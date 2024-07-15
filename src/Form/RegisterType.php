@@ -47,8 +47,10 @@ class RegisterType extends AbstractType
                 'label_attr' => ['class' => 'label-required'],
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
-                        /* ->join('c.filiere', 'f')
-                        ->groupBy('f') */;
+                        ->join('c.anneeScolaire', 'a')
+                        ->where('a.actif = :isActif')
+                        ->setParameter('isActif', true)
+                        /*->groupBy('f') */;
                 },
             ])
             /* ->add('dateNaissance',  DateType::class,  [
