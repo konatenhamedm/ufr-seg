@@ -2,12 +2,13 @@
 
 namespace App\Controller\Parametre;
 
-use App\Entity\AnneeScolaire;
-use App\Form\AnneeScolaireType;
-use App\Repository\AnneeScolaireRepository;
+use App\Entity\Promotion;
+use App\Form\PromotionType;
+use App\Repository\PromotionRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\BoolColumn;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
@@ -18,40 +19,30 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/admin/parametre/annee/scolaire')]
-class AnneeScolaireController extends AbstractController
+#[Route('/admin/parametre/promotion')]
+class PromotionController extends AbstractController
 {
-    #[Route('/', name: 'app_parametre_annee_scolaire_index', methods: ['GET', 'POST'])]
+    #[Route('/', name: 'app_parametre_promotion_index', methods: ['GET', 'POST'])]
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
     {
         $table = $dataTableFactory->create()
-            ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
-            ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date début', 'format' => 'd-m-Y'])
-            ->add('dateFin', DateTimeColumn::class, ['label' => 'Date fin', 'format' => 'd-m-Y'])
-            ->add('actif', TextColumn::class, ['label' => 'Etat', 'className' => ' w-50px', 'render' => function ($value, AnneeScolaire $context) {
+            ->add('code', TextColumn::class, ['label' => 'Code'])
+            ->add('libelle', TextColumn::class, ['label' => 'Libelle'])
+            ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.code'])
+            ->add('anneeScolaire', TextColumn::class, ['label' => 'Année scolaire', 'field' => 'a.libelle'])
+            ->add('numero', TextColumn::class, ['label' => 'Numéro'])
 
-                if ($context->isActif() == true) {
-
-                    return   '<span class="badge bg-success">Oui</span>';
-                } else {
-
-                    return   '<span class="badge bg-danger">Non</span>';
-                }
-            }])
-            ->add('verrou', TextColumn::class, ['label' => 'Verrouillé', 'className' => ' w-50px', 'render' => function ($value, AnneeScolaire $context) {
-
-                if ($context->isVerrou() == true) {
-
-                    return   '<span class="badge bg-success">Verrouillé</span>';
-                } else {
-
-                    return   '<span class="badge bg-success">Non Verrouillé</span>';
-                }
-            }])
             ->createAdapter(ORMAdapter::class, [
-                'entity' => AnneeScolaire::class,
+                'entity' => Promotion::class,
+                'query' => function (QueryBuilder $qb) {
+                    $qb->select(['c'])
+                        ->from(Promotion::class, 'c')
+                        ->innerJoin('c.anneeScolaire', 'a')
+                        ->innerJoin('c.filiere', 'filiere')
+                        ->orderBy('c.id', 'DESC');
+                }
             ])
-            ->setName('dt_app_parametre_annee_scolaire');
+            ->setName('dt_app_parametre_promotion');
 
         $renders = [
             'edit' =>  new ActionRender(function () {
@@ -74,14 +65,14 @@ class AnneeScolaireController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, AnneeScolaire $context) use ($renders) {
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Promotion $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
-                        'target' => '#modal-lg225',
+                        'target' => '#modal-lg',
 
                         'actions' => [
                             'edit' => [
-                                'url' => $this->generateUrl('app_parametre_annee_scolaire_edit', ['id' => $value]),
+                                'url' => $this->generateUrl('app_parametre_promotion_edit', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-pen',
@@ -90,7 +81,7 @@ class AnneeScolaireController extends AbstractController
                             ],
                             'delete' => [
                                 'target' => '#modal-small',
-                                'url' => $this->generateUrl('app_parametre_annee_scolaire_delete', ['id' => $value]),
+                                'url' => $this->generateUrl('app_parametre_promotion_delete', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-trash',
@@ -113,19 +104,19 @@ class AnneeScolaireController extends AbstractController
         }
 
 
-        return $this->render('parametre/annee_scolaire/index.html.twig', [
+        return $this->render('parametre/promotion/index.html.twig', [
             'datatable' => $table
         ]);
     }
 
 
-    #[Route('/new', name: 'app_parametre_annee_scolaire_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError, AnneeScolaireRepository $anneeScolaireRepository): Response
+    #[Route('/new', name: 'app_parametre_promotion_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError): Response
     {
-        $anneeScolaire = new AnneeScolaire();
-        $form = $this->createForm(AnneeScolaireType::class, $anneeScolaire, [
+        $promotion = new Promotion();
+        $form = $this->createForm(PromotionType::class, $promotion, [
             'method' => 'POST',
-            'action' => $this->generateUrl('app_parametre_annee_scolaire_new')
+            'action' => $this->generateUrl('app_parametre_promotion_new')
         ]);
         $form->handleRequest($request);
 
@@ -136,26 +127,14 @@ class AnneeScolaireController extends AbstractController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_parametre_annee_scolaire_index');
+            $redirect = $this->generateUrl('app_parametre_promotion_index');
 
-            $data = $anneeScolaireRepository->findAll();
 
-            $actif = $form->get('actif')->getData();
-            //$anneeScolaire->setActif($actif);
 
-            /// dd($actif);
 
             if ($form->isValid()) {
-                if ($actif) {
 
-                    foreach ($data as $key => $annee) {
-                        $annee->setActif(false);
-                        $entityManager->persist($annee);
-                        $entityManager->flush();
-                    }
-                }
-
-                $entityManager->persist($anneeScolaire);
+                $entityManager->persist($promotion);
                 $entityManager->flush();
 
                 $data = true;
@@ -181,28 +160,29 @@ class AnneeScolaireController extends AbstractController
             }
         }
 
-        return $this->render('parametre/annee_scolaire/new.html.twig', [
-            'annee_scolaire' => $anneeScolaire,
+        return $this->render('parametre/promotion/new.html.twig', [
+            'promotion' => $promotion,
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/{id}/show', name: 'app_parametre_annee_scolaire_show', methods: ['GET'])]
-    public function show(AnneeScolaire $anneeScolaire): Response
+    #[Route('/{id}/show', name: 'app_parametre_promotion_show', methods: ['GET'])]
+    public function show(Promotion $promotion): Response
     {
-        return $this->render('parametre/annee_scolaire/show.html.twig', [
-            'annee_scolaire' => $anneeScolaire,
+        return $this->render('parametre/promotion/show.html.twig', [
+            'promotion' => $promotion,
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_parametre_annee_scolaire_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, AnneeScolaire $anneeScolaire, EntityManagerInterface $entityManager, FormError $formError, AnneeScolaireRepository $anneeScolaireRepository): Response
+    #[Route('/{id}/edit', name: 'app_parametre_promotion_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Promotion $promotion, EntityManagerInterface $entityManager, FormError $formError, PromotionRepository $promotionRepository): Response
     {
+        $promotion->setNumero($promotionRepository->findLatestPromotion()->getNumero() + 1);
 
-        $form = $this->createForm(AnneeScolaireType::class, $anneeScolaire, [
+        $form = $this->createForm(PromotionType::class, $promotion, [
             'method' => 'POST',
-            'action' => $this->generateUrl('app_parametre_annee_scolaire_edit', [
-                'id' =>  $anneeScolaire->getId()
+            'action' => $this->generateUrl('app_parametre_promotion_edit', [
+                'id' =>  $promotion->getId()
             ])
         ]);
 
@@ -216,23 +196,14 @@ class AnneeScolaireController extends AbstractController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_parametre_annee_scolaire_index');
-            $data = $anneeScolaireRepository->findAll();
-            $actif = $form->get('actif')->getData();
+            $redirect = $this->generateUrl('app_parametre_promotion_index');
+
+
+
 
             if ($form->isValid()) {
 
-                if ($actif) {
-                    foreach ($data as $key => $annee) {
-                        $annee->setActif(false);
-                        $entityManager->persist($annee);
-                        $entityManager->flush();
-                    }
-                }
-
-                $anneeScolaire->setActif(true);
-
-                $entityManager->persist($anneeScolaire);
+                $entityManager->persist($promotion);
                 $entityManager->flush();
 
                 $data = true;
@@ -257,21 +228,21 @@ class AnneeScolaireController extends AbstractController
             }
         }
 
-        return $this->render('parametre/annee_scolaire/edit.html.twig', [
-            'annee_scolaire' => $anneeScolaire,
+        return $this->render('parametre/promotion/edit.html.twig', [
+            'promotion' => $promotion,
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_parametre_annee_scolaire_delete', methods: ['DELETE', 'GET'])]
-    public function delete(Request $request, AnneeScolaire $anneeScolaire, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/delete', name: 'app_parametre_promotion_delete', methods: ['DELETE', 'GET'])]
+    public function delete(Request $request, Promotion $promotion, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
-                    'app_parametre_annee_scolaire_delete',
+                    'app_parametre_promotion_delete',
                     [
-                        'id' => $anneeScolaire->getId()
+                        'id' => $promotion->getId()
                     ]
                 )
             )
@@ -280,10 +251,10 @@ class AnneeScolaireController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = true;
-            $entityManager->remove($anneeScolaire);
+            $entityManager->remove($promotion);
             $entityManager->flush();
 
-            $redirect = $this->generateUrl('app_parametre_annee_scolaire_index');
+            $redirect = $this->generateUrl('app_parametre_promotion_index');
 
             $message = 'Opération effectuée avec succès';
 
@@ -303,8 +274,8 @@ class AnneeScolaireController extends AbstractController
             }
         }
 
-        return $this->render('parametre/annee_scolaire/delete.html.twig', [
-            'annee_scolaire' => $anneeScolaire,
+        return $this->render('parametre/promotion/delete.html.twig', [
+            'promotion' => $promotion,
             'form' => $form,
         ]);
     }

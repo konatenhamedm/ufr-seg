@@ -110,7 +110,7 @@ class PersonneController extends AbstractController
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
                             ],
-                            'imprime' => [
+                            /*    'imprime' => [
                                 'url' => $this->generateUrl('default_print_iframe', [
                                     'r' => 'app_certificate_imprime',
                                     'params' => [
@@ -122,7 +122,7 @@ class PersonneController extends AbstractController
                                 'icon' => '%icon% bi bi-printer',
                                 'attrs' => ['class' => 'btn-main btn-stack']
                                 //, 'render' => new ActionRender(fn() => $source || $etat != 'cree')
-                            ],
+                            ], */
                             'delete' => [
                                 'target' => '#modal-small',
                                 'url' => $this->generateUrl('app_utilisateur_personne_delete', ['id' => $value]),

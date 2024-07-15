@@ -1,9 +1,17 @@
 {% macro prototype_ligne_frais(form) %}
+ <div class="proto-container" data-prototype="{{ _self.ligne_frais(form.frais.vars.prototype)|e }}"></div>
+   {#  <button type="button" data-protoname="__name__" class="btn btn-default add-collection add-ligne btn-xs" id="add_ligne" data-protoclass=".proto-container" data-container=".row-container">
+        <i class="fa fa-plus"></i>
+        Ajouter une ligne
+    </button> #}
+
     <table class="table table-bordered table-custom">
         <thead class="thead-dark">
             <tr>
                 <th width="70%" class="p-2">Frais</th>
                 <th width="30%" class="p-2">Montant</th>
+                <th width="30%" class="p-2">Montant</th>
+                
             </tr>
         </thead>
         <tbody  class="row-container">
@@ -25,10 +33,15 @@
    
     <tr class="row-colonne even pointer table-light">
         <td class="p-2">
-            {{ frais.typeFrais.vars.data.libelle }}
-            <div style="display:none">{{ form_widget(frais.typeFrais) }}</div>
+           {#  {{ frais.typeFrais.vars.data.libelle }} #}
+           {# {% if frais.typeFrais.vars.data %}
+           {{ dump(frais.typeFrais.vars)}}
+           {% endif %} #}
+           
+            <div style="display:nonei">{{ form_widget(frais.typeFrais,{attr: {'readonly':'true'}}) }}</div>
         </td>
         <td class="p-2">{{ form_widget(frais.montant) }}</td>
+         <td class="p-2 text-center del-col"></td>
     </tr>
 {% endmacro %}
 
@@ -43,7 +56,7 @@
     <table class="table table-bordered table-custom">
         <thead class="thead-dark">
             <tr>
-                <th width="70%" class="p-2">Matière</th>
+                <th width="70%" class="p-2">ECUE</th>
                 <th width="25%" class="p-2">Coefficient</th>
                 <th></th>
             </tr>

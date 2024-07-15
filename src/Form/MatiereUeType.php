@@ -20,11 +20,12 @@ class MatiereUeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('coef', TextType::class, [
-                'attr' => ['class' => 'input-money input-note', 'data-max' => 20]
+            ->add('code', TextType::class, [
+                'label' => false,
+                'attr' => ['class' => '']
             ])
-            /*    ->add('visible') */
-            ->add('nombreCredit', TextType::class, ['attr' => ['class' => 'input-money credit', 'data-max' => 20]])
+
+            /*->add('nombreCredit', TextType::class, ['attr' => ['class' => 'input-money credit', 'data-max' => 20]]) */
             ->add('noteEliminatoire', TextType::class, ['attr' => ['class' => 'input-money input-note', 'data-max' => 20]])
             ->add('moyenneValidation', TextType::class, ['attr' => ['class' => 'input-money input-note', 'data-max' => 20]])
 
@@ -40,8 +41,8 @@ class MatiereUeType extends AbstractType
                         ->orderBy('c.id', 'ASC');
                 },
             ]);
-        $builder->get('nombreCredit')->addModelTransformer(new ThousandNumberTransformer());
-        $builder->get('coef')->addModelTransformer(new ThousandNumberTransformer());
+        /*  $builder->get('nombreCredit')->addModelTransformer(new ThousandNumberTransformer());
+        $builder->get('coef')->addModelTransformer(new ThousandNumberTransformer()); */
         $builder->get('noteEliminatoire')->addModelTransformer(new ThousandNumberTransformer());
         $builder->get('moyenneValidation')->addModelTransformer(new ThousandNumberTransformer());
     }

@@ -1,7 +1,7 @@
 {% block page_content %}
     {% form_theme form 'widget/fields-block.html.twig' %}
     <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Création Semestre</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Modification Promotion</h5>
         <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
             <span class="svg-icon svg-icon-2x text-white">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,29 +14,17 @@
     {{ form_start(form, {'attr': {'role':'form', 'class': 'form'}}) }}
     <div class="modal-body">
         {{ include('_includes/ajax/response.html.twig') }}
-        <div class="row">
-            <div class="col-md-2">{{ form_row(form.actif) }}</div>
-            <div class="col-md-1 text-end">Bloque</div>
-            <div class="col-md-4">{{ form_row(form.bloque) }}</div>
-            <div class="col-md-5"></div>
-        </div>
-         <div class="row">
+          <div class="row">
+        
             <div class="col-md-12">{{ form_row(form.libelle) }}</div>
-           
+        </div>
+        <div class="row">
+            <div class="col-md-4">{{ form_row(form.code) }}</div>
+            <div class="col-md-8">{{ form_row(form.filiere) }}</div>
         </div>
          <div class="row">
-            <div class="col-md-12">{{ form_row(form.dateDebut) }}</div>
-           
-        </div>
-         <div class="row">
-            <div class="col-md-12">{{ form_row(form.dateFin) }}</div>
-           
-        </div>
-         <div class="row">
-            <div class="col-md-6">{{ form_row(form.anneeScolaire) }}</div>
-            <div class="col-md-3">{{ form_row(form.coef) }}</div>
-            <div class="col-md-3">{{ form_row(form.numero) }}</div>
-           
+            <div class="col-md-4">{{ form_row(form.numero) }}</div>
+             <div class="col-md-8">{{ form_row(form.anneeScolaire) }}</div> 
         </div>
     </div>
     <div class="modal-footer">
@@ -49,21 +37,30 @@
 
 {% block java %}
     <script>
-       {# init_select2('select',null,'#modal-xl2'); #}
-                init_select2('select', null, '#modal-lg225');
-         $(function () {
-
-              $('.no-auto').each(function () {
+      {#   $(function () {
+            init_select2('select');
+        }); #}
+          init_select2('select', null, '#modal-lg225');
+        $(function () {
+            init_select2('select', null, '#modal-lg');
+            //let total = 0;
+            $('.input-mnt').on('update-value',  (e, val, element)  => {
                 const $this = $(this);
-                const $id = $('#' + $this.attr('id'));
-                init_date_picker($id,  'down', (start, e) => {
-                    //$this.val(start.format('DD/MM/YYYY'));
-                }, null, null, false);
-
-                $id.on('apply.daterangepicker', function (ev, picker) {
-                    $(this).val(picker.startDate.format('DD/MM/YYYY'));
+                let total = +val.replaceAll(' ', '');
+                
+                $('.input-mnt').not($(element)).each(function () {
+                    total += +$(this).val().replaceAll(' ', '');
                 });
+
+                $('.total').text(setValue(total));
+                
             });
-        }); 
+           
+           
+
+            
+
+        });
+       
     </script>
 {% endblock %}

@@ -142,15 +142,20 @@ class DashboardController extends AbstractController
                     'href' => $this->generateUrl('app_parametre_niveau_index')
                 ],
                 [
+                    'label' => 'Promotion',
+                    'id' => 'param_promotion',
+                    'href' => $this->generateUrl('app_parametre_promotion_index')
+                ],
+                [
                     'label' => 'Classes',
                     'id' => 'param_classe',
                     'href' => $this->generateUrl('app_parametre_classe_index')
                 ],
-                [
+                /* [
                     'label' => 'Type de matière',
                     'id' => 'param_type_matiere',
                     'href' => $this->generateUrl('app_parametre_type_matiere_index')
-                ],
+                ], */
                 [
                     'label' => 'Matières',
                     'id' => 'param_matiere',

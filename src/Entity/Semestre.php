@@ -7,8 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 
 #[ORM\Entity(repositoryClass: SemestreRepository::class)]
+#[Table(name: 'param_semestre')]
+#[UniqueEntity(fields: ['numero', 'anneeScolaire'], message: 'Cette occurence existe deja en base')]
 class Semestre
 {
     #[ORM\Id]
@@ -43,6 +49,9 @@ class Semestre
 
     #[ORM\Column]
     private ?bool $actif = null;
+
+    #[ORM\Column]
+    private ?int $numero = null;
 
     public function __construct()
     {
@@ -196,6 +205,18 @@ class Semestre
     public function setActif(bool $actif): static
     {
         $this->actif = $actif;
+
+        return $this;
+    }
+
+    public function getNumero(): ?int
+    {
+        return $this->numero;
+    }
+
+    public function setNumero(int $numero): static
+    {
+        $this->numero = $numero;
 
         return $this;
     }

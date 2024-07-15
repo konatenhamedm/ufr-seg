@@ -56,6 +56,12 @@ class Niveau
     #[ORM\OneToMany(mappedBy: 'niveau', targetEntity: Classe::class)]
     private Collection $classes;
 
+    #[ORM\ManyToOne(inversedBy: 'niveaux')]
+    private ?Promotion $promotion = null;
+
+    #[ORM\ManyToOne(inversedBy: 'niveaux')]
+    private ?AnneeScolaire $anneeScolaire = null;
+
 
 
 
@@ -269,6 +275,30 @@ class Niveau
                 $class->setNiveau(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPromotion(): ?Promotion
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?Promotion $promotion): static
+    {
+        $this->promotion = $promotion;
+
+        return $this;
+    }
+
+    public function getAnneeScolaire(): ?AnneeScolaire
+    {
+        return $this->anneeScolaire;
+    }
+
+    public function setAnneeScolaire(?AnneeScolaire $anneeScolaire): static
+    {
+        $this->anneeScolaire = $anneeScolaire;
 
         return $this;
     }

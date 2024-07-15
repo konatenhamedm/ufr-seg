@@ -45,6 +45,12 @@ class AnneeScolaire
     #[ORM\OneToMany(mappedBy: 'anneeScolaire', targetEntity: Controle::class)]
     private Collection $controles;
 
+    #[ORM\OneToMany(mappedBy: 'anneeScolaire', targetEntity: Promotion::class)]
+    private Collection $promotions;
+
+    #[ORM\OneToMany(mappedBy: 'anneeScolaire', targetEntity: Niveau::class)]
+    private Collection $niveaux;
+
 
     public function __construct()
     {
@@ -52,6 +58,8 @@ class AnneeScolaire
         $this->cours = new ArrayCollection();
         $this->classes = new ArrayCollection();
         $this->controles = new ArrayCollection();
+        $this->promotions = new ArrayCollection();
+        $this->niveaux = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -235,6 +243,66 @@ class AnneeScolaire
             // set the owning side to null (unless already changed)
             if ($controle->getAnneeScolaire() === $this) {
                 $controle->setAnneeScolaire(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Promotion>
+     */
+    public function getPromotions(): Collection
+    {
+        return $this->promotions;
+    }
+
+    public function addPromotion(Promotion $promotion): static
+    {
+        if (!$this->promotions->contains($promotion)) {
+            $this->promotions->add($promotion);
+            $promotion->setAnneeScolaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removePromotion(Promotion $promotion): static
+    {
+        if ($this->promotions->removeElement($promotion)) {
+            // set the owning side to null (unless already changed)
+            if ($promotion->getAnneeScolaire() === $this) {
+                $promotion->setAnneeScolaire(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Niveau>
+     */
+    public function getNiveaux(): Collection
+    {
+        return $this->niveaux;
+    }
+
+    public function addNiveau(Niveau $niveau): static
+    {
+        if (!$this->niveaux->contains($niveau)) {
+            $this->niveaux->add($niveau);
+            $niveau->setAnneeScolaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNiveau(Niveau $niveau): static
+    {
+        if ($this->niveaux->removeElement($niveau)) {
+            // set the owning side to null (unless already changed)
+            if ($niveau->getAnneeScolaire() === $this) {
+                $niveau->setAnneeScolaire(null);
             }
         }
 

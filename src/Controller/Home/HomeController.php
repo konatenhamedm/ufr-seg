@@ -46,48 +46,56 @@ class HomeController extends AbstractController
             [
                 'label' => 'Etude de dossier',
                 'icon' => 'bi bi-list',
-                'module' => 'general',
+                'module' => 'etude',
+                'id' => 'module_etude',
                 'href' => $this->generateUrl('app_config_preinscription_etude_dossier_index')
             ],
             [
                 'label' => 'Paiement de préinscriptions',
                 'icon' => 'bi bi-list',
-                'module' => 'general',
+                'module' => 'paiement',
+                'id' => 'module_paiement',
                 'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_index')
             ],
             [
                 'label' => 'Traitement après examen',
                 'icon' => 'bi bi-list',
-                'module' => 'gestion',
+                'module' => 'traitement',
+                'id' => 'module_traitement',
                 'href' => $this->generateUrl('app_direction_deliberation_time_index')
             ],
             [
                 'label' => 'Echéancier en attente de validation',
                 'icon' => 'bi bi-list',
-                'module' => 'gestion',
+                'module' => 'echeancier',
+                'id' => 'module_echeancier',
                 'href' => $this->generateUrl('app_inscription_inscription_list_ls', ['etat' => 'echeance_soumis'])
             ],
             [
+
                 'label' => 'Affectation classe',
                 'icon' => 'bi bi-list',
                 'module' => 'classe',
+                'id' => 'module_classe',
                 'href' => $this->generateUrl('app_inscription_inscription_list_ls', ['etat' => 'valide_classe'])
             ],
             [
                 'label' => 'Liste étudiants inscrits',
                 'icon' => 'bi bi-list',
-                'module' => 'gestion',
+                'module' => 'inscrits',
+                'id' => 'module_inscrits',
                 'href' => $this->generateUrl('app_inscription_inscription_list_ls', ['etat' => 'valide'])
             ],
             [
                 'label' => 'Dossiers soldés',
                 'icon' => 'bi bi-list',
-                'module' => 'gestion',
+                'module' => 'dossier',
+                'id' => 'module_dossier',
                 'href' => $this->generateUrl('app_inscription_inscription_list_ls', ['etat' => 'solde'])
             ]
         ];
 
-        return $this->render('home/time_index.html.twig', [
+        return $this->render('home/config/index.html.twig', [
             'modules' => $modules,
         ]);
     }
@@ -238,10 +246,6 @@ class HomeController extends AbstractController
         //dd($niveauRepository->findNiveauDisponible(21));
 
         //dd($preinscription);
-
-
-
-
 
         $validationGroups = ['Default', 'FileRequired', 'autre'];
         $form = $this->createForm(EtudiantVerificationType::class, $etudiant, [
@@ -437,10 +441,11 @@ class HomeController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Preinscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $ver) {
-                    $qb->select('e, filiere, etudiant,niveau,c')
+                    $qb->select('e, filiere, etudiant,niveau,c,promotion')
                         ->from(Preinscription::class, 'e')
                         ->join('e.etudiant', 'etudiant')
-                        ->join('e.niveau', 'niveau')
+                        ->join('e.promotion', 'promotion')
+                        ->join('promotion.niveau', 'niveau')
                         ->join('niveau.filiere', 'filiere')
                         ->leftJoin('e.caissiere', 'c')
                         ->andWhere('e.etat = :statut')
@@ -561,9 +566,11 @@ class HomeController extends AbstractController
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
             'query' => function (QueryBuilder $qb) use ($user, $etat) {
-                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                $qb->select(['p'])
+                    /* $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe', 'promotion']) */
                     ->from(Inscription::class, 'p')
-                    ->join('p.niveau', 'niveau')
+                    ->join('p.promotion', 'promotion')
+                    ->join('promotion.niveau', 'niveau')
                     ->join('p.classe', 'classe')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant')
@@ -723,9 +730,11 @@ class HomeController extends AbstractController
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
             'query' => function (QueryBuilder $qb) use ($user, $etat) {
-                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                $qb->select(['p'])
+                    /* $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe', 'promotion']) */
                     ->from(Inscription::class, 'p')
-                    ->join('p.niveau', 'niveau')
+                    ->join('p.promotion', 'promotion')
+                    ->join('promotion.niveau', 'niveau')
                     ->join('p.classe', 'classe')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant')
@@ -851,9 +860,11 @@ class HomeController extends AbstractController
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
             'query' => function (QueryBuilder $qb) use ($user, $etat) {
-                $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                $qb->select(['p'])
+                    /* $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe', 'promotion']) */
                     ->from(Inscription::class, 'p')
-                    ->join('p.niveau', 'niveau')
+                    ->join('p.promotion', 'promotion')
+                    ->join('promotion.niveau', 'niveau')
                     ->join('p.classe', 'classe')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant')

@@ -42,10 +42,14 @@ class Filiere
     #[ORM\OneToMany(mappedBy: 'filiere', targetEntity: NiveauEtudiant::class)]
     private Collection $niveauEtudiants;
 
+    #[ORM\OneToMany(mappedBy: 'filiere', targetEntity: Promotion::class)]
+    private Collection $promotions;
+
     public function __construct()
     {
         $this->niveaux = new ArrayCollection();
         $this->niveauEtudiants = new ArrayCollection();
+        $this->promotions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -157,6 +161,36 @@ class Filiere
             // set the owning side to null (unless already changed)
             if ($niveauEtudiant->getFiliere() === $this) {
                 $niveauEtudiant->setFiliere(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Promotion>
+     */
+    public function getPromotions(): Collection
+    {
+        return $this->promotions;
+    }
+
+    public function addPromotion(Promotion $promotion): static
+    {
+        if (!$this->promotions->contains($promotion)) {
+            $this->promotions->add($promotion);
+            $promotion->setFiliere($this);
+        }
+
+        return $this;
+    }
+
+    public function removePromotion(Promotion $promotion): static
+    {
+        if ($this->promotions->removeElement($promotion)) {
+            // set the owning side to null (unless already changed)
+            if ($promotion->getFiliere() === $this) {
+                $promotion->setFiliere(null);
             }
         }
 

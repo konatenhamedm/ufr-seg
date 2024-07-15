@@ -23,6 +23,10 @@
             <div class="col-md-4">{{ form_row(form.filiere) }}</div>
             <div class="col-md-8">{{ form_row(form.responsable) }}</div>
         </div>
+         <div class="row">
+            <div class="col-md-6">{{ form_row(form.promotion) }}</div>
+            <div class="col-md-6">{{ form_row(form.anneeScolaire) }}</div>
+        </div>
         {{ prototype_ligne_frais(form) }}
     </div>
     <div class="modal-footer">
@@ -36,6 +40,7 @@
 {% endblock %}
 
 {% block java %}
+    <script src="{{ asset('promotion.js') }}"></script>
     <script>
         $(function () {
             init_select2('select', null, '#modal-lg');

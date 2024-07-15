@@ -2,10 +2,12 @@
 
 namespace App\Form;
 
+use App\Entity\AnneeScolaire;
 use App\Entity\Employe;
 use App\Entity\Filiere;
 use App\Entity\Frais;
 use App\Entity\Niveau;
+use App\Entity\Promotion;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -28,6 +30,24 @@ class NiveauType extends AbstractType
                 'label_attr' => ['class' => 'label-required'],
                 'choice_label' => 'libelle',
                 'label' => 'Filière',
+                'attr' => ['class' => 'has-select2']
+            ])
+            ->add('promotion', EntityType::class, [
+                'class' => Promotion::class,
+                'required' => false,
+                'placeholder' => '----',
+                'label_attr' => ['class' => 'label-required'],
+                'choice_label' => 'code',
+                'label' => 'Promotion',
+                'attr' => ['class' => 'has-select2']
+            ])
+            ->add('anneeScolaire', EntityType::class, [
+                'class' => AnneeScolaire::class,
+                'required' => false,
+                'placeholder' => '----',
+                'label_attr' => ['class' => 'label-required'],
+                'choice_label' => 'libelle',
+                'label' => 'Année scolaire',
                 'attr' => ['class' => 'has-select2']
             ])
             ->add(

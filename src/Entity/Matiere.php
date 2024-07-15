@@ -34,8 +34,7 @@ class Matiere
     private ?string $libelle = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank(message: 'Veuillez sélectionner le type de matière')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?TypeMatiere $typeMatiere = null;
 
     #[ORM\OneToMany(mappedBy: 'matiere', targetEntity: Cours::class)]
