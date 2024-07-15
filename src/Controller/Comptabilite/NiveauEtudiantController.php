@@ -300,7 +300,7 @@ class NiveauEtudiantController extends AbstractController
     public function indexPreinscription(Request $request, DataTableFactory $dataTableFactory, $etat, UtilisateurGroupeRepository $utilisateurGroupeRepository, UserInterface $user, SessionInterface $session): Response
     {
         //dd($etat);
-        $anneeScolaire = $session->get('annee_scolaire');
+        $anneeScolaire = $session->get('anneeScolaire');
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
         $titre = '';
         if ($etat == "attente_paiement") {
@@ -369,7 +369,7 @@ class NiveauEtudiantController extends AbstractController
                         }
 
                         if ($anneeScolaire != null) {
-                            dd($anneeScolaire);
+                            //dd($anneeScolaire);
                             $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
                                 ->setParameter('anneeScolaire', $anneeScolaire);
                         }
@@ -406,7 +406,7 @@ class NiveauEtudiantController extends AbstractController
                                 ->setParameter('id', $user->getPersonne()->getId());
                         }
                         if ($anneeScolaire != null) {
-                            dd($anneeScolaire);
+                            //dd($anneeScolaire);
 
                             $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
                                 ->setParameter('anneeScolaire', $anneeScolaire);
@@ -452,7 +452,7 @@ class NiveauEtudiantController extends AbstractController
                                 ->setParameter('id', $user->getPersonne()->getId());
                         }
                         if ($anneeScolaire != null) {
-                            dd($anneeScolaire);
+                            // dd($anneeScolaire);
 
                             $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
                                 ->setParameter('anneeScolaire', $anneeScolaire);

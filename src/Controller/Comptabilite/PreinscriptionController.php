@@ -276,7 +276,7 @@ class PreinscriptionController extends AbstractController
 
 
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-        $anneeScolaire = $session->get('annee_scolaire');
+         $anneeScolaire = $session->get('anneeScolaire');
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code']);
         if (!$isEtudiant) {

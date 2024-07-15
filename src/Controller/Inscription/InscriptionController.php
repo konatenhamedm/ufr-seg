@@ -513,7 +513,7 @@ class InscriptionController extends AbstractController
 
         //dd($etat);
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-        $anneeScolaire = $session->get('annee_scolaire');
+         $anneeScolaire = $session->get('anneeScolaire');
 
         $titre = '';
         if ($etat == "echeance_soumis") {
@@ -834,7 +834,7 @@ class InscriptionController extends AbstractController
     public function indexListe(Request $request, UserInterface $user, string $etat, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-        $anneeScolaire = $session->get('annee_scolaire');
+         $anneeScolaire = $session->get('anneeScolaire');
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
