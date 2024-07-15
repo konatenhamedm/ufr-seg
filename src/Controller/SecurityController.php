@@ -20,11 +20,33 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-
+    public const DEFAULT_ROUTE = 'app_liste_inscription_etudiant_admin_index';
+    public const DEFAULT_ROUTE_SUIVI = 'app_home_timeline_index';
+    public const DEFAULT_INFORMATION = 'site_information';
+    public const DEFAULT_INFORMATION_CAISSIERE = 'app_parametre_preinscription_index';
+    public const DEFAULT_LISTE_INSCRIS = 'app_inscription_etudiant_admin_index';
+    public const DEFAULT_INFORMATION_DIRECTEUR = 'app_utilisateur_personne_index';
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
 
+
+
+        if ($this->getUser()) {
+
+            if (in_array('ROLE_SUPER_ADMIN', $this->getUser()->getRoles())) {
+                $route = self::DEFAULT_ROUTE_SUIVI;
+            } elseif (in_array('ROLE_ETUDIANT', $this->getUser()->getRoles())) {
+                $route = self::DEFAULT_INFORMATION;
+            } elseif (in_array('ROLE_CAISSIERE', $this->getUser()->getRoles()) || in_array('ROLE_COMPTABLE', $this->getUser()->getRoles())) {
+                $route = self::DEFAULT_LISTE_INSCRIS;
+            } else {
+                $route = self::DEFAULT_ROUTE;
+            }
+
+
+            return $this->redirectToRoute($route);
+        }
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
@@ -42,13 +64,12 @@ class SecurityController extends AbstractController
     #[Route(path: '/oublie-pass', name: 'forget_password')]
     public function forgetPassword(
         Request $request,
-          FormError $formError,
+        FormError $formError,
         UtilisateurRepository $utilisateurRepository,
         TokenGeneratorInterface $tokenGenerator,
         EntityManagerInterface $entityManager,
         SendMailService $sendMailService
-    ): Response
-    {
+    ): Response {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
         $form->handleRequest($request);
 
@@ -62,13 +83,13 @@ class SecurityController extends AbstractController
                 if ($user) {
 
                     $token = $tokenGenerator->generateToken();
-                   $user->setResetToken($token);
+                    $user->setResetToken($token);
                     $entityManager->persist($user);
                     $entityManager->flush();
 
-                    $url = $this->generateUrl('reset_pass',['token'=>$token],UrlGeneratorInterface::ABSOLUTE_URL);
+                    $url = $this->generateUrl('reset_pass', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
 
-                    $context = compact('url','user');
+                    $context = compact('url', 'user');
 
                     // TO DO
                     $sendMailService->send(
@@ -79,7 +100,7 @@ class SecurityController extends AbstractController
                         'password_reset',
                         $context
                     );
-                    $this->addFlash('warning ','email envoyé avec success');
+                    $this->addFlash('warning ', 'email envoyé avec success');
                     return  $this->redirectToRoute('app_login');
                 }
                 $this->addFlash('danger', 'Un probleme est survenu');
@@ -103,33 +124,32 @@ class SecurityController extends AbstractController
         UserPasswordHasherInterface $hasher,
 
 
-    ): Response
-    {
+    ): Response {
         $user = $utilisateurRepository->findOneByResetToken($token);
 
-        if($user){
+        if ($user) {
             $form = $this->createForm(ResetPasswordFormType::class);
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
                 $user->setPassword($hasher->hashPassword(
-                    $user,$form->get('password')->getData()
+                    $user,
+                    $form->get('password')->getData()
                 ));
                 $user->setResetToken('');
 
                 $entityManager->persist($user);
                 $entityManager->flush();
 
-                $this->addFlash('success','Mot de passe changé avec success');
+                $this->addFlash('success', 'Mot de passe changé avec success');
                 return $this->redirectToRoute('app_login');
             }
 
-            return $this->render('security/reset_password.html.twig',[
-                'form'=>$form->createView()
+            return $this->render('security/reset_password.html.twig', [
+                'form' => $form->createView()
             ]);
         }
-        $this->addFlash('danger','Jeton invalide');
+        $this->addFlash('danger', 'Jeton invalide');
         return $this->redirectToRoute('app_login');
-
     }
 }
