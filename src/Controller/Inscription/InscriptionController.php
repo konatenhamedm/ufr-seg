@@ -37,6 +37,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Workflow\Registry;
@@ -167,10 +168,12 @@ class InscriptionController extends AbstractController
 
 
     #[Route('/{etat}/{id}', name: 'app_inscription_inscription_suivi_formation_index', methods: ['GET', 'POST'])]
-    public function indexSuviFormation(Request $request, UserInterface $user, $id, string $etat, DataTableFactory $dataTableFactory): Response
+    public function indexSuviFormation(Request $request, UserInterface $user, $id, string $etat, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
 
         //dd($user->getPersonne());
+
+        $anneeScolaire = $session->get('anneeScolaire');
 
         //dd($etat);
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
@@ -227,7 +230,7 @@ class InscriptionController extends AbstractController
 
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
-            'query' => function (QueryBuilder $qb) use ($user, $etat, $id) {
+            'query' => function (QueryBuilder $qb) use ($user, $etat, $id, $anneeScolaire) {
                 $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant'])
                     ->from(Inscription::class, 'p')
                     ->join('p.niveau', 'niveau')
@@ -248,6 +251,12 @@ class InscriptionController extends AbstractController
                 } else {
                     $qb->andWhere('p.etat = :etat')
                         ->setParameter('etat', $etat);
+                }
+
+                if ($anneeScolaire) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
                 }
             }
         ])
@@ -356,12 +365,12 @@ class InscriptionController extends AbstractController
 
 
     #[Route('/formation', name: 'app_inscription_inscription_formation_index', methods: ['GET', 'POST'])]
-    public function indexFormation(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    public function indexFormation(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
 
         //dd($etat);
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-
+        $anneeScolaire  = $session->get('annee_scolaire');
 
         //Code Etudiant, Filière, Nom et prénoms, Coût formation, Total payé, Solde
         $table = $dataTableFactory->create()->add('code', TextColumn::class, ['label' => 'Code'])
@@ -379,7 +388,7 @@ class InscriptionController extends AbstractController
             }]);
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
-            'query' => function (QueryBuilder $qb) use ($user) {
+            'query' => function (QueryBuilder $qb) use ($user, $isEtudiant, $anneeScolaire) {
                 $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant'])
                     ->from(Inscription::class, 'p')
                     ->join('p.niveau', 'niveau')
@@ -391,6 +400,12 @@ class InscriptionController extends AbstractController
                 if ($this->isGranted('ROLE_ETUDIANT')) {
                     $qb->andWhere('p.etudiant = :etudiant')
                         ->setParameter('etudiant', $user->getPersonne());
+                }
+
+                if ($anneeScolaire) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
                 }
             }
         ])
@@ -493,11 +508,12 @@ class InscriptionController extends AbstractController
 
 
     #[Route('/{etat}', name: 'app_inscription_inscription_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, UserInterface $user, string $etat, DataTableFactory $dataTableFactory, EcheancierRepository $echeancierRepository): Response
+    public function index(Request $request, UserInterface $user, string $etat, DataTableFactory $dataTableFactory, EcheancierRepository $echeancierRepository, SessionInterface $session): Response
     {
 
         //dd($etat);
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
+        $anneeScolaire = $session->get('annee_scolaire');
 
         $titre = '';
         if ($etat == "echeance_soumis") {
@@ -605,7 +621,7 @@ class InscriptionController extends AbstractController
 
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
-            'query' => function (QueryBuilder $qb) use ($user, $etat) {
+            'query' => function (QueryBuilder $qb) use ($user, $etat, $anneeScolaire) {
                 $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
                     ->from(Inscription::class, 'p')
                     ->join('p.niveau', 'niveau')
@@ -633,6 +649,12 @@ class InscriptionController extends AbstractController
                 } else {
                     $qb->andWhere('p.etat = :etat')
                         ->setParameter('etat', $etat);
+                }
+
+                if ($anneeScolaire) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
                 }
             }
         ])
@@ -809,10 +831,10 @@ class InscriptionController extends AbstractController
         ]);
     }
     #[Route('/{etat}', name: 'app_inscription_inscription_list_ls', methods: ['GET', 'POST'])]
-    public function indexListe(Request $request, UserInterface $user, string $etat, DataTableFactory $dataTableFactory): Response
+    public function indexListe(Request $request, UserInterface $user, string $etat, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-
+        $anneeScolaire = $session->get('annee_scolaire');
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
@@ -837,7 +859,7 @@ class InscriptionController extends AbstractController
         }
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
-            'query' => function (QueryBuilder $qb) use ($user, $etat) {
+            'query' => function (QueryBuilder $qb) use ($user, $etat, $isEtudiant, $anneeScolaire) {
                 $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant,res'])
                     ->from(Inscription::class, 'p')
                     ->join('p.niveau', 'niveau')
@@ -861,6 +883,11 @@ class InscriptionController extends AbstractController
                 if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
                     $qb->andWhere("res = :user")
                         ->setParameter('user', $user->getPersonne());
+                }
+                if ($anneeScolaire) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
                 }
             }
         ])

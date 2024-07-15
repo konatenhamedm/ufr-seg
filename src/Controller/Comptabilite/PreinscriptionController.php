@@ -25,6 +25,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
@@ -45,10 +46,10 @@ class PreinscriptionController extends AbstractController
 
 
     #[Route('/', name: 'app_comptabilite_preinscription_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-
+        $anneeScolaire = $session->get('anneeScolaire');
         $table = $dataTableFactory->create()
             ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
             ->add('niveau', TextColumn::class, ['field' => 'niveau.libelle', 'label' => 'Niveau'])
@@ -65,7 +66,7 @@ class PreinscriptionController extends AbstractController
 
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Preinscription::class,
-            'query' => function (QueryBuilder $qb) use ($user) {
+            'query' => function (QueryBuilder $qb) use ($user, $anneeScolaire) {
                 $qb->select(['p', 'niveau', 'filiere', 'etudiant'])
                     ->from(Preinscription::class, 'p')
                     ->join('p.niveau', 'niveau')
@@ -74,6 +75,11 @@ class PreinscriptionController extends AbstractController
                 if ($this->isGranted('ROLE_ETUDIANT')) {
                     $qb->andWhere('p.etudiant = :etudiant')
                         ->setParameter('etudiant', $user->getPersonne());
+                }
+                if ($anneeScolaire) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
                 }
             }
         ])
@@ -143,10 +149,10 @@ class PreinscriptionController extends AbstractController
         ]);
     }
     #[Route('/formation', name: 'app_comptabilite_preinscription_formation_index', methods: ['GET', 'POST'])]
-    public function indexFormation(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    public function indexFormation(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-
+        $anneeScolaire = $session->get('anneeScolaire');
         $table = $dataTableFactory->create()
             ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
             ->add('niveau', TextColumn::class, ['field' => 'niveau.libelle', 'label' => 'Niveau'])
@@ -163,7 +169,7 @@ class PreinscriptionController extends AbstractController
 
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Preinscription::class,
-            'query' => function (QueryBuilder $qb) use ($user) {
+            'query' => function (QueryBuilder $qb) use ($user, $isEtudiant, $anneeScolaire) {
                 $qb->select(['p', 'niveau', 'filiere', 'etudiant'])
                     ->from(Preinscription::class, 'p')
                     ->join('p.niveau', 'niveau')
@@ -172,6 +178,11 @@ class PreinscriptionController extends AbstractController
                 if ($this->isGranted('ROLE_ETUDIANT')) {
                     $qb->andWhere('p.etudiant = :etudiant')
                         ->setParameter('etudiant', $user->getPersonne());
+                }
+                if ($anneeScolaire) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
                 }
             }
         ])
@@ -259,13 +270,13 @@ class PreinscriptionController extends AbstractController
 
 
     #[Route('/{etat}/liste', name: 'app_comptabilite_preinscription_ls', methods: ['GET', 'POST'])]
-    public function liste(Request $request, UserInterface $user, string $etat, DataTableFactory $dataTableFactory): Response
+    public function liste(Request $request, UserInterface $user, string $etat, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
 
 
 
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-
+        $anneeScolaire = $session->get('annee_scolaire');
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code']);
         if (!$isEtudiant) {
@@ -285,7 +296,7 @@ class PreinscriptionController extends AbstractController
 
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Preinscription::class,
-            'query' => function (QueryBuilder $qb) use ($user, $etat) {
+            'query' => function (QueryBuilder $qb) use ($user, $etat, $anneeScolaire) {
                 $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant,res'])
                     ->from(Preinscription::class, 'p')
                     ->join('p.niveau', 'niveau')
@@ -302,6 +313,11 @@ class PreinscriptionController extends AbstractController
                 if ($this->isGranted('ROLE_DIRECTEUR')) {
                     $qb->andWhere('res.id = :id')
                         ->setParameter('id', $user->getPersonne()->getId());
+                }
+                if ($anneeScolaire) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
                 }
             }
         ])

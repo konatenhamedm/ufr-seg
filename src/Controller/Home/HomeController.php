@@ -44,10 +44,23 @@ class HomeController extends AbstractController
     #[Route(path: '/update-annee-scolaire/{id}', name: 'update_annee_scolaire', methods: ['POST'])]
     public function updateAnneeScolaire(Request $request, SessionInterface $session, $id, AnneeScolaireRepository $anneeScolaireRepository)
     {
+        $annee = $session->get('anneeScolaire');
 
-        $session->set('anneeScolaire', $anneeScolaireRepository->find($id));
 
-        return  $this->json(['status' => 'success']);
+
+        if (!empty($annee)) {
+            unset($annee);
+        }
+        // Supprimer l'ancienne valeur de la session (si nécessaire)
+        // $session->remove('anneeScolaire');
+
+        // Récupérer la nouvelle année scolaire par son ID
+        $anneeScolaire = $anneeScolaireRepository->find($id);
+
+        // Mettre à jour la session avec la nouvelle valeur
+        $session->set('anneeScolaire', $anneeScolaire);
+
+        return $this->json(['status' => 'success']);
     }
 
     protected const UPLOAD_PATH = 'media_etudiant';

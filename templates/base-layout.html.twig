@@ -193,6 +193,7 @@ License: For each use you must have a valid license purchased only from above li
 
 											{% set actif = 0 %}
 											<select class="form-select all_annee" value={{ actif }}  aria-label="Select example">
+											<option value="0">Année Scolaire</option>
 												{% for item in menu.getListeAnnees %}
 													{% if item.actif == true %}
 														{% set actif =  item.id   %}
@@ -370,33 +371,23 @@ License: For each use you must have a valid license purchased only from above li
 
 
 		  <script>
-		  $(".all_annee").on('change',function(){
+		 $(".all_annee").on('change', function() {
+				var anneeScolaire = this.value;
+				var url = "{{ path('update_annee_scolaire', {id: 'id'}) }}".replace('id', anneeScolaire);
+				$.ajax({
+					url: url,
+					method: 'POST',
+					dataType: 'json',
+					success: function (json) {
+						console.log("success");
+						window.location.reload(); // Recharger la page si la requête est réussie
+					},
+					error: function () {
+						console.log("error");
+					}
+				});
+			});
 
-			var anneeScolaire = this.value;
-			  var url = "{{ path('update_annee_scolaire', {id: 'id'}) }}".replace('id', anneeScolaire);
-			   $.ajax({
-                    url: url,
-                    method: 'POST',
-                    dataType: 'json',
-                    /*beforeSend: function () {
-                        
-                        $form_content.html(`<div class="d-flex align-items-center">
-                                    <strong>Chargement des données de l'étape</strong>
-                                    <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
-                                    </div>`);
-                    },*/
-                    success: function (json) {
-                        
-                      console.log("suecccccccc")
-                    },
-                   
-                    error: function () {
-                      console.log("echecccc")
-                        
-                    }
-                })
-
-		  })
 		  
 		  </script>
 

@@ -59,7 +59,7 @@ class PersonneController extends AbstractController
 
         $anneeScolaire = $session->get('anneeScolaire');
 
-        // dd($anneeScolaire);
+        //  dd($anneeScolaire);
 
         $table = $dataTableFactory->create()
             ->add('nom', TextColumn::class, ['label' => 'Nom'])

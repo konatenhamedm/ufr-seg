@@ -40,6 +40,7 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 
@@ -49,10 +50,10 @@ class InscriptionController extends AbstractController
     use FileTrait;
 
     #[Route('/', name: 'app_comptabilite_inscription_index',  methods: ['GET', 'POST'], options: ['expose' => true])]
-    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session): Response
     {
         //  $isDirecteur = $this->isGranted('ROLE_DIRECTEUR');
-
+        $anneeScolaire = $session->get('anneeScolaire');
         $niveau = $request->query->get('niveau');
         $caissiere = $request->query->get('caissiere');
         $dateDebut = $request->query->get('dateDebut');
@@ -133,7 +134,7 @@ class InscriptionController extends AbstractController
             ->add('caissiere', TextColumn::class, ['label' => 'Caissière', 'field' => 'ca.getNomComplet'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => InfoPreinscription::class,
-                'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode) {
+                'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $anneeScolaire) {
                     $qb->select(['p', 'niveau', 'filiere', 'etudiant', 'info,ca,res'])
                         ->from(InfoPreinscription::class, 'info')
                         ->leftJoin('info.preinscription', 'p')
@@ -201,6 +202,12 @@ class InscriptionController extends AbstractController
                     if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
                         $qb->andWhere("res = :user")
                             ->setParameter('user', $user->getPersonne());
+                    }
+
+                    if ($anneeScolaire) {
+
+                        $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
                     }
                 }
             ])
@@ -291,9 +298,10 @@ class InscriptionController extends AbstractController
         ]);
     }
     #[Route('/paiement/scolarite', name: 'app_comptabilite_paiement_scolarite_index',  methods: ['GET', 'POST'], options: ['expose' => true])]
-    public function indexPaiementScolarite(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
+    public function indexPaiementScolarite(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session): Response
     {
         //  $isDirecteur = $this->isGranted('ROLE_DIRECTEUR');
+        $anneeScolaire = $session->get('anneeScolaire');
 
         $niveau = $request->query->get('niveau');
         $caissiere = $request->query->get('caissiere');
@@ -339,7 +347,7 @@ class InscriptionController extends AbstractController
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => InfoInscription::class,
-                'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $filiere, $classe, $typeFrais) {
+                'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $filiere, $classe, $typeFrais, $anneeScolaire) {
                     $qb->select(['p', 'i', 'res', 'niveau', 'filiere', 'etudiant', 'ca', 'classe', 'typeFrais', 'mode'])
                         ->from(InfoInscription::class, 'i')
                         ->join('i.inscription', 'p')
@@ -410,6 +418,12 @@ class InscriptionController extends AbstractController
                         if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
                             $qb->andWhere("res = :user")
                                 ->setParameter('user', $user->getPersonne());
+                        }
+
+                        if ($anneeScolaire) {
+
+                            $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                                ->setParameter('anneeScolaire', $anneeScolaire);
                         }
                     }
                 }
