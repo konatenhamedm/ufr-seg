@@ -665,7 +665,7 @@ class NiveauEtudiantController extends AbstractController
                             ->setParameter('user', $user->getPersonne());
                     }
 
-                    if ($anneeScolaire) {
+                    if ($anneeScolaire != null) {
 
                         $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
                             ->setParameter('anneeScolaire', $anneeScolaire);
@@ -804,7 +804,7 @@ class NiveauEtudiantController extends AbstractController
                         $qb->andWhere('res.id = :id')
                             ->setParameter('id', $user->getPersonne()->getId());
                     }
-                    if ($anneeScolaire) {
+                    if ($anneeScolaire != null) {
 
                         $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
                             ->setParameter('anneeScolaire', $anneeScolaire);
