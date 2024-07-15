@@ -441,11 +441,11 @@ class HomeController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Preinscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $ver) {
-                    $qb->select('e, filiere, etudiant,niveau,c,promotion')
+                    $qb->select('e, filiere, etudiant,niveau,c')
                         ->from(Preinscription::class, 'e')
                         ->join('e.etudiant', 'etudiant')
-                        ->join('e.promotion', 'promotion')
-                        ->join('promotion.niveau', 'niveau')
+                        ->join('e.niveau', 'niveau')
+                        /* ->join('promotion.niveau', 'niveau') */
                         ->join('niveau.filiere', 'filiere')
                         ->leftJoin('e.caissiere', 'c')
                         ->andWhere('e.etat = :statut')
@@ -569,8 +569,7 @@ class HomeController extends AbstractController
                 $qb->select(['p'])
                     /* $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe', 'promotion']) */
                     ->from(Inscription::class, 'p')
-                    ->join('p.promotion', 'promotion')
-                    ->join('promotion.niveau', 'niveau')
+                    ->join('p.niveau', 'niveau')
                     ->join('p.classe', 'classe')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant')
@@ -733,8 +732,7 @@ class HomeController extends AbstractController
                 $qb->select(['p'])
                     /* $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe', 'promotion']) */
                     ->from(Inscription::class, 'p')
-                    ->join('p.promotion', 'promotion')
-                    ->join('promotion.niveau', 'niveau')
+                    ->join('p.niveau', 'niveau')
                     ->join('p.classe', 'classe')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant')
@@ -863,8 +861,7 @@ class HomeController extends AbstractController
                 $qb->select(['p'])
                     /* $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe', 'promotion']) */
                     ->from(Inscription::class, 'p')
-                    ->join('p.promotion', 'promotion')
-                    ->join('promotion.niveau', 'niveau')
+                    ->join('p.niveau', 'niveau')
                     ->join('p.classe', 'classe')
                     ->join('niveau.filiere', 'filiere')
                     ->join('p.etudiant', 'etudiant')
