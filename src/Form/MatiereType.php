@@ -15,10 +15,10 @@ class MatiereType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('code', null,['label' => 'Code'])
+            ->add('code', null, ['label' => 'Code'])
             ->add('ordre', IntegerType::class, ['label' => 'Numéro Ordre'])
             ->add('libelle', null, ['label' => 'Libellé'])
-            ->add('typeMatiere', EntityType::class, [
+            /*   ->add('typeMatiere', EntityType::class, [
                 'class' => TypeMatiere::class,
                 'required' => false,
                 'placeholder' => '----',
@@ -26,8 +26,7 @@ class MatiereType extends AbstractType
                 'choice_label' => 'libelle',
                 'label' => 'Type de matière',
                 'attr' => ['class' => 'has-select2']
-            ])
-        ;
+            ]) */;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
