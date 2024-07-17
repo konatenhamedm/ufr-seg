@@ -67,4 +67,9 @@ class Menu
         $repo = $this->em->getRepository(Preinscription::class)->nombrePreinscriptionAdmin($etat, $annee);
         return $repo;
     }
+    public function getAllYears()
+    {
+        $repo = $this->em->getRepository(Preinscription::class)->listeAnneScolaire($this->security->getUser()->getPersonne());
+        return $repo;
+    }
 }

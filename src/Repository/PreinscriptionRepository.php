@@ -115,6 +115,19 @@ class PreinscriptionRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function listeAnneScolaire($etudiant)
+    {
+        return $this->createQueryBuilder('p')
+            ->select("distinct(a.id) id,a.libelle")
+            ->innerJoin('p.niveau', 'niveau')
+            ->innerJoin('niveau.anneeScolaire', 'a')
+            ->andWhere('p.etudiant = :etudiant')
+            ->setParameter("etudiant", $etudiant)
+            ->orderBy("a.id")
+            ->getQuery()
+            ->getResult();
+    }
+
 
     //    /**
     //     * @return Preinscription[] Returns an array of Preinscription objects

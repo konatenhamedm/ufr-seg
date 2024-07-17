@@ -34,6 +34,7 @@ use App\Form\RegisterType;
 use App\Form\UtilisateurInscriptionSimpleType;
 use App\Form\UtilisateurInscriptionType;
 use App\Form\UtilisateurType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\ClasseRepository;
 use App\Repository\EcheancierRepository;
 use App\Repository\EmployeRepository;
@@ -215,9 +216,8 @@ class HomeController extends AbstractController
     }
 
     #[Route(path: '/', name: 'site_home', methods: ['GET', 'POST'])]
-    public function index(Request $request, FiliereRepository $filiereRepository): Response
+    public function index(Request $request, FiliereRepository $filiereRepository, Security $security): Response
     {
-
         return $this->render('site/index.html.twig', ['filieres' => $filiereRepository->findAll()]);
     }
 
@@ -588,18 +588,24 @@ class HomeController extends AbstractController
         NiveauRepository $niveauRepository,
         UtilisateurRepository $utilisateurRepository,
         PreinscriptionRepository $preinscriptionRepository,
+        SessionInterface $session,
+        AnneeScolaireRepository $anneeScolaireRepository
 
     ): Response {
         $etudiant = $etudiantRepository->find($user->getPersonne()->getId());
 
         $info = new InfoEtudiant();
 
+        $annee = $session->get('anneeScolaire');
+        //dd("");
 
+        if ($annee != null) {
 
-        //$etudiant->getInf
-
-
-
+            //  dd("");
+            // dd($anneeScolaireRepository->find($preinscriptionRepository->listeAnneScolaire($etudiant)[0]['id']));
+            //unset($annee);
+            $session->set('anneeScolaire', $anneeScolaireRepository->find($preinscriptionRepository->listeAnneScolaire($etudiant)[0]['id']));
+        }
 
 
         if (count($etudiant->getInfoEtudiants()) == 0) {
