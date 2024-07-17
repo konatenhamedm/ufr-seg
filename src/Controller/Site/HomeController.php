@@ -69,6 +69,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
@@ -790,12 +791,14 @@ class HomeController extends AbstractController
 
 
     #[Route('/inscription/etudiant/admin', name: 'app_inscription_etudiant_admin_index', methods: ['GET', 'POST'], options: ['expose' => true])]
-    public function indexInformationAdmin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    public function indexInformationAdmin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $classe = $request->query->get('classe');
         $niveau = $request->query->get('niveau');
         $filiere = $request->query->get('filiere');
         // dd($niveau, $filiere);
+
+        $anneeScolaire = $session->get('anneeScolaire');
 
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
@@ -836,7 +839,7 @@ class HomeController extends AbstractController
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Inscription::class,
-                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau, $user) {
+                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau, $user, $anneeScolaire) {
                     $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
                         ->join('p.classe', 'classe', 'res')
@@ -868,6 +871,12 @@ class HomeController extends AbstractController
                     if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
                         $qb->andWhere("res = :user")
                             ->setParameter('user', $user->getPersonne());
+                    }
+
+                    if ($anneeScolaire != null) {
+
+                        $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
                     }
                 }
 
@@ -964,9 +973,9 @@ class HomeController extends AbstractController
         ]);
     }
     #[Route('/liste/inscription/etudiant/admin', name: 'app_liste_inscription_etudiant_admin_index', methods: ['GET', 'POST'])]
-    public function indexListeInscris(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    public function indexListeInscris(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
-
+        $anneeScolaire = $session->get('anneeScolaire');
 
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
@@ -977,7 +986,7 @@ class HomeController extends AbstractController
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Etudiant::class,
-                'query' => function (QueryBuilder $qb) {
+                'query' => function (QueryBuilder $qb) use ($anneeScolaire) {
                     $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
                         ->join('p.classe', 'classe')
@@ -987,6 +996,12 @@ class HomeController extends AbstractController
                         ->leftJoin('p.caissiere', 'c')
                         ->andWhere('p.classe is not null')
                         ->orderBy('p.id', 'DESC');
+
+                    if ($anneeScolaire != null) {
+
+                        $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
+                    }
                 }
 
             ])

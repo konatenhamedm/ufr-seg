@@ -49,7 +49,8 @@ class HomeController extends AbstractController
 
 
         if (!empty($annee)) {
-            unset($annee);
+            //unset($annee);
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
         }
         // Supprimer l'ancienne valeur de la session (si nécessaire)
         // $session->remove('anneeScolaire');
@@ -65,9 +66,18 @@ class HomeController extends AbstractController
 
     protected const UPLOAD_PATH = 'media_etudiant';
     #[Route('/workflow/timeline', name: 'app_home_timeline_index')]
-    public function index(UserInterface $user): Response
+    public function index(UserInterface $user, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+        $annee = $session->get('anneeScolaire');
 
+
+        if ($annee == null) {
+            // dd($anneeScolaireRepository->findOneBy(['actif' => 1]));
+            //unset($annee);
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
+        //dd($annee);
         $modules = [
             [
                 'label' => 'Etude de dossier',
@@ -447,11 +457,12 @@ class HomeController extends AbstractController
     }
 
     #[Route('/preinscription/solde', name: 'app_comptabilite_niveau_etudiant_preinscription_solde_index', methods: ['GET', 'POST'])]
-    public function indexPreinscriptionSolde(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
+    public function indexPreinscriptionSolde(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session): Response
     {
 
         //dd('vv');
         $ver = $this->isGranted('ROLE_ETUDIANT');
+        $anneeScolaire = $session->get('anneeScolaire');
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code Preinscription'])
             ->add('etudiant', TextColumn::class, ['label' => 'Nom et Prénoms', 'render' => function ($value, Preinscription $preinscription) {
@@ -466,7 +477,7 @@ class HomeController extends AbstractController
             //->add('montantPreinscription', NumberFormatColumn::class, ['label' => 'Mnt. Préinscr.'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Preinscription::class,
-                'query' => function (QueryBuilder $qb) use ($user, $ver) {
+                'query' => function (QueryBuilder $qb) use ($user, $ver, $anneeScolaire) {
                     $qb->select('e, filiere, etudiant,niveau,c')
                         ->from(Preinscription::class, 'e')
                         ->join('e.etudiant', 'etudiant')
@@ -480,6 +491,11 @@ class HomeController extends AbstractController
                     if ($this->isGranted('ROLE_ETUDIANT')) {
                         $qb->andWhere('e.etudiant = :etudiant')
                             ->setParameter('etudiant', $user->getPersonne());
+                    }
+                    if ($anneeScolaire != null) {
+
+                        $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
                     }
                 }
             ])
@@ -562,12 +578,14 @@ class HomeController extends AbstractController
 
 
     #[Route('/admin/frais', name: 'app_inscription_inscription_frais_index', methods: ['GET', 'POST'])]
-    public function indexListe(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    public function indexListe(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
         $isRoleFind = $this->isGranted('ROLE_SECRETAIRE');
         $isRoleAdminFind = $this->isGranted('ROLE_ADMIN');
         $etat = 'valide';
+
+        $anneeScolaire = $session->get('anneeScolaire');
 
 
         $table = $dataTableFactory->create()
@@ -591,7 +609,7 @@ class HomeController extends AbstractController
         // }
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
-            'query' => function (QueryBuilder $qb) use ($user, $etat) {
+            'query' => function (QueryBuilder $qb) use ($user, $etat, $anneeScolaire) {
                 $qb->select(['p'])
                     /* $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe', 'promotion']) */
                     ->from(Inscription::class, 'p')
@@ -607,6 +625,12 @@ class HomeController extends AbstractController
 
                 $qb->andWhere('p.etat = :etat')
                     ->setParameter('etat', $etat);
+
+                if ($anneeScolaire != null) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
+                }
             }
         ])
             ->setName('dt_app_inscription_inscription_frais');
@@ -725,12 +749,14 @@ class HomeController extends AbstractController
         ]);
     }
     #[Route('/admin/frais/solde', name: 'app_inscription_inscription_frais_solde_index', methods: ['GET', 'POST'])]
-    public function indexListeFraisSolde(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    public function indexListeFraisSolde(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
         $isRoleFind = $this->isGranted('ROLE_SECRETAIRE');
         $isRoleAdminFind = $this->isGranted('ROLE_ADMIN');
         $etat = 'solde';
+
+        $anneeScolaire = $session->get('anneeScolaire');
 
 
         $table = $dataTableFactory->create()
@@ -754,7 +780,7 @@ class HomeController extends AbstractController
         // }
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
-            'query' => function (QueryBuilder $qb) use ($user, $etat) {
+            'query' => function (QueryBuilder $qb) use ($user, $etat, $anneeScolaire) {
                 $qb->select(['p'])
                     /* $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe', 'promotion']) */
                     ->from(Inscription::class, 'p')
@@ -770,6 +796,12 @@ class HomeController extends AbstractController
 
                 $qb->andWhere('p.etat = :etat')
                     ->setParameter('etat', $etat);
+
+                if ($anneeScolaire != null) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
+                }
             }
         ])
             ->setName('dt_app_inscription_inscription_frais_solde');
@@ -846,13 +878,13 @@ class HomeController extends AbstractController
         ]);
     }
     #[Route('/admin/frais/caissiere', name: 'app_inscription_inscription_frais_caissiere_index', methods: ['GET', 'POST'])]
-    public function indexListeCaissiere(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    public function indexListeCaissiere(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
         $isRoleFind = $this->isGranted('ROLE_SECRETAIRE');
         $isRoleAdminFind = $this->isGranted('ROLE_ADMIN');
         $etat = 'valide';
-
+        $anneeScolaire = $session->get('anneeScolaire');
 
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code étudiant'])
@@ -883,7 +915,7 @@ class HomeController extends AbstractController
         }
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
-            'query' => function (QueryBuilder $qb) use ($user, $etat) {
+            'query' => function (QueryBuilder $qb) use ($user, $etat, $anneeScolaire) {
                 $qb->select(['p'])
                     /* $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe', 'promotion']) */
                     ->from(Inscription::class, 'p')
@@ -904,6 +936,17 @@ class HomeController extends AbstractController
                 } else {
                     $qb->andWhere('p.etat = :etat')
                         ->setParameter('etat', 'valide');
+                }
+
+                if ($anneeScolaire != null) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
+                }
+                if ($anneeScolaire != null) {
+
+                    $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
                 }
             }
         ])

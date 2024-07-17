@@ -193,19 +193,25 @@ License: For each use you must have a valid license purchased only from above li
 
 											{% set actif = 0 %}
 
-											{% if app.session.get('anneeScolaire') %}
-											{% set anneeScolaire = app.session.get('anneeScolaire') %}
 											
-											{% set actif = anneeScolaire.id %}
-												{% else %}
-													{% set actif = 0 %}
-												{% endif %}
 											<select class="form-select all_annee" value={{ actif }}  aria-label="Select example">
-											<option value="0">Année Scolaire</option>
+
+											
+											
 												{% for item in menu.getListeAnnees %}
+												{{ dump(actif) }}
+													{% if item.actif == true %}
+													  	{% set actif = item.id %}
+													{% endif %}
 													
 													
-												<option value={{ item.id}} >{{ item.libelle }}</option>
+												<option value={{ item.id}} 
+
+												{% if item.actif == true and app.session.get("anneeScolaire").id == item.id %}
+													  	selected="selected"
+													{% endif %}
+
+												>{{ item.libelle }}</option>
 												{% endfor %}
 												{# <option value="2" selected="selected">Two</option>
 												<option value="3">Three</option> #}
