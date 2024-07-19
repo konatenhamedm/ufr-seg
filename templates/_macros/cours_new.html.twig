@@ -1,0 +1,48 @@
+{% macro prototype_ligne(form) %}
+    <div class="proto-container" data-prototype="{{ _self.ligne(form.cours.vars.prototype)|e }}"></div>
+ 
+    <table class="table table-bordered table-custom">
+        <thead class="thead-dark">
+            <tr>
+                <th width="30%" class="p-2">Matière </th>
+                <th width="50%" class="p-2">Enseignant</th>
+        
+               {#  <th></th> #}
+            </tr>
+        </thead>
+        <tbody  class="row-container">
+            {% for item in form.cours %}
+                {{ _self.ligne(item|e) }}
+            {% endfor %}
+              {% if form.cours|length == 0 %}
+             <tr>
+             <td colspan="2" class="text-center">
+                <h1>
+                  Il n'y a aucune données pour cette recherche !!!
+                </h1>
+             </td>
+             </tr>
+             {% endif %}
+        </tbody>
+         
+    </table>
+    
+{% endmacro %}
+
+{% macro ligne(data) %}
+   
+    <tr class="row-colonne even pointer table-light">
+  
+        <td class="p-2">
+            <span class="label">{{ data.matiere.vars.data.libelle | default('') }}</span>
+            <div style="display:none " class="field-matiere">{{ form_widget(data.matiere) }}</div>
+        </td>
+      
+        <td class="p-2 text-center">{{ form_widget(data.employe) }}</td>
+        {# <td class="p-2 text-center del-col"></td> #}
+    </tr>
+{% endmacro %}
+
+
+
+

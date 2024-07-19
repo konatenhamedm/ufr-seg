@@ -30,6 +30,28 @@ class MatiereUeRepository extends ServiceEntityRepository
         }
     }
 
+    public function getAllMatiere($classe, $annee)
+    {
+        return $this->createQueryBuilder('d')
+            ->innerJoin('d.uniteEnseignement', 'u')
+            ->innerJoin('u.niveau', 'niveau')
+            ->andWhere('niveau.anneeScolaire = :annee')
+            ->setParameter('annee', $annee)
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+    }
+    public function getAllMatiereWithouLimit($classe, $annee)
+    {
+        return $this->createQueryBuilder('d')
+            ->innerJoin('d.uniteEnseignement', 'u')
+            ->innerJoin('u.niveau', 'niveau')
+            ->andWhere('niveau.anneeScolaire = :annee')
+            ->setParameter('annee', $annee)
+            ->getQuery()
+            ->getResult();
+    }
+
 
     //    /**
     //     * @return MatiereUe[] Returns an array of MatiereUe objects

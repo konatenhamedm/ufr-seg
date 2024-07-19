@@ -42,7 +42,7 @@ class EvaluationMenuBuilder
             $menu->addChild('type.index', ['route' => 'app_controle_type_controle_index', 'label' => 'Type de Controles'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_SECRETAIRE');
             $menu->addChild('typeEvaluation.index', ['route' => 'app_controle_type_evaluation_index', 'label' => 'Type évaluation'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_SECRETAIRE');
             //$menu->addChild('controle.index', ['route' => 'app_controle_controle_index', 'label' => 'Saisie des notes'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_SECRETAIRE');
-            $menu->addChild('cours.index', ['route' => 'app_controle_cours_index', 'label' => 'Cours'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_SECRETAIRE');
+            $menu->addChild('cours.index', ['route' => 'app_controle_cours_parent_new', 'label' => 'Cours'])->setExtra('icon', 'bi bi-gear')->setExtra('role', 'ROLE_SECRETAIRE');
             // $menu->addChild('deliberation.index', ['route' => 'app_direction_deliberation_index', 'label' => 'GESTION DE EXAMENS'])->setExtra('icon', 'bi bi-gear');
             if ($this->user->getPersonne()->getFonction()->getCode() == "DR") {
 

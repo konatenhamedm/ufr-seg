@@ -40,6 +40,9 @@ class Classe
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $blocEcheanciers;
 
+    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: CoursParent::class)]
+    private Collection $coursParents;
+
 
 
     public function __construct()
@@ -48,11 +51,17 @@ class Classe
         $this->inscriptions = new ArrayCollection();
         $this->controles = new ArrayCollection();
         $this->blocEcheanciers = new ArrayCollection();
+        $this->coursParents = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getClasseAnneeScolaire()
+    {
+        return sprintf('[%s] %s %s', $this->getLibelle(), '-', $this->getAnneeScolaire()->getLibelle());
     }
 
     public function getLibelle(): ?string
@@ -205,6 +214,36 @@ class Classe
             // set the owning side to null (unless already changed)
             if ($blocEcheancier->getClasse() === $this) {
                 $blocEcheancier->setClasse(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CoursParent>
+     */
+    public function getCoursParents(): Collection
+    {
+        return $this->coursParents;
+    }
+
+    public function addCoursParent(CoursParent $coursParent): static
+    {
+        if (!$this->coursParents->contains($coursParent)) {
+            $this->coursParents->add($coursParent);
+            $coursParent->setClasse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCoursParent(CoursParent $coursParent): static
+    {
+        if ($this->coursParents->removeElement($coursParent)) {
+            // set the owning side to null (unless already changed)
+            if ($coursParent->getClasse() === $this) {
+                $coursParent->setClasse(null);
             }
         }
 

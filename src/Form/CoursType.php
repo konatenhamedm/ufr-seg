@@ -27,10 +27,10 @@ class CoursType extends AbstractType
                 'choice_label' => 'libelle',
                 'attr' => ['class' => 'has-select2 form-select']
             ])
-            ->add('anneeScolaire', EntityType::class, [
+            /*    ->add('anneeScolaire', EntityType::class, [
                 'class' => AnneeScolaire::class,
                 'choice_label' => 'libelle',
-            ])
+            ]) */
             /*   ->add('employe', EntityType::class, [
                 'class' => Employe::class,
                 'choice_label' => 'getNomComplet',

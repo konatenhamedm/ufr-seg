@@ -78,7 +78,7 @@ class CoursController extends AbstractController
                     $qb->select(['co'])
                         ->from(Cours::class, 'co')
                         ->innerJoin('co.classe', 'c')
-                        ->leftJoin('c.promotion', 'promotion')
+                        ->leftJoin('c.', 'promotion')
                         ->leftJoin('promotion.niveau', 'niveau')
                         ->leftJoin('promotion.responsable', 'res')
                         ->join('co.matiere', 'm')

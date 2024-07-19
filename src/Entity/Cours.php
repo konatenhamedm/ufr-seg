@@ -33,6 +33,9 @@ class Cours
     #[ORM\ManyToOne(inversedBy: 'cours')]
     private ?Classe $classe = null;
 
+    #[ORM\ManyToOne(inversedBy: 'cours')]
+    private ?CoursParent $coursParent = null;
+
     public function __construct()
     {
         $this->controles = new ArrayCollection();
@@ -119,6 +122,18 @@ class Cours
     public function setClasse(?Classe $classe): static
     {
         $this->classe = $classe;
+
+        return $this;
+    }
+
+    public function getCoursParent(): ?CoursParent
+    {
+        return $this->coursParent;
+    }
+
+    public function setCoursParent(?CoursParent $coursParent): static
+    {
+        $this->coursParent = $coursParent;
 
         return $this;
     }
