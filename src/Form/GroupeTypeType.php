@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Controle;
 use App\Entity\GroupeType;
 use App\Entity\TypeControle;
+use App\Entity\TypeEvaluation;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -22,8 +23,8 @@ class GroupeTypeType extends AbstractType
                 'label' => false,
                 'mapped' => false
             ]) */
-            ->add('type', EntityType::class, [
-                'class' => TypeControle::class,
+            ->add('typeEvaluation', EntityType::class, [
+                'class' => TypeEvaluation::class,
                 'choice_label' => 'code',
                 'label'   => false,
                 'attr'    => ['class' => 'has-select2 '],
@@ -47,8 +48,9 @@ class GroupeTypeType extends AbstractType
                     'attr' => ['class' => 'has-select2'],
                     'multiple' => false,
                     'choices'  => array_flip([
-                        '20' => '20',
                         '10' => '10',
+                        '20' => '20',
+                        '40' => '40',
 
                     ]),
 
@@ -61,6 +63,7 @@ class GroupeTypeType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => GroupeType::class,
+            'allow_extra_fields' => true
         ]);
     }
 }

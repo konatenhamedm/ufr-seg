@@ -32,19 +32,22 @@
 <script src="{{ asset('assets/evaluations/index.js')}}"></script>
     <script>
         $(function () {
-            init_select2('select');
+            init_select2('select',null,'.content');
            
             
         });
 
          const $semestre = $('#{{ form.semestre.vars.id }}');
          const $classe = $('#{{ form.classe.vars.id }}');
+         const $ue = $('#{{ form.ue.vars.id }}');
          const $matiere = $('#{{ form.matiere.vars.id }}');
-         const $session = $('#{{ form.session.vars.id }}');
 
+         load_classe()
+
+         //function load_content(url,semestre,classe,matiere,ue) {
         function load_content(url,filters = []) {
-                //alert(nombre);
             const $form_content = $(`#form-content`);
+         
            
             $.ajax({
                 url: url,
@@ -53,10 +56,10 @@
                 data:filters,
                 beforeSend: function () {
                     
-                    $form_content.html(`<div class="align-items-center">
-                                <strong>Chargement des données de l'étape</strong>
-                                <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
-                                </div>`);
+                       $form_content.html(`<div class="text-center "> 
+                    <strong>Chargement des données de l'étape</strong><br>
+                                <div class="spinner-border ms-auto" role="status" aria-hidden="true">
+                    </div>`);
                 },
                 success: function (html) {
                     $form_content.html(html);
@@ -72,18 +75,14 @@
         }
 
         
-         function load_principal(semestre,classe,matiere,session){
+
+         function load_principal(filters = []){
              
             $.ajax({
-                url: '/admin/controle/controle/new/saisie/simple',
+                url: "/admin/controle/controle/new/saisie/simple",
                 method: 'GET',
                 dataType: 'html',
-                data: {
-                        semestre: semestre,
-                        classe: classe,
-                        matiere: matiere,
-                        session: session
-                    },
+                data: filters,
               
                 success: function (html) {
                   
@@ -93,9 +92,30 @@
 
         }
 
-           function load_matiere(classe){
+        function load_classe(){
+              $.ajax({
+                    url:  "{{ path('get_classe')}}",
+                    type:  'get',
+                    async: false,
+                    data:     {id:classe},
+                    dataType:   'json',
+                    success: function(json){
+
+                      $('#'+ $('.classe').attr("id")).html(''); //je vide la 2ème list
+                      //$('#'+ $('.matiere').attr("id")).append('<option value selected="default" >Choisissez</option>');
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $("#"+ $('.classe').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          });
+                    }
+                });
+        }
+
+        function load_matiere(classe){
             $.ajax({
-                    url:  '/admin/controle/cours/liste/matiere',
+                    url:  "{{ path('get_matiere')}}",
                     type:  'get',
                     async: false,
                     data:     {id:classe},
@@ -112,28 +132,87 @@
                           });
                     }
                 });
-            }
+        }
+        function load_ue(classe){
+            $.ajax({
+                    url:  "{{ path('get_ue')}}",
+                    type:  'get',
+                    async: false,
+                    data:     {id:classe},
+                    dataType:   'json',
+                    success: function(json){
 
-      
-        $classe.on('change', function () {
+                    
+
+                      $('#'+ $('.ue').attr("id")).html(''); //je vide la 2ème list
+                      //$('#'+ $('.matiere').attr("id")).append('<option value selected="default" >Choisissez</option>');
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $("#"+ $('.ue').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          });
+                    }
+                });
+        }
+        function load_ue_matiere(ue){
+            $.ajax({
+                    url:  "{{ path('get_ue_matiere')}}",
+                    type:  'get',
+                    async: false,
+                    data:     {id:ue},
+                    dataType:   'json',
+                    success: function(json){
+
+                      $('#'+ $('.matiere').attr("id")).html(''); //je vide la 2ème list
+                      //$('#'+ $('.matiere').attr("id")).append('<option value selected="default" >Choisissez</option>');
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $("#"+ $('.matiere').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          });
+                    }
+                });
+        }
+
+           //load_matiere($classe.val())
+
+          $classe.on('change', function () {
+     
               const $this = $(this);
               const val = $(this).val();
-              load_content(`/admin/controle/controle/new/load/${$semestre.val()}/${val}/${$matiere.val()}/${$session.val()}`,{semestre: $semestre.val(),classe:val,matiere: $matiere.val(),session: $session.val()})
-              load_matiere(val)
-              load_principal({semestre: $semestre.val(),classe:val,matiere: $matiere.val(),session: $session.val()})
-        });
+
+               load_content(`/admin/controle/controle/new/load/${$semestre.val()}/${val}/${$matiere.val()}/${$ue.val()}`,{semestre: $semestre.val(),classe:val,matiere: $matiere.val(),ue: $ue.val()})
+                //load_matiere(val)
+                load_ue(val)
+                load_principal({semestre: $semestre.val(),classe:val,matiere: $matiere.val(),ue: $ue.val()})
+          });
+          $ue.on('change', function () {
+     
+              const $this = $(this);
+              const val = $(this).val();
+
+                load_content(`/admin/controle/controle/new/load/${$semestre.val()}/${val}/${$matiere.val()}/${$ue.val()}`,{semestre: $semestre.val(),classe:val,matiere: $matiere.val(),ue: $ue.val()})
+                //load_matiere(val)
+                load_ue_matiere(val)
+                load_principal({semestre: $semestre.val(),classe:val,matiere: $matiere.val(),ue: $ue.val()})
+          });
 
           
-        $matiere.on('change', function () {
+          $matiere.on('change', function () {
   
               const $this = $(this);
               const val = $(this).val();
-              load_content(`/admin/controle/controle/new/load/${$semestre.val()}/${$classe.val()}/${val}/${$session.val()}`,{semestre: $semestre.val(),classe:$classe.val(),matiere: val,session: $session.val()})
-              load_principal({semestre: $semestre.val(),classe:$classe.val(),matiere: val,session: $session.val()})
+                 load_content(`/admin/controle/controle/new/load/${$semestre.val()}/${$classe.val()}/${val}/${$ue.val()}`,{semestre: $semestre.val(),classe:$classe.val(),matiere: val,ue: $ue.val()})
+                load_principal({semestre: $semestre.val(),classe:$classe.val(),matiere: val,ue: $ue.val()})
           });
+           load_ue($classe.val())
+           load_ue_matiere($ue.val())
 
-             load_content(`/admin/controle/controle/new/load/${$semestre.val()}/${$classe.val()}/${$matiere.val()}/${$session.val()}`,{semestre: $semestre.val(),classe:$classe.val(),matiere: $matiere.val(),session: $session.val()})
-             load_principal({semestre: $semestre.val(),classe:$classe.val(),matiere: $matiere.val(),session: $session.val()})
+          load_content(`/admin/controle/controle/new/load/${$semestre.val()}/${$classe.val()}/${$matiere.val()}/${$ue.val()}`,{semestre: $semestre.val(),classe:$classe.val(),matiere: $matiere.val(),ue: $ue.val()})
+          load_principal({semestre: $semestre.val(),classe:$classe.val(),matiere: $matiere.val(),ue: $ue.val()})
 
+       
     </script>
 {% endblock %}

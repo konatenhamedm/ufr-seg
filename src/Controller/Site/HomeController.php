@@ -149,7 +149,7 @@ class HomeController extends AbstractController
     }
 
 
-    #[Route('/liste/niveau/par/filiere/{id}',  methods: ['GET'])]
+    #[Route('/liste/niveau/par/filiere/{id}', name: 'liste_niveau_by_filiere_id',  methods: ['GET'])]
     public function getNiveau(Request $request, NiveauRepository  $niveauRepository, $id)
     {
         $response = new Response();
@@ -796,19 +796,19 @@ class HomeController extends AbstractController
     }
 
 
+
+
     #[Route('/inscription/etudiant/admin', name: 'app_inscription_etudiant_admin_index', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function indexInformationAdmin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $classe = $request->query->get('classe');
-        $niveau = $request->query->get('niveau');
-        $filiere = $request->query->get('filiere');
+        /*  $niveau = $request->query->get('niveau');
+        $filiere = $request->query->get('filiere'); */
         // dd($niveau, $filiere);
-
-        $anneeScolaire = $session->get('anneeScolaire');
-
+        $anneeScolaire = $session->get("anneeScolaire");
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
-            'action' => $this->generateUrl('app_inscription_etudiant_admin_index', compact('classe', 'niveau', 'filiere')),
+            'action' => $this->generateUrl('app_inscription_etudiant_admin_index', compact('classe')),
         ])->add('classe', EntityType::class, [
             'class' => Classe::class,
             'choice_label' => 'libelle',
@@ -816,8 +816,8 @@ class HomeController extends AbstractController
             'placeholder' => '---',
             'required' => false,
             'attr' => ['class' => 'form-control-sm has-select2']
-        ])
-            ->add('niveau', EntityType::class, [
+        ]);
+        /* ->add('niveau', EntityType::class, [
                 'class' => Niveau::class,
                 'choice_label' => 'libelle',
                 'label' => 'Niveau',
@@ -832,23 +832,38 @@ class HomeController extends AbstractController
                 // 'placeholder' => '---',
                 'required' => false,
                 'attr' => ['class' => 'form-control-sm has-select2']
-            ]);
+            ]); */
 
 
 
         $table = $dataTableFactory->create()
+
+            ->add('check', TextColumn::class, [
+                'label' => '',
+                'raw' => true,
+                'orderable' => false,
+                'searchable' => false,
+                'render' => function ($value, $context) {
+                    return sprintf('<input type="checkbox" class="row-check" value="%s">', $context->getId());
+                },
+            ])
             ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'etudiant.nom'])
             ->add('prenom', TextColumn::class, ['label' => 'Prénoms', 'field' => 'etudiant.prenom'])
-            ->add('contact', TextColumn::class, ['label' => 'Contact', 'field' => 'etudiant.contact'])
             ->add('classe', TextColumn::class, ['label' => 'Classe', 'field' => 'classe.libelle'])
+            ->add('moyenne', TextColumn::class, ['label' => 'Moyenne ', 'className' => 'text-end w-50px', 'render' => function ($value, $context) {
+                return '14';
+            }])
+            ->add('nombreCredit', TextColumn::class, ['label' => 'Nombre crédits ', 'className' => 'text-end w-70px', 'render' => function ($value, $context) {
+                return '14';
+            }])
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Inscription::class,
-                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau, $user, $anneeScolaire) {
-                    $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                'query' => function (QueryBuilder $qb) use ($classe, $user, $anneeScolaire) {
+                    $qb->select(['p', 'c', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
-                        ->join('p.classe', 'classe', 'res')
+                        ->join('p.classe', 'classe')
                         ->join('p.niveau', 'niveau')
                         ->join('niveau.filiere', 'filiere')
                         ->join('niveau.responsable', 'res')
@@ -859,25 +874,26 @@ class HomeController extends AbstractController
 
                     //dd($classe, $niveau, $filiere);
 
-                    if ($classe || $niveau || $filiere) {
+                    if ($classe) {
                         if ($classe) {
                             $qb->andWhere('classe.id = :classe')
                                 ->setParameter('classe', $classe);
                         }
-                        if ($niveau) {
+                        /*  if ($niveau) {
                             $qb->andWhere('niveau.id = :niveau')
                                 ->setParameter('niveau', $niveau);
                         }
                         if ($filiere) {
                             $qb->andWhere('filiere.id = :filiere')
                                 ->setParameter('filiere', $filiere);
-                        }
+                        } */
                     }
 
                     if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
                         $qb->andWhere("res = :user")
                             ->setParameter('user', $user->getPersonne());
                     }
+
 
                     if ($anneeScolaire != null) {
 
@@ -887,7 +903,7 @@ class HomeController extends AbstractController
                 }
 
             ])
-            ->setName('dt_app_inscription_etudiant_admin_' . $classe . '_' . $niveau . '_' . $filiere);
+            ->setName('dt_app_inscription_etudiant_admin_' . $classe);
 
         $renders = [
             'edit' =>  new ActionRender(function () {
@@ -899,9 +915,21 @@ class HomeController extends AbstractController
             'delete' => new ActionRender(function () {
                 return true;
             }),
+            'first_print' => new ActionRender(function () {
+                return true;
+            }),
+            'seconde_print' => new ActionRender(function () {
+                return true;
+            }),
+            'third_print' => new ActionRender(function () {
+                return true;
+            }),
+            'fourth_print' => new ActionRender(function () {
+                return true;
+            }),
         ];
 
-        $gridId = $classe . '_' . $niveau . '_' . $filiere;
+        $gridId = $classe;
         $hasActions = false;
 
         foreach ($renders as $_ => $cb) {
@@ -955,7 +983,64 @@ class HomeController extends AbstractController
                                 'icon' => '%icon% bi bi-trash',
                                 'attrs' => ['class' => 'btn-danger'],
                                 'render' => $renders['delete']
-                            ]
+                            ],
+
+                            'first_print' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_test',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-warning '],
+                                'render' => $renders['first_print']
+                            ],
+                            'fourth_print' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_test2',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-info '],
+                                'render' => $renders['fourth_print']
+                            ],
+                            'seconde_print' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_test4',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-danger '],
+                                'render' => $renders['seconde_print']
+                            ],
+                            'third_print' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_test1',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-primary '],
+                                'render' => $renders['third_print']
+                            ],
                         ]
 
                     ];
@@ -978,6 +1063,7 @@ class HomeController extends AbstractController
             'grid_id' => $gridId
         ]);
     }
+
     #[Route('/liste/inscription/etudiant/admin', name: 'app_liste_inscription_etudiant_admin_index', methods: ['GET', 'POST'])]
     public function indexListeInscris(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {

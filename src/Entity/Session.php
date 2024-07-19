@@ -7,8 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\UniqueConstraint;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: SessionRepository::class)]
+#[UniqueConstraint(name: "numero_session", fields: ["numero", "promotion"])]
+#[UniqueEntity(fields: ['numero', 'promotion'], message: 'cette session existe deja pour cette promotion')]
+#[Table(name: 'param_session')]
 class Session
 {
     #[ORM\Id]
@@ -20,18 +26,35 @@ class Session
     private ?string $libelle = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $dateSession = null;
+    private ?\DateTimeInterface $dateDebut = null;
 
-    #[ORM\OneToMany(mappedBy: 'session', targetEntity: Controle::class)]
-    private Collection $controles;
+
 
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: MoyenneMatiere::class)]
     private Collection $moyenneMatieres;
 
+
+    #[ORM\Column]
+    private ?int $numero = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateFin = null;
+
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: ControleExamen::class)]
+    private Collection $controleExamens;
+
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: DecisionExamen::class)]
+    private Collection $decisionExamens;
+
+    #[ORM\ManyToOne(inversedBy: 'sessions')]
+    private ?Niveau $niveau = null;
+
     public function __construct()
     {
-        $this->controles = new ArrayCollection();
+
         $this->moyenneMatieres = new ArrayCollection();
+        $this->controleExamens = new ArrayCollection();
+        $this->decisionExamens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -51,52 +74,23 @@ class Session
         return $this;
     }
 
-    public function getDateSession(): ?\DateTimeInterface
+    public function getDateDebut(): ?\DateTimeInterface
     {
-        return $this->dateSession;
+        return $this->dateDebut;
     }
 
-    public function setDateSession(\DateTimeInterface $dateSession): static
+    public function setDateDebut(\DateTimeInterface $dateDebut): static
     {
-        $this->dateSession = $dateSession;
+        $this->dateDebut = $dateDebut;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Controle>
-     */
-    public function getControles(): Collection
-    {
-        return $this->controles;
-    }
-
-    public function addControle(Controle $controle): static
-    {
-        if (!$this->controles->contains($controle)) {
-            $this->controles->add($controle);
-            $controle->setSession($this);
-        }
-
-        return $this;
-    }
-
-    public function removeControle(Controle $controle): static
-    {
-        if ($this->controles->removeElement($controle)) {
-            // set the owning side to null (unless already changed)
-            if ($controle->getSession() === $this) {
-                $controle->setSession(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, MoyenneMatiere>
      */
-    public function getMoyenneMatieres(): Collection
+    /* public function getMoyenneMatieres(): Collection
     {
         return $this->moyenneMatieres;
     }
@@ -114,11 +108,109 @@ class Session
     public function removeMoyenneMatiere(MoyenneMatiere $moyenneMatiere): static
     {
         if ($this->moyenneMatieres->removeElement($moyenneMatiere)) {
-            // set the owning side to null (unless already changed)
+            
             if ($moyenneMatiere->getSession() === $this) {
                 $moyenneMatiere->setSession(null);
             }
         }
+
+        return $this;
+    } */
+
+
+
+    public function getNumero(): ?int
+    {
+        return $this->numero;
+    }
+
+    public function setNumero(int $numero): static
+    {
+        $this->numero = $numero;
+
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTimeInterface
+    {
+        return $this->dateFin;
+    }
+
+    public function setDateFin(\DateTimeInterface $dateFin): static
+    {
+        $this->dateFin = $dateFin;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ControleExamen>
+     */
+    public function getControleExamens(): Collection
+    {
+        return $this->controleExamens;
+    }
+
+    public function addControleExamen(ControleExamen $controleExamen): static
+    {
+        if (!$this->controleExamens->contains($controleExamen)) {
+            $this->controleExamens->add($controleExamen);
+            $controleExamen->setSession($this);
+        }
+
+        return $this;
+    }
+
+    public function removeControleExamen(ControleExamen $controleExamen): static
+    {
+        if ($this->controleExamens->removeElement($controleExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($controleExamen->getSession() === $this) {
+                $controleExamen->setSession(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DecisionExamen>
+     */
+    public function getDecisionExamens(): Collection
+    {
+        return $this->decisionExamens;
+    }
+
+    public function addDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if (!$this->decisionExamens->contains($decisionExamen)) {
+            $this->decisionExamens->add($decisionExamen);
+            $decisionExamen->setSession($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if ($this->decisionExamens->removeElement($decisionExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($decisionExamen->getSession() === $this) {
+                $decisionExamen->setSession(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getNiveau(): ?Niveau
+    {
+        return $this->niveau;
+    }
+
+    public function setNiveau(?Niveau $niveau): static
+    {
+        $this->niveau = $niveau;
 
         return $this;
     }

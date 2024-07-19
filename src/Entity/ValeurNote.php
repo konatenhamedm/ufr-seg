@@ -4,9 +4,11 @@ namespace App\Entity;
 
 use App\Repository\ValeurNoteRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: ValeurNoteRepository::class)]
+#[Table(name: 'evaluation_valeur_notes')]
 class ValeurNote
 {
     #[ORM\Id]

@@ -57,6 +57,7 @@ class NoteType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Note::class,
+            'allow_extra_fields' => true
         ]);
     }
 }

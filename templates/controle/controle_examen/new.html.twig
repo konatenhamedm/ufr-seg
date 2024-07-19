@@ -1,0 +1,176 @@
+{% extends 'base-layout.html.twig' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+
+ {% from '_macros/controle_examen_new.html.twig' import prototype_ligne_controle %}
+{% block body %}
+    {% form_theme form 'widget/fields-block.html.twig' %}
+    {{ form_start(form, {'attr': {'role':'form', 'class': 'form'}}) }}    
+    <div class="card card-custom card-sticky gutter-b" id="kt_page_sticky_card">
+        <div class="card-header  flex-wrap border-1 pt-0 pb-0">
+            <div class="card-title">
+               {#  <h3 class="card-label">MODIFICATION DU GROUPE <span class="d-block text-muted pt-0 font-size-sm"></h3> #}
+            </div>
+            <div class="card-toolbar">
+              
+             {#    <button name="sticky-submit" id="sticky-submit" class="btn btn-main btn-sm btn-ajax">
+                    <span class="spinner-border d-none  spinner-ajax spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Modifier
+                </button> #}
+            </div>
+        </div>
+        <div class="card-body content">
+            {{ include('_includes/ajax/response.html.twig') }}
+            <div class="row">
+                 <div class="col-md-3">{{ form_row(form.niveau) }}</div>
+            <div class="col-md-3">{{ form_row(form.ue) }}</div>
+            <div class="col-md-3">{{ form_row(form.session) }}</div>
+            </div>
+          
+            <div class="card">
+                <div class="card-header pt-0 pb-0" id="heading4">
+                    <div class="card-title m-0">
+                       <br>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="form-content">
+                        {{ prototype_ligne_controle(form,nombre) }}
+                    </div>
+                </div>
+            </div>
+        </div>      
+    </div>
+    {{ form_widget(form._token) }}
+    {{ form_end(form, {render_rest: false}) }}
+{% endblock %}
+
+{% block java %}
+    <script src="{{ asset('assets/evaluations/index.js')}}"></script>
+    <script>
+        $(function () {
+            init_select2('select',null,'.content');
+
+         
+            
+        });
+
+         const $session = $('#{{ form.session.vars.id }}');
+         const $niveau = $('#{{ form.niveau.vars.id }}');
+         const $ue = $('#{{ form.ue.vars.id }}');
+
+        
+
+         //function load_content(url,semestre,classe,matiere,ue) {
+        function load_content(url,filters = []) {
+           // alert("")
+            const $form_content = $(`#form-content`);
+         
+           
+            $.ajax({
+                url: url,
+                method: 'GET',
+                dataType: 'html',
+                data:filters,
+                beforeSend: function () {
+                    
+                        $form_content.html(`<div class="text-center "> 
+                    <strong>Chargement des données de l'étape</strong><br>
+                                <div class="spinner-border ms-auto" role="status" aria-hidden="true">
+                    </div>`);
+                },
+                success: function (html) {
+                    $form_content.html(html);
+                },
+               
+                error: function () {
+                    $form_content.html('<div class="text-center text-danger">Une erreur est survenue...</div>');
+                }
+            })
+
+              
+        
+        }
+
+        
+
+         function load_principal(filters = []){
+
+            $.ajax({
+                url: "/admin/controle/controle/examen/new/saisie/simple",
+                method: 'GET',
+                dataType: 'html',
+                data: filters,
+              
+                success: function (html) {
+                  
+                },
+            
+            })
+
+        }
+
+        function load_ue(niveau){
+            $.ajax({
+                    url:  "{{ path('get_ue_promotion')}}",
+                    type:  'get',
+                    async: false,
+                    data:     {id:niveau},
+                    dataType:   'json',
+                    success: function(json){
+
+                      $('#'+ $('.ue').attr("id")).html(''); //je vide la 2ème list
+                      //$('#'+ $('.matiere').attr("id")).append('<option value selected="default" >Choisissez</option>');
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $("#"+ $('.ue').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          });
+                    }
+                });
+        }
+        function load_session(niveau){
+            $.ajax({
+                    url:  "{{ path('get_session')}}",
+                    type:  'get',
+                    async: false,
+                    data:     {id:niveau},
+                    dataType:   'json',
+                    success: function(json){
+
+                      $('#'+ $('.session').attr("id")).html(''); //je vide la 2ème list
+                      //$('#'+ $('.matiere').attr("id")).append('<option value selected="default" >Choisissez</option>');
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $("#"+ $('.session').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          });
+                    }
+                });
+        }
+
+        
+          $niveau.on('change', function () {
+     
+              const $this = $(this);
+              const val = $(this).val();
+
+           load_ue(val)
+           load_session(val)
+          load_content(`/admin/controle/controle/examen/new/load/${$session.val()}/${$niveau.val()}/${$ue.val()}`,{session: $session.val(),niveau:val,ue: $ue.val()})
+          load_principal({session: $session.val(),niveau:val,ue: $ue.val()})
+          });
+
+        load_ue($niveau.val())
+          load_session($niveau.val())
+          load_content(`/admin/controle/controle/examen/new/load/${$session.val()}/${$niveau.val()}/${$ue.val()}`,{session: $session.val(),niveau:$niveau.val(),ue: $ue.val()})
+          load_principal({session: $session.val(),niveau:$niveau.val(),ue: $ue.val()})
+
+       
+    </script>
+{% endblock %}

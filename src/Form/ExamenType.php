@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Examen;
 use App\Entity\MatiereExamen;
 use App\Entity\Niveau;
+use App\Entity\Promotion;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -14,6 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class ExamenType extends AbstractType
 {
@@ -61,7 +63,7 @@ class ExamenType extends AbstractType
                             ->setParameter('user', $this->user->getPersonne());
                     }
                 },
-                'choice_label' => 'getFullLibelleSigle',
+                'choice_label' => 'getFullCodeAnneeScolaire',
                 //'label' => 'Reponsable de niveau',
                 'attr' => ['class' => 'has-select2 form-select']
             ])

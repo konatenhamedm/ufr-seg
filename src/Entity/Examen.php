@@ -34,14 +34,19 @@ class Examen
     #[Assert\NotBlank(message: 'Veuillez renseigner la date de début')]
     private ?\DateTimeInterface $dateExamen = null;
 
-    #[ORM\ManyToOne]
+    /* #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank(message: 'Veuillez sélectionner un niveau')]
-    private ?Niveau $niveau = null;
+    #[Assert\NotBlank(message: 'Veuillez sélectionner un promotion')]
+    private ?Promotion $promotion = null; */
 
     #[ORM\OneToMany(mappedBy: 'examen', targetEntity: MatiereExamen::class, orphanRemoval: true, cascade: ['persist'])]
     #[Assert\Valid()]
     private Collection $matiereExamens;
+
+    #[ORM\ManyToOne(inversedBy: 'examens')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: 'Veuillez sélectionner un promotion')]
+    private ?Niveau $niveau = null;
 
     public function __construct()
     {
@@ -89,17 +94,7 @@ class Examen
         return $this;
     }
 
-    public function getNiveau(): ?Niveau
-    {
-        return $this->niveau;
-    }
 
-    public function setNiveau(?Niveau $niveau): static
-    {
-        $this->niveau = $niveau;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, MatiereExamen>
@@ -127,6 +122,18 @@ class Examen
                 $matiereExamen->setExamen(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNiveau(): ?Niveau
+    {
+        return $this->niveau;
+    }
+
+    public function setNiveau(?Niveau $niveau): static
+    {
+        $this->niveau = $niveau;
 
         return $this;
     }

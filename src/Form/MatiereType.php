@@ -18,7 +18,7 @@ class MatiereType extends AbstractType
             ->add('code', null, ['label' => 'Code'])
             ->add('ordre', IntegerType::class, ['label' => 'Numéro Ordre'])
             ->add('libelle', null, ['label' => 'Libellé'])
-            /*   ->add('typeMatiere', EntityType::class, [
+            /*  ->add('typeMatiere', EntityType::class, [
                 'class' => TypeMatiere::class,
                 'required' => false,
                 'placeholder' => '----',

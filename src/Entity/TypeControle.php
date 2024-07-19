@@ -6,8 +6,10 @@ use App\Repository\TypeControleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
 
 #[ORM\Entity(repositoryClass: TypeControleRepository::class)]
+#[Table(name: 'evaluation_type_controle')]
 class TypeControle
 {
     #[ORM\Id]
@@ -24,16 +26,20 @@ class TypeControle
     #[ORM\Column(length: 255)]
     private ?string $coef = null;
 
-    #[ORM\OneToMany(mappedBy: 'type', targetEntity: Controle::class)]
+
+
+    #[ORM\OneToMany(mappedBy: 'typeControle', targetEntity: ControleExamen::class)]
+    private Collection $controleExamens;
+
+    #[ORM\OneToMany(mappedBy: 'typeControle', targetEntity: Controle::class)]
     private Collection $controles;
 
-    #[ORM\OneToMany(mappedBy: 'type', targetEntity: GroupeType::class)]
-    private Collection $groupeTypes;
+
 
     public function __construct()
     {
         $this->controles = new ArrayCollection();
-        $this->groupeTypes = new ArrayCollection();
+        $this->controleExamens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -77,6 +83,37 @@ class TypeControle
         return $this;
     }
 
+
+    /**
+     * @return Collection<int, ControleExamen>
+     */
+    public function getControleExamens(): Collection
+    {
+        return $this->controleExamens;
+    }
+
+    public function addControleExamen(ControleExamen $controleExamen): static
+    {
+        if (!$this->controleExamens->contains($controleExamen)) {
+            $this->controleExamens->add($controleExamen);
+            $controleExamen->setTypeControle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeControleExamen(ControleExamen $controleExamen): static
+    {
+        if ($this->controleExamens->removeElement($controleExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($controleExamen->getTypeControle() === $this) {
+                $controleExamen->setTypeControle(null);
+            }
+        }
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Controle>
      */
@@ -89,7 +126,7 @@ class TypeControle
     {
         if (!$this->controles->contains($controle)) {
             $this->controles->add($controle);
-            $controle->setType($this);
+            $controle->setTypeControle($this);
         }
 
         return $this;
@@ -99,38 +136,8 @@ class TypeControle
     {
         if ($this->controles->removeElement($controle)) {
             // set the owning side to null (unless already changed)
-            if ($controle->getType() === $this) {
-                $controle->setType(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, GroupeType>
-     */
-    public function getGroupeTypes(): Collection
-    {
-        return $this->groupeTypes;
-    }
-
-    public function addGroupeType(GroupeType $groupeType): static
-    {
-        if (!$this->groupeTypes->contains($groupeType)) {
-            $this->groupeTypes->add($groupeType);
-            $groupeType->setType($this);
-        }
-
-        return $this;
-    }
-
-    public function removeGroupeType(GroupeType $groupeType): static
-    {
-        if ($this->groupeTypes->removeElement($groupeType)) {
-            // set the owning side to null (unless already changed)
-            if ($groupeType->getType() === $this) {
-                $groupeType->setType(null);
+            if ($controle->getTypeControle() === $this) {
+                $controle->setTypeControle(null);
             }
         }
 

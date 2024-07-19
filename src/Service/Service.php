@@ -5,6 +5,8 @@ namespace App\Service;
 
 use App\Entity\AnneeScolaire;
 use App\Entity\ArticleMagasin;
+use App\Entity\Decision;
+use App\Entity\DecisionExamen;
 use App\Entity\Document;
 use App\Entity\Echeancier;
 use App\Entity\Etudiant;
@@ -21,6 +23,7 @@ use App\Repository\AnneeScolaireRepository;
 use App\Repository\ArticleMagasinRepository;
 use App\Repository\ClasseRepository;
 use App\Repository\CoursRepository;
+use App\Repository\DecisionExamenRepository;
 use App\Repository\DocumentRepository;
 use App\Repository\EcheancierRepository;
 use App\Repository\FraisBlocRepository;
@@ -31,9 +34,14 @@ use App\Repository\LigneDocumentRepository;
 use App\Repository\MatiereRepository;
 use App\Repository\MatiereUeRepository;
 use App\Repository\MoyenneMatiereRepository;
+use App\Repository\NiveauRepository;
+use App\Repository\NoteExamenRepository;
 use App\Repository\NoteRepository;
+use App\Repository\PromotionRepository;
 use App\Repository\SemestreRepository;
 use App\Repository\SessionRepository;
+use App\Repository\TypeControleRepository;
+use App\Repository\UniteEnseignementRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -60,6 +68,12 @@ class Service
     private $fraisInscriptionRepository;
     private $infoInscriptionRepository;
     private $fraisBlocRepository;
+    private $ueRepository;
+    private $decisionExamenRepository;
+    private $noteExamenRepository;
+    private $promotionRepository;
+    private $typeControleRepository;
+    private $niveauRepository;
 
 
     public function __construct(
@@ -80,6 +94,12 @@ class Service
         InscriptionRepository $inscriptionRepository,
         FraisInscriptionRepository $fraisInscriptionRepository,
         FraisBlocRepository $fraisBlocRepository,
+        UniteEnseignementRepository $uniteEnseignementRepository,
+        DecisionExamenRepository $decisionExamenRepository,
+        NoteExamenRepository $noteExamenRepository,
+        PromotionRepository $promotionRepository,
+        TypeControleRepository $typeControleRepository,
+        NiveauRepository $niveauRepository
     ) {
         $this->em = $em;
         $this->security = $security;
@@ -99,6 +119,12 @@ class Service
         $this->fraisInscriptionRepository = $fraisInscriptionRepository;
         $this->infoInscriptionRepository = $infoInscriptionRepository;
         $this->fraisBlocRepository = $fraisBlocRepository;
+        $this->ueRepository = $uniteEnseignementRepository;
+        $this->decisionExamenRepository = $decisionExamenRepository;
+        $this->noteExamenRepository = $noteExamenRepository;
+        $this->niveauRepository = $promotionRepository;
+        $this->typeControleRepository = $typeControleRepository;
+        $this->niveauRepository = $niveauRepository;
 
         //$this->verifieIfFile2(15,2);
     }
@@ -721,31 +747,42 @@ class Service
                 $nbreTour = 0;
                 foreach ($groupeTypes as $key => $groupe) {
                     //$note = 0;
-                    if ($key1 == $key) {
+                    /*  if ($key1 == $key) {
 
                         $note = (int)$groupe->getCoef() == 10 ? $value->getNote() * 2 * (int)$groupe->getType()->getCoef() : $value->getNote() * (int)$groupe->getType()->getCoef();
 
+
+                        $note2 = 
                         if ($value->getNote() > 10 && $groupe->getCoef() == 10) {
                             $compteIfNoteSuperieurMax++;
                         }
                     }
                     if ($groupe->getType())
-                        $coef = $coef + (int)$groupe->getType()->getCoef();
-                    $nbreTour++;
+                        $coef = $coef + (int)$groupe->getType()->getCoef(); */
+
+                    if ((int)$groupe->getCoef() == 10)
+                        $nbreTour += 0.5;
+                    if ((int)$groupe->getCoef() == 20)
+                        $nbreTour += 1;
+                    if ((int)$groupe->getCoef() == 40)
+                        $nbreTour += 2;
                 }
 
-                $somme = $somme + $note;
+
+
+                $somme = $somme + $value->getNote();
                 // dd()
 
             }
             //dd($somme / ($coef / 2), $note, $coef);
-            $moyenneEtudiant = $somme / ($nbreTour == 1 ? $coef : $coef / 2);
+            $moyenneEtudiant = $somme / $nbreTour;
+            // $moyenneEtudiant = $somme / ($nbreTour == 1 ? $coef : $coef / 2);
             $row->setMoyenneMatiere($moyenneEtudiant);
 
-            $moyenneMatiere = $this->moyenneMatiereRepository->findOneBy(['matiere' => $data['matiere'], 'etudiant' => $row->getEtudiant()]);
+            $moyenneMatiere = $this->moyenneMatiereRepository->findOneBy(['matiere' => $data['matiere'], 'etudiant' => $row->getEtudiant(), 'ue' => $data['ue']]);
             if ($moyenneMatiere) {
                 $moyenneMatiere->setMoyenne($moyenneEtudiant);
-                $matiereUeValide = $this->matiereUeRepository->findOneBy(['matiere' => $data['matiere']]);
+                $matiereUeValide = $this->matiereUeRepository->findOneBy(['uniteEnseignement' => $data['ue'], 'matiere' => $data['matiere']]);
                 $moyenneMatiere->setValide($moyenneEtudiant  >= $matiereUeValide->getMoyenneValidation() ? 'Oui' : 'Non');
                 $this->em->persist($moyenneMatiere);
                 $this->em->flush();
@@ -758,8 +795,9 @@ class Service
 
                 $matiereUeValide = $this->matiereUeRepository->findOneBy(['matiere' => $data['matiere']]);
 
-                $newMoyenneMatiere->setValide($moyenneEtudiant  >= $matiereUeValide->getMoyenneValidation() ? 'Oui' : 'Non');
-                $newMoyenneMatiere->setSession($this->sessionRepository->find($data['session']));
+                $newMoyenneMatiere->setValide('seelater');
+                //$newMoyenneMatiere->setValide($moyenneEtudiant  >= $matiereUeValide->getMoyenneValidation() ? 'Oui' : 'Non'); TODO
+                $newMoyenneMatiere->setUe($this->ueRepository->find($data['ue']));
                 $this->em->persist($newMoyenneMatiere);
                 $this->em->flush();
             }
@@ -772,7 +810,7 @@ class Service
             $controleVefication->setAnneeScolaire($this->semestreRepository->find($data['semestre'])->getAnneeScolaire());
             $controleVefication->setClasse($this->classeRepository->find($data['classe']));
             $controleVefication->setMatiere($this->matiereRepository->find($data['matiere']));
-            $controleVefication->setSession($this->sessionRepository->find($data['session']));
+            $controleVefication->setUe($this->ueRepository->find($data['ue']));
             $controleVefication->setSemestre($this->semestreRepository->find($data['semestre']));
             $this->em->persist($controleVefication);
         } else {
@@ -780,7 +818,7 @@ class Service
             $controle->setAnneeScolaire($this->semestreRepository->find($data['semestre'])->getAnneeScolaire());
             $controle->setMatiere($this->matiereRepository->find($data['matiere']));
             $controle->setClasse($this->classeRepository->find($data['classe']));
-            $controle->setSession($this->sessionRepository->find($data['session']));
+            $controle->setUe($this->ueRepository->find($data['ue']));
             $controle->setSemestre($this->semestreRepository->find($data['semestre']));
             $this->em->persist($controle);
         }
@@ -789,7 +827,118 @@ class Service
         return $compteIfNoteSuperieurMax;
     }
 
-    public function rangExposant($dataNotes,)
+
+
+    public function gestionNotesExamen($dataNotes, $groupeTypes, $data = [], $controleVefication, $controle): int
+    {
+
+        foreach ($dataNotes as $key => $ligne) {
+            $somme = 0;
+            $noteExamen = 0;
+            foreach ($ligne->getValeurNoteExamens() as $valeur) {
+                $nbreTour = 0;
+                foreach ($groupeTypes as $key => $groupe) {
+                    if ((int)$groupe->getMax() == 10)
+                        $nbreTour += 0.5;
+                    if ((int)$groupe->getMax() == 20)
+                        $nbreTour += 1;
+                    if ((int)$groupe->getMax() == 40)
+                        $nbreTour += 2;
+                }
+                $noteExamen = $valeur->getNote();
+                $somme += $valeur->getNote();
+            }
+            $moyenneEXamen = $somme / $nbreTour;
+
+            // je vais calculer la moyenne des ue de l'etudiant ici
+            $sommeUe = 0;
+            $cpteNombreInvalide = 0;
+            $moyenneMatiereEtudiant = $this->moyenneMatiereRepository->findBy(['etudiant' => $ligne->getEtudiant(), 'ue' => $data['ue']]);
+            foreach ($moyenneMatiereEtudiant as $key => $moyenneUe) {
+                $matiereUeValide = $this->matiereUeRepository->findOneBy(['uniteEnseignement' => $data['ue'], 'matiere' => $moyenneUe->getMatiere()]);
+                $sommeUe += $moyenneUe->getMoyenne();
+
+                if ($moyenneUe->getMoyenne() <= $matiereUeValide->getMoyenneValidation())
+                    $cpteNombreInvalide++;
+            }
+
+            $typeExamen = $this->typeControleRepository->findOneByCode("EXA");
+            $typeControle = $this->typeControleRepository->findOneByCode("CC");
+            $moyenneEtudiantControle = $sommeUe / count($moyenneMatiereEtudiant);
+            $moyenneUe = ($moyenneEtudiantControle * $typeControle->getCoef() / 100)  + ($moyenneEXamen * $typeExamen->getCoef() / 100);
+            $ligne->setMoyenneConrole(round($moyenneEtudiantControle, 2));
+            $ligne->setMoyenneUe(round($moyenneUe, 2));
+
+            if ($moyenneUe >= 10 && $cpteNombreInvalide == 0) {
+                //dd("admis");
+                $ligne->setDecision(DecisionExamen::DECISION["Admis"]);
+            } else {
+                $ligne->setDecision(DecisionExamen::DECISION["Refuser"]);
+            }
+            $decisionExam = $this->decisionExamenRepository->findOneBy(['etudiant' => $ligne->getEtudiant(), 'niveau' => $this->niveauRepository->find($data['niveau']), 'session' => $this->sessionRepository->find($data['session'])]);
+            //dd($decisionExam);
+
+            if ($decisionExam) {
+
+                $decisionExam->setEtudiant($ligne->getEtudiant());
+                $decisionExam->setMoyenneAnnuelle(round($moyenneUe, 2));
+                $decisionExam->setMoyenneControle(round($moyenneEtudiantControle, 2));
+                $decisionExam->setNoteExamen($noteExamen);
+                $decisionExam->setSession($this->sessionRepository->find($data['session']));
+                $decisionExam->setNiveau($this->niveauRepository->find($data['niveau']));
+                $decisionExam->setNombreCredit("30");
+                if ($moyenneUe >= 10 && $cpteNombreInvalide == 0) {
+                    //dd("admis");
+                    $decisionExam->setDecision("Admis");
+                } else {
+                    $decisionExam->setDecision("Refuser");
+                }
+                $this->em->persist($decisionExam);
+                $this->em->flush();
+            } else {
+                $decisionExamen = new DecisionExamen();
+                $decisionExamen->setEtudiant($ligne->getEtudiant());
+                $decisionExamen->setMoyenneAnnuelle($moyenneUe);
+                $decisionExamen->setMoyenneControle($moyenneEtudiantControle);
+                $decisionExamen->setNoteExamen($noteExamen);
+                $decisionExamen->setSession($this->sessionRepository->find($data['session']));
+                $decisionExamen->setNiveau($this->niveauRepository->find($data['niveau']));
+                $decisionExamen->setNombreCredit("30");
+                if ($moyenneUe >= 10 && $cpteNombreInvalide == 0) {
+                    //dd("admis");
+                    $decisionExamen->setDecision("Admis");
+                } else {
+                    $decisionExamen->setDecision("Refuser");
+                }
+                $this->em->persist($decisionExamen);
+                $this->em->flush();
+            }
+        }
+
+        if ($controleVefication) {
+
+            //dd($controleVefication);
+
+
+            $controleVefication->setPromotion($this->niveauRepository->find($data['niveau']));
+            $controleVefication->setUe($this->ueRepository->find($data['ue']));
+            $controleVefication->setSession($this->sessionRepository->find($data['session']));
+            $this->em->persist($controleVefication);
+        } else {
+            $controle->setPromotion($this->niveauRepository->find($data['niveau']));
+            $controle->setUe($this->ueRepository->find($data['ue']));
+            $controle->setSession($this->sessionRepository->find($data['session']));
+            $this->em->persist($controle);
+        }
+        $this->em->flush();
+
+
+
+
+        return 0;
+    }
+
+    public function rangExposant($dataNotes)
     {
         $tableau = [];
 
@@ -811,6 +960,73 @@ class Service
                     //dd($existeRang);
 
                     $note = $this->noteRepository->find($allNotes->getId());
+
+                    if ($note) {
+                        $note->setRang($rang);
+                        if (count($existeRang) > 1) {
+                            $note->setExposant("ex");
+                        } else {
+                            if ($rang == 1) {
+                                $note->setExposant("er");
+                            } else {
+                                $note->setExposant("e");
+                            }
+                        }
+                        $this->em->persist($note);
+                        $this->em->flush();
+                    } else {
+                        if (count($existeRang) > 1) {
+                            $allNotes->setExposant("ex");
+                        } else {
+                            if ($rang == 1) {
+                                $allNotes->setExposant("er");
+                            } else {
+                                $allNotes->setExposant("e");
+                            }
+                        }
+                    }
+                }
+            }
+
+            /*  $existeRang = $noteRepository->findBy(['controle' => $allNotes->getControle(), 'rang' => $rang]);
+
+                    if ($note) {
+                        if (count($existeRang) > 1) {
+                            $note->setExposant("ex");
+                        } else {
+                            if ($rang == 1) {
+                                $note->setExposant("er");
+                            } else {
+                                $note->setExposant("e");
+                            }
+                        }
+                        $entityManager->persist($note);
+                        $entityManager->flush();
+                    } */
+        }
+    }
+    public function rangExposantExamen($dataNotes)
+    {
+        //dd($dataNotes);
+        $tableau = [];
+        foreach ($dataNotes as $allNotes) {
+
+            $tableau[$allNotes->getEtudiant()->getId()] = (int)$allNotes->getMoyenneUe();
+        }
+        // dd($dataNotes);
+        foreach ($dataNotes as  $allNotes) {
+
+            foreach ($tableau as $key => $value) {
+
+                // dd($key, $tableau[$allNotes->getEtudiant()->getId()] ==);
+                if ($tableau[$allNotes->getEtudiant()->getId()] == $tableau[$key]) {
+                    $rang = $this->Rangeleve($key, $tableau, count($tableau));
+
+                    //je verifie si le existe deja afin de savoir sil est execo ou pas
+                    $existeRang = $this->noteExamenRepository->findBy(['controleExamen' => $allNotes->getControleExamen(), 'rang' => $rang]);
+
+
+                    $note = $this->noteExamenRepository->find($allNotes->getId());
 
                     if ($note) {
                         $note->setRang($rang);

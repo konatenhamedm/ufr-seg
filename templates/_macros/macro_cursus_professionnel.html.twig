@@ -1,5 +1,6 @@
 
 {% macro colonne(colonne) %}
+
     <div class="row-colonne_professionnel  my-3 py-2" style="border-bottom:3px solid #000">
         {#{{ dump(redaction.children.path.vars.data) }}#}
         <div class="row">
@@ -28,12 +29,18 @@
 
 {% macro prototype_ligne_colonne_professionnel(form) %}
     <div class="list-colonne_professionnel"  data-prototype="{{ _self.colonne(form.cursusProfessionnels.vars.prototype)|e }}"></div>
+   {% if app.user.personne.fonction.code !="ADM" %}
     <button type="button" data-protoname="__name__" class="btn btn-default add_line_professionnel btn-xs" id="add_ligne_professionnel"  data-protoclass=".list-colonne_professionnel" data-container=".column-container_professionnel">
         <i class="fa fa-plus"></i> Ajouter une ligne
     </button>
+   
+   {% endif %}
+   
     <div class="column-container_professionnel proto-container_professionnel" data-childclass="">
         {% for item in form.cursusProfessionnels %}
             {{ _self.colonne(item|e) }}
+              {% else %}
+                <p style="text-align: center;"><h3>Il n'y a aucune données </h3></p>
         {% endfor %}
     </div>
 {% endmacro %}
