@@ -60,6 +60,7 @@ use App\Service\SendMailService;
 use App\Service\Service;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\TextColumn;
@@ -150,18 +151,18 @@ class HomeController extends AbstractController
 
 
     #[Route('/liste/niveau/par/filiere/{id}', name: 'liste_niveau_by_filiere_id',  methods: ['GET'])]
-    public function getNiveau(Request $request, NiveauRepository  $niveauRepository, $id)
+    public function getNiveau(Request $request, NiveauRepository  $niveauRepository, $id, SessionInterface $session)
     {
         $response = new Response();
         $tabNiveaux = array();
 
-
+        $anneeScolaire = $session->get('anneeScolaire');
         // $id = $request->get('id');
 
         if ($id) {
 
 
-            $niveaux = $niveauRepository->findBy(['filiere' => $id]);
+            $niveaux = $niveauRepository->findBy(['filiere' => $id, 'anneScolaire' => $anneeScolaire]);
             // dd($frais);
 
             $i = 0;
@@ -169,7 +170,7 @@ class HomeController extends AbstractController
             foreach ($niveaux as $e) {
                 // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
                 $tabNiveaux[$i]['id'] = $e->getId();
-                $tabNiveaux[$i]['libelle'] = $e->getLibelle();
+                $tabNiveaux[$i]['libelle'] = $e->getFullCodeAnneeScolaire();
 
 
                 $i++;
@@ -802,13 +803,15 @@ class HomeController extends AbstractController
     public function indexInformationAdmin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $classe = $request->query->get('classe');
-        /*  $niveau = $request->query->get('niveau');
-        $filiere = $request->query->get('filiere'); */
+        $niveau = $request->query->get('niveau');
+        $filiere = $request->query->get('filiere');
         // dd($niveau, $filiere);
-        $anneeScolaire = $session->get("anneeScolaire");
+
+        $anneeScolaire = $session->get('anneeScolaire');
+
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
-            'action' => $this->generateUrl('app_inscription_etudiant_admin_index', compact('classe')),
+            'action' => $this->generateUrl('app_inscription_etudiant_admin_index', compact('classe', 'niveau', 'filiere')),
         ])->add('classe', EntityType::class, [
             'class' => Classe::class,
             'choice_label' => 'libelle',
@@ -816,14 +819,20 @@ class HomeController extends AbstractController
             'placeholder' => '---',
             'required' => false,
             'attr' => ['class' => 'form-control-sm has-select2']
-        ]);
-        /* ->add('niveau', EntityType::class, [
+        ])
+            ->add('niveau', EntityType::class, [
                 'class' => Niveau::class,
-                'choice_label' => 'libelle',
+                'choice_label' => 'getFullCodeAnneeScolaire',
                 'label' => 'Niveau',
                 'placeholder' => '---',
                 'required' => false,
-                'attr' => ['class' => 'form-control-sm has-select2']
+                'attr' => ['class' => 'form-control-sm has-select2'],
+                'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                    return $er->createQueryBuilder('c')
+                        ->where('c.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire)
+                        ->orderBy('c.id', 'ASC');
+                },
             ])
             ->add('filiere', EntityType::class, [
                 'class' => Filiere::class,
@@ -832,38 +841,23 @@ class HomeController extends AbstractController
                 // 'placeholder' => '---',
                 'required' => false,
                 'attr' => ['class' => 'form-control-sm has-select2']
-            ]); */
+            ]);
 
 
 
         $table = $dataTableFactory->create()
-
-            ->add('check', TextColumn::class, [
-                'label' => '',
-                'raw' => true,
-                'orderable' => false,
-                'searchable' => false,
-                'render' => function ($value, $context) {
-                    return sprintf('<input type="checkbox" class="row-check" value="%s">', $context->getId());
-                },
-            ])
             ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'etudiant.nom'])
             ->add('prenom', TextColumn::class, ['label' => 'Prénoms', 'field' => 'etudiant.prenom'])
+            ->add('contact', TextColumn::class, ['label' => 'Contact', 'field' => 'etudiant.contact'])
             ->add('classe', TextColumn::class, ['label' => 'Classe', 'field' => 'classe.libelle'])
-            ->add('moyenne', TextColumn::class, ['label' => 'Moyenne ', 'className' => 'text-end w-50px', 'render' => function ($value, $context) {
-                return '14';
-            }])
-            ->add('nombreCredit', TextColumn::class, ['label' => 'Nombre crédits ', 'className' => 'text-end w-70px', 'render' => function ($value, $context) {
-                return '14';
-            }])
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Inscription::class,
-                'query' => function (QueryBuilder $qb) use ($classe, $user, $anneeScolaire) {
-                    $qb->select(['p', 'c', 'etudiant', 'classe'])
+                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau, $user, $anneeScolaire) {
+                    $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
-                        ->join('p.classe', 'classe')
+                        ->join('p.classe', 'classe', 'res')
                         ->join('p.niveau', 'niveau')
                         ->join('niveau.filiere', 'filiere')
                         ->join('niveau.responsable', 'res')
@@ -874,19 +868,19 @@ class HomeController extends AbstractController
 
                     //dd($classe, $niveau, $filiere);
 
-                    if ($classe) {
+                    if ($classe || $niveau || $filiere) {
                         if ($classe) {
                             $qb->andWhere('classe.id = :classe')
                                 ->setParameter('classe', $classe);
                         }
-                        /*  if ($niveau) {
+                        if ($niveau) {
                             $qb->andWhere('niveau.id = :niveau')
                                 ->setParameter('niveau', $niveau);
                         }
                         if ($filiere) {
                             $qb->andWhere('filiere.id = :filiere')
                                 ->setParameter('filiere', $filiere);
-                        } */
+                        }
                     }
 
                     if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
@@ -894,16 +888,14 @@ class HomeController extends AbstractController
                             ->setParameter('user', $user->getPersonne());
                     }
 
-
-                    if ($anneeScolaire != null) {
-
+                    if ($anneeScolaire) {
                         $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
                             ->setParameter('anneeScolaire', $anneeScolaire);
                     }
                 }
 
             ])
-            ->setName('dt_app_inscription_etudiant_admin_' . $classe);
+            ->setName('dt_app_inscription_etudiant_admin_' . $classe . '_' . $niveau . '_' . $filiere);
 
         $renders = [
             'edit' =>  new ActionRender(function () {
@@ -915,21 +907,9 @@ class HomeController extends AbstractController
             'delete' => new ActionRender(function () {
                 return true;
             }),
-            'first_print' => new ActionRender(function () {
-                return true;
-            }),
-            'seconde_print' => new ActionRender(function () {
-                return true;
-            }),
-            'third_print' => new ActionRender(function () {
-                return true;
-            }),
-            'fourth_print' => new ActionRender(function () {
-                return true;
-            }),
         ];
 
-        $gridId = $classe;
+        $gridId = $classe . '_' . $niveau . '_' . $filiere;
         $hasActions = false;
 
         foreach ($renders as $_ => $cb) {
@@ -983,64 +963,7 @@ class HomeController extends AbstractController
                                 'icon' => '%icon% bi bi-trash',
                                 'attrs' => ['class' => 'btn-danger'],
                                 'render' => $renders['delete']
-                            ],
-
-                            'first_print' => [
-                                'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_test',
-                                    'params' => [
-                                        'id' => $value,
-                                    ]
-                                ]),
-                                'ajax' => true,
-                                'stacked' => false,
-                                'icon' => '%icon% bi bi-printer',
-                                'attrs' => ['class' => 'btn-warning '],
-                                'render' => $renders['first_print']
-                            ],
-                            'fourth_print' => [
-                                'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_test2',
-                                    'params' => [
-                                        'id' => $value,
-                                    ]
-                                ]),
-                                'ajax' => true,
-                                'stacked' => false,
-                                'icon' => '%icon% bi bi-printer',
-                                'attrs' => ['class' => 'btn-info '],
-                                'render' => $renders['fourth_print']
-                            ],
-                            'seconde_print' => [
-                                'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_test4',
-                                    'params' => [
-                                        'id' => $value,
-                                    ]
-                                ]),
-                                'ajax' => true,
-                                'stacked' => false,
-                                'icon' => '%icon% bi bi-printer',
-                                'attrs' => ['class' => 'btn-danger '],
-                                'render' => $renders['seconde_print']
-                            ],
-                            'third_print' => [
-                                'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('default_print_iframe', [
-                                    'r' => 'app_test1',
-                                    'params' => [
-                                        'id' => $value,
-                                    ]
-                                ]),
-                                'ajax' => true,
-                                'stacked' => false,
-                                'icon' => '%icon% bi bi-printer',
-                                'attrs' => ['class' => 'btn-primary '],
-                                'render' => $renders['third_print']
-                            ],
+                            ]
                         ]
 
                     ];
