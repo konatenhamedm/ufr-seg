@@ -390,6 +390,18 @@ License: For each use you must have a valid license purchased only from above li
 
 
 		  <script>
+		  $(document).ready(function() {
+            // Initialiser le sélecteur avec Select2 ou une autre bibliothèque
+            $('.all_annee').select2();
+
+            // Déboguer les classes et attributs appliqués
+            console.log($('.all_annee').attr('class'));
+            console.log($('.all_annee').attr('disabled'));
+            console.log($('.all_annee').attr('readonly'));
+
+            // S'assurer que le sélecteur n'est pas désactivé
+            $('.all_annee').prop('disabled', false);
+            $('.all_annee').prop('readonly', false);
 		 $(".all_annee").on('change', function() {
 				var anneeScolaire = this.value;
 				var url = "{{ path('update_annee_scolaire', {id: 'id'}) }}".replace('id', anneeScolaire);
@@ -407,7 +419,7 @@ License: For each use you must have a valid license purchased only from above li
 				});
 			});
 
-		  
+		  });
 		  </script>
 
 	</body>

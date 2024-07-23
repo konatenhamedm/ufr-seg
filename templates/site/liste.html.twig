@@ -166,7 +166,7 @@ tr:nth-child(even) {
             <td style="vertical-align:middle;text-align:center;">{{key+1}}</td>
             <td style="vertical-align:middle;text-align:center;" >{{ ligne.preinscription.code }}</td>
             <td style="vertical-align:middle;text-align:center;" >{{ ligne.preinscription.etudiant.nom ~ ' ' ~ ligne.preinscription.etudiant.prenom }}</td>
-             <td style="vertical-align:middle;text-align:center;" >{{ ligne.preinscription.promotion.niveau.getSigle }}</td>
+             <td style="vertical-align:middle;text-align:center;" >{{ ligne.preinscription.niveau.getSigle }}</td>
              <td style="vertical-align:middle;text-align:center;" >{{ ligne.datePaiement | date('d/m/Y') }}</td>
             <td style="vertical-align:middle;text-align:center;">{{ligne.montant |number_format(0, '.', '.') }}</td>
              <td style="vertical-align:middle;text-align:center;" >{{ ligne.modePaiement.libelle }}</td>

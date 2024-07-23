@@ -79,7 +79,7 @@ class CoursController extends AbstractController
                         ->from(Cours::class, 'co')
                         ->innerJoin('co.classe', 'c')
                         ->leftJoin('c.', 'promotion')
-                        ->leftJoin('promotion.niveau', 'niveau')
+                        ->leftJoin('niveau', 'niveau')
                         ->leftJoin('promotion.responsable', 'res')
                         ->join('co.matiere', 'm')
                         ->join('co.anneeScolaire', 'a')

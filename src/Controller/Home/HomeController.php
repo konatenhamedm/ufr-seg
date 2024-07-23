@@ -482,7 +482,7 @@ class HomeController extends AbstractController
                         ->from(Preinscription::class, 'e')
                         ->join('e.etudiant', 'etudiant')
                         ->join('e.niveau', 'niveau')
-                        /* ->join('promotion.niveau', 'niveau') */
+                        /* ->join('niveau', 'niveau') */
                         ->join('niveau.filiere', 'filiere')
                         ->leftJoin('e.caissiere', 'c')
                         ->andWhere('e.etat = :statut')
