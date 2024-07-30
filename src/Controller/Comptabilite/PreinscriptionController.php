@@ -276,7 +276,7 @@ class PreinscriptionController extends AbstractController
 
 
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-         $anneeScolaire = $session->get('anneeScolaire');
+        $anneeScolaire = $session->get('anneeScolaire');
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code']);
         if (!$isEtudiant) {
@@ -491,12 +491,14 @@ class PreinscriptionController extends AbstractController
     }
 
     #[Route('/demande/new', name: 'app_comptabilite_preinscription_demande_new', methods: ['GET', 'POST'])]
-    public function demanddNew(Request $request, NiveauRepository $niveauRepository, UserInterface $user, EntityManagerInterface $entityManager, FormError $formError, PreinscriptionRepository $preinscriptionRepository): Response
+    public function demanddNew(Request $request, NiveauRepository $niveauRepository, UserInterface $user, EntityManagerInterface $entityManager, FormError $formError, PreinscriptionRepository $preinscriptionRepository, SessionInterface $session): Response
     {
         $preinscription = new Preinscription();
+        //dd($session->get('anneeScolaire'));
         //dd();
         $form = $this->createForm(PreinscriptionEudiantConnecteType::class, $preinscription, [
             'method' => 'POST',
+            "anneeScolaire" => $session->get('anneeScolaire'),
             'action' => $this->generateUrl('app_comptabilite_preinscription_demande_new')
         ]);
         $form->handleRequest($request);

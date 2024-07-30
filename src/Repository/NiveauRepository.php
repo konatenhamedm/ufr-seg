@@ -40,24 +40,33 @@ class NiveauRepository extends ServiceEntityRepository
     }
 
 
-    public  function findNiveauDisponible()
+    public function findNiveauDisponible($anneeScolaire)
     {
+        // Première requête
         $qb = $this->em->createQueryBuilder();
-
-        $linked = $qb->select('n.id', 'rl.id as rlid')
+        $linked = $qb->select('n.id')
             ->from(Preinscription::class, 'rl')
             ->innerJoin('rl.niveau', 'n')
             ->innerJoin('rl.utilisateur', 'u')
-            ->andWhere('u.id =:id')
+            /*  ->andWhere("n.anneeScolaire = :annee") */
+            ->andWhere('u.id = :id')
             ->setParameter('id', $this->user->getId())
+            /* ->setParameter('annee', $anneeScolaire) */
             ->getQuery()
             ->getResult();
 
+        // Extraction des ids du résultat
+        $linkedIds = array_column($linked, 'id');
 
-        $qb2 = $this->createQueryBuilder('e');
+        // Deuxième requête
+        $qb2 = $this->em->createQueryBuilder();
         $qb2->select('e')
-            ->where('e.id not IN (:id)')
-            ->setParameter('id', $linked);
+            ->from(Niveau::class, 'e')
+            ->innerJoin('e.anneeScolaire', 'an')
+            ->andWhere("an.id = :anneedff")
+            ->andWhere($qb2->expr()->notIn('e.id', ':ids'))
+            ->setParameter('anneedff', $anneeScolaire) // en supposant que $anneeScolaire est le bon id
+            ->setParameter('ids', $linkedIds);
 
         return $qb2;
     }

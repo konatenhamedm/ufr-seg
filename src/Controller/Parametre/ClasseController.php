@@ -3,13 +3,18 @@
 namespace App\Controller\Parametre;
 
 use App\Entity\Classe;
+use App\Entity\Cours;
+use App\Entity\CoursParent;
 use App\Form\ClasseType;
 use App\Form\NiveauAddEnseignantType;
 use App\Repository\AnneeScolaireRepository;
 use App\Repository\ClasseRepository;
+use App\Repository\CoursParentRepository;
 use App\Repository\CoursRepository;
+use App\Repository\MatiereUeRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
@@ -20,6 +25,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -27,15 +33,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class ClasseController extends AbstractController
 {
     #[Route('/', name: 'app_parametre_classe_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session): Response
     {
+        $anneeScolaire = $session->get('anneeScolaire');
         $table = $dataTableFactory->create()
             ->add('libelle', TextColumn::class, ['label' => 'Libelle'])
             ->add('niveau', TextColumn::class, ['label' => 'Niveau', 'field' => 'niveau.libelle'])
             ->add('annee', TextColumn::class, ['label' => 'Année', 'field' => 'annee.libelle'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Classe::class,
-                'query' => function (QueryBuilder $qb) use ($user) {
+                'query' => function (QueryBuilder $qb) use ($user, $anneeScolaire) {
                     $qb->select('u, niveau, annee,res')
                         ->from(Classe::class, 'u')
                         ->join('u.niveau', 'niveau')
@@ -45,6 +52,12 @@ class ClasseController extends AbstractController
                     if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
                         $qb->andWhere("res = :user")
                             ->setParameter('user', $user->getPersonne());
+                    }
+
+                    if ($anneeScolaire != null) {
+
+                        $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
                     }
                 }
             ])
@@ -130,8 +143,39 @@ class ClasseController extends AbstractController
 
 
     #[Route('/{id}/enseignant/matiere/edit/', name: 'app_parametre_niveau_enseignant_matiere_edit', methods: ['GET', 'POST'])]
-    public function editPersonnalisation(Request $request, Classe $classe, EntityManagerInterface $entityManager, FormError $formError, CoursRepository $coursRepository, AnneeScolaireRepository $anneeScolaireRepository): Response
+    public function editPersonnalisation(Request $request, Classe $classe, EntityManagerInterface $entityManager, CoursParentRepository $coursParentRepository, SessionInterface $session, MatiereUeRepository $matiereUeRepository, ClasseRepository $classeRepository, FormError $formError, CoursRepository $coursRepository, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+        $annee = $session->get('anneeScolaire');
+        $matieresUe = $matiereUeRepository->getAllMatiereWithouLimit($classe, $annee);
+
+        //dd($annee);
+        // dd($coursRepository->findBy(['classe' => $classe, 'anneeScolaire' => $annee]));
+
+        if ($coursRepository->findBy(['classe' => $classe, 'anneeScolaire' => $annee]) == null) {
+            $coursParent = new CoursParent();
+            $coursParent->setClasse($classe);
+
+            foreach ($matieresUe as $key => $matiereUe) {
+                // dd($matiereUe->getMatiere());
+                if ($matiereUe->getUniteEnseignement()->getNiveau() == $classeRepository->find($classe)->getNiveau()) {
+
+                    //dd($matiereUe->getMatiere());
+
+                    // $coursParentRepository->add($coursParent, true);
+
+                    $cours = new Cours();
+                    $cours->setMatiere($matiereUe->getMatiere());
+                    $cours->setAnneeScolaire($anneeScolaireRepository->find($annee->getId()));
+                    $cours->setCoursParent($coursParent);
+                    /* $cours->setClasse($classeRepository->find($classe)); */
+
+                    $classe->addCoursParent($coursParent);
+                    $classe->addCour($cours);
+                }
+            }
+        }
+
+
 
         $form = $this->createForm(NiveauAddEnseignantType::class, $classe, [
             'method' => 'POST',
@@ -198,11 +242,12 @@ class ClasseController extends AbstractController
 
 
     #[Route('/new', name: 'app_parametre_classe_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError, SessionInterface $session): Response
     {
         $classe = new Classe();
         $form = $this->createForm(ClasseType::class, $classe, [
             'method' => 'POST',
+            "anneeScolaire" => $session->get('anneeScolaire'),
             'action' => $this->generateUrl('app_parametre_classe_new')
         ]);
         $form->handleRequest($request);
@@ -262,11 +307,12 @@ class ClasseController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_parametre_classe_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Classe $classe, EntityManagerInterface $entityManager, FormError $formError): Response
+    public function edit(Request $request, Classe $classe, EntityManagerInterface $entityManager, FormError $formError, SessionInterface $session): Response
     {
 
         $form = $this->createForm(ClasseType::class, $classe, [
             'method' => 'POST',
+            "anneeScolaire" => $session->get('anneeScolaire'),
             'action' => $this->generateUrl('app_parametre_classe_edit', [
                 'id' =>  $classe->getId()
             ])

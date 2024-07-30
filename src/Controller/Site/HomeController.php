@@ -598,9 +598,10 @@ class HomeController extends AbstractController
         $info = new InfoEtudiant();
 
         $annee = $session->get('anneeScolaire');
-        //dd("");
 
-        if ($annee != null) {
+        // dd($annee, $anneeScolaireRepository->find($preinscriptionRepository->listeAnneScolaire($etudiant)[0]['id']));
+
+        if ($annee == null) {
 
             //  dd("");
             // dd($anneeScolaireRepository->find($preinscriptionRepository->listeAnneScolaire($etudiant)[0]['id']));
@@ -608,6 +609,7 @@ class HomeController extends AbstractController
             $session->set('anneeScolaire', $anneeScolaireRepository->find($preinscriptionRepository->listeAnneScolaire($etudiant)[0]['id']));
         }
 
+        //dd($annee);
 
         if (count($etudiant->getInfoEtudiants()) == 0) {
             $info->setTuteurNomPrenoms('');

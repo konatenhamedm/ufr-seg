@@ -46,7 +46,8 @@ class UtilisateurType extends AbstractType
                         'ROLE_CAISSIERE' => 'Caissière',
                         'ROLE_COMPTABLE' => 'Comptable',
                         'ROLE_SECRETAIRE' => 'Secrétaire',
-                        'ROLE_DIRECTEUR' => 'Directeur'
+                        'ROLE_DIRECTEUR' => 'Directeur',
+                        'ROLE_ENSEIGNANT' => 'Enseignants',
                     ]),
                 ]
             )

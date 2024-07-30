@@ -17,6 +17,8 @@ class UniteEnseignementType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $anneeScolaire = $options['anneeScolaire'];
+        //dd($anneeScolaire);
         $builder
             ->add('codeUe')
             ->add('libelle')
@@ -45,8 +47,25 @@ class UniteEnseignementType extends AbstractType
                 'class' => Semestre::class,
                 'choice_label' => 'libelle',
                 'attr' => ['class' => 'has-select2 '],
+                'query_builder' => function (EntityRepository $entityR) use ($anneeScolaire) {
+                    return $entityR->createQueryBuilder('s')
+                        ->andWhere("s.anneeScolaire = :annee")
+                        ->setParameter('annee', $anneeScolaire);
+                },
             ])
             ->add('niveau', EntityType::class, [
+                'class' => Niveau::class,
+                'label' => "Niveau",
+                'choice_label' => 'getFullCodeLibelle',
+                'attr' => ['class' => 'has-select2 form-select niveau'],
+                'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                    return $er->createQueryBuilder('c')
+                        ->andWhere("c.anneeScolaire = :annee")
+                        ->setParameter('annee', $anneeScolaire);
+                },
+
+            ])
+            /*    ->add('niveau', EntityType::class, [
                 'class' => Niveau::class,
                 'choice_label' => 'getFullCodeAnneeScolaire',
                 'label_attr' => ['class' => 'label-required'],
@@ -55,7 +74,7 @@ class UniteEnseignementType extends AbstractType
                     return $er->createQueryBuilder('c')
                         ->orderBy('c.id', 'ASC');
                 },
-            ])
+            ]) */
             ->add(
                 'matiereUes',
                 CollectionType::class,
@@ -77,5 +96,6 @@ class UniteEnseignementType extends AbstractType
         $resolver->setDefaults([
             'data_class' => UniteEnseignement::class,
         ]);
+        $resolver->setRequired(['anneeScolaire']);
     }
 }

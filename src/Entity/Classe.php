@@ -40,7 +40,7 @@ class Classe
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $blocEcheanciers;
 
-    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: CoursParent::class)]
+    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: CoursParent::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $coursParents;
 
 

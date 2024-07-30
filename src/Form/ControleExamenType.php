@@ -35,7 +35,7 @@ class ControleExamenType extends AbstractType
             ->add('niveau', EntityType::class, [
                 'class' => Niveau::class,
                 'label' => "Niveau",
-                'choice_label' => 'getFullCodeAnneeScolaire',
+                'choice_label' => 'getFullCodeLibelle',
                 'attr' => ['class' => 'has-select2 form-select niveau'],
                 'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
                     return $er->createQueryBuilder('c')

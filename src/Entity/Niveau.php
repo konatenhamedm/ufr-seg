@@ -115,6 +115,10 @@ class Niveau
     {
         return sprintf('[%s] %s %s', $this->getCode(), '-', $this->getAnneeScolaire()->getLibelle());
     }
+    public function getFullCodeLibelle()
+    {
+        return sprintf('[%s] %s %s', $this->getCode(), '-', $this->getLibelle());
+    }
 
     public function getFullLibelleSigle()
     {

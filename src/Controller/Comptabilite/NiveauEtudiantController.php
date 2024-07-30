@@ -405,6 +405,9 @@ class NiveauEtudiantController extends AbstractController
                             $qb->andWhere('res.id = :id')
                                 ->setParameter('id', $user->getPersonne()->getId());
                         }
+                        $qb
+                            ->andWhere('etudiant.etat != :etat')
+                            ->setParameter('etat', 'complete');
                         if ($anneeScolaire != null) {
                             //dd($anneeScolaire);
 

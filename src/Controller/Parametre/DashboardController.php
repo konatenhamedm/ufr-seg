@@ -104,6 +104,11 @@ class DashboardController extends AbstractController
                     'id' => 'param_genre',
                     'href' => $this->generateUrl('app_parametre_genre_index')
                 ],
+                [
+                    'label' => 'Types documents',
+                    'id' => 'param_type_document',
+                    'href' => $this->generateUrl('app_parametre_type_document_index')
+                ],
             ],
             'gestion' => [
                 [
