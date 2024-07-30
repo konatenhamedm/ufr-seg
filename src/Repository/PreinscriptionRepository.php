@@ -100,6 +100,11 @@ class PreinscriptionRepository extends ServiceEntityRepository
                 ->andWhere("d.etat =:etat")
                 ->setParameter('etatEtudiant', 'complete')
                 ->setParameter('etat', $etat);
+        } else {
+            $sql
+                ->join('d.etudiant', 'e')
+                ->andWhere('e.etat != :etatEtudiant')
+                ->setParameter('etatEtudiant', 'complete');
         }
 
         if ($anneeScolaire != null) {
