@@ -990,10 +990,15 @@ class HomeController extends AbstractController
     }
 
     #[Route('/liste/inscription/etudiant/admin', name: 'app_liste_inscription_etudiant_admin_index', methods: ['GET', 'POST'])]
-    public function indexListeInscris(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
+    public function indexListeInscris(Request $request, UserInterface $user, AnneeScolaireRepository $anneeScolaireRepository, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
         $anneeScolaire = $session->get('anneeScolaire');
 
+        if ($anneeScolaire == null) {
+            // dd($anneeScolaireRepository->findOneBy(['actif' => 1]));
+            //unset($annee);
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
             ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'etudiant.nom'])
