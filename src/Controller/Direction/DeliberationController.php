@@ -27,6 +27,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -104,8 +105,9 @@ class DeliberationController extends AbstractController
 
 
     #[Route('/timeline', name: 'app_direction_deliberation_time_index', methods: ['GET', 'POST'])]
-    public function indexTimeLigne(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    public function indexTimeLigne(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
+        $anneeScolaire = $session->get("anneeScolaire");
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
@@ -113,7 +115,7 @@ class DeliberationController extends AbstractController
             ->add('dateExamen', DateTimeColumn::class, ['label' => 'Date Prévue', 'format' => 'd-m-Y'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Examen::class,
-                'query' => function (QueryBuilder $qb) use ($user) {
+                'query' => function (QueryBuilder $qb) use ($user, $anneeScolaire) {
                     $qb->select(['d', 'n', 'f', 'res'])
                         ->from(Examen::class, 'd')
                         ->innerJoin('d.niveau', 'n')
@@ -124,6 +126,12 @@ class DeliberationController extends AbstractController
                     if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
                         $qb->andWhere("res = :user")
                             ->setParameter('user', $user->getPersonne());
+                    }
+
+                    if ($anneeScolaire != null) {
+
+                        $qb->andWhere('n.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
                     }
                 }
             ])
@@ -208,8 +216,9 @@ class DeliberationController extends AbstractController
 
 
     #[Route('/historique/{id}', name: 'app_direction_deliberation_historique', methods: ['GET', 'POST'])]
-    public function historique(Request $request, UserInterface $user, $id, DataTableFactory $dataTableFactory, ExamenRepository $examenRepository): Response
+    public function historique(Request $request, UserInterface $user, $id, DataTableFactory $dataTableFactory, ExamenRepository $examenRepository, SessionInterface $session): Response
     {
+        $anneeScolaire = $session->get("anneeScolaire");
         $table = $dataTableFactory->create()
             //->add('date', TextColumn::class, ['label' => 'Code'])
             ->add('candidat', TextColumn::class, ['label' => 'Candidat', 'render' => function ($value, Deliberation $deliberation) {
@@ -229,7 +238,7 @@ class DeliberationController extends AbstractController
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Deliberation::class,
-                'query' => function (QueryBuilder $qb) use ($user, $id) {
+                'query' => function (QueryBuilder $qb) use ($user, $id, $anneeScolaire) {
                     $qb->select(['d', 'ex', 'n', 'm', 'dp', 'p', 'res'])
                         ->from(Deliberation::class, 'd')
                         ->join('d.infoPreinscription', 'dp')
@@ -248,6 +257,11 @@ class DeliberationController extends AbstractController
                     if ($this->isGranted('ROLE_DIRECTEUR')) {
                         $qb->andWhere('res.id = :id')
                             ->setParameter('id', $user->getPersonne()->getId());
+                    }
+                    if ($anneeScolaire != null) {
+
+                        $qb->andWhere('n.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
                     }
                 }
             ])

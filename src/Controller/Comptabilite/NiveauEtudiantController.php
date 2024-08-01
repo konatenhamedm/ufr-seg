@@ -634,7 +634,7 @@ class NiveauEtudiantController extends AbstractController
     public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session): Response
     {
         $anneeScolaire = $session->get('anneeScolaire');
-
+        //dd("dd");
         $ver = $this->isGranted('ROLE_ETUDIANT');
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code Preinscription'])

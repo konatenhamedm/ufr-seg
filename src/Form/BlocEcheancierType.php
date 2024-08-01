@@ -6,6 +6,7 @@ use App\Entity\BlocEcheancier;
 use App\Entity\Classe;
 use App\Entity\Etudiant;
 use App\Form\DataTransformer\ThousandNumberTransformer;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -18,6 +19,8 @@ class BlocEcheancierType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $anneeScolaire = $options['anneeScolaire'];
+        //dd($anneeScolaire);
         $builder
 
 
@@ -35,6 +38,11 @@ class BlocEcheancierType extends AbstractType
                     'class' => 'classe'
                 ],
                 'choice_label' => 'libelle',
+                'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                    return $er->createQueryBuilder('c')
+                        ->andWhere("c.anneeScolaire = :annee")
+                        ->setParameter('annee', $anneeScolaire);
+                },
             ])
             ->add('echeancierProvisoires', CollectionType::class, [
                 'entry_type' => EcheancierProvisoireType::class,
@@ -70,5 +78,6 @@ class BlocEcheancierType extends AbstractType
         $resolver->setDefaults([
             'data_class' => BlocEcheancier::class,
         ]);
+        $resolver->setRequired(['anneeScolaire']);
     }
 }

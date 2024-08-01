@@ -81,6 +81,9 @@ class Preinscription
     #[ORM\OneToMany(mappedBy: 'preinscription', targetEntity: Decision::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $decisions;
 
+    #[ORM\Column(length: 255)]
+    private ?string $montant = null;
+
     public function __construct()
     {
         $this->decisions = new ArrayCollection();
@@ -323,6 +326,18 @@ class Preinscription
             // set the owning side to null (unless already changed)
             $this->decisions->clear($decision);
         }
+
+        return $this;
+    }
+
+    public function getMontant(): ?string
+    {
+        return $this->montant;
+    }
+
+    public function setMontant(string $montant): static
+    {
+        $this->montant = $montant;
 
         return $this;
     }

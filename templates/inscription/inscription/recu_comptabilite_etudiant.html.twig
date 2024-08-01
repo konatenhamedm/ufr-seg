@@ -186,6 +186,10 @@ td, th {
                     <td style=" border: 0px !important;"><p style="font-family: "Times New Roman", Times, serif;"><b><h3>{{ data.code }}</h3></b></p></th>
                   </tr>
                   <tr style=" border: 0px !important;">
+                     <td style=" border: 0px !important;">Montant préinscription :</th>
+                    <td style=" border: 0px !important;"><b>{{ data.niveau.filiere.montantPreinscription |number_format(0, '.', '.')}} FCFA</b></th>
+                  </tr>
+                  <tr style=" border: 0px !important;">
                      <td style=" border: 0px !important;">Nom :</th>
                     <td style=" border: 0px !important;"><b>{{ data.etudiant.nom}}</b></th>
                   </tr>

@@ -31,6 +31,7 @@ class EtudiantAdminNewType extends AbstractType
                 'entry_type' => BlocEcheancierType::class,
                 'entry_options' => [
                     'label' => false,
+                    'anneeScolaire' => $options['anneeScolaire']
                 ],
                 'allow_add' => true,
                 'label' => false,
@@ -55,5 +56,6 @@ class EtudiantAdminNewType extends AbstractType
         $resolver->setRequired('doc_options');
         $resolver->setRequired('doc_required');
         $resolver->setRequired(['validation_groups']);
+        $resolver->setRequired(['anneeScolaire']);
     }
 }

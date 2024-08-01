@@ -313,8 +313,16 @@ class HomeController extends AbstractController
                         $loginFormAuthenticator,
                         $request
                     );
+                    //attente_paiement
                     $preinscription = new Preinscription();
-                    $preinscription->setEtat('attente_validation');
+
+                    if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+
+                        $preinscription->setEtat('attente_paiement');
+                    } else {
+
+                        $preinscription->setEtat('attente_validation');
+                    }
                     $preinscription->setEtatDeliberation('pas_deliberer');
                     $preinscription->setEtudiant($etudiant);
                     $preinscription->setDatePreinscription(new \DateTime());
@@ -353,7 +361,13 @@ class HomeController extends AbstractController
                     } else {
 
                         $preinscription = new Preinscription();
-                        $preinscription->setEtat('attente_validation');
+                        if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+
+                            $preinscription->setEtat('attente_paiement');
+                        } else {
+
+                            $preinscription->setEtat('attente_validation');
+                        }
                         $preinscription->setEtatDeliberation('pas_deliberer');
                         $preinscription->setEtudiant($user->getPersonne());
                         $preinscription->setDatePreinscription(new \DateTime());
@@ -489,7 +503,13 @@ class HomeController extends AbstractController
                         $request
                     );
                     $preinscription = new Preinscription();
-                    $preinscription->setEtat('attente_validation');
+                    if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+
+                        $preinscription->setEtat('attente_paiement');
+                    } else {
+
+                        $preinscription->setEtat('attente_validation');
+                    }
                     $preinscription->setEtatDeliberation('pas_deliberer');
                     $preinscription->setEtudiant($etudiant);
                     $preinscription->setDatePreinscription(new \DateTime());
@@ -528,7 +548,13 @@ class HomeController extends AbstractController
                     } else {
 
                         $preinscription = new Preinscription();
-                        $preinscription->setEtat('attente_validation');
+                        if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+
+                            $preinscription->setEtat('attente_paiement');
+                        } else {
+
+                            $preinscription->setEtat('attente_validation');
+                        }
                         $preinscription->setEtatDeliberation('pas_deliberer');
                         $preinscription->setEtudiant($user->getPersonne());
                         $preinscription->setDatePreinscription(new \DateTime());
@@ -1082,7 +1108,7 @@ class HomeController extends AbstractController
 
 
     #[Route('/all/frais/niveau/{id}', name: 'get_frais', methods: ['GET'])]
-    public function getmatiere(Request $request, FraisRepository  $fraisRepository, $id)
+    public function getmatiere(Request $request, FraisRepository  $fraisRepository, $id, Classe $classe): Response
     {
         $response = new Response();
         $tabFrais = array();
@@ -1090,10 +1116,12 @@ class HomeController extends AbstractController
 
         // $id = $request->get('id');
 
+        //dd($id);
+
         if ($id) {
 
 
-            $frais = $fraisRepository->findBy(['niveau' => $id]);
+            $frais = $fraisRepository->findBy(['niveau' => $classe->getNiveau()]);
             // dd($frais);
 
             $i = 0;
@@ -1574,7 +1602,8 @@ class HomeController extends AbstractController
         InscriptionRepository $inscriptionRepository,
         EcheancierRepository $echeancierRepository,
         EntityManagerInterface $entityManager,
-        Service $service
+        Service $service,
+        SessionInterface $session
     ): Response {
 
         $etudiant = new Etudiant();
@@ -1625,6 +1654,7 @@ class HomeController extends AbstractController
 
         $form = $this->createForm(EtudiantAdminNewType::class, $etudiant, [
             'method' => 'POST',
+            "anneeScolaire" => $session->get("anneeScolaire"),
             'doc_options' => [
                 'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
                 'attrs' => ['class' => 'filestyle'],
@@ -1718,10 +1748,13 @@ class HomeController extends AbstractController
         InscriptionRepository $inscriptionRepository,
         EcheancierRepository $echeancierRepository,
         EntityManagerInterface $entityManager,
-        Service $service
+        Service $service,
+        SessionInterface $session
     ): Response {
 
         $etudiant = new Etudiant();
+
+        $anneeScolaire = $session->get('anneeScolaire');
 
 
         if (count($etudiant->getBlocEcheanciers()) == 0) {
@@ -1769,6 +1802,7 @@ class HomeController extends AbstractController
 
         $form = $this->createForm(EtudiantAdminNewType::class, $etudiant, [
             'method' => 'POST',
+            'anneeScolaire' => $anneeScolaire,
             'doc_options' => [
                 'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
                 'attrs' => ['class' => 'filestyle'],
@@ -1866,7 +1900,8 @@ class HomeController extends AbstractController
         EcheancierRepository $echeancierRepository,
         EntityManagerInterface $entityManager,
         Service $service,
-        PreinscriptionRepository $preinscriptionRepository2
+        PreinscriptionRepository $preinscriptionRepository2,
+        SessionInterface $session
     ): Response {
 
 
@@ -1899,6 +1934,7 @@ class HomeController extends AbstractController
 
         $form = $this->createForm(EtudiantAdminNewType::class, $etudiant, [
             'method' => 'POST',
+            'anneeScolaire' => $session->get("anneeScolaire"),
             'doc_options' => [
                 'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
                 'attrs' => ['class' => 'filestyle'],
