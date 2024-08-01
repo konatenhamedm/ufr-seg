@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Filiere;
 use App\Form\DataTransformer\ThousandNumberTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,16 +17,19 @@ class FiliereType extends AbstractType
     {
         $builder
             ->add('code', null, ['label' => 'Code'])
+            ->add('passageExamen', CheckboxType::class, [
+                'label' => "Passage Examens",
+                'required' => false,
+            ])
             ->add('libelle', null, ['label' => 'Libellé'])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'attr' => ['class' => 'has-editor']
             ])
             ->add('montantPreinscription', TextType::class, [
-                'label' => 'Montant Préinscription', 
+                'label' => 'Montant Préinscription',
                 'attr' => ['class' => 'input-money']
-            ])
-        ;
+            ]);
 
         $builder->get('montantPreinscription')->addModelTransformer(new ThousandNumberTransformer());
     }

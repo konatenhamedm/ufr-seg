@@ -45,6 +45,9 @@ class Filiere
     #[ORM\OneToMany(mappedBy: 'filiere', targetEntity: Promotion::class)]
     private Collection $promotions;
 
+    #[ORM\Column]
+    private ?bool $passageExamen = null;
+
     public function __construct()
     {
         $this->niveaux = new ArrayCollection();
@@ -193,6 +196,18 @@ class Filiere
                 $promotion->setFiliere(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isPassageExamen(): ?bool
+    {
+        return $this->passageExamen;
+    }
+
+    public function setPassageExamen(bool $passageExamen): static
+    {
+        $this->passageExamen = $passageExamen;
 
         return $this;
     }
