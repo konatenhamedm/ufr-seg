@@ -520,8 +520,18 @@ class PreinscriptionController extends AbstractController
                 $preinscription->setEtudiant($this->getUser()->getPersonne());
                 $preinscription->setUtilisateur($this->getUser());
                 $preinscription->setCode($this->numero($niveauRepository->find($form->get('niveau')->getData()->getId())->getCode()));
-                $preinscription->setEtat('attente_validation');
+                /*  $preinscription->setEtat('attente_validation');
                 $preinscription->setEtatDeliberation('pas_deliberer');
+ */
+                if ($preinscription->getNiveau()->getFiliere()->isPassageExamen()) {
+
+                    $preinscription->setEtat('attente_paiement');
+                    $preinscription->setEtatDeliberation('pas_deliberer');
+                } else {
+
+                    $preinscription->setEtat('attente_validation');
+                    $preinscription->setEtatDeliberation('deliberer');
+                }
                 $entityManager->persist($preinscription);
                 $entityManager->flush();
 
