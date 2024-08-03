@@ -20,6 +20,7 @@ class BlocEcheancierType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $anneeScolaire = $options['anneeScolaire'];
+        $niveau = $options['niveau'];
         //dd($anneeScolaire);
         $builder
 
@@ -38,10 +39,12 @@ class BlocEcheancierType extends AbstractType
                     'class' => 'classe'
                 ],
                 'choice_label' => 'libelle',
-                'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                'query_builder' => function (EntityRepository $er) use ($anneeScolaire, $niveau) {
                     return $er->createQueryBuilder('c')
                         ->andWhere("c.anneeScolaire = :annee")
-                        ->setParameter('annee', $anneeScolaire);
+                        ->andWhere("c.niveau = :niveau")
+                        ->setParameter('annee', $anneeScolaire)
+                        ->setParameter('niveau', $niveau);
                 },
             ])
             ->add('echeancierProvisoires', CollectionType::class, [
@@ -79,5 +82,6 @@ class BlocEcheancierType extends AbstractType
             'data_class' => BlocEcheancier::class,
         ]);
         $resolver->setRequired(['anneeScolaire']);
+        $resolver->setRequired(['niveau']);
     }
 }

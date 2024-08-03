@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Civilite;
 use App\Entity\Etudiant;
 use App\Entity\Genre;
+use App\Entity\Inscription;
 use App\Entity\Pays;
 use App\Entity\Personne;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -20,7 +21,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotNull;
 
-class EtudiantAdminNewType extends AbstractType
+class InscriptionEcheancierNewType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -32,7 +33,7 @@ class EtudiantAdminNewType extends AbstractType
                 'entry_options' => [
                     'label' => false,
                     'anneeScolaire' => $options['anneeScolaire'],
-                    'niveau' => $options['niveau'],
+                    'niveau' => $options['niveau']
                 ],
                 'allow_add' => true,
                 'label' => false,
@@ -49,7 +50,7 @@ class EtudiantAdminNewType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Etudiant::class,
+            'data_class' => Inscription::class,
             'doc_required' => true,
             'doc_options' => [],
             'validation_groups' => [],

@@ -3,17 +3,24 @@
 namespace App\Controller\Inscription;
 
 use App\Controller\FileTrait;
+use App\Entity\BlocEcheancier;
+use App\Entity\EcheancierProvisoire;
+use App\Entity\Etudiant;
 use App\Entity\InfoInscription;
 use App\Entity\InfoPreinscription;
 use App\Entity\Inscription;
 use App\Entity\Paiement;
 use App\Entity\Preinscription;
 use App\Entity\Versement;
+use App\Form\EtudiantAdminNewType;
 use App\Form\InscriptionAdminType;
 use App\Form\InscriptionAffectationClasseType;
+use App\Form\InscriptionEcheancierNewType;
 use App\Form\InscriptionPayementType;
 use App\Form\InscriptionRejeterType;
 use App\Form\InscriptionType;
+use App\Repository\ClasseRepository;
+use App\Repository\EcheancierNiveauRepository;
 use App\Repository\EcheancierRepository;
 use App\Repository\FraisInscriptionRepository;
 use App\Repository\FraisRepository;
@@ -26,6 +33,7 @@ use App\Service\ActionRender;
 use App\Service\FormError;
 use App\Service\Omines\Column\NumberFormatColumn;
 use App\Service\Service;
+use DateTime;
 use DeepCopy\Filter\Filter;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -48,7 +56,7 @@ class InscriptionController extends AbstractController
     protected $workflow;
     use FileTrait;
 
-
+    protected const UPLOAD_PATH = 'media_etudiant';
 
 
     public function __construct(Registry $workflow)
@@ -511,9 +519,9 @@ class InscriptionController extends AbstractController
     public function index(Request $request, UserInterface $user, string $etat, DataTableFactory $dataTableFactory, EcheancierRepository $echeancierRepository, SessionInterface $session): Response
     {
 
-        //dd($etat);
+        // dd($etat);
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-         $anneeScolaire = $session->get('anneeScolaire');
+        $anneeScolaire = $session->get('anneeScolaire');
 
         $titre = '';
         if ($etat == "echeance_soumis") {
@@ -703,10 +711,13 @@ class InscriptionController extends AbstractController
 
                         'actions' => [
                             'classe' => [
-                                'url' => $this->generateUrl('app_inscription_affectation_classe', ['id' => $value]),
+                                'target' => '#modal-xl2',
+
+                                'url' => $this->generateUrl('validation_echeancier_affectation_classe', ['id' => $value]),
+                                //'url' => $this->generateUrl('app_inscription_affectation_classe', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
-                                'target' => '#exampleModalSizeLg1',
+                                /*  'target' => '#exampleModalSizeLg1', */
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['classe']
@@ -830,11 +841,139 @@ class InscriptionController extends AbstractController
             'titre' => $titre,
         ]);
     }
+
+
+    #[Route(path: '/validation/echeancier/demande/{id}', name: 'validation_echeancier_affectation_classe', methods: ['GET', 'POST'])]
+    public function informationAdminNewDirectAfterDemandeEtudiantSincePreinscription(
+        Request $request,
+        FormError $formError,
+        Inscription $inscription,
+        ClasseRepository $classeRepository,
+        InscriptionRepository $inscriptionRepository,
+        EcheancierRepository $echeancierRepository,
+        EntityManagerInterface $entityManager,
+        Service $service,
+        SessionInterface $session,
+        EcheancierNiveauRepository $echeancierNiveauRepository
+    ): Response {
+
+
+        /* foreach ($frais as $key => $value) {
+            $sommeFrais += (int)$value->getMontant();
+        } */
+        $bloc_echeancier = new BlocEcheancier();
+
+        /*  $bloc_echeancier->setClasse($classeRepository->find(21)); */
+        $bloc_echeancier->setDateInscription(new DateTime());
+        $bloc_echeancier->setTotal('0');
+
+
+        $inscription->addBlocEcheancier($bloc_echeancier);
+
+        foreach ($echeancierNiveauRepository->findBy(["niveau" => $inscriptionRepository->find($inscription)->getNiveau()]) as $key => $echeancierNiveau) {
+            $echeancierProvisoire = new EcheancierProvisoire();
+            $echeancierProvisoire->setDateVersement($echeancierNiveau->getDateVersement());
+            $echeancierProvisoire->setNumero($echeancierNiveau->getNumero());
+            $echeancierProvisoire->setMontant($echeancierNiveau->getMontant());
+
+            $bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
+        }
+
+
+
+
+        $validationGroups = ['Default', 'FileRequired', 'autre'];
+        //dd($niveauRepository->findNiveauDisponible(21));
+
+        $form = $this->createForm(InscriptionEcheancierNewType::class, $inscription, [
+            'method' => 'POST',
+            'anneeScolaire' => $session->get("anneeScolaire"),
+            'niveau' => $inscription->getNiveau(),
+            'doc_options' => [
+                'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
+                'attrs' => ['class' => 'filestyle'],
+            ],
+            'validation_groups' => $validationGroups,
+            'action' => $this->generateUrl('validation_echeancier_affectation_classe', [
+                'id' =>  $inscription->getId(),
+
+
+            ])
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_home_timeline_index');
+
+
+            $blocEcheanciers = $form->get('blocEcheanciers')->getData();
+
+
+
+            if ($form->isValid()) {
+
+
+                $responseRegister = $service->registerEcheancieOnlyInscription($blocEcheanciers, $inscription);
+
+                if ($responseRegister) {
+                    // $inscription->setClasse()
+                    $inscriptionRepository->save($inscription, true);
+
+
+                    $statut = 1;
+                    $message       = 'Opération effectuée avec succès';
+                    $this->addFlash('success', $message);
+                } else {
+                    $statut = 0;
+                    $message       = "Opération échouée car le montant total à payer est different du montant total de l 'échanece";
+                    $this->addFlash('danger', $message);
+                }
+
+
+                $data = true;
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->render('inscription/inscription/new_validation.html.twig', [
+            'etudiant' => $inscription,
+            'etat' => 'ok',
+            'form' => $form->createView(),
+            'frais' => 3,
+        ]);
+
+        //return $this->render('site/admin/pages/informations.html.twig');
+    }
+
     #[Route('/{etat}', name: 'app_inscription_inscription_list_ls', methods: ['GET', 'POST'])]
     public function indexListe(Request $request, UserInterface $user, string $etat, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
+        //dd("");
+        //dd($etat);
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
-         $anneeScolaire = $session->get('anneeScolaire');
+        $anneeScolaire = $session->get('anneeScolaire');
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])

@@ -81,7 +81,7 @@ class Preinscription
     #[ORM\OneToMany(mappedBy: 'preinscription', targetEntity: Decision::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $decisions;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $montant = null;
 
     public function __construct()

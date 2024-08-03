@@ -507,15 +507,17 @@ class HomeController extends AbstractController
                     if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
 
                         $preinscription->setEtat('attente_paiement');
+                        $preinscription->setEtatDeliberation('pas_deliberer');
                     } else {
 
                         $preinscription->setEtat('attente_validation');
+                        $preinscription->setEtatDeliberation('deliberer');
                     }
-                    $preinscription->setEtatDeliberation('pas_deliberer');
                     $preinscription->setEtudiant($etudiant);
                     $preinscription->setDatePreinscription(new \DateTime());
                     $preinscription->setNiveau($inscriptionDTO->getNiveau());
                     $preinscription->setUtilisateur($utilisateur);
+                    $preinscription->setMontant($inscriptionDTO->getNiveau()->getFiliere()->getMontantPreinscription());
                     $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
                     $preinscriptionRepository->add($preinscription, true);
 
@@ -552,11 +554,11 @@ class HomeController extends AbstractController
                         if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
 
                             $preinscription->setEtat('attente_paiement');
+                            $preinscription->setEtatDeliberation('pas_deliberer');
                         } else {
-
+                            $preinscription->setEtatDeliberation('deliberer');
                             $preinscription->setEtat('attente_validation');
                         }
-                        $preinscription->setEtatDeliberation('pas_deliberer');
                         $preinscription->setEtudiant($user->getPersonne());
                         $preinscription->setDatePreinscription(new \DateTime());
                         $preinscription->setNiveau($inscriptionDTO->getNiveau());
@@ -1117,7 +1119,7 @@ class HomeController extends AbstractController
 
         // $id = $request->get('id');
 
-        //dd($id);
+        // dd($classe);
 
         if ($id) {
 
@@ -1804,6 +1806,7 @@ class HomeController extends AbstractController
         $form = $this->createForm(EtudiantAdminNewType::class, $etudiant, [
             'method' => 'POST',
             'anneeScolaire' => $anneeScolaire,
+            //'niveau'=>
             'doc_options' => [
                 'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
                 'attrs' => ['class' => 'filestyle'],
@@ -1941,6 +1944,7 @@ class HomeController extends AbstractController
         $form = $this->createForm(EtudiantAdminNewType::class, $etudiant, [
             'method' => 'POST',
             'anneeScolaire' => $session->get("anneeScolaire"),
+            "niveau" => $preinscriptionRepository->find($preinscription)->getNiveau(),
             'doc_options' => [
                 'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
                 'attrs' => ['class' => 'filestyle'],

@@ -110,7 +110,7 @@ class ExamenController extends AbstractController
                 'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Examen $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
-                        'target' => '#exampleModalSizeLg2',
+                        'target' => '#modal-lg',
 
                         'actions' => [
                             'edit' => [
@@ -256,9 +256,10 @@ class ExamenController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_direction_examen_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Examen $examen, EntityManagerInterface $entityManager, FormError $formError): Response
+    public function edit(Request $request, Examen $examen, EntityManagerInterface $entityManager, FormError $formError, SessionInterface $session): Response
     {
 
+        $anneeScolaire = $session->get("anneeScolaire");
 
         $matieres = $entityManager->getRepository(Matiere::class)->findAll();
         $oldMatieres = $examen->getMatiereExamens();
@@ -277,6 +278,7 @@ class ExamenController extends AbstractController
 
         $form = $this->createForm(ExamenType::class, $examen, [
             'method' => 'POST',
+            "anneeScolaire" => $anneeScolaire,
             'action' => $this->generateUrl('app_direction_examen_edit', [
                 'id' =>  $examen->getId()
             ])

@@ -428,6 +428,51 @@ class Service
 
         return $response;
     }
+    public function registerEcheancieOnlyInscription($blocEcheanciers, Inscription $inscription): bool
+    {
+        $somme = 0;
+        $response = true;
+        $classe = "";
+        foreach ($blocEcheanciers as $key => $value) {
+            foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                $somme += $echeancier->getMontant();
+            }
+
+
+            if ($somme == (int)$value->getTotal()) {
+                //$inscription->setClasse($this->numero($this->classeRepository->find()->getNiveau()->getCode()));
+                foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                    $echeancierReel = new Echeancier();
+                    $echeancierReel->setDateCreation(new DateTime());
+                    $echeancierReel->setEtat('pas_payer');
+                    $echeancierReel->setInscription($inscription);
+                    $echeancierReel->setMontant($echeancier->getMontant());
+                    $echeancierReel->setTotaPayer('0');
+                    $this->echeancierRepository->save($echeancierReel, true);
+                }
+
+                //dd($value->getFraisBlocs()->count());
+                foreach ($value->getFraisBlocs() as $key => $fraisItem) {
+                    $frais = new FraisInscription();
+                    $frais->setMontant($fraisItem->getMontant());
+                    $frais->setInscription($inscription);
+                    $frais->setTypeFrais($fraisItem->getTypeFrais());
+                    $this->em->persist($frais);
+                    $this->em->flush();
+                }
+                $inscription->setClasse($value->getClasse());
+                $response;
+            } else {
+                $response = false;
+            }
+
+            //if ($key == 0) {
+
+            // }
+        }
+
+        return $response;
+    }
     public function registerEcheancierAdminEdit($blocEcheanciers, $etudiant): string
     {
         $somme = 0;

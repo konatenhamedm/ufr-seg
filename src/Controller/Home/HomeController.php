@@ -100,13 +100,13 @@ class HomeController extends AbstractController
                 'id' => 'module_traitement',
                 'href' => $this->generateUrl('app_direction_deliberation_time_index')
             ],
-            [
+            /* [
                 'label' => 'Echéancier en attente de validation',
                 'icon' => 'bi bi-list',
                 'module' => 'echeancier',
                 'id' => 'module_echeancier',
                 'href' => $this->generateUrl('app_inscription_inscription_list_ls', ['etat' => 'echeance_soumis'])
-            ],
+            ], */
             [
 
                 'label' => 'Affectation classe',
@@ -160,7 +160,7 @@ class HomeController extends AbstractController
                 'module' => 'gestion',
                 'href' => $this->generateUrl('app_deliberation_preinscription_index')
             ],
-            [
+            /* [
                 'label' => 'En attente échéancier de paiement',
                 'icon' => 'bi bi-list',
                 'module' => 'gestion',
@@ -172,7 +172,7 @@ class HomeController extends AbstractController
                 'module' => 'gestion',
                 'href' => $this->generateUrl('app_inscription_inscription_list_ls', ['etat' => 'echeance_soumis'])
             ],
-
+ */
             [
                 'label' => 'En cours de paiement ',
                 'icon' => 'bi bi-list',

@@ -4,6 +4,7 @@ namespace App\Controller\Direction;
 
 use App\Entity\Deliberation;
 use App\Entity\DeliberationPreinscription;
+use App\Entity\Echeancier;
 use App\Entity\Examen;
 use App\Entity\FraisInscription;
 use App\Entity\Inscription;
@@ -16,6 +17,7 @@ use App\Repository\FraisRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use App\Service\Omines\Column\NumberFormatColumn;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
@@ -399,7 +401,7 @@ class DeliberationController extends AbstractController
                     $inscription->setEtudiant($preinscription->getEtudiant());
                     $inscription->setNiveau($examen->getNiveau());
                     //$inscription->setMontant($preinscription->getCode());
-                    $inscription->setEtat('attente_echeancier');
+                    $inscription->setEtat('valide');
                     $inscription->setCode($preinscription->getCode());
                     $inscription->setCodeUtilisateur($this->getUser()->getEmail());
                     foreach ($niveau->getFrais() as $frais) {
@@ -413,6 +415,17 @@ class DeliberationController extends AbstractController
 
 
                     $entityManager->persist($inscription);
+
+                    /* foreach ($examen->getNiveau()->getEcheancierNiveaux() as $key => $echeancierNiveau) {
+                        $echenacierInscription = new Echeancier();
+                        $echenacierInscription->setDateCreation(new DateTime());
+                        $echenacierInscription->setMontant($echeancierNiveau->getMontant());
+                        $echenacierInscription->setEtat("pas_payer");
+                        $echenacierInscription->setTotaPayer(0);
+                        $echenacierInscription->setInscription($inscription);
+                        $entityManager->persist($echenacierInscription);
+                        $entityManager->flush();
+                    } */
                 } elseif ($etat == 'rejet') {
                     $preinscription->setEtat('ajourne_inscription');
                     $preinscription->setEtatDeliberation('deliberer');
