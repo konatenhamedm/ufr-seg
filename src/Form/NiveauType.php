@@ -20,94 +20,96 @@ class NiveauType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('code', null, ['label' => 'Code'])
-            ->add('libelle', TextType::class, ['label' => 'Libellé'])
-            ->add('filiere', EntityType::class, [
-                'class' => Filiere::class,
-                'required' => false,
-                'placeholder' => '----',
-                'label_attr' => ['class' => 'label-required'],
-                'choice_label' => 'libelle',
-                'label' => 'Filière',
-                'attr' => ['class' => 'has-select2']
-            ])
-            ->add('promotion', EntityType::class, [
-                'class' => Promotion::class,
-                'required' => false,
-                'placeholder' => '----',
-                'label_attr' => ['class' => 'label-required'],
-                'choice_label' => 'code',
-                'label' => 'Promotion',
-                'attr' => ['class' => 'has-select2']
-            ])
-            ->add('anneeScolaire', EntityType::class, [
-                'class' => AnneeScolaire::class,
-                'required' => false,
-                'placeholder' => '----',
-                'label_attr' => ['class' => 'label-required'],
-                'choice_label' => 'libelle',
-                'label' => 'Année scolaire',
-                'attr' => ['class' => 'has-select2']
-            ])
-            ->add(
-                'frais',
+        if ($options['type'] != "echeancier") {
+            $builder
+                ->add('code', null, ['label' => 'Code'])
+                ->add('libelle', TextType::class, ['label' => 'Libellé'])
+                ->add('filiere', EntityType::class, [
+                    'class' => Filiere::class,
+                    'required' => false,
+                    'placeholder' => '----',
+                    'label_attr' => ['class' => 'label-required'],
+                    'choice_label' => 'libelle',
+                    'label' => 'Filière',
+                    'attr' => ['class' => 'has-select2']
+                ])
+                ->add('promotion', EntityType::class, [
+                    'class' => Promotion::class,
+                    'required' => false,
+                    'placeholder' => '----',
+                    'label_attr' => ['class' => 'label-required'],
+                    'choice_label' => 'code',
+                    'label' => 'Promotion',
+                    'attr' => ['class' => 'has-select2']
+                ])
+                ->add('anneeScolaire', EntityType::class, [
+                    'class' => AnneeScolaire::class,
+                    'required' => false,
+                    'placeholder' => '----',
+                    'label_attr' => ['class' => 'label-required'],
+                    'choice_label' => 'libelle',
+                    'label' => 'Année scolaire',
+                    'attr' => ['class' => 'has-select2']
+                ])
+                ->add(
+                    'frais',
+                    CollectionType::class,
+                    [
+                        'label'         => false,
+                        'entry_type'    => FraisType::class,
+                        //'label'         => false,
+                        'allow_add'     => true,
+                        'allow_delete'  => true,
+                        'by_reference'  => false,
+
+                        'entry_options' => ['label' => false],
+                    ]
+                )
+                ->add(
+                    'infoNiveaux',
+                    CollectionType::class,
+                    [
+                        'label'         => false,
+                        'entry_type'    => InfoNiveauType::class,
+                        //'label'         => false,
+                        'allow_add'     => true,
+                        'allow_delete'  => true,
+                        'by_reference'  => false,
+
+                        'entry_options' => ['label' => false],
+                    ]
+                )
+                ->add('responsable', EntityType::class, [
+                    'class' => Employe::class,
+                    'required' => false,
+                    'placeholder' => '----',
+                    'label_attr' => ['class' => 'label-required'],
+                    'query_builder' => function (EntityRepository $er) {
+                        return $er->createQueryBuilder('c')
+                            ->innerJoin('c.fonction', 'f')
+                            ->andWhere('f.code = :code')
+                            ->setParameter('code', 'DR')
+                            ->orderBy('c.id', 'ASC');
+                    },
+                    'choice_label' => 'nomComplet',
+                    'label' => 'Reponsable de niveau',
+                    'attr' => ['class' => 'has-select2']
+                ]);
+        } else {
+            $builder->add(
+                'echeancierNiveaux',
                 CollectionType::class,
                 [
                     'label'         => false,
-                    'entry_type'    => FraisType::class,
+                    'entry_type'    => EcheancierNiveauType::class,
                     //'label'         => false,
                     'allow_add'     => true,
                     'allow_delete'  => true,
                     'by_reference'  => false,
-
                     'entry_options' => ['label' => false],
                 ]
-            )
-            ->add(
-                'infoNiveaux',
-                CollectionType::class,
-                [
-                    'label'         => false,
-                    'entry_type'    => InfoNiveauType::class,
-                    //'label'         => false,
-                    'allow_add'     => true,
-                    'allow_delete'  => true,
-                    'by_reference'  => false,
-
-                    'entry_options' => ['label' => false],
-                ]
-            )
-            ->add('responsable', EntityType::class, [
-                'class' => Employe::class,
-                'required' => false,
-                'placeholder' => '----',
-                'label_attr' => ['class' => 'label-required'],
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('c')
-                        ->innerJoin('c.fonction', 'f')
-                        ->andWhere('f.code = :code')
-                        ->setParameter('code', 'DR')
-                        ->orderBy('c.id', 'ASC');
-                },
-                'choice_label' => 'nomComplet',
-                'label' => 'Reponsable de niveau',
-                'attr' => ['class' => 'has-select2']
-            ])
-            /*  ->add(
-                'cours',
-                CollectionType::class,
-                [
-                    'label'         => false,
-                    'entry_type'    => CoursType::class,
-                    //'label'         => false,
-                    'allow_add'     => true,
-                    'allow_delete'  => true,
-                    'by_reference'  => false,
-
-                    'entry_options' => ['label' => false],
-                ]
-            ) */;
+            );
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -115,5 +117,6 @@ class NiveauType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Niveau::class,
         ]);
+        $resolver->setRequired(['type']);
     }
 }

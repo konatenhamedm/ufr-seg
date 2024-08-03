@@ -36,6 +36,7 @@ use App\Form\UtilisateurInscriptionType;
 use App\Form\UtilisateurType;
 use App\Repository\AnneeScolaireRepository;
 use App\Repository\ClasseRepository;
+use App\Repository\EcheancierNiveauRepository;
 use App\Repository\EcheancierRepository;
 use App\Repository\EmployeRepository;
 use App\Repository\EtudiantRepository;
@@ -1901,7 +1902,8 @@ class HomeController extends AbstractController
         EntityManagerInterface $entityManager,
         Service $service,
         PreinscriptionRepository $preinscriptionRepository2,
-        SessionInterface $session
+        SessionInterface $session,
+        EcheancierNiveauRepository $echeancierNiveauRepository
     ): Response {
 
 
@@ -1920,12 +1922,16 @@ class HomeController extends AbstractController
 
 
         $etudiant->addBlocEcheancier($bloc_echeancier);
-        $echeancierProvisoire = new EcheancierProvisoire();
-        $echeancierProvisoire->setDateVersement(new DateTime());
-        $echeancierProvisoire->setNumero('1');
-        $echeancierProvisoire->setMontant('0');
 
-        $bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
+        foreach ($echeancierNiveauRepository->findBy(["niveau" => $preinscriptionRepository->find($preinscription)->getNiveau()]) as $key => $echeancierNiveau) {
+            $echeancierProvisoire = new EcheancierProvisoire();
+            $echeancierProvisoire->setDateVersement($echeancierNiveau->getDateVersement());
+            $echeancierProvisoire->setNumero($echeancierNiveau->getNumero());
+            $echeancierProvisoire->setMontant($echeancierNiveau->getMontant());
+
+            $bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
+        }
+
 
 
 

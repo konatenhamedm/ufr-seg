@@ -28,6 +28,9 @@ class ExamenType extends AbstractType
     {
 
         //dd($this->user);
+
+        $anneeScolaire = $options['anneeScolaire'];
+        //dd($anneeScolaire);
         $builder
             ->add('libelle', null, ['label' => 'Libellé'])
             ->add('code', null, ['label' => 'Code'])
@@ -54,8 +57,10 @@ class ExamenType extends AbstractType
                 'label' => 'Niveau',
                 //'placeholder' => '----',
                 'label_attr' => ['class' => 'label-required'],
-                'query_builder' => function (EntityRepository $er) {
-                    $sql = $er->createQueryBuilder('c');
+                'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                    $sql = $er->createQueryBuilder('c')
+                        ->andWhere("c.anneeScolaire = :annee")
+                        ->setParameter('annee', $anneeScolaire);
 
                     if ($this->user->getPersonne()->getFonction()->getCode() == 'DR') {
                         $sql->innerJoin('c.responsable', 'res')
@@ -88,5 +93,6 @@ class ExamenType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Examen::class,
         ]);
+        $resolver->setRequired(['anneeScolaire']);
     }
 }

@@ -23,6 +23,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -162,8 +163,9 @@ class ExamenController extends AbstractController
 
 
     #[Route('/new', name: 'app_direction_examen_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError, SendMailService $sendMailService, PreinscriptionRepository $preinscriptionRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, FormError $formError, SendMailService $sendMailService, PreinscriptionRepository $preinscriptionRepository): Response
     {
+        $anneeScolaire = $session->get("anneeScolaire");
         $examen = new Examen();
         $matieres = $entityManager->getRepository(Matiere::class)->findAll();
         /*  foreach ($matieres as $matiere) {
@@ -173,6 +175,7 @@ class ExamenController extends AbstractController
         } */
         $form = $this->createForm(ExamenType::class, $examen, [
             'method' => 'POST',
+            "anneeScolaire" => $anneeScolaire,
             'action' => $this->generateUrl('app_direction_examen_new')
         ]);
         $form->handleRequest($request);

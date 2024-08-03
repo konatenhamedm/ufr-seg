@@ -74,6 +74,9 @@ class Niveau
     #[ORM\OneToMany(mappedBy: 'niveau', targetEntity: Session::class)]
     private Collection $sessions;
 
+    #[ORM\OneToMany(mappedBy: 'niveau', targetEntity: EcheancierNiveau::class, orphanRemoval: true, cascade: ['persist'])]
+    private Collection $echeancierNiveaux;
+
 
 
 
@@ -88,6 +91,7 @@ class Niveau
         $this->controleExamens = new ArrayCollection();
         $this->examens = new ArrayCollection();
         $this->sessions = new ArrayCollection();
+        $this->echeancierNiveaux = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -441,6 +445,36 @@ class Niveau
             // set the owning side to null (unless already changed)
             if ($session->getNiveau() === $this) {
                 $session->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EcheancierNiveau>
+     */
+    public function getEcheancierNiveaux(): Collection
+    {
+        return $this->echeancierNiveaux;
+    }
+
+    public function addEcheancierNiveau(EcheancierNiveau $echeancierNiveau): static
+    {
+        if (!$this->echeancierNiveaux->contains($echeancierNiveau)) {
+            $this->echeancierNiveaux->add($echeancierNiveau);
+            $echeancierNiveau->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEcheancierNiveau(EcheancierNiveau $echeancierNiveau): static
+    {
+        if ($this->echeancierNiveaux->removeElement($echeancierNiveau)) {
+            // set the owning side to null (unless already changed)
+            if ($echeancierNiveau->getNiveau() === $this) {
+                $echeancierNiveau->setNiveau(null);
             }
         }
 

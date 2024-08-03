@@ -4,10 +4,12 @@ namespace App\Controller\Parametre;
 
 use App\Attribute\Module;
 use App\Attribute\RoleMethod;
+use App\Repository\AnneeScolaireRepository;
 use App\Service\Breadcrumb;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
@@ -19,11 +21,16 @@ class DashboardController extends AbstractController
 
     #[Route(path: '/', name: 'app_parametre_dashboard_index', methods: ['GET', 'POST'])]
     #[RoleMethod(title: 'Gestion des Paramètres', as: 'index')]
-    public function index(Request $request, Breadcrumb $breadcrumb, UserInterface $user): Response
+    public function index(Request $request, Breadcrumb $breadcrumb, UserInterface $user, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
 
 
-
+        $anneeScolaire = $session->get('anneeScolaire');
+        if ($anneeScolaire == null) {
+            // dd($anneeScolaireRepository->findOneBy(['actif' => 1]));
+            //unset($annee);
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         // dd($user->getPersonne()->getFonction()->getCode());
         $module = $request->query->get('module');
         if ($user->getPersonne()->getFonction()->getCode() == "DR") {

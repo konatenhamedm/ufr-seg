@@ -23,6 +23,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -30,8 +31,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class NiveauController extends AbstractController
 {
     #[Route('/', name: 'app_parametre_niveau_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session): Response
     {
+
+        $anneeScolaire = $session->get('anneeScolaire');
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
@@ -39,7 +42,7 @@ class NiveauController extends AbstractController
             ->add('responsable', TextColumn::class, ['label' => 'Responsable', 'field' => 'res.getNomComplet'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Niveau::class,
-                'query' => function (QueryBuilder $qb) use ($user) {
+                'query' => function (QueryBuilder $qb) use ($user, $anneeScolaire) {
                     $qb->select('niveau,filiere,res')
                         ->from(Niveau::class, 'niveau')
                         ->leftJoin('niveau.filiere', 'filiere')
@@ -49,12 +52,20 @@ class NiveauController extends AbstractController
                         $qb->andWhere("res = :user")
                             ->setParameter('user', $user->getPersonne());
                     }
+
+                    if ($anneeScolaire) {
+                        $qb->andWhere("niveau.anneeScolaire = :anneeScolaire")
+                            ->setParameter('anneeScolaire', $anneeScolaire);
+                    }
                 },
             ])
             ->setName('dt_app_parametre_niveau');
 
         $renders = [
             'edit' =>  new ActionRender(function () {
+                return true;
+            }),
+            'echeance' =>  new ActionRender(function () {
                 return true;
             }),
             'personnalise' =>  new ActionRender(function () {
@@ -92,6 +103,14 @@ class NiveauController extends AbstractController
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
+                            ],
+                            'echeance' => [
+                                'url' => $this->generateUrl('app_parametre_niveau_echeancier', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-calendar',
+                                'attrs' => ['class' => 'btn-primary'],
+                                'render' => $renders['echeance']
                             ],
 
                             'delete' => [
@@ -231,6 +250,7 @@ class NiveauController extends AbstractController
 
         $form = $this->createForm(NiveauType::class, $niveau, [
             'method' => 'POST',
+            'type' => 'new',
             'action' => $this->generateUrl('app_parametre_niveau_new')
         ]);
         $form->handleRequest($request);
@@ -306,6 +326,7 @@ class NiveauController extends AbstractController
 
         $form = $this->createForm(NiveauType::class, $niveau, [
             'method' => 'POST',
+            'type' => 'edit',
             'action' => $this->generateUrl('app_parametre_niveau_edit', [
                 'id' =>  $niveau->getId()
             ])
@@ -354,6 +375,66 @@ class NiveauController extends AbstractController
         }
 
         return $this->render('parametre/niveau/edit.html.twig', [
+            'niveau' => $niveau,
+            'form' => $form->createView(),
+        ]);
+    }
+    #[Route('/{id}/echeancier', name: 'app_parametre_niveau_echeancier', methods: ['GET', 'POST'])]
+    public function echeancier(Request $request, Niveau $niveau, EntityManagerInterface $entityManager, FormError $formError): Response
+    {
+
+
+        $form = $this->createForm(NiveauType::class, $niveau, [
+            'method' => 'POST',
+            'type' => 'echeancier',
+            'action' => $this->generateUrl('app_parametre_niveau_echeancier', [
+                'id' =>  $niveau->getId()
+            ])
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_parametre_niveau_index');
+
+
+
+
+            if ($form->isValid()) {
+
+                $entityManager->persist($niveau);
+                $entityManager->flush();
+
+                $data = true;
+                $message       = 'Opération effectuée avec succès';
+                $statut = 1;
+                $this->addFlash('success', $message);
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->render('parametre/niveau/echeancier.html.twig', [
             'niveau' => $niveau,
             'form' => $form->createView(),
         ]);

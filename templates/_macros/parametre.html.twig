@@ -28,6 +28,32 @@
     </table>
     
 {% endmacro %}
+{% macro prototype_ligne_echenacier(form) %}
+    <div class="proto-container" data-prototype="{{ _self.ligne_echeancier(form.echeancierNiveaux.vars.prototype)|e }}"></div>
+    <button type="button" data-protoname="__name__" class="btn btn-default add-collection add-ligne btn-xs" id="add_ligne" data-protoclass=".proto-container" data-container=".row-container">
+        <i class="fa fa-plus"></i>
+        Ajouter une ligne
+    </button>
+
+
+    <table class="table table-bordered table-custom">
+        <thead class="thead-dark">
+            <tr>
+                <th width="10%" class="p-2">Numero</th>
+                <th width="30%" class="p-2">Date versement</th>
+                <th width="50%" class="p-2">Montant</th>
+                
+            </tr>
+        </thead>
+        <tbody  class="row-container">
+            {% for item in form.echeancierNiveaux %}
+                {{ _self.ligne_echeancier(item|e) }}
+            {% endfor %}
+        </tbody>
+        
+    </table>
+    
+{% endmacro %}
 
 {% macro ligne_frais(frais) %}
    
@@ -41,6 +67,20 @@
             <div style="display:nonei">{{ form_widget(frais.typeFrais,{attr: {'readonly':'true'}}) }}</div>
         </td>
         <td class="p-2">{{ form_widget(frais.montant) }}</td>
+         <td class="p-2 text-center del-col"></td>
+    </tr>
+{% endmacro %}
+{% macro ligne_echeancier(echeancier) %}
+   
+     <tr class="row-colonne even pointer table-light">
+    {#     <td class="p-2">
+        
+           
+            <div style="display:nonei">{{ form_widget(frais.typeFrais,{attr: {'readonly':'true'}}) }}</div>
+        </td> #}
+        <td class="p-2">{{ form_widget(echeancier.numero) }}</td>
+        <td class="p-2">{{ form_widget(echeancier.dateVersement) }}</td>
+        <td class="p-2">{{ form_widget(echeancier.montant) }}</td>
          <td class="p-2 text-center del-col"></td>
     </tr>
 {% endmacro %}
