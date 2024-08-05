@@ -155,10 +155,10 @@ class ControleController extends AbstractController
         } else {
             // dd('ppp');
             $controle = new Controle();
-            $controle->setTypeControle($typeControleRepository->findOneBy(['code' => 'CC']));
+            // $controle->setTypeControle($typeControleRepository->findOneBy(['code' => 'CC']));
 
             $groupe = new GroupeType();
-            $groupe->setTypeEvaluation($typeEvaluationRepository->findOneBy(['code' => 'DT']));
+            //  $groupe->setTypeEvaluation($typeEvaluationRepository->findOneBy(['code' => 'DT']));
             $groupe->setDateNote(new \DateTime());
             if (count($inscriptionRepository->findBy(['classe' => $classe])) > 0)
                 $controle->addGroupeType($groupe);
@@ -238,12 +238,12 @@ class ControleController extends AbstractController
         EtudiantRepository $etudiantRepository,
         ControleRepository $controleRepository,
         TypeEvaluationRepository $typeEvaluationRepository,
+        SessionInterface $sessionData,
         $semestre = null,
         $classe = null,
         $matiere = null,
         $ue = null,
         Service $service,
-        SessionInterface $sessionData
     ): Response {
 
 
@@ -270,11 +270,11 @@ class ControleController extends AbstractController
         } else {
             // dd('');
             $controle = new Controle();
-            $controle->setTypeControle($typeControleRepository->findOneBy(['code' => 'CC']));
+            //  $controle->setTypeControle($typeControleRepository->findOneBy(['code' => 'CC']));
 
             $groupe = new GroupeType();
             $groupe->setCoef('10');
-            $groupe->setTypeEvaluation($typeEvaluationRepository->findOneBy(['code' => 'TD']));
+            // $groupe->setTypeEvaluation($typeEvaluationRepository->findOneBy(['code' => 'TD']));
             $groupe->setDateNote(new \DateTime());
             if (count($inscriptionRepository->findBy(['classe' => $classe])) > 0)
                 $controle->addGroupeType($groupe);
@@ -373,7 +373,7 @@ class ControleController extends AbstractController
 
         $groupe = new GroupeType();
         $groupe->setCoef('10');
-        $groupe->setTypeEvaluation($typeEvaluationRepository->findOneBy(['code' => "TD"]));
+        //$groupe->setTypeEvaluation($typeEvaluationRepository->findOneBy(['code' => "TD"]));
         $groupe->setDateNote(new \DateTime());
         $controle->addGroupeType($groupe);
 

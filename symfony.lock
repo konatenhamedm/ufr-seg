@@ -283,6 +283,9 @@
             "./config/packages/workflow.yaml"
         ]
     },
+    "twig/extra-bundle": {
+        "version": "v3.8.0"
+    },
     "vich/uploader-bundle": {
         "version": "2.3",
         "recipe": {

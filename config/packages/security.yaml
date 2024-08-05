@@ -33,7 +33,7 @@ security:
             logout:
                 path: app_logout
                 # where to redirect after logout
-                target: site_home
+                target: /
 
             remember_me:
                 secret: '%kernel.secret%'

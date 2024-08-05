@@ -43,5 +43,27 @@
 });
 		  
 		  </script>
+
+            <script>
+		 let inactivityTime = function () {
+				let time;
+				window.onload = resetTimer;
+				document.onmousemove = resetTimer;
+				document.onkeypress = resetTimer;
+
+				function logout() {
+					window.location.href = '/logout';  // remplacez par l'URL de déconnexion de votre application
+				}
+
+				function resetTimer() {
+					clearTimeout(time);
+					time = setTimeout(logout, 60000);  // déconnecter après 60 secondes
+				}
+			};
+
+			inactivityTime();
+
+		  
+		  </script>
     </body>
 </html>
