@@ -181,7 +181,7 @@ class UniteEnseignementController extends AbstractController
 
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -264,7 +264,11 @@ class UniteEnseignementController extends AbstractController
             $response = [];
             $redirect = $this->generateUrl('app_parametre_unite_enseignement_index');
 
+            $lignes = $form->get('matiereUes')->getData();
 
+            /* foreach ($lignes as $key => $ligne) {
+                
+            } */
 
 
             if ($form->isValid()) {

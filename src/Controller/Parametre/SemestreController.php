@@ -182,7 +182,7 @@ class SemestreController extends AbstractController
 
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -262,7 +262,7 @@ class SemestreController extends AbstractController
             }
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);

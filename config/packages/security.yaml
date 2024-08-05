@@ -38,7 +38,7 @@ security:
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
-                path: /admin
+                path: /
                 always_remember_me: false
 
     # Easy way to control access for large sections of your site

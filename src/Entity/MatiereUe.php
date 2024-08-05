@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: MatiereUeRepository::class)]
-#[UniqueEntity(fields: 'matiere', message: 'cette ligne existe deja pour cette matiere')]
+#[UniqueEntity(fields: ['matiere', 'uniteEnseignement'], message: "Il s'embelle que cette matiere n'existe pas dans cette UE")]
 class MatiereUe
 {
     #[ORM\Id]

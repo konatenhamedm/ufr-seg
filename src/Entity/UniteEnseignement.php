@@ -10,7 +10,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 #[ORM\Entity(repositoryClass: UniteEnseignementRepository::class)]
-#[UniqueEntity(fields: ['niveau'], message: 'Ce niveau existe deja')]
+//#[UniqueEntity(fields: ['niveau'], message: 'Ce niveau existe deja')]
 class UniteEnseignement
 {
     #[ORM\Id]
