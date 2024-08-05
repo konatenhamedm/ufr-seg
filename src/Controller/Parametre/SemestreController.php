@@ -18,14 +18,16 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/parametre/semestre')]
 class SemestreController extends AbstractController
 {
     #[Route('/', name: 'app_parametre_semestre_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
+        $anneeScolaire = $session->get('anneeScolaire');
         $table = $dataTableFactory->create()
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
             ->add('dateDebut', DateTimeColumn::class, ['label' => 'Date début', 'format' => 'd-m-Y'])
@@ -44,12 +46,17 @@ class SemestreController extends AbstractController
             ->add('coef', TextColumn::class, ['label' => 'Coefficient', 'className' => ' w-50px text-center'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Semestre::class,
-                'query' => function (QueryBuilder $qb) {
+                'query' => function (QueryBuilder $qb) use ($anneeScolaire) {
                     $qb->select(['c', 'a'])
                         ->from(Semestre::class, 'c')
                         ->innerJoin('c.anneeScolaire', 'a')
 
                         ->orderBy('c.id', 'DESC');
+
+                    if ($anneeScolaire) {
+                        $qb->andWhere('c.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
+                    }
                 }
             ])
             ->setName('dt_app_parametre_semestre');
@@ -121,11 +128,12 @@ class SemestreController extends AbstractController
 
 
     #[Route('/new', name: 'app_parametre_semestre_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError, SemestreRepository $semestreRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError, SemestreRepository $semestreRepository, SessionInterface $session): Response
     {
         $semestre = new Semestre();
         $form = $this->createForm(SemestreType::class, $semestre, [
             'method' => 'POST',
+            "anneeScolaire" => $session->get('anneeScolaire'),
             'action' => $this->generateUrl('app_parametre_semestre_new')
         ]);
         $form->handleRequest($request);
@@ -138,7 +146,9 @@ class SemestreController extends AbstractController
         if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('app_parametre_semestre_index');
-            $data = $semestreRepository->findAll();
+            $data = $semestreRepository->findBy([
+                'anneeScolaire' => $session->get('anneeScolaire')
+            ]);
 
             $actif = $form->get('actif')->getData();
 
@@ -194,11 +204,12 @@ class SemestreController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_parametre_semestre_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Semestre $semestre, EntityManagerInterface $entityManager, FormError $formError, SemestreRepository $semestreRepository): Response
+    public function edit(Request $request, Semestre $semestre, EntityManagerInterface $entityManager, FormError $formError, SemestreRepository $semestreRepository, SessionInterface $session): Response
     {
 
         $form = $this->createForm(SemestreType::class, $semestre, [
             'method' => 'POST',
+            "anneeScolaire" => $session->get('anneeScolaire'),
             'action' => $this->generateUrl('app_parametre_semestre_edit', [
                 'id' =>  $semestre->getId()
             ])
@@ -216,7 +227,9 @@ class SemestreController extends AbstractController
             $response = [];
             $redirect = $this->generateUrl('app_parametre_semestre_index');
 
-            $data = $semestreRepository->findAll();
+            $data = $semestreRepository->findBy([
+                'anneeScolaire' => $session->get('anneeScolaire')
+            ]);
 
             $actif = $form->get('actif')->getData();
 

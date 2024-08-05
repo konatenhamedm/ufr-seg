@@ -17,6 +17,7 @@ class SemestreType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $anneeScolaire = $options['anneeScolaire'];
         $builder
             ->add('actif', CheckboxType::class, [
                 'label' => 'actif',
@@ -76,6 +77,11 @@ class SemestreType extends AbstractType
             ->add('anneeScolaire', EntityType::class, [
                 'class' => AnneeScolaire::class,
                 'choice_label' => 'libelle',
+                "query_builder" => function (\Doctrine\ORM\EntityRepository $er) use ($anneeScolaire) {
+                    return $er->createQueryBuilder('a')
+                        ->andWhere('a = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire);
+                }
             ]);
     }
 
@@ -84,5 +90,6 @@ class SemestreType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Semestre::class,
         ]);
+        $resolver->setRequired(['anneeScolaire']);
     }
 }
