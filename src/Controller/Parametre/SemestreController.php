@@ -89,6 +89,7 @@ class SemestreController extends AbstractController
 
                         'actions' => [
                             'edit' => [
+                                'target' => '#modal-lg225',
                                 'url' => $this->generateUrl('app_parametre_semestre_edit', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
@@ -181,7 +182,7 @@ class SemestreController extends AbstractController
 
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -261,7 +262,7 @@ class SemestreController extends AbstractController
             }
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
