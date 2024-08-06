@@ -489,7 +489,21 @@ class PreinscriptionController extends AbstractController
         }
         return ($code . '-' . date("y") . '-' . str_pad($nb, 3, '0', STR_PAD_LEFT));
     }
+    private function numeroPreinscription($code)
+    {
 
+        $query = $this->em->createQueryBuilder();
+        $query->select("count(a.id)")
+            ->from(Preinscription::class, 'a');
+
+        $nb = $query->getQuery()->getSingleScalarResult();
+        if ($nb == 0) {
+            $nb = 1;
+        } else {
+            $nb = $nb + 1;
+        }
+        return ($code . '-' . date("y") . '-' . str_pad($nb, 3, '0', STR_PAD_LEFT));
+    }
     #[Route('/demande/new', name: 'app_comptabilite_preinscription_demande_new', methods: ['GET', 'POST'])]
     public function demanddNew(Request $request, NiveauRepository $niveauRepository, UserInterface $user, EntityManagerInterface $entityManager, FormError $formError, PreinscriptionRepository $preinscriptionRepository, SessionInterface $session): Response
     {
@@ -519,7 +533,7 @@ class PreinscriptionController extends AbstractController
                 $preinscription->setDatePreinscription(new \DateTime());
                 $preinscription->setEtudiant($this->getUser()->getPersonne());
                 $preinscription->setUtilisateur($this->getUser());
-                $preinscription->setCode($this->numero($niveauRepository->find($form->get('niveau')->getData()->getId())->getCode()));
+                $preinscription->setCode($this->numeroPreinscription($niveauRepository->find($form->get('niveau')->getData()->getId())->getCode()));
                 /*  $preinscription->setEtat('attente_validation');
                 $preinscription->setEtatDeliberation('pas_deliberer');
  */

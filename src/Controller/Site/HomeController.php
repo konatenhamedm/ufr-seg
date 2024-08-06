@@ -118,6 +118,21 @@ class HomeController extends AbstractController
         }
         return ($code . '-' . date("y") . '-' . str_pad($nb, 3, '0', STR_PAD_LEFT));
     }
+    private function numeroPreinscription($code)
+    {
+
+        $query = $this->em->createQueryBuilder();
+        $query->select("count(a.id)")
+            ->from(Preinscription::class, 'a');
+
+        $nb = $query->getQuery()->getSingleScalarResult();
+        if ($nb == 0) {
+            $nb = 1;
+        } else {
+            $nb = $nb + 1;
+        }
+        return ($code . '-' . date("y") . '-' . str_pad($nb, 3, '0', STR_PAD_LEFT));
+    }
 
 
     #[Route('/{id}', name: 'fichier_index', methods: ['GET'])]
@@ -329,7 +344,7 @@ class HomeController extends AbstractController
                     $preinscription->setDatePreinscription(new \DateTime());
                     $preinscription->setNiveau($inscriptionDTO->getNiveau());
                     $preinscription->setUtilisateur($utilisateur);
-                    $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
+                    $preinscription->setCode($this->numeroPreinscription($inscriptionDTO->getNiveau()->getCode()));
                     $preinscriptionRepository->add($preinscription, true);
 
 
@@ -374,7 +389,7 @@ class HomeController extends AbstractController
                         $preinscription->setDatePreinscription(new \DateTime());
                         $preinscription->setNiveau($inscriptionDTO->getNiveau());
                         $preinscription->setUtilisateur($user);
-                        $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
+                        $preinscription->setCode($this->numeroPreinscription($inscriptionDTO->getNiveau()->getCode()));
                         $preinscriptionRepository->add($preinscription, true);
                         $userAuthenticator->authenticateUser(
                             $user,
@@ -518,7 +533,7 @@ class HomeController extends AbstractController
                     $preinscription->setNiveau($inscriptionDTO->getNiveau());
                     $preinscription->setUtilisateur($utilisateur);
                     $preinscription->setMontant($inscriptionDTO->getNiveau()->getFiliere()->getMontantPreinscription());
-                    $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
+                    $preinscription->setCode($this->numeroPreinscription($inscriptionDTO->getNiveau()->getCode()));
                     $preinscriptionRepository->add($preinscription, true);
 
 
@@ -563,7 +578,7 @@ class HomeController extends AbstractController
                         $preinscription->setDatePreinscription(new \DateTime());
                         $preinscription->setNiveau($inscriptionDTO->getNiveau());
                         $preinscription->setUtilisateur($user);
-                        $preinscription->setCode($this->numero($inscriptionDTO->getNiveau()->getCode()));
+                        $preinscription->setCode($this->numeroPreinscription($inscriptionDTO->getNiveau()->getCode()));
                         $preinscriptionRepository->add($preinscription, true);
                         $userAuthenticator->authenticateUser(
                             $user,
