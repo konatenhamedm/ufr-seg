@@ -991,7 +991,7 @@ class HomeController extends AbstractController
                             ],
                             'new' => [
                                 'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('site_information_edit_new', ['id' =>  $context->getEtudiant()->getId()]),
+                                'url' => $this->generateUrl('site_information_edit_new', ['id' =>  $context->getEtudiant()->getId(), 'niveau' => $context->getNiveau()->getId()]),
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-plus-square',
@@ -1605,7 +1605,7 @@ class HomeController extends AbstractController
 
         //return $this->render('site/admin/pages/informations.html.twig');
     }
-    #[Route(path: '/site/information/new/{id}', name: 'site_information_edit_new', methods: ['GET', 'POST'])]
+    #[Route(path: '/site/information/new/{id}/{niveau}', name: 'site_information_edit_new', methods: ['GET', 'POST'])]
     public function informationAdminNewEdit(
         Request $request,
         EtudiantRepository $etudiantRepository,
@@ -1615,6 +1615,7 @@ class HomeController extends AbstractController
         UtilisateurRepository $utilisateurRepository,
         PreinscriptionRepository $preinscriptionRepository,
         $id,
+        $niveau,
         SendMailService $sendMailService,
         UserPasswordHasherInterface $userPasswordHasher,
         ClasseRepository $classeRepository,
@@ -1622,10 +1623,12 @@ class HomeController extends AbstractController
         EcheancierRepository $echeancierRepository,
         EntityManagerInterface $entityManager,
         Service $service,
-        SessionInterface $session
+        SessionInterface $session,
+        EcheancierNiveauRepository $echeancierNiveauRepository
     ): Response {
 
         $etudiant = new Etudiant();
+
 
 
         if (count($etudiant->getBlocEcheanciers()) == 0) {
@@ -1635,18 +1638,29 @@ class HomeController extends AbstractController
         } */
             $bloc_echeancier = new BlocEcheancier();
 
-            $bloc_echeancier->setClasse($classeRepository->find(1));
+            // $bloc_echeancier->setClasse($classeRepository->find(7));
             $bloc_echeancier->setDateInscription(new DateTime());
             $bloc_echeancier->setTotal('0');
 
-
             $etudiant->addBlocEcheancier($bloc_echeancier);
+
+
+            /*  $etudiant->addBlocEcheancier($bloc_echeancier);
             $echeancierProvisoire = new EcheancierProvisoire();
             $echeancierProvisoire->setDateVersement(new DateTime());
             $echeancierProvisoire->setNumero('1');
-            $echeancierProvisoire->setMontant('0');
+            $echeancierProvisoire->setMontant('0'); */
 
-            $bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
+            //$bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
+
+            foreach ($echeancierNiveauRepository->findBy(["niveau" => $niveau]) as $key => $echeancierNiveau) {
+                $echeancierProvisoire = new EcheancierProvisoire();
+                $echeancierProvisoire->setDateVersement($echeancierNiveau->getDateVersement());
+                $echeancierProvisoire->setNumero($echeancierNiveau->getNumero());
+                $echeancierProvisoire->setMontant($echeancierNiveau->getMontant());
+
+                $bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
+            }
         }
         $info = new InfoEtudiant();
 
@@ -1674,13 +1688,15 @@ class HomeController extends AbstractController
         $form = $this->createForm(EtudiantAdminNewType::class, $etudiant, [
             'method' => 'POST',
             "anneeScolaire" => $session->get("anneeScolaire"),
+            "niveau" => null,
             'doc_options' => [
                 'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
                 'attrs' => ['class' => 'filestyle'],
             ],
             'validation_groups' => $validationGroups,
             'action' => $this->generateUrl('site_information_edit_new', [
-                'id' =>  $id
+                'id' =>  $id,
+                'niveau' => $niveau
             ])
         ]);
 
