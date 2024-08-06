@@ -170,6 +170,7 @@ class DeliberationController extends AbstractController
 
                         'actions' => [
                             'edit' => [
+                                'target' => '#modal-lg225',
                                 'url' => $this->generateUrl('app_direction_examen_edit', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,

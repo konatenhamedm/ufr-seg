@@ -1,7 +1,7 @@
 {% block page_content %}
     {% form_theme form 'widget/fields-block.html.twig' %}
     <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Nouvel Examen</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Nouvessl Examen</h5>
         <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
             <span class="svg-icon svg-icon-2x text-white">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -36,7 +36,7 @@
 {% block java %}
     <script>
         $(function () {
-                        init_select2('select',null,'.document');
+                        init_select2('select',null,'#modal-lg225');
 
              $('.no-auto').each(function () {
                 const $this = $(this);
@@ -77,7 +77,7 @@
                     $this.find("select").each(function () {
                         const $this = $(this);
                                                 
-init_select2($this, null, '#exampleModalSizeSm2');
+                init_select2($this, null, '#modal-lg225');
                     });
                 });
             }
@@ -96,7 +96,7 @@ init_select2($this, null, '#exampleModalSizeSm2');
 
                 $prototype.find("select").each(function () {
                 const $this = $(this);
-                    init_select2($this, null, '#exampleModalSizeSm2');
+                    init_select2($this, null, '#modal-lg225');
 
                 });
 

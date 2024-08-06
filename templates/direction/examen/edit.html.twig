@@ -35,7 +35,7 @@
 {% block java %}
     <script>
         $(function () {
-             init_select2('select','','#modal-lg');
+             init_select2('select','','#modal-lg225');
              $('.no-auto').each(function () {
                 const $this = $(this);
                 const $id = $('#' + $this.attr('id'));
@@ -74,7 +74,7 @@
                     addDeleteLink($this);
                     $this.find("select").each(function () {
                         const $this = $(this);
-                        init_select2($this, null, '#modal-lg');
+                        init_select2($this, null, '#modal-lg225');
                     });
                 });
             }
@@ -93,7 +93,7 @@
 
                 $prototype.find("select").each(function () {
                 const $this = $(this);
-                    init_select2($this, null, '#modal-lg');
+                    init_select2($this, null, '#modal-lg225');
                 });
 
                 $prototype.find('.field-matiere').css('display', 'block');

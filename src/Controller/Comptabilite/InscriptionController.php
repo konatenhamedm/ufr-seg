@@ -204,7 +204,7 @@ class InscriptionController extends AbstractController
                             ->setParameter('user', $user->getPersonne());
                     }
 
-                    if ($anneeScolaire !=null) {
+                    if ($anneeScolaire != null) {
 
                         $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
                             ->setParameter('anneeScolaire', $anneeScolaire);
@@ -555,7 +555,7 @@ class InscriptionController extends AbstractController
             'data' => $preinscription,
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
         ], [
-            'orientation' => 'L',
+            'orientation' => 'P',
             'protected' => true,
 
             'format' => 'A5',
