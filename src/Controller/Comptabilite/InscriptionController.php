@@ -558,7 +558,7 @@ class InscriptionController extends AbstractController
             'orientation' => 'P',
             'protected' => true,
 
-            'format' => 'A5',
+            'format' => 'A4',
 
             'showWaterkText' => true,
             'fontDir' => [
