@@ -85,6 +85,13 @@ class ConfigController extends AbstractController
         $module = $request->query->get('module');
         $modules = [
             [
+                'label' => 'LISTE DES EXAMENS',
+                'icon' => 'bi bi-bookmark',
+                'module' => 'gestion',
+                'etat' => 'examen',
+                'href' => $this->generateUrl('app_direction_deliberation_time_index')
+            ],
+            [
                 'label' => 'EN ATTENTE DE TRAITEMENT',
                 'icon' => 'bi bi-list',
                 'module' => 'attente_validation',
@@ -98,13 +105,7 @@ class ConfigController extends AbstractController
                 'etat' => 'delibere',
                 'href' => $this->generateUrl('app_direction_deliberation_liste_etudiant_traitement_exament', ['etat' => 'delibere'])
             ],
-            [
-                'label' => 'LISTE DES EXAMENS',
-                'icon' => 'bi bi-bookmark',
-                'module' => 'gestion',
-                'etat' => 'examen',
-                'href' => $this->generateUrl('app_direction_deliberation_time_index')
-            ],
+
         ];
 
         $breadcrumb->addItem([

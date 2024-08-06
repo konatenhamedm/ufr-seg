@@ -15,6 +15,7 @@ use App\Form\DeliberationType;
 use App\Repository\DeliberationRepository;
 use App\Repository\ExamenRepository;
 use App\Repository\FraisRepository;
+use App\Repository\PreinscriptionRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use App\Service\Omines\Column\NumberFormatColumn;
@@ -37,6 +38,22 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[Route('/admin/direction/deliberation')]
 class DeliberationController extends AbstractController
 {
+
+    #[Route('/update/preinscription',  methods: ['GET'])]
+    public function updatePreinscription(PreinscriptionRepository $preinscriptionRepository)
+    {
+
+        $pre = $preinscriptionRepository->findAll();
+        foreach ($pre as $key => $value) {
+            $value->setMontant($value->getNiveau()->getFiliere()->getMontantPreinscription());
+
+            $preinscriptionRepository->add($value, true);
+        }
+
+        return $this->json([], 200);
+    }
+
+
     #[Route('/', name: 'app_direction_deliberation_index', methods: ['GET', 'POST'])]
     public function index(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
     {
@@ -416,10 +433,10 @@ class DeliberationController extends AbstractController
                             /* ->join('niveau', 'niveau') */
                             ->join('niveau.filiere', 'filiere')
                             ->leftJoin('e.caissiere', 'c')
-                            ->andWhere('e.etat = :statut')
+                            ->andWhere('e.etat in (:statut)')
                             ->andWhere('e.etatDeliberation = :etatDeliberation')
                             ->setParameter('etatDeliberation', 'pas_deliberer')
-                            ->setParameter('statut', 'valide');
+                            ->setParameter('statut', ['valide', 'attente_paiement']);
 
                         if ($this->isGranted('ROLE_ETUDIANT')) {
                             $qb->andWhere('e.etudiant = :etudiant')
