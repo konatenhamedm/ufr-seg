@@ -831,7 +831,7 @@ class HomeController extends AbstractController
 
 
     #[Route('/inscription/etudiant/admin', name: 'app_inscription_etudiant_admin_index', methods: ['GET', 'POST'], options: ['expose' => true])]
-    public function indexInformationAdmin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
+    public function indexInformationAdmin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
         $classe = $request->query->get('classe');
         $niveau = $request->query->get('niveau');
@@ -839,6 +839,12 @@ class HomeController extends AbstractController
         // dd($niveau, $filiere);
 
         $anneeScolaire = $session->get('anneeScolaire');
+
+        if ($anneeScolaire == null) {
+            // dd($anneeScolaireRepository->findOneBy(['actif' => 1]));
+            //unset($annee);
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
 
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
