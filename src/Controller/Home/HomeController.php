@@ -98,7 +98,8 @@ class HomeController extends AbstractController
                 'icon' => 'bi bi-list',
                 'module' => 'traitement',
                 'id' => 'module_traitement',
-                'href' => $this->generateUrl('app_direction_deliberation_time_index')
+                'href' => $this->generateUrl('app_config_traitement_examen')
+                //'href' => $this->generateUrl('app_direction_deliberation_time_index')
             ],
             /* [
                 'label' => 'Echéancier en attente de validation',

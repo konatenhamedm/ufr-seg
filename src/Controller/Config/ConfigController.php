@@ -78,6 +78,55 @@ class ConfigController extends AbstractController
             'breadcrumb' => $breadcrumb
         ]);
     }
+    #[Route(path: '/traitement/examen', name: 'app_config_traitement_examen', methods: ['GET', 'POST'])]
+    #[RoleMethod(title: 'Gestion des Paramètres', as: 'index')]
+    public function indexTraitementExamen(Request $request, Breadcrumb $breadcrumb): Response
+    {
+        $module = $request->query->get('module');
+        $modules = [
+            [
+                'label' => 'EN ATTENTE DE TRAITEMENT',
+                'icon' => 'bi bi-list',
+                'module' => 'attente_validation',
+                'etat' => 'attente_validation',
+                'href' => $this->generateUrl('app_direction_deliberation_liste_etudiant_traitement_exament', ['etat' => 'attente_validation'])
+            ],
+            [
+                'label' => 'APRES DELIBERATION',
+                'icon' => 'bi bi-list',
+                'module' => 'gestion',
+                'etat' => 'delibere',
+                'href' => $this->generateUrl('app_direction_deliberation_liste_etudiant_traitement_exament', ['etat' => 'delibere'])
+            ],
+            [
+                'label' => 'LISTE DES EXAMENS',
+                'icon' => 'bi bi-bookmark',
+                'module' => 'gestion',
+                'etat' => 'examen',
+                'href' => $this->generateUrl('app_direction_deliberation_time_index')
+            ],
+        ];
+
+        $breadcrumb->addItem([
+            [
+                'route' => 'app_default',
+                'label' => 'Tableau de bord'
+            ],
+            [
+                'label' => 'Paramètres'
+            ]
+        ]);
+
+
+        if ($module) {
+            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+        }
+
+        return $this->render('config/preinscription/index_traitement_examen.html.twig', [
+            'modules' => $modules,
+            'breadcrumb' => $breadcrumb
+        ]);
+    }
     #[Route(path: '/frais/scolarite/{id}', name: 'app_config_inscription_frais_scolarite_index', methods: ['GET', 'POST'])]
     #[RoleMethod(title: 'Gestion des Paramètres', as: 'index')]
     public function indexConfigFraisScolarite(Request $request, Breadcrumb $breadcrumb, $id, Inscription $inscription): Response

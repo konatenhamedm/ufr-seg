@@ -58,7 +58,7 @@ class ExamenType extends AbstractType
                 //'placeholder' => '----',
                 'label_attr' => ['class' => 'label-required'],
                 'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
-                    $sql = $er->createQueryBuilder('c')
+                    return $sql = $er->createQueryBuilder('c')
                         ->andWhere("c.anneeScolaire = :annee")
                         ->setParameter('annee', $anneeScolaire);
 

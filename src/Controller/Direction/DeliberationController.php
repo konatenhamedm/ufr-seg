@@ -10,6 +10,7 @@ use App\Entity\FraisInscription;
 use App\Entity\Inscription;
 use App\Entity\LigneDeliberation;
 use App\Entity\Mention;
+use App\Entity\Preinscription;
 use App\Form\DeliberationType;
 use App\Repository\DeliberationRepository;
 use App\Repository\ExamenRepository;
@@ -334,6 +335,175 @@ class DeliberationController extends AbstractController
             'title' => 'Historique des délibérations',
             'id' => $id,
             'examen' => $examenRepository->find($id)
+        ]);
+    }
+    #[Route('/traitement/examen/{etat}', name: 'app_direction_deliberation_liste_etudiant_traitement_exament', methods: ['GET', 'POST'])]
+    public function ListeEtudiantTraitementExament(Request $request, UserInterface $user, $etat, DataTableFactory $dataTableFactory, ExamenRepository $examenRepository, SessionInterface $session): Response
+    {
+        $anneeScolaire = $session->get("anneeScolaire");
+
+
+
+        if ($etat == 'delibere') {
+            $titre = "Liste des délibérations";
+            $table = $dataTableFactory->create()
+                ->add('candidat', TextColumn::class, ['label' => 'Candidat', 'render' => function ($value, Deliberation $deliberation) {
+                    return $deliberation->getPreinscription()->getNomComplet();
+                }])
+                ->add('examen', TextColumn::class, ['label' => 'Examen', 'field' => 'ex.libelle'])
+                ->add('niveau', TextColumn::class, ['label' => 'Niveau', 'field' => 'n.code'])
+                ->add('total', NumberFormatColumn::class, ['label' => 'Total'])
+                ->add('moyenne', NumberFormatColumn::class, ['label' => 'Moyenne'])
+                ->add('mention', TextColumn::class, ['label' => 'Mention', 'field' => 'm.libelle'])
+                ->add('etat', TextColumn::class, ['label' => 'Decision', 'raw' => false,  'render' => function ($value, Deliberation $context) {
+                    if ($value == 'valide') {
+                        return sprintf('<span class="badge badge-success">Admis(e)</span>');
+                    }
+                    return sprintf('<span class="badge badge-success">Ajourné(e)</span>');
+                }])
+
+                ->createAdapter(ORMAdapter::class, [
+                    'entity' => Deliberation::class,
+                    'query' => function (QueryBuilder $qb) use ($user, $anneeScolaire) {
+                        $qb->select(['d', 'ex', 'n', 'm', 'dp', 'p', 'res'])
+                            ->from(Deliberation::class, 'd')
+                            ->join('d.infoPreinscription', 'dp')
+                            ->join('dp.preinscription', 'p')
+                            ->join('d.examen', 'ex')
+                            ->join('ex.niveau', 'n')
+                            ->join('n.responsable', 'res')
+                            ->join('d.mention', 'm')/* 
+                        ->andWhere('ex.id = :id')
+                        ->setParameter('id', $id) */;
+                        /*  ->orderBy('d.date', 'DESC') */
+                        if ($this->isGranted('ROLE_ETUDIANT')) {
+                            $qb->andWhere('p.etudiant = :etudiant')->setParameter('etudiant', $user->getPersonne());
+                        }
+
+                        if ($this->isGranted('ROLE_DIRECTEUR')) {
+                            $qb->andWhere('res.id = :id')
+                                ->setParameter('id', $user->getPersonne()->getId());
+                        }
+                        if ($anneeScolaire != null) {
+
+                            $qb->andWhere('n.anneeScolaire = :anneeScolaire')
+                                ->setParameter('anneeScolaire', $anneeScolaire);
+                        }
+                    }
+                ])
+                ->setName('dt_app_direction_deliberation_liste_etudiant_traitement_exament' . $etat);
+        } else {
+            $titre = "Liste des étudiants en attente de traitement";
+
+            $table = $dataTableFactory->create()
+                ->add('code', TextColumn::class, ['label' => 'Code Preinscription'])
+                ->add('etudiant', TextColumn::class, ['label' => 'Nom et Prénoms', 'render' => function ($value, Preinscription $preinscription) {
+                    return   $preinscription->getEtudiant()->getNomComplet();
+                }])
+
+                ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.code'])
+                ->add('datePreinscription', DateTimeColumn::class, ['label' => 'Date pré-inscription', 'format' => 'd/m/Y', "searchable" => false,])
+                ->add('montant', NumberFormatColumn::class, ['label' => 'Montant'])
+                /*   ->add('caissiere', TextColumn::class, ['field' => 'c.getNomComplet', 'label' => 'Caissière ']) */
+                //->add('montantPreinscription', NumberFormatColumn::class, ['label' => 'Mnt. Préinscr.'])
+                ->createAdapter(ORMAdapter::class, [
+                    'entity' => Preinscription::class,
+                    'query' => function (QueryBuilder $qb) use ($user, $anneeScolaire) {
+                        $qb->select('e, filiere, etudiant,niveau,c')
+                            ->from(Preinscription::class, 'e')
+                            ->join('e.etudiant', 'etudiant')
+                            ->join('e.niveau', 'niveau')
+                            /* ->join('niveau', 'niveau') */
+                            ->join('niveau.filiere', 'filiere')
+                            ->leftJoin('e.caissiere', 'c')
+                            ->andWhere('e.etat = :statut')
+                            ->andWhere('e.etatDeliberation = :etatDeliberation')
+                            ->setParameter('etatDeliberation', 'pas_deliberer')
+                            ->setParameter('statut', 'valide');
+
+                        if ($this->isGranted('ROLE_ETUDIANT')) {
+                            $qb->andWhere('e.etudiant = :etudiant')
+                                ->setParameter('etudiant', $user->getPersonne());
+                        }
+                        if ($anneeScolaire != null) {
+
+                            $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                                ->setParameter('anneeScolaire', $anneeScolaire);
+                        }
+                    }
+                ])
+                ->setName('dt_app_direction_deliberation_liste_etudiant_traitement_exament' . $etat);
+        }
+
+
+
+        $renders = [
+            'edit' =>  new ActionRender(function () {
+                return true;
+            }),
+            'delete' => new ActionRender(function () {
+                return true;
+            }),
+        ];
+
+
+        $hasActions = false;
+
+        foreach ($renders as $_ => $cb) {
+            if ($cb->execute()) {
+                $hasActions = true;
+                break;
+            }
+        }
+
+        if ($hasActions) {
+            if ($etat == 'delibere') {
+                $table->add('id', TextColumn::class, [
+                    'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Deliberation $context) use ($renders) {
+                        $options = [
+                            'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                            'target' => '#modal-lg',
+
+                            'actions' => [
+                                /*'edit' => [
+                                'url' => $this->generateUrl('app_direction_deliberation_edit', ['id' => $value]),
+                                'ajax' => false,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-pen',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['edit']
+                            ],*/
+                                'show' => [
+                                    'url' => $this->generateUrl('app_direction_deliberation_show', ['id' => $value]),
+                                    'ajax' => true,
+                                    'stacked' => false,
+                                    'icon' => '%icon% bi bi-eye',
+                                    'attrs' => ['class' => 'btn-main'],
+                                    'render' => $renders['edit']
+                                ],
+                            ]
+
+                        ];
+                        return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                    }
+                ]);
+            } else {
+            }
+        }
+
+
+        $table->handleRequest($request);
+
+        if ($table->isCallback()) {
+            return $table->getResponse();
+        }
+
+
+        return $this->render('direction/deliberation/index_traitement_examen.html.twig', [
+            'datatable' => $table,
+            'title' => $titre,
+            'etat' => $etat,
+            //'examen' => $examenRepository->find($id)
         ]);
     }
 
