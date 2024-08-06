@@ -335,11 +335,12 @@ class HomeController extends AbstractController
                     if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
 
                         $preinscription->setEtat('attente_paiement');
+                        $preinscription->setEtatDeliberation('pas_deliberer');
                     } else {
 
+                        $preinscription->setEtatDeliberation('deliberer');
                         $preinscription->setEtat('attente_validation');
                     }
-                    $preinscription->setEtatDeliberation('pas_deliberer');
                     $preinscription->setEtudiant($etudiant);
                     $preinscription->setDatePreinscription(new \DateTime());
                     $preinscription->setNiveau($inscriptionDTO->getNiveau());
@@ -380,11 +381,12 @@ class HomeController extends AbstractController
                         if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
 
                             $preinscription->setEtat('attente_paiement');
+                            $preinscription->setEtatDeliberation('pas_deliberer');
                         } else {
 
+                            $preinscription->setEtatDeliberation('deliberer');
                             $preinscription->setEtat('attente_validation');
                         }
-                        $preinscription->setEtatDeliberation('pas_deliberer');
                         $preinscription->setEtudiant($user->getPersonne());
                         $preinscription->setDatePreinscription(new \DateTime());
                         $preinscription->setNiveau($inscriptionDTO->getNiveau());
