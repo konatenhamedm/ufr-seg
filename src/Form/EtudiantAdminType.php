@@ -189,6 +189,7 @@ class EtudiantAdminType extends AbstractType
                 'entry_type' => StageType::class,
                 'entry_options' => [
                     'label' => false,
+
                 ],
                 'allow_add' => true,
                 'label' => false,
@@ -214,6 +215,8 @@ class EtudiantAdminType extends AbstractType
                 'entry_type' => BlocEcheancierType::class,
                 'entry_options' => [
                     'label' => false,
+                    'anneeScolaire' => $options['anneeScolaire'],
+                    'niveau' => $options['niveau'],
                 ],
                 'allow_add' => true,
                 'label' => false,
@@ -238,5 +241,7 @@ class EtudiantAdminType extends AbstractType
         $resolver->setRequired('doc_options');
         $resolver->setRequired('doc_required');
         $resolver->setRequired(['validation_groups']);
+        $resolver->setRequired(['anneeScolaire']);
+        $resolver->setRequired(['niveau']);
     }
 }

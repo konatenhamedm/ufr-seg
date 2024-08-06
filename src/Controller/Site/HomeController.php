@@ -1178,11 +1178,13 @@ class HomeController extends AbstractController
         InscriptionRepository $inscriptionRepository,
         EcheancierRepository $echeancierRepository,
         FraisRepository $fraisRepository,
-        Service $service
+        Service $service,
         // Etudiant $etudiant
+        SessionInterface $session
     ): Response {
 
         //dd('');
+        $anneeScolaire = $session->get('anneeScolaire');
         $etudiant = new Etudiant();
         $etudiant->setDateNaissance(new DateTime());
         $info = new InfoEtudiant();
@@ -1243,6 +1245,8 @@ class HomeController extends AbstractController
 
         $form = $this->createForm(EtudiantAdminType::class, $etudiant, [
             'method' => 'POST',
+            'anneeScolaire' => $anneeScolaire,
+            'niveau' => null,
             'doc_options' => [
                 'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
                 'attrs' => ['class' => 'filestyle'],

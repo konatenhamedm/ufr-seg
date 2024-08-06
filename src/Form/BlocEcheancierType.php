@@ -42,9 +42,13 @@ class BlocEcheancierType extends AbstractType
                 'query_builder' => function (EntityRepository $er) use ($anneeScolaire, $niveau) {
                     return $er->createQueryBuilder('c')
                         ->andWhere("c.anneeScolaire = :annee")
-                        ->andWhere("c.niveau = :niveau")
-                        ->setParameter('annee', $anneeScolaire)
-                        ->setParameter('niveau', $niveau);
+                        ->setParameter('annee', $anneeScolaire);
+
+                    if ($niveau != null) {
+
+                        $er->andWhere("c.niveau = :niveau")
+                            ->setParameter('niveau', $niveau);
+                    }
                 },
             ])
             ->add('echeancierProvisoires', CollectionType::class, [
