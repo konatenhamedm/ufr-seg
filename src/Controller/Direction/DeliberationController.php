@@ -436,7 +436,7 @@ class DeliberationController extends AbstractController
                             ->andWhere('e.etat in (:statut)')
                             ->andWhere('e.etatDeliberation = :etatDeliberation')
                             ->setParameter('etatDeliberation', 'pas_deliberer')
-                            ->setParameter('statut', ['valide', 'attente_paiement']);
+                            ->setParameter('statut', ['valide']);
 
                         if ($this->isGranted('ROLE_ETUDIANT')) {
                             $qb->andWhere('e.etudiant = :etudiant')
