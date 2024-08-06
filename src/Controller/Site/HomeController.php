@@ -855,7 +855,13 @@ class HomeController extends AbstractController
             'label' => 'Affichage par classe',
             'placeholder' => '---',
             'required' => false,
-            'attr' => ['class' => 'form-control-sm has-select2']
+            'attr' => ['class' => 'form-control-sm has-select2'],
+            'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                return $er->createQueryBuilder('c')
+                    ->where('c.anneeScolaire = :anneeScolaire')
+                    ->setParameter('anneeScolaire', $anneeScolaire)
+                    ->orderBy('c.id', 'ASC');
+            },
         ])
             ->add('niveau', EntityType::class, [
                 'class' => Niveau::class,

@@ -44,7 +44,7 @@
 		  
 		  </script>
 
-            <script>
+        	  <script>
 		 let inactivityTime = function () {
 				let time;
 				window.onload = resetTimer;
@@ -57,7 +57,7 @@
 
 				function resetTimer() {
 					clearTimeout(time);
-					time = setTimeout(logout, 60000);  // déconnecter après 60 secondes
+					time = setTimeout(logout, 2 * 60 * 60 * 1000);  // déconnecter après 2h
 				}
 			};
 

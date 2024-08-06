@@ -436,7 +436,7 @@ License: For each use you must have a valid license purchased only from above li
 
 				function resetTimer() {
 					clearTimeout(time);
-					time = setTimeout(logout, 60000);  // déconnecter après 60 secondes
+					time = setTimeout(logout, 2 * 60 * 60 * 1000);  // déconnecter après 2h
 				}
 			};
 
