@@ -334,12 +334,12 @@ class HomeController extends AbstractController
 
                     if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
 
-                        $preinscription->setEtat('attente_paiement');
+                        $preinscription->setEtat('attente_validation');
                         $preinscription->setEtatDeliberation('pas_deliberer');
                     } else {
 
                         $preinscription->setEtatDeliberation('deliberer');
-                        $preinscription->setEtat('attente_validation');
+                        $preinscription->setEtat('attente_paiement');
                     }
                     $preinscription->setEtudiant($etudiant);
                     $preinscription->setDatePreinscription(new \DateTime());
@@ -380,12 +380,12 @@ class HomeController extends AbstractController
                         $preinscription = new Preinscription();
                         if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
 
-                            $preinscription->setEtat('attente_paiement');
+                            $preinscription->setEtat('attente_validation');
                             $preinscription->setEtatDeliberation('pas_deliberer');
                         } else {
 
                             $preinscription->setEtatDeliberation('deliberer');
-                            $preinscription->setEtat('attente_validation');
+                            $preinscription->setEtat('attente_paiement');
                         }
                         $preinscription->setEtudiant($user->getPersonne());
                         $preinscription->setDatePreinscription(new \DateTime());
@@ -444,7 +444,8 @@ class HomeController extends AbstractController
         GroupeRepository $groupeRepository,
         FonctionRepository $fonctionRepository,
         UtilisateurRepository $utilisateurRepository,
-        SendMailService $sendMailService
+        SendMailService $sendMailService,
+        InscriptionRepository $inscriptionRepository
         //PreinscriptionRepository $preinscriptionRepository
     ): Response {
         $inscriptionDTO = new InscriptionDTO();
@@ -523,11 +524,11 @@ class HomeController extends AbstractController
                     $preinscription = new Preinscription();
                     if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
 
-                        $preinscription->setEtat('attente_paiement');
+                        $preinscription->setEtat('attente_validation');
                         $preinscription->setEtatDeliberation('pas_deliberer');
                     } else {
 
-                        $preinscription->setEtat('attente_validation');
+                        $preinscription->setEtat('attente_paiement');
                         $preinscription->setEtatDeliberation('deliberer');
                     }
                     $preinscription->setEtudiant($etudiant);
@@ -537,6 +538,22 @@ class HomeController extends AbstractController
                     $preinscription->setMontant($inscriptionDTO->getNiveau()->getFiliere()->getMontantPreinscription());
                     $preinscription->setCode($this->numeroPreinscription($inscriptionDTO->getNiveau()->getCode()));
                     $preinscriptionRepository->add($preinscription, true);
+
+                    /*  if (!$preinscription->getNiveau()->getFiliere()->isPassageExamen()) {
+                        $inscription = new Inscription();
+
+                        // $inscription->setCaissiere();
+                        //$inscription->setMontant($value->getTotal());
+                        //$inscription->setClasse($value->getClasse());
+                        $inscription->setNiveau($inscriptionDTO->getNiveau());
+                        $inscription->setCode($this->numeroPreinscription($inscriptionDTO->getNiveau()->getCode()));
+                        $inscription->setCodeUtilisateur($this->getUser()->getEmail());
+                        $inscription->setEtudiant($etudiant);
+                        $inscription->setEtat('valide');
+                        $inscription->setDateInscription(new \DateTime());
+                        $inscription->setTotalPaye('0');
+                        $inscriptionRepository->save($inscription, true);
+                    } */
 
 
                     $info_user = [
@@ -570,11 +587,11 @@ class HomeController extends AbstractController
                         $preinscription = new Preinscription();
                         if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
 
-                            $preinscription->setEtat('attente_paiement');
+                            $preinscription->setEtat('attente_validation');
                             $preinscription->setEtatDeliberation('pas_deliberer');
                         } else {
+                            $preinscription->setEtat('attente_paiement');
                             $preinscription->setEtatDeliberation('deliberer');
-                            $preinscription->setEtat('attente_validation');
                         }
                         $preinscription->setEtudiant($user->getPersonne());
                         $preinscription->setDatePreinscription(new \DateTime());

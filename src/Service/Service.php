@@ -367,7 +367,7 @@ class Service
         } else {
             $nb = $nb + 1;
         }
-        return ($code . '-' . date("y") . '-' . str_pad($nb, 3, '0', STR_PAD_LEFT));
+        return ($code . '-' . date("m") . '-' . date("y") . '-' . str_pad($nb, 3, '0', STR_PAD_LEFT));
     }
     public function registerEcheancierAdmin($blocEcheanciers, $etudiant): bool
     {
@@ -460,6 +460,7 @@ class Service
                     $this->em->persist($frais);
                     $this->em->flush();
                 }
+                $inscription->setMontant($value->getTotal());
                 $inscription->setClasse($value->getClasse());
                 $response;
             } else {

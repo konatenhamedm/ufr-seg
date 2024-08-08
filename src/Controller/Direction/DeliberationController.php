@@ -482,14 +482,14 @@ class DeliberationController extends AbstractController
                             'target' => '#modal-lg',
 
                             'actions' => [
-                                /*'edit' => [
-                                'url' => $this->generateUrl('app_direction_deliberation_edit', ['id' => $value]),
-                                'ajax' => false,
-                                'stacked' => false,
-                                'icon' => '%icon% bi bi-pen',
-                                'attrs' => ['class' => 'btn-main'],
-                                'render' => $renders['edit']
-                            ],*/
+                                /*  'edit' => [
+                                    'url' => $this->generateUrl('app_direction_deliberation_edit', ['id' => $value]),
+                                    'ajax' => false,
+                                    'stacked' => false,
+                                    'icon' => '%icon% bi bi-pen',
+                                    'attrs' => ['class' => 'btn-main'],
+                                    'render' => $renders['edit']
+                                ], */
                                 'show' => [
                                     'url' => $this->generateUrl('app_direction_deliberation_show', ['id' => $value]),
                                     'ajax' => true,

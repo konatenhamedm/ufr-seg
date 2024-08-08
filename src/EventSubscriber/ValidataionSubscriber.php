@@ -38,18 +38,17 @@ class ValidataionSubscriber implements EventSubscriberInterface
     } else {
       $nb = $nb + 1;
     }
-    return ($code.'-'.date("y") .'-'. str_pad($nb, 3, '0', STR_PAD_LEFT));
+    return ($code . '-' . date("y") . '-' . str_pad($nb, 3, '0', STR_PAD_LEFT));
   }
 
 
-  public function __construct(EntityManagerInterface $em, \Symfony\Component\Workflow\Registry $workflow,Security $security)
+  public function __construct(EntityManagerInterface $em, \Symfony\Component\Workflow\Registry $workflow, Security $security)
   {
     ///  $this->security = $security;
-      /// $security
-      $this->security =$security;
+    /// $security
+    $this->security = $security;
     $this->em = $em;
     $this->workflow = $workflow;
-
   }
 
   public function handleValidation(TransitionEvent $event): void
@@ -63,31 +62,27 @@ class ValidataionSubscriber implements EventSubscriberInterface
     $entity->setMotif("RAS");
     $entity->setCode($this->numero($entity->getNiveau()->getCode()));
     $this->em->flush();
-
-
   }
 
-    public function handlePayer(TransitionEvent $event): void
-    {
+  public function handlePayer(TransitionEvent $event): void
+  {
 
-        $transition_name = $event->getTransition()->getName();
-        $entity = $event->getSubject();
-        $this->em->flush();
+    //dd("ok");
+    $transition_name = $event->getTransition()->getName();
+    $entity = $event->getSubject();
+    // dd($entity);
+    $this->em->flush();
 
+    $inscription = new Inscription();
+    $inscription->setNiveauEtudiant($entity);
+    $inscription->setDatePaiement($entity->getDatePaiement());
+    $inscription->setCodeUtilisateur($this->security->getUser()->getUserIdentifier());
+    $inscription->setDateInscription(new \DateTime());
+    $inscription->setMontant($entity->getFiliere()->getMontantPreinscription());
 
-        //dd($entity->getPrestataire());
-        $inscription= new Inscription();
-        $inscription->setNiveauEtudiant($entity);
-        $inscription->setDatePaiement($entity->getDatePaiement());
-        $inscription->setCodeUtilisateur($this->security->getUser()->getUserIdentifier());
-        $inscription->setDateInscription(new \DateTime());
-        $inscription->setMontant($entity->getFiliere()->getMontantPreinscription());
-
-        $this->em->persist($inscription);
-        $this->em->flush();
-
-
-    }
+    $this->em->persist($inscription);
+    $this->em->flush();
+  }
 
 
 

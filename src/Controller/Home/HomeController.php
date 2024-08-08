@@ -91,7 +91,8 @@ class HomeController extends AbstractController
                 'icon' => 'bi bi-list',
                 'module' => 'paiement',
                 'id' => 'module_paiement',
-                'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_index')
+                'href' => $this->generateUrl('app_config_traitement_paiement_precription')
+                // 'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_index')
             ],
             [
                 'label' => 'Traitement après examen',
@@ -471,11 +472,12 @@ class HomeController extends AbstractController
             }])
             /* ->add('etudiant', TextColumn::class, ['field' => 'etudiant.nom', 'label' => 'Nom'])
             ->add('prenoms', TextColumn::class, ['field' => 'etudiant.prenom', 'label' => 'Prénoms']) */
-            ->add('dateNaissance', DateTimeColumn::class, ['label' => 'Date de naissance', 'format' => 'd-m-Y', "searchable" => false, 'field' => 'etudiant.dateNaissance'])
+            //->add('dateNaissance', DateTimeColumn::class, ['label' => 'Date de naissance', 'format' => 'd-m-Y', "searchable" => false, 'field' => 'etudiant.dateNaissance'])
             ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.libelle'])
             ->add('datePreinscription', DateTimeColumn::class, ['label' => 'Date pré-inscription', 'format' => 'd/m/Y', "searchable" => false,])
             /*   ->add('caissiere', TextColumn::class, ['field' => 'c.getNomComplet', 'label' => 'Caissière ']) */
-            //->add('montantPreinscription', NumberFormatColumn::class, ['label' => 'Mnt. Préinscr.'])
+            ->add('montantPreinscription', NumberFormatColumn::class, ['label' => 'Montant payé'])
+            ->add('dateValidation', DateTimeColumn::class, ['label' => 'Date paiement', 'format' => 'd/m/Y', "searchable" => false,])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Preinscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $ver, $anneeScolaire) {

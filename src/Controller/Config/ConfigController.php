@@ -128,6 +128,49 @@ class ConfigController extends AbstractController
             'breadcrumb' => $breadcrumb
         ]);
     }
+    #[Route(path: '/traitement/paiement/precription', name: 'app_config_traitement_paiement_precription', methods: ['GET', 'POST'])]
+    #[RoleMethod(title: 'Gestion des Paramètres', as: 'index')]
+    public function indexPaiementPreinscription(Request $request, Breadcrumb $breadcrumb): Response
+    {
+        $module = $request->query->get('module');
+        $modules = [
+            [
+                'label' => 'EN ATTENTE DE PAIEMENT',
+                'icon' => 'bi bi-bookmark',
+                'module' => 'gestion',
+                'etat' => 'examen',
+                'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_index')
+            ],
+            [
+                'label' => 'PAIEMENT EFFECTUE',
+                'icon' => 'bi bi-list',
+                'module' => 'attente_validation',
+                'etat' => 'attente_validation',
+                'href' => $this->generateUrl('app_comptabilite_niveau_paiement_valide_prescription_index')
+            ]
+
+        ];
+
+        $breadcrumb->addItem([
+            [
+                'route' => 'app_default',
+                'label' => 'Tableau de bord'
+            ],
+            [
+                'label' => 'Paramètres'
+            ]
+        ]);
+
+
+        if ($module) {
+            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+        }
+
+        return $this->render('config/preinscription/index_traitement_examen.html.twig', [
+            'modules' => $modules,
+            'breadcrumb' => $breadcrumb
+        ]);
+    }
     #[Route(path: '/frais/scolarite/{id}', name: 'app_config_inscription_frais_scolarite_index', methods: ['GET', 'POST'])]
     #[RoleMethod(title: 'Gestion des Paramètres', as: 'index')]
     public function indexConfigFraisScolarite(Request $request, Breadcrumb $breadcrumb, $id, Inscription $inscription): Response

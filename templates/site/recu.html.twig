@@ -152,7 +152,7 @@
 <table style="width:100%">
 <tr>
     <td>Année académique :</td>
-    <td>2023 - 2024</td>
+    <td>{{ data.niveau.anneeScolaire.libelle}}</td>
 
   </tr>
   <tr>
@@ -191,14 +191,14 @@
     
     <tr>
     <td>TOTAL PAYE :</td>
-    <td class=""><strong>{{ data.totalPaye | number_format(0, '.') }} FCFA
+    <td class=""><strong>{{ data.montant | number_format(0, '.') }} FCFA
       </strong></td>
 
     </tr>
     
     <tr>
     <td>SOLDE :</td>
-    <td class=""><strong>{{ (data.montant - data.totalPaye) | number_format(0, '.') }} FCFA
+    <td class=""><strong>{{ (data.montant - data.montant) | number_format(0, '.') }} FCFA
       </strong></td>
 
     </tr>

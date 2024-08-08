@@ -4,6 +4,7 @@ namespace App\Controller\Comptabilite;
 
 use App\Controller\FileTrait;
 use App\Entity\InfoPreinscription;
+use App\Entity\Inscription;
 use App\Entity\NiveauEtudiant;
 use App\Entity\Paiement;
 use App\Entity\Preinscription;
@@ -12,6 +13,7 @@ use App\Form\PreinscriptionPaiementType;
 use App\Form\PreinscriptionType;
 use App\Repository\EcheancierRepository;
 use App\Repository\InfoPreinscriptionRepository;
+use App\Repository\InscriptionRepository;
 use App\Repository\NaturePaiementRepository;
 use App\Repository\NiveauEtudiantRepository;
 use App\Repository\PaiementRepository;
@@ -159,9 +161,7 @@ class NiveauEtudiantController extends AbstractController
                             ->join('e.niveau', 'niveau')
                             ->join('niveau.responsable', 'res')
                             ->join('niveau.filiere', 'filiere')
-
                             ->andWhere('e.id = :id')
-
                             ->setParameter('id', $id);
 
 
@@ -337,7 +337,8 @@ class NiveauEtudiantController extends AbstractController
                             /*  ->leftJoin('e.caissiere', 'c') */
                             ->join('e.niveau', 'niveau')
                             ->join('niveau.responsable', 'res')
-                            ->join('niveau.filiere', 'filiere');
+                            ->join('niveau.filiere', 'filiere')
+                            ->orderBy('e.id', 'DESC');
 
                         /* ->andWhere('e.etat = :statut')
                             ->setParameter('statut', $etat); */
@@ -399,7 +400,9 @@ class NiveauEtudiantController extends AbstractController
                             /*   ->join('e.filiere', 'filiere') */
                             ->join('e.niveau', 'niveau')
                             ->join('niveau.responsable', 'res')
-                            ->join('niveau.filiere', 'filiere');
+                            ->join('niveau.filiere', 'filiere')
+                            ->orderBy('e.id', 'DESC');
+
 
                         if ($this->isGranted('ROLE_DIRECTEUR')) {
                             $qb->andWhere('res.id = :id')
@@ -659,7 +662,8 @@ class NiveauEtudiantController extends AbstractController
                         ->join('niveau.responsable', 'res')
                         ->leftJoin('e.caissiere', 'c')
                         ->andWhere('e.etat = :statut')
-                        ->setParameter('statut', 'attente_paiement');
+                        ->setParameter('statut', 'attente_paiement')
+                        ->orderBy('e.datePreinscription', 'DESC');
 
                     if ($this->isGranted('ROLE_ETUDIANT')) {
                         $qb->andWhere('e.etudiant = :etudiant')
@@ -766,6 +770,119 @@ class NiveauEtudiantController extends AbstractController
 
 
         return $this->render('comptabilite/niveau_etudiant/index.html.twig', [
+            'datatable' => $table
+        ]);
+    }
+    #[Route('/paiement/valide/prescription', name: 'app_comptabilite_niveau_paiement_valide_prescription_index', methods: ['GET', 'POST'])]
+    public function indexPaiementValide(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session): Response
+    {
+        $anneeScolaire = $session->get('anneeScolaire');
+        //dd("dd");
+        $ver = $this->isGranted('ROLE_ETUDIANT');
+        $table = $dataTableFactory->create()
+            ->add('code', TextColumn::class, ['label' => 'Code Preinscription'])
+            ->add('etudiant', TextColumn::class, ['label' => 'Nom et Prénoms', 'render' => function ($value, Preinscription $preinscription) {
+                return   $preinscription->getEtudiant()->getNomComplet();
+            }])
+            ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.libelle'])
+            ->add('datePreinscription', DateTimeColumn::class, ['label' => 'Date pré-inscription', 'format' => 'd/m/Y', "searchable" => false,])
+            /*   ->add('caissiere', TextColumn::class, ['field' => 'c.getNomComplet', 'label' => 'Caissière ']) */
+            ->add('montantPreinscription', NumberFormatColumn::class, ['label' => 'Montant paiemen'])
+            ->add('dateValidation', DateTimeColumn::class, ['label' => 'Date paiement', 'format' => 'd/m/Y', "searchable" => false,])
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => Preinscription::class,
+                'query' => function (QueryBuilder $qb) use ($user, $ver, $anneeScolaire) {
+                    $qb->select('e, filiere, etudiant,niveau,c,res')
+                        ->from(Preinscription::class, 'e')
+                        ->join('e.etudiant', 'etudiant')
+                        ->join('e.niveau', 'niveau')
+                        ->join('niveau.filiere', 'filiere')
+                        ->join('niveau.responsable', 'res')
+                        ->leftJoin('e.caissiere', 'c')
+                        ->andWhere('e.etat = :statut')
+                        ->setParameter('statut', 'valide')
+                        ->orderBy('e.datePreinscription', 'DESC');
+
+                    if ($this->isGranted('ROLE_ETUDIANT')) {
+                        $qb->andWhere('e.etudiant = :etudiant')
+                            ->setParameter('etudiant', $user->getPersonne());
+                    }
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
+                    }
+
+                    if ($anneeScolaire != null) {
+
+                        $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
+                    }
+                }
+            ])
+            ->setName('dt_app_comptabilite_niveau_paiement_valide_prescription');
+        // dd($this->isGranted('ROLE_ETUDIANT'));
+        $renders = [
+            'edit' => new ActionRender(fn () => $ver == false),
+            'delete' => new ActionRender(function () {
+                return false;
+            }),
+            'show' => new ActionRender(function () {
+                return true;
+            }),
+            'imprime' => new ActionRender(function () {
+                return true;
+            }),
+        ];
+
+
+        $hasActions = false;
+
+        foreach ($renders as $_ => $cb) {
+            if ($cb->execute()) {
+                $hasActions = true;
+                break;
+            }
+        }
+
+        if ($hasActions) {
+            $table->add('id', TextColumn::class, [
+                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                    $options = [
+                        'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                        'target' => '#modal-lg',
+
+                        'actions' => [
+                            'imprime' => [
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_comptabilite_print_preinscription',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'target' =>  '#exampleModalSizeSm2',
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-main btn-stack']
+                                //, 'render' => new ActionRender(fn() => $source || $etat != 'cree')
+                            ],
+
+                        ]
+
+                    ];
+                    return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                }
+            ]);
+        }
+
+
+        $table->handleRequest($request);
+
+        if ($table->isCallback()) {
+            return $table->getResponse();
+        }
+
+
+        return $this->render('comptabilite/niveau_etudiant/index_paiement_prescription.html.twig', [
             'datatable' => $table
         ]);
     }
@@ -1061,7 +1178,7 @@ class NiveauEtudiantController extends AbstractController
     }
 
     #[Route('/{id}/edit/paiement', name: 'app_comptabilite_paiement_etudiant_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Preinscription  $preinscription, PaiementRepository $paiementRepository, InfoPreinscriptionRepository $infoPreinscriptionRepository, PreinscriptionRepository $preinscriptionRepository, EntityManagerInterface $entityManager, FormError $formError, NaturePaiementRepository $naturePaiementRepository): Response
+    public function edit(Request $request, InscriptionRepository $inscriptionRepository, Preinscription  $preinscription, PaiementRepository $paiementRepository, InfoPreinscriptionRepository $infoPreinscriptionRepository, PreinscriptionRepository $preinscriptionRepository, EntityManagerInterface $entityManager, FormError $formError, NaturePaiementRepository $naturePaiementRepository): Response
     {
         // dd($niveauEtudiant->getEtudiant()->getNom());
 
@@ -1099,6 +1216,8 @@ class NiveauEtudiantController extends AbstractController
 
                 if ($form->getClickedButton()->getName() === 'payer') {
                     $workflow->apply($preinscription, 'paiement');
+
+                    //dd("yes");
                     /*    if (!$mode->isConfirmation()) {
                         $workflow->apply($preinscription, 'paiement');
                     } else {
@@ -1122,10 +1241,29 @@ class NiveauEtudiantController extends AbstractController
                     $infoPreinscriptionRepository->add($infos, true);
                     // $niveauEtudiant->setCode($niveauEtudiant->getFiliere()->getCode())
                     //  $preinscription->setDatePaiement($form->get('datePaiement')->getData());;
+                    $preinscription->setCaissiere($this->getUser());
+                    $preinscription->setDateValidation($form->get('datePaiement')->getData());
                     $preinscriptionRepository->add($preinscription, true);
+
+                    if (!$preinscription->getNiveau()->getFiliere()->isPassageExamen()) {
+                        $inscription = new Inscription();
+
+                        // $inscription->setCaissiere();
+                        //$inscription->setMontant($value->getTotal());
+                        //$inscription->setClasse($value->getClasse());
+                        $inscription->setNiveau($preinscription->getNiveau());
+                        $inscription->setCode($preinscription->getCode());
+                        $inscription->setCodeUtilisateur($this->getUser()->getEmail());
+                        $inscription->setEtudiant($preinscription->getEtudiant());
+                        $inscription->setEtat('valide');
+                        $inscription->setDateInscription(new \DateTime());
+                        $inscription->setTotalPaye('0');
+                        $inscriptionRepository->save($inscription, true);
+                    }
                 } elseif ($form->getClickedButton()->getName() === 'confirmation') {
 
                     $preinscription->setEtat('valide');
+                    $preinscription->setCaissiere($this->getUser());
                     $preinscriptionRepository->add($preinscription, true);
                 } else {
                     $preinscriptionRepository->add($preinscription, true);
@@ -1133,7 +1271,6 @@ class NiveauEtudiantController extends AbstractController
 
                 /* $entityManager->persist($niveauEtudiant);
                 $entityManager->flush();*/
-                $preinscription->setCaissiere($this->getUser());
                 $data = true;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
@@ -1242,7 +1379,8 @@ class NiveauEtudiantController extends AbstractController
             'method' => 'POST',
             'etat' => 'payer',
             'action' => $this->generateUrl('app_comptabilite_niveau_etudiant_payer', [
-                'id' =>  $niveauEtudiant->getId()
+                'id' =>  $niveauEtudiant->getId(),
+                //'preinscription' =>  $preinscription
             ])
         ]);
 
