@@ -48,6 +48,21 @@ class PreinscriptionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function dataFilireWithoutExamen($etudiant)
+    {
+        return $this->createQueryBuilder('p')
+            ->select('count(p.id)')
+            ->innerJoin('p.niveau', 'n')
+            ->innerJoin('n.filiere', 'f')
+            ->andWhere('p.etudiant = :etudiant')
+            ->andWhere('p.etat = :status')
+            ->andWhere('f.passageExamen = :etat')
+            ->setParameter('etudiant', $etudiant)
+            ->setParameter('status', 'attente_paiement')
+            ->setParameter('etat', 1)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
     /**
      * @return mixed

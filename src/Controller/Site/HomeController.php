@@ -672,7 +672,7 @@ class HomeController extends AbstractController
             $session->set('anneeScolaire', $anneeScolaireRepository->find($preinscriptionRepository->listeAnneScolaire($etudiant)[0]['id']));
         }
 
-        //dd($annee);
+        //dd($preinscriptionRepository->dataFilireWithoutExamen($etudiant));
 
         if (count($etudiant->getInfoEtudiants()) == 0) {
             $info->setTuteurNomPrenoms('');
@@ -729,6 +729,7 @@ class HomeController extends AbstractController
             $response = [];
             $redirect = $this->generateUrl('site_information');
             $datas = $preinscriptionRepository->findBy(array('etudiant' => $etudiant, 'etat' => 'attente_informations'));
+            $dataFilireWithoutExamen = $preinscriptionRepository->dataFilireWithoutExamen($etudiant);
 
             $prenoms = '';
             $explodePrenom = explode(" ", $form->get('prenom')->getData());
@@ -741,7 +742,14 @@ class HomeController extends AbstractController
                 $etudiant->setPrenom($prenoms);
                 if ($form->getClickedButton()->getName() === 'valider') {
                     $etudiant->setEtat('complete');
-                    $message       = 'Votre dossier a bien été transmis pour validation. Vous recevrez une notification après traitement.';
+                    if ($dataFilireWithoutExamen > 0) {
+
+                        $message       = 'VOTRE DOSSIER A ETE VALIDE! RENDEZ-VOUS DIRECTEMENT DANS SUIVI DOSSIER, ATTENTE DE PAIEMENT POUR IMPRIMER LA FICHE ET PAYER LA PREINSCRIPTION';
+                    } else {
+
+                        $message       = 'Votre dossier a bien été transmis pour validation. Vous recevrez une notification après traitement.';
+                    }
+
                     $etudiantRepository->add($etudiant, true);
 
                     foreach ($datas as $key => $value) {
