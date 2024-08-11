@@ -6,6 +6,7 @@ use App\Controller\FileTrait;
 use App\Entity\Employe;
 use App\Entity\Personne;
 use App\Form\PersonneType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\PersonneRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
@@ -54,12 +55,18 @@ class PersonneController extends AbstractController
     }
 
     #[Route('/', name: 'app_utilisateur_personne_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory, SessionInterface $session): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     { //je suis en mode test
 
-        $anneeScolaire = $session->get('anneeScolaire');
+        $annee = $session->get('anneeScolaire');
 
-        //dd($anneeScolaire);
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
+
 
         $table = $dataTableFactory->create()
             ->add('nom', TextColumn::class, ['label' => 'Nom'])
@@ -100,7 +107,11 @@ class PersonneController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Personne $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Personne $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',

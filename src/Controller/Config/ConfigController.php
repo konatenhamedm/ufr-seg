@@ -8,6 +8,7 @@ use App\Entity\Echeancier;
 use App\Entity\InfoInscription;
 use App\Entity\Inscription;
 use App\Form\InscriptionPayementType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\EcheancierRepository;
 use App\Repository\FraisInscriptionRepository;
 use App\Repository\InfoInscriptionRepository;
@@ -20,6 +21,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -70,7 +72,7 @@ class ConfigController extends AbstractController
 
 
         if ($module) {
-            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+            $modules = array_filter($modules, fn($_module) => $_module['module'] == $module);
         }
 
         return $this->render('config/preinscription/index_etude_dossier.html.twig', [
@@ -120,7 +122,7 @@ class ConfigController extends AbstractController
 
 
         if ($module) {
-            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+            $modules = array_filter($modules, fn($_module) => $_module['module'] == $module);
         }
 
         return $this->render('config/preinscription/index_traitement_examen.html.twig', [
@@ -163,7 +165,7 @@ class ConfigController extends AbstractController
 
 
         if ($module) {
-            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+            $modules = array_filter($modules, fn($_module) => $_module['module'] == $module);
         }
 
         return $this->render('config/preinscription/index_traitement_examen.html.twig', [
@@ -205,7 +207,7 @@ class ConfigController extends AbstractController
 
 
         if ($module) {
-            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+            $modules = array_filter($modules, fn($_module) => $_module['module'] == $module);
         }
 
         return $this->render('config/preinscription/index_frais_scolarite.html.twig', [
@@ -216,8 +218,16 @@ class ConfigController extends AbstractController
     }
     #[Route(path: '/point/paiement', name: 'app_config_preinscription_point_paiement_index', methods: ['GET', 'POST'])]
     #[RoleMethod(title: 'Gestion des Paramètres', as: 'index')]
-    public function indexPointPaiement(Request $request, Breadcrumb $breadcrumb): Response
+    public function indexPointPaiement(Request $request, Breadcrumb $breadcrumb, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         $module = $request->query->get('module');
         $modules = [
             [
@@ -246,7 +256,7 @@ class ConfigController extends AbstractController
 
 
         if ($module) {
-            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+            $modules = array_filter($modules, fn($_module) => $_module['module'] == $module);
         }
 
         return $this->render('config/preinscription/index_point_paiement.html.twig', [
@@ -258,9 +268,17 @@ class ConfigController extends AbstractController
 
     #[Route(path: '/point/paiement/cheque', name: 'app_config_preinscription_point_paiement_cheque_index', methods: ['GET', 'POST'])]
     #[RoleMethod(title: 'Gestion des Paramètres', as: 'index')]
-    public function indexPointPaiementCheque(Request $request, Breadcrumb $breadcrumb): Response
+    public function indexPointPaiementCheque(Request $request, Breadcrumb $breadcrumb, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+
         $module = $request->query->get('module');
+        $annee = $session->get('anneeScolaire');
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
         $modules = [
             [
                 'label' => 'EN ATTENTE DE CONFIRMATION',
@@ -288,7 +306,7 @@ class ConfigController extends AbstractController
 
 
         if ($module) {
-            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+            $modules = array_filter($modules, fn($_module) => $_module['module'] == $module);
         }
 
         return $this->render('config/preinscription/index_point_paiement_cheque.html.twig', [
@@ -445,8 +463,16 @@ class ConfigController extends AbstractController
     }
     #[Route(path: '/config/echeanciers', name: 'app_config_echeanciers', methods: ['GET', 'POST'])]
     #[RoleMethod(title: 'Gestion des Paramètres', as: 'index')]
-    public function indexConfigEcheancier(Request $request, Breadcrumb $breadcrumb): Response
+    public function indexConfigEcheancier(Request $request, Breadcrumb $breadcrumb, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         $module = $request->query->get('module');
         $modules = [
             [
@@ -475,7 +501,7 @@ class ConfigController extends AbstractController
 
 
         if ($module) {
-            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+            $modules = array_filter($modules, fn($_module) => $_module['module'] == $module);
         }
 
         return $this->render('config/echeancier/index.html.twig', [
@@ -486,8 +512,15 @@ class ConfigController extends AbstractController
     }
     #[Route(path: '/config/scolarite', name: 'app_config_scolarite', methods: ['GET', 'POST'])]
     #[RoleMethod(title: 'Gestion des Paramètres', as: 'index')]
-    public function indexConfigSoclarite(Request $request, Breadcrumb $breadcrumb): Response
+    public function indexConfigSoclarite(Request $request, Breadcrumb $breadcrumb, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         $module = $request->query->get('module');
         $modules = [
             [
@@ -516,7 +549,7 @@ class ConfigController extends AbstractController
 
 
         if ($module) {
-            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+            $modules = array_filter($modules, fn($_module) => $_module['module'] == $module);
         }
 
         return $this->render('config/scolarite/index.html.twig', [
@@ -557,7 +590,7 @@ class ConfigController extends AbstractController
 
 
         if ($module) {
-            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+            $modules = array_filter($modules, fn($_module) => $_module['module'] == $module);
         }
 
         return $this->render('config/scolarite/index.html.twig', [

@@ -9,6 +9,7 @@ use App\Entity\GroupeTypeExamen;
 use App\Entity\NoteExamen;
 use App\Entity\ValeurNoteExamen;
 use App\Form\ControleExamenType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\ControleExamenRepository;
 use App\Repository\DecisionExamenRepository;
 use App\Repository\DecisionRepository;
@@ -130,7 +131,11 @@ class ControleExamenController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, ControleExamen $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, ControleExamen $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -187,7 +192,8 @@ class ControleExamenController extends AbstractController
         DecisionRepository $decisionRepository,
         SessionRepository $sessionRepository,
         DecisionExamenRepository $decisionExamenRepository,
-        SessionInterface $sessionData
+        SessionInterface $sessionData,
+        AnneeScolaireRepository $anneeScolaireRepository
     ): Response {
 
         $promotion = $request->query->get('niveau');
@@ -195,6 +201,13 @@ class ControleExamenController extends AbstractController
         $ue = $request->query->get('ue');
         //dd($promotion, $session, $ue);
 
+        $annee = $sessionData->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $sessionData->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
 
         $controleVefication = $controleExamenRepository->findOneBy(['niveau' => $promotion, 'session' => $session, 'ue' => $ue]);
 

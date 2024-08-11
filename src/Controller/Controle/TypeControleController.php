@@ -4,6 +4,7 @@ namespace App\Controller\Controle;
 
 use App\Entity\TypeControle;
 use App\Form\TypeControleType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\TypeControleRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
@@ -16,6 +17,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -67,8 +69,16 @@ class TypeControleController extends AbstractController
     }
 
     #[Route('/', name: 'app_controle_type_controle_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
         $table = $dataTableFactory->create()
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
             ->add('code', TextColumn::class, ['label' => 'Code'])
@@ -99,7 +109,11 @@ class TypeControleController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, TypeControle $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, TypeControle $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',

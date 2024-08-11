@@ -4,6 +4,7 @@ namespace App\Controller\Controle;
 
 use App\Entity\TypeEvaluation;
 use App\Form\TypeEvaluationType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\TypeEvaluationRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
@@ -16,6 +17,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/controle/type/evaluation')]
@@ -48,8 +50,15 @@ class TypeEvaluationController extends AbstractController
     }
 
     #[Route('/', name: 'app_controle_type_evaluation_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'libelle'])
@@ -80,7 +89,11 @@ class TypeEvaluationController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, TypeEvaluation $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, TypeEvaluation $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',

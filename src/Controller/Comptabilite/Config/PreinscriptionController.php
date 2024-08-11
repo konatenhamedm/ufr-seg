@@ -4,10 +4,12 @@ namespace App\Controller\Comptabilite\Config;
 
 use App\Attribute\Module;
 use App\Attribute\RoleMethod;
+use App\Repository\AnneeScolaireRepository;
 use App\Service\Breadcrumb;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/parametre/preinscription')]
@@ -17,8 +19,15 @@ class PreinscriptionController extends AbstractController
 
     #[Route(path: '/', name: 'app_parametre_preinscription_index', methods: ['GET', 'POST'])]
     #[RoleMethod(title: 'Gestion des Préinscriptions', as: 'index')]
-    public function index(Request $request, Breadcrumb $breadcrumb): Response
+    public function index(Request $request, Breadcrumb $breadcrumb, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+
+        $annee = $session->get('anneeScolaire');
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
         $module = $request->query->get('module');
         $modules = [
             [
@@ -53,7 +62,7 @@ class PreinscriptionController extends AbstractController
 
 
         if ($module) {
-            $modules = array_filter($modules, fn ($_module) => $_module['module'] == $module);
+            $modules = array_filter($modules, fn($_module) => $_module['module'] == $module);
         }
 
         return $this->render('parametre/dashboard/index.html.twig', [

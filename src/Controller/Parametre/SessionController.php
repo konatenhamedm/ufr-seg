@@ -4,6 +4,7 @@ namespace App\Controller\Parametre;
 
 use App\Entity\Session;
 use App\Form\SessionType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\SessionRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
@@ -16,6 +17,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -23,8 +25,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class SessionController extends AbstractController
 {
     #[Route('/', name: 'app_parametre_session_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
         $table = $dataTableFactory->create()
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
             ->add('dateSession', DateTimeColumn::class, ['label' => 'Date session', 'format' => 'd-m-Y'])
@@ -54,7 +64,11 @@ class SessionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Session $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Session $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',

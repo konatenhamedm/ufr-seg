@@ -10,6 +10,7 @@ use App\Entity\Note;
 use App\Entity\TypeControle;
 use App\Entity\ValeurNote;
 use App\Form\ControleType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\ClasseRepository;
 use App\Repository\ControleRepository;
 use App\Repository\CoursRepository;
@@ -74,7 +75,11 @@ class ControleController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Controle $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Controle $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -135,7 +140,8 @@ class ControleController extends AbstractController
         SemestreRepository $semestreRepository,
         SessionRepository $sessionRepository,
         TypeEvaluationRepository $typeEvaluationRepository,
-        SessionInterface $sessionData
+        SessionInterface $sessionData,
+        AnneeScolaireRepository $anneeScolaireRepository
     ): Response {
 
         $semestre = $request->query->get('semestre');
@@ -144,6 +150,15 @@ class ControleController extends AbstractController
         $matiere = $request->query->get('matiere');
 
         //dd($semestre);
+
+        $annee = $sessionData->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $sessionData->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
         $controleVefication = $controleRepository->findOneBy(['classe' => $classe, 'matiere' => $matiere, 'semestre' => $semestre, 'ue' => $ue]);
         // dd($controleVefication, $semestre);
         if ($controleVefication) {

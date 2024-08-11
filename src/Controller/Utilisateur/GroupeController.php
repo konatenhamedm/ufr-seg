@@ -7,6 +7,7 @@ use App\DTO\GroupeDTO;
 use App\DTO\GroupeModuleDTO;
 use App\Entity\Groupe;
 use App\Form\GroupeType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\GroupeRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
@@ -20,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Throwable;
 
@@ -28,14 +30,22 @@ use Throwable;
 class GroupeController extends AbstractController
 {
     #[Route('/', name: 'app_utilisateur_groupe_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         $table = $dataTableFactory->create()
-        ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
-        ->createAdapter(ORMAdapter::class, [
-            'entity' => Groupe::class,
-        ])
-        ->setName('dt_app_utilisateur_groupe');
+            ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => Groupe::class,
+            ])
+            ->setName('dt_app_utilisateur_groupe');
 
         $renders = [
             'edit' =>  new ActionRender(function () {
@@ -46,7 +56,7 @@ class GroupeController extends AbstractController
             }),
         ];
 
-        
+
         $hasActions = false;
 
         foreach ($renders as $_ => $cb) {
@@ -58,39 +68,39 @@ class GroupeController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions'
-                , 'orderable' => false
-                ,'globalSearchable' => false
-                ,'className' => 'grid_row_actions'
-                , 'render' => function ($value, Groupe $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Groupe $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-xs btn-clean btn-icon mr-2 ',
                         'target' => '#exampleModalSizeLg2',
-                            
+
                         'actions' => [
                             'edit' => [
-                            'url' => $this->generateUrl('app_utilisateur_groupe_edit', ['id' => $value])
-                            , 'ajax' => false
-                            , 'icon' => '%icon% bi bi-pen'
-                            , 'attrs' => ['class' => 'btn-default']
-                            , 'render' => $renders['edit']
-                        ],
-                        'delete' => [
-                            'target' => '#exampleModalSizeNormal',
-                            'url' => $this->generateUrl('app_utilisateur_groupe_delete', ['id' => $value])
-                            , 'ajax' => true
-                            , 'icon' => '%icon% bi bi-trash'
-                            , 'attrs' => ['class' => 'btn-main']
-                            ,  'render' => $renders['delete']
+                                'url' => $this->generateUrl('app_utilisateur_groupe_edit', ['id' => $value]),
+                                'ajax' => false,
+                                'icon' => '%icon% bi bi-pen',
+                                'attrs' => ['class' => 'btn-default'],
+                                'render' => $renders['edit']
+                            ],
+                            'delete' => [
+                                'target' => '#exampleModalSizeNormal',
+                                'url' => $this->generateUrl('app_utilisateur_groupe_delete', ['id' => $value]),
+                                'ajax' => true,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['delete']
+                            ]
                         ]
-                    ] 
-                            
+
                     ];
                     return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
                 }
             ]);
         }
-       
+
 
         $table->handleRequest($request);
 
@@ -104,7 +114,7 @@ class GroupeController extends AbstractController
         ]);
     }
 
-    
+
 
     #[Route('/new', name: 'app_utilisateur_groupe_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, FormError $formError): Response
@@ -112,9 +122,9 @@ class GroupeController extends AbstractController
         $groupeDTO = new GroupeDTO();
 
         [$maps, $titles] = $this->getModulesMap();
-       
-        
-        
+
+
+
         $allRoles = [];
         $allowedRoles = [];
         $modules = [];
@@ -125,18 +135,18 @@ class GroupeController extends AbstractController
         $groupes = [];
         $moduleRoles = [];
 
-       
 
-        
+
+
         foreach ($maps as $module => $allProps) {
             $modules[] = $module;
-          
+
             $moduleName = strtolower($module);
-            $moduleLabels[$module] =  mb_strtoupper($this->getParameter($moduleName.'.name'));
+            $moduleLabels[$module] =  mb_strtoupper($this->getParameter($moduleName . '.name'));
             $moduleRoles[$module] = [];
             foreach ($allProps as $controller => $props) {
                 $groupeModule = new GroupeModuleDTO();
-              
+
                 $roles = [];
 
                 foreach ($props['roles'] as $role => $label) {
@@ -146,14 +156,14 @@ class GroupeController extends AbstractController
                     //$roleLabels[$role] = $label;
                 }
 
-                
+
                 $groupeModule->setListRoles(array_merge($roles));
                 $groupeDTO->addModule($groupeModule);
             }
         }
-        
-       
-       
+
+
+
         $form = $this->createForm(GroupeType::class, $groupeDTO, [
             'method' => 'POST',
             'roles' => array_unique($allRoles),
@@ -170,7 +180,7 @@ class GroupeController extends AbstractController
             $response = [];
             $redirect = $this->generateUrl('app_utilisateur_groupe_index');
 
-           
+
 
 
             if ($form->isValid()) {
@@ -181,33 +191,28 @@ class GroupeController extends AbstractController
                 $groupe->setRoles($roles);
                 $em->persist($groupe);
                 $em->flush();
-               
+
                 $data = null;
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
-
-                
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
                 $statutCode = Response::HTTP_BAD_REQUEST;
                 if (!$isAjax) {
-                  $this->addFlash('warning', $message);
+                    $this->addFlash('warning', $message);
                 }
-                
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data', 'fullRedirect'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'fullRedirect'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
                 }
             }
-
-            
         }
 
         return $this->render('utilisateur/groupe/new.html.twig', [
@@ -235,12 +240,12 @@ class GroupeController extends AbstractController
     #[Route('/{id}/edit', name: 'app_utilisateur_groupe_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Groupe $groupe, EntityManagerInterface $em, FormError $formError): Response
     {
-         [$maps, $titles] = $this->getModulesMap();
-        
+        [$maps, $titles] = $this->getModulesMap();
+
 
         $oldRoles = $groupe->getRoles();
 
-      
+
         $groupeDTO = new GroupeDTO();
         $groupeDTO->setLibelle($groupe->getLibelle());
         $groupeDTO->setDescription($groupe->getDescription());
@@ -256,18 +261,18 @@ class GroupeController extends AbstractController
         $groupes = [];
         $moduleRoles = [];
 
-       
 
-        
+
+
         foreach ($maps as $module => $allProps) {
             $modules[] = $module;
-          
+
             $moduleName = strtolower($module);
-            $moduleLabels[$module] =  mb_strtoupper($this->getParameter($moduleName.'.name'));
+            $moduleLabels[$module] =  mb_strtoupper($this->getParameter($moduleName . '.name'));
             $moduleRoles[$module] = [];
             foreach ($allProps as $controller => $props) {
                 $groupeModule = new GroupeModuleDTO();
-              
+
                 $roles = [];
 
                 foreach ($props['roles'] as $role => $label) {
@@ -277,14 +282,14 @@ class GroupeController extends AbstractController
                     //$roleLabels[$role] = $label;
                 }
 
-                
+
                 $groupeModule->setListRoles(array_merge($roles));
                 $groupeDTO->addModule($groupeModule);
             }
         }
-      
-        
-        
+
+
+
         $form = $this->createForm(GroupeType::class, $groupeDTO, [
             'method' => 'POST',
             'roles' => array_unique($allRoles),
@@ -311,18 +316,17 @@ class GroupeController extends AbstractController
                 $groupe->setDescription($groupeDTO->getDescription());
                 $roles = array_merge($groupeDTO->getRoles(), $request->request->all()['group_roles'] ?? []);
 
-              
+
                 $groupe->setRoles($roles);
-        
+
                 $em->persist($groupe);
 
                 $em->flush();
-                
+
                 $message       = 'Opération effectuée avec succès';
                 $statut = 1;
                 $this->addFlash('success', $message);
                 $redirect = null;
-                
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
@@ -331,12 +335,11 @@ class GroupeController extends AbstractController
                 if (!$isAjax) {
                     $this->addFlash('warning', $message);
                 }
-                
             }
 
 
             if ($isAjax) {
-                return $this->json( compact('statut', 'message', 'redirect', 'data'), $code);
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $code);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect);
@@ -345,7 +348,7 @@ class GroupeController extends AbstractController
         }
 
 
-        
+
 
         return $this->render('utilisateur/groupe/edit.html.twig', [
             'groupe' => $groupeDTO,
@@ -368,14 +371,14 @@ class GroupeController extends AbstractController
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
-                'app_utilisateur_groupe_delete'
-                ,   [
+                    'app_utilisateur_groupe_delete',
+                    [
                         'id' => $groupe->getId()
                     ]
                 )
             )
             ->setMethod('DELETE')
-        ->getForm();
+            ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = true;
@@ -418,25 +421,25 @@ class GroupeController extends AbstractController
     private function getModulesMap()
     {
         $modules = $this->getModules();
-       
+
         $maps = [];
         $titles = [];
         $baseControllerPath = "App\\Controller";
         $mapChildren = [];
-       
+
         foreach ($modules as $module) {
-           
+
             try {
                 $controllers = $this->getParameter("{$module}.controllers");
-               
-            
-               
+
+
+
                 $module = strtoupper($module);
                 $maps[$module] = [];
-                
+
                 foreach ($controllers as $controller) {
-                   
-                  
+
+
                     $name = $controller['name'];
                     $alias = snake_case($controller['as']);
                     $currentName = $this->getName($alias, $name);
@@ -450,12 +453,8 @@ class GroupeController extends AbstractController
                     if ($methods) {
                         $maps[$module][$name] = ['title' => $title, 'roles' => $methods];
                     }
-
-                   
-                   
                 }
             } catch (Throwable $e) {
-               
             }
 
             if (!$maps[$module]) {
@@ -463,13 +462,13 @@ class GroupeController extends AbstractController
             }
         }
 
-      
+
 
         return [$maps, $titles];
     }
 
 
-    
+
     /**
      * Retourne la liste des modules
      *
@@ -477,8 +476,8 @@ class GroupeController extends AbstractController
      */
     private function getModules(): array
     {
-        $configDir = $this->getParameter('kernel.project_dir').'/config/modules';
-      
+        $configDir = $this->getParameter('kernel.project_dir') . '/config/modules';
+
         $finder = new Finder();
         $finder->files()->in($configDir);
 
@@ -490,5 +489,4 @@ class GroupeController extends AbstractController
 
         return $modules;
     }
-
 }

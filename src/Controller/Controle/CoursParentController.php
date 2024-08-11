@@ -5,6 +5,7 @@ namespace App\Controller\Controle;
 use App\Entity\Cours;
 use App\Entity\CoursParent;
 use App\Form\CoursParentType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\ClasseRepository;
 use App\Repository\CoursParentRepository;
 use App\Repository\CoursRepository;
@@ -57,7 +58,11 @@ class CoursParentController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, CoursParent $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, CoursParent $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -112,13 +117,22 @@ class CoursParentController extends AbstractController
         MatiereUeRepository $matiereUeRepository,
         MatiereRepository $matiereRepository,
         SessionInterface $session,
-        ClasseRepository $classeRepository
+        ClasseRepository $classeRepository,
+        AnneeScolaireRepository $anneeScolaireRepository
     ): Response {
 
         $classe =  $request->query->get('classe');
         $annee = $session->get('anneeScolaire');
         $all = $request->query->all();
         //dd($all);
+
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
 
         $coursParentVerification = $coursParentRepository->findOneBy(['classe' => $classe]);
         if ($coursParentVerification) {

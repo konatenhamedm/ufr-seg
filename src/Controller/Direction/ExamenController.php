@@ -7,6 +7,7 @@ use App\Entity\Filiere;
 use App\Entity\Matiere;
 use App\Entity\MatiereExamen;
 use App\Form\ExamenType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\ExamenRepository;
 use App\Repository\PreinscriptionRepository;
 use App\Service\ActionRender;
@@ -31,10 +32,18 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class ExamenController extends AbstractController
 {
     #[Route('/', name: 'app_direction_examen_index',   methods: ['GET', 'POST'], options: ['expose' => true])]
-    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
+    public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
 
         $filiere = $request->query->get('filiere');
+
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
 
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
@@ -55,10 +64,11 @@ class ExamenController extends AbstractController
             ->add('dateExamen', DateTimeColumn::class, ['label' => 'Date Prévue', 'format' => 'd-m-Y'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Examen::class,
-                'query' => function (QueryBuilder $qb) use ($filiere, $user) {
-                    $qb->select(['d', 'n', 'f', 'res'])
+                'query' => function (QueryBuilder $qb) use ($filiere, $user, $annee) {
+                    $qb->select(['d', 'n', 'f', 'res', 'an'])
                         ->from(Examen::class, 'd')
                         ->innerJoin('d.niveau', 'n')
+                        ->innerJoin('n.anneeScolaire', 'an')
                         ->join('n.responsable', 'res')
                         ->innerJoin('n.filiere', 'f')
                         ->orderBy('d.id', 'DESC');
@@ -73,6 +83,11 @@ class ExamenController extends AbstractController
                     if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
                         $qb->andWhere("res = :user")
                             ->setParameter('user', $user->getPersonne());
+                    }
+
+                    if ($annee) {
+                        $qb->andWhere('an = : anneeScolaire')
+                            ->setParameter('anneeScolaire', $annee);
                     }
 
                     /* if ($this->isGranted('ROLE_DIRECTEUR')) {
@@ -107,7 +122,11 @@ class ExamenController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Examen $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Examen $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -265,7 +284,7 @@ class ExamenController extends AbstractController
         $oldMatieres = $examen->getMatiereExamens();
         if (!$oldMatieres->count()) {
             foreach ($matieres as $matiere) {
-                $matiereExamen = $oldMatieres->filter(fn (MatiereExamen $matiereExamen) => $matiereExamen->getMatiere() == $matiere)->current();
+                $matiereExamen = $oldMatieres->filter(fn(MatiereExamen $matiereExamen) => $matiereExamen->getMatiere() == $matiere)->current();
                 if (!$matiereExamen) {
                     $matiereExamen = new MatiereExamen();
                 }

@@ -72,8 +72,7 @@ class HomeController extends AbstractController
 
 
         if ($annee == null) {
-            // dd($anneeScolaireRepository->findOneBy(['actif' => 1]));
-            //unset($annee);
+
             $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
         }
 
@@ -139,9 +138,15 @@ class HomeController extends AbstractController
     }
 
     #[Route('/workflow/etudiant', name: 'app_home_timeline_etudiant_index')]
-    public function indexEtudiant(): Response
+    public function indexEtudiant(SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+        $annee = $session->get('anneeScolaire');
 
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         $modules = [
             /* [
                 'label' => 'Etude de dossier',
@@ -505,7 +510,7 @@ class HomeController extends AbstractController
             ->setName('dt_app_comptabilite_niveau_etudiant_preinscription_solde');
         // dd($this->isGranted('ROLE_ETUDIANT'));
         $renders = [
-            'edit' => new ActionRender(fn () => $ver == false),
+            'edit' => new ActionRender(fn() => $ver == false),
             'delete' => new ActionRender(function () {
                 return false;
             }),
@@ -529,7 +534,11 @@ class HomeController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Preinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -581,7 +590,7 @@ class HomeController extends AbstractController
 
 
     #[Route('/admin/frais', name: 'app_inscription_inscription_frais_index', methods: ['GET', 'POST'])]
-    public function indexListe(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
+    public function indexListe(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
         $isRoleFind = $this->isGranted('ROLE_SECRETAIRE');
@@ -589,6 +598,12 @@ class HomeController extends AbstractController
         $etat = 'valide';
 
         $anneeScolaire = $session->get('anneeScolaire');
+
+
+        if ($anneeScolaire == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
 
 
         $table = $dataTableFactory->create()
@@ -642,11 +657,11 @@ class HomeController extends AbstractController
             /* 'edit' =>  new ActionRender(function () {
                 return true;
             }), */
-            'edit_etudiant' => new ActionRender(fn () => $etat == 'attente_echeancier' || $etat == 'rejete'),
-            'edit' => new ActionRender(fn () => $etat == 'echeance_soumis'),
-            'payer' => new ActionRender(fn () => $etat == 'valide'),
-            'payer_load' => new ActionRender(fn () => $etat == 'valide'),
-            'delete' => new ActionRender(fn () =>  $isRoleFind == true || $isRoleAdminFind == true),
+            'edit_etudiant' => new ActionRender(fn() => $etat == 'attente_echeancier' || $etat == 'rejete'),
+            'edit' => new ActionRender(fn() => $etat == 'echeance_soumis'),
+            'payer' => new ActionRender(fn() => $etat == 'valide'),
+            'payer_load' => new ActionRender(fn() => $etat == 'valide'),
+            'delete' => new ActionRender(fn() =>  $isRoleFind == true || $isRoleAdminFind == true),
             /*  'delete' => new ActionRender(function () {
                 return ;
             }), */
@@ -665,7 +680,11 @@ class HomeController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -752,7 +771,7 @@ class HomeController extends AbstractController
         ]);
     }
     #[Route('/admin/frais/solde', name: 'app_inscription_inscription_frais_solde_index', methods: ['GET', 'POST'])]
-    public function indexListeFraisSolde(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
+    public function indexListeFraisSolde(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
         $isRoleFind = $this->isGranted('ROLE_SECRETAIRE');
@@ -760,6 +779,10 @@ class HomeController extends AbstractController
         $etat = 'solde';
 
         $anneeScolaire = $session->get('anneeScolaire');
+        if ($anneeScolaire == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
 
 
         $table = $dataTableFactory->create()
@@ -813,11 +836,11 @@ class HomeController extends AbstractController
             /* 'edit' =>  new ActionRender(function () {
                 return true;
             }), */
-            'edit_etudiant' => new ActionRender(fn () => $etat == 'attente_echeancier' || $etat == 'rejete'),
-            'edit' => new ActionRender(fn () => $etat == 'echeance_soumis'),
-            'payer' => new ActionRender(fn () => $etat == 'valide'),
-            'payer_load' => new ActionRender(fn () => $etat == 'valide'),
-            'delete' => new ActionRender(fn () =>  $isRoleFind == true || $isRoleAdminFind == true),
+            'edit_etudiant' => new ActionRender(fn() => $etat == 'attente_echeancier' || $etat == 'rejete'),
+            'edit' => new ActionRender(fn() => $etat == 'echeance_soumis'),
+            'payer' => new ActionRender(fn() => $etat == 'valide'),
+            'payer_load' => new ActionRender(fn() => $etat == 'valide'),
+            'delete' => new ActionRender(fn() =>  $isRoleFind == true || $isRoleAdminFind == true),
             /*  'delete' => new ActionRender(function () {
                 return ;
             }), */
@@ -836,7 +859,11 @@ class HomeController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -959,11 +986,11 @@ class HomeController extends AbstractController
             /* 'edit' =>  new ActionRender(function () {
                 return true;
             }), */
-            'edit_etudiant' => new ActionRender(fn () => $etat == 'attente_echeancier' || $etat == 'rejete'),
-            'edit' => new ActionRender(fn () => $etat == 'echeance_soumis'),
-            'payer' => new ActionRender(fn () => $etat == 'valide'),
-            'payer_load' => new ActionRender(fn () => $etat == 'valide'),
-            'delete' => new ActionRender(fn () =>  $isRoleFind == true || $isRoleAdminFind == true),
+            'edit_etudiant' => new ActionRender(fn() => $etat == 'attente_echeancier' || $etat == 'rejete'),
+            'edit' => new ActionRender(fn() => $etat == 'echeance_soumis'),
+            'payer' => new ActionRender(fn() => $etat == 'valide'),
+            'payer_load' => new ActionRender(fn() => $etat == 'valide'),
+            'delete' => new ActionRender(fn() =>  $isRoleFind == true || $isRoleAdminFind == true),
             /*  'delete' => new ActionRender(function () {
                 return ;
             }), */
@@ -982,7 +1009,11 @@ class HomeController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',

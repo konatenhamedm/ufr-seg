@@ -90,7 +90,11 @@ class NiveauController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Niveau $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Niveau $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -143,8 +147,16 @@ class NiveauController extends AbstractController
     }
 
     #[Route('/config', name: 'app_parametre_niveau_config_index', methods: ['GET', 'POST'])]
-    public function indexConfig(Request $request, DataTableFactory $dataTableFactory, UserInterface $user): Response
+    public function indexConfig(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
@@ -191,7 +203,11 @@ class NiveauController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Niveau $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Niveau $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -315,7 +331,7 @@ class NiveauController extends AbstractController
         $typeFrais = $entityManager->getRepository(TypeFrais::class)->findAll();
         $oldFrais = $niveau->getFrais();
         foreach ($typeFrais as $type) {
-            $frais = $oldFrais->filter(fn (Frais $frais) => $frais->getTypeFrais() == $type)->current();
+            $frais = $oldFrais->filter(fn(Frais $frais) => $frais->getTypeFrais() == $type)->current();
             if (!$frais) {
                 $frais = new Frais();
             }
