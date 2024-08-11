@@ -230,7 +230,11 @@ class NiveauEtudiantController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Preinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -524,7 +528,11 @@ class NiveauEtudiantController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Preinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -641,9 +649,11 @@ class NiveauEtudiantController extends AbstractController
         $ver = $this->isGranted('ROLE_ETUDIANT');
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code Preinscription'])
-            ->add('etudiant', TextColumn::class, ['label' => 'Nom et Prénoms', 'render' => function ($value, Preinscription $preinscription) {
+            /* ->add('etudiant', TextColumn::class, ['label' => 'Nom et Prénoms', "searchable" => true, 'render' => function ($value, Preinscription $preinscription) {
                 return   $preinscription->getEtudiant()->getNomComplet();
-            }])
+            }]) */
+            ->add('nom', TextColumn::class, ['label' => 'Nom ', 'field' => 'etudiant.nom'])
+            ->add('prenomnom', TextColumn::class, ['label' => 'Prénoms', 'field' => 'etudiant.prenom'])
             /* ->add('etudiant', TextColumn::class, ['field' => 'etudiant.nom', 'label' => 'Nom'])
             ->add('prenoms', TextColumn::class, ['field' => 'etudiant.prenom', 'label' => 'Prénoms']) */
             ->add('dateNaissance', DateTimeColumn::class, ['label' => 'Date de naissance', 'format' => 'd-m-Y', "searchable" => false, 'field' => 'etudiant.dateNaissance'])
@@ -684,7 +694,7 @@ class NiveauEtudiantController extends AbstractController
             ->setName('dt_app_comptabilite_niveau_etudiant');
         // dd($this->isGranted('ROLE_ETUDIANT'));
         $renders = [
-            'edit' => new ActionRender(fn () => $ver == false),
+            'edit' => new ActionRender(fn() => $ver == false),
             'delete' => new ActionRender(function () {
                 return false;
             }),
@@ -708,7 +718,11 @@ class NiveauEtudiantController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Preinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -822,7 +836,7 @@ class NiveauEtudiantController extends AbstractController
             ->setName('dt_app_comptabilite_niveau_paiement_valide_prescription');
         // dd($this->isGranted('ROLE_ETUDIANT'));
         $renders = [
-            'edit' => new ActionRender(fn () => $ver == false),
+            'edit' => new ActionRender(fn() => $ver == false),
             'delete' => new ActionRender(function () {
                 return false;
             }),
@@ -846,7 +860,11 @@ class NiveauEtudiantController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Preinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -936,7 +954,7 @@ class NiveauEtudiantController extends AbstractController
             ->setName('dt_app_comptabilite_niveau_etudiant_formation' . $id);
         // dd($this->isGranted('ROLE_ETUDIANT'));
         $renders = [
-            'edit' => new ActionRender(fn () => $ver == false),
+            'edit' => new ActionRender(fn() => $ver == false),
             'delete' => new ActionRender(function () {
                 return false;
             }),
@@ -957,7 +975,11 @@ class NiveauEtudiantController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Preinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -1065,7 +1087,11 @@ class NiveauEtudiantController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, NiveauEtudiant $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, NiveauEtudiant $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',

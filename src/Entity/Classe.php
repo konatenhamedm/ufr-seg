@@ -64,6 +64,11 @@ class Classe
         return sprintf('[%s] %s %s', $this->getLibelle(), '-', $this->getAnneeScolaire()->getLibelle());
     }
 
+    public function getClasseNiveau()
+    {
+        return sprintf('[%s] %s %s', $this->getLibelle(), '-', $this->getNiveau()->getCode());
+    }
+
     public function getLibelle(): ?string
     {
         return $this->libelle;

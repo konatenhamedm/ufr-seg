@@ -12,6 +12,7 @@ use App\Entity\LigneDeliberation;
 use App\Entity\Mention;
 use App\Entity\Preinscription;
 use App\Form\DeliberationType;
+use App\Repository\AnneeScolaireRepository;
 use App\Repository\DeliberationRepository;
 use App\Repository\ExamenRepository;
 use App\Repository\FraisRepository;
@@ -55,8 +56,16 @@ class DeliberationController extends AbstractController
 
 
     #[Route('/', name: 'app_direction_deliberation_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, UserInterface $user, DataTableFactory $dataTableFactory): Response
+    public function index(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
@@ -88,7 +97,11 @@ class DeliberationController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Examen $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Examen $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -125,9 +138,18 @@ class DeliberationController extends AbstractController
 
 
     #[Route('/timeline', name: 'app_direction_deliberation_time_index', methods: ['GET', 'POST'])]
-    public function indexTimeLigne(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session): Response
+    public function indexTimeLigne(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
         $anneeScolaire = $session->get("anneeScolaire");
+
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
@@ -181,7 +203,11 @@ class DeliberationController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Examen $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Examen $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -237,9 +263,17 @@ class DeliberationController extends AbstractController
 
 
     #[Route('/historique/{id}', name: 'app_direction_deliberation_historique', methods: ['GET', 'POST'])]
-    public function historique(Request $request, UserInterface $user, $id, DataTableFactory $dataTableFactory, ExamenRepository $examenRepository, SessionInterface $session): Response
+    public function historique(Request $request, UserInterface $user, $id, DataTableFactory $dataTableFactory, ExamenRepository $examenRepository, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
         $anneeScolaire = $session->get("anneeScolaire");
+
+        //$annee = $session->get('anneeScolaire');
+
+
+        if ($anneeScolaire == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         $table = $dataTableFactory->create()
             //->add('date', TextColumn::class, ['label' => 'Code'])
             ->add('candidat', TextColumn::class, ['label' => 'Candidat', 'render' => function ($value, Deliberation $deliberation) {
@@ -309,20 +343,24 @@ class DeliberationController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Deliberation $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Deliberation $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
 
                         'actions' => [
-                            /*'edit' => [
+                            'edit' => [
                                 'url' => $this->generateUrl('app_direction_deliberation_edit', ['id' => $value]),
                                 'ajax' => false,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
-                            ],*/
+                            ],
                             'show' => [
                                 'url' => $this->generateUrl('app_direction_deliberation_show', ['id' => $value]),
                                 'ajax' => true,
@@ -355,11 +393,17 @@ class DeliberationController extends AbstractController
         ]);
     }
     #[Route('/traitement/examen/{etat}', name: 'app_direction_deliberation_liste_etudiant_traitement_exament', methods: ['GET', 'POST'])]
-    public function ListeEtudiantTraitementExament(Request $request, UserInterface $user, $etat, DataTableFactory $dataTableFactory, ExamenRepository $examenRepository, SessionInterface $session): Response
+    public function ListeEtudiantTraitementExament(Request $request, UserInterface $user, $etat, DataTableFactory $dataTableFactory, ExamenRepository $examenRepository, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
         $anneeScolaire = $session->get("anneeScolaire");
 
 
+
+
+        if ($anneeScolaire == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
 
         if ($etat == 'delibere') {
             $titre = "Liste des délibérations";
@@ -476,7 +520,11 @@ class DeliberationController extends AbstractController
         if ($hasActions) {
             if ($etat == 'delibere') {
                 $table->add('id', TextColumn::class, [
-                    'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Deliberation $context) use ($renders) {
+                    'label' => 'Actions',
+                    'orderable' => false,
+                    'globalSearchable' => false,
+                    'className' => 'grid_row_actions',
+                    'render' => function ($value, Deliberation $context) use ($renders) {
                         $options = [
                             'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                             'target' => '#modal-lg',
@@ -526,13 +574,20 @@ class DeliberationController extends AbstractController
 
 
     #[Route('/{id}/new', name: 'app_direction_deliberation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, Examen $examen, EntityManagerInterface $entityManager, FormError $formError, FraisRepository $fraisRepository): Response
+    public function new(Request $request, Examen $examen, EntityManagerInterface $entityManager, FormError $formError, FraisRepository $fraisRepository, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
         $deliberation = new Deliberation();
         $deliberation->setExamen($examen);
         $mentions = $entityManager->getRepository(Mention::class)->findAll();
         $etudiant = $request->query->get('etudiant');
 
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
 
 
         foreach ($examen->getMatiereExamens() as $matiereExamen) {
@@ -663,12 +718,20 @@ class DeliberationController extends AbstractController
         ]);
     }
     #[Route('/{id}/new/historique', name: 'app_direction_deliberation_historique_new', methods: ['GET', 'POST'])]
-    public function newHistorique(Request $request, Examen $examen, EntityManagerInterface $entityManager, FormError $formError, FraisRepository $fraisRepository): Response
+    public function newHistorique(Request $request, Examen $examen, EntityManagerInterface $entityManager, FormError $formError, FraisRepository $fraisRepository, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
         $deliberation = new Deliberation();
         $deliberation->setExamen($examen);
         $mentions = $entityManager->getRepository(Mention::class)->findAll();
         $etudiant = $request->query->get('etudiant');
+
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
 
 
 
@@ -800,8 +863,18 @@ class DeliberationController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_direction_deliberation_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Deliberation $deliberation, EntityManagerInterface $entityManager, FormError $formError): Response
+    public function edit(Request $request, Deliberation $deliberation, EntityManagerInterface $entityManager, FormError $formError, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+
+        // $anneeScolaire = $session->get("anneeScolaire");
+
+        $annee = $session->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
         $examen = $deliberation->getExamen();
 
         $mentions = $entityManager->getRepository(Mention::class)->findAll();

@@ -38,7 +38,7 @@ class BlocEcheancierType extends AbstractType
                 'attr' => [
                     'class' => 'classe'
                 ],
-                'choice_label' => 'libelle',
+                'choice_label' => 'getClasseNiveau',
                 'query_builder' => function (EntityRepository $er) use ($anneeScolaire, $niveau) {
                     return $er->createQueryBuilder('c')
                         ->andWhere("c.anneeScolaire = :annee")

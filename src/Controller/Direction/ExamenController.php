@@ -34,7 +34,7 @@ class ExamenController extends AbstractController
     #[Route('/', name: 'app_direction_examen_index',   methods: ['GET', 'POST'], options: ['expose' => true])]
     public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
-
+        // dd("ff");
         $filiere = $request->query->get('filiere');
 
         $annee = $session->get('anneeScolaire');
@@ -65,10 +65,10 @@ class ExamenController extends AbstractController
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Examen::class,
                 'query' => function (QueryBuilder $qb) use ($filiere, $user, $annee) {
-                    $qb->select(['d', 'n', 'f', 'res', 'an'])
+                    $qb->select(['d', 'n', 'f', 'res'])
                         ->from(Examen::class, 'd')
-                        ->innerJoin('d.niveau', 'n')
-                        ->innerJoin('n.anneeScolaire', 'an')
+                        ->innerJoin('d.niveau', 'n')/* 
+                        ->innerJoin('n.anneeScolaire', 'an') */
                         ->join('n.responsable', 'res')
                         ->innerJoin('n.filiere', 'f')
                         ->orderBy('d.id', 'DESC');
@@ -86,7 +86,7 @@ class ExamenController extends AbstractController
                     }
 
                     if ($annee) {
-                        $qb->andWhere('an = : anneeScolaire')
+                        $qb->andWhere('n.anneeScolaire = :anneeScolaire')
                             ->setParameter('anneeScolaire', $annee);
                     }
 

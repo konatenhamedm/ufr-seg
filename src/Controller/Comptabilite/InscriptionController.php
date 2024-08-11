@@ -118,20 +118,22 @@ class InscriptionController extends AbstractController
 
 
         $table = $dataTableFactory->create()
-            ->add('codePreinscription', TextColumn::class, ['label' => 'Code Préinscription', 'field' => 'p.getCode'])
+            ->add('codePreinscription', TextColumn::class, ['label' => 'Code Préinscription', 'field' => 'p.code'])
             // ->add('datePreinscription', DateTimeColumn::class, [
             //     'label' => 'Date inscription',
             //     'format' => 'd-m-Y'
             // ])
-            ->add('nom', TextColumn::class, ['label' => 'Nom et prénoms', 'field' => 'etudiant.getNomComplet'])
-            ->add('sigleNiveauFiliere', TextColumn::class, ['label' => 'Sigle', 'field' => 'niveau.getSigle'])
+            //->add('nom', TextColumn::class, ['label' => 'Nom et prénoms', 'field' => 'etudiant.getNomComplet'])
+            ->add('nom', TextColumn::class, ['label' => 'Nom ', 'field' => 'etudiant.nom'])
+            ->add('prenomnom', TextColumn::class, ['label' => 'Prénoms', 'field' => 'etudiant.prenom'])
+            ->add('sigleNiveauFiliere', TextColumn::class, ['label' => 'Sigle', 'field' => 'niveau.code'])
             ->add('datePaiement', DateTimeColumn::class, ['label' => 'Date paiement', 'format' => 'd-m-Y', 'field' => 'info.datePaiement'])
             ->add('montantPaiement', NumberFormatColumn::class, ['label' => 'Montant', 'field' => 'info.montant'])
             /*  ->add('montant', NumberFormatColumn::class, ['label' => 'Montant', 'field' => 'info.montant']) */
-            ->add('mode', TextColumn::class, ['label' => 'Mode de paiement', 'render' => function ($value, InfoPreinscription $context) {
+            ->add('mode', TextColumn::class, ['label' => 'Mode de paiement', "searchable" => false, 'render' => function ($value, InfoPreinscription $context) {
                 return $context->getModePaiement() ? $context->getModePaiement()->getLibelle() : 'En attente de paiement';
             }])
-            ->add('caissiere', TextColumn::class, ['label' => 'Caissière', 'field' => 'ca.getNomComplet'])
+            ->add('caissiere', TextColumn::class, ['label' => 'Caissière', "searchable" => false, 'field' => 'ca.getNomComplet'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => InfoPreinscription::class,
                 'query' => function (QueryBuilder $qb) use ($user, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $anneeScolaire) {
@@ -239,7 +241,11 @@ class InscriptionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, InfoPreinscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, InfoPreinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -456,7 +462,11 @@ class InscriptionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, InfoInscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, InfoInscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
