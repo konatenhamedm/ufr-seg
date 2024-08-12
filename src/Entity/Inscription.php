@@ -72,6 +72,9 @@ class Inscription
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Collection $blocEcheanciers;
 
+    #[ORM\ManyToOne(inversedBy: 'inscriptions')]
+    private ?Deliberation $deliberation = null;
+
     public function __construct()
     {
         $this->fraisInscriptions = new ArrayCollection();
@@ -361,6 +364,18 @@ class Inscription
                 $blocEcheancier->setInscription(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDeliberation(): ?Deliberation
+    {
+        return $this->deliberation;
+    }
+
+    public function setDeliberation(?Deliberation $deliberation): static
+    {
+        $this->deliberation = $deliberation;
 
         return $this;
     }

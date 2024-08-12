@@ -1006,7 +1006,11 @@ class HomeController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -1136,7 +1140,11 @@ class HomeController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -1985,7 +1993,7 @@ class HomeController extends AbstractController
 
 
 
-
+        //dd($preinscriptionRepository->find($preinscription));
 
 
         /* foreach ($frais as $key => $value) {
@@ -1993,7 +2001,7 @@ class HomeController extends AbstractController
         } */
         $bloc_echeancier = new BlocEcheancier();
 
-        $bloc_echeancier->setClasse($classeRepository->find(1));
+        //$bloc_echeancier->setClasse($classeRepository->find(1));
         $bloc_echeancier->setDateInscription(new DateTime());
         $bloc_echeancier->setTotal('0');
 

@@ -17,6 +17,7 @@ class DeliberationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+
         $builder
             ->add('dateExamen', DateType::class, [
                 'widget' => 'single_text',
@@ -24,8 +25,7 @@ class DeliberationType extends AbstractType
                 'format'  => 'dd/MM/yyyy',
                 'html5' => false,
                 'attr'    => ['autocomplete' => 'off', 'class' => 'datepicker no-auto'],
-            ]) 
-            ->add('infoPreinscription', DeliberationPreinscriptionType::class, ['examen' => $options['examen']])
+            ])
             ->add('etat', ChoiceType::class, [
                 'choices' => [
                     'Validé' => 'valide',
@@ -35,7 +35,7 @@ class DeliberationType extends AbstractType
                 'label' => 'Décision',
                 'attr' => ['class' => 'has-select2']
             ])
-            ->add('commentaire',TextareaType::class, ['label' => 'Observations', 'required' => false, 'empty_data' => ''])
+            ->add('commentaire', TextareaType::class, ['label' => 'Observations', 'required' => false, 'empty_data' => ''])
             /*->add('etudiant', EntityType::class, [
                 'class' => Etudiant::class,
                 'required' => false,
@@ -56,12 +56,16 @@ class DeliberationType extends AbstractType
                     'allow_add'     => true,
                     'allow_delete'  => true,
                     'by_reference'  => false,
-                    
+
                     'entry_options' => ['label' => false],
                 ]
             )
-          
+
         ;
+
+        if ($options['type'] != 'edit') {
+            $builder->add('infoPreinscription', DeliberationPreinscriptionType::class, ['examen' => $options['examen']]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -70,5 +74,6 @@ class DeliberationType extends AbstractType
             'data_class' => Deliberation::class,
         ]);
         $resolver->setRequired('examen');
+        $resolver->setRequired('type');
     }
 }

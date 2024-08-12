@@ -55,10 +55,14 @@ class Deliberation
     #[Assert\Valid()]
     private ?DeliberationPreinscription $infoPreinscription = null;
 
+    #[ORM\OneToMany(mappedBy: 'deliberation', targetEntity: Inscription::class)]
+    private Collection $inscriptions;
+
     public function __construct()
     {
         $this->ligneDeliberations = new ArrayCollection();
         $this->setEtat('cree');
+        $this->inscriptions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -239,5 +243,35 @@ class Deliberation
     public function getCandidat()
     {
         return $this->getPreinscription()?->getEtudiant();
+    }
+
+    /**
+     * @return Collection<int, Inscription>
+     */
+    public function getInscriptions(): Collection
+    {
+        return $this->inscriptions;
+    }
+
+    public function addInscription(Inscription $inscription): static
+    {
+        if (!$this->inscriptions->contains($inscription)) {
+            $this->inscriptions->add($inscription);
+            $inscription->setDeliberation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInscription(Inscription $inscription): static
+    {
+        if ($this->inscriptions->removeElement($inscription)) {
+            // set the owning side to null (unless already changed)
+            if ($inscription->getDeliberation() === $this) {
+                $inscription->setDeliberation(null);
+            }
+        }
+
+        return $this;
     }
 }

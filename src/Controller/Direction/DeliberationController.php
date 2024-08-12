@@ -13,9 +13,11 @@ use App\Entity\Mention;
 use App\Entity\Preinscription;
 use App\Form\DeliberationType;
 use App\Repository\AnneeScolaireRepository;
+use App\Repository\DeliberationPreinscriptionRepository;
 use App\Repository\DeliberationRepository;
 use App\Repository\ExamenRepository;
 use App\Repository\FraisRepository;
+use App\Repository\InscriptionRepository;
 use App\Repository\PreinscriptionRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
@@ -230,15 +232,7 @@ class DeliberationController extends AbstractController
                                 'attrs' => ['class' => 'btn-primary'],
                                 'render' => $renders['edit']
                             ],
-                            'delete' => [
-                                'target' => '#modal-small',
-                                'url' => $this->generateUrl('app_direction_examen_delete', ['id' => $value]),
-                                'ajax' => true,
-                                'stacked' => false,
-                                'icon' => '%icon% bi bi-trash',
-                                'attrs' => ['class' => 'btn-danger'],
-                                'render' => $renders['delete']
-                            ]
+
                         ]
 
                     ];
@@ -369,6 +363,15 @@ class DeliberationController extends AbstractController
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
                             ],
+                            'delete' => [
+                                'target' => '#modal-small',
+                                'url' => $this->generateUrl('app_direction_deliberation_delete', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-danger'],
+                                'render' => $renders['delete']
+                            ]
                         ]
 
                     ];
@@ -604,6 +607,7 @@ class DeliberationController extends AbstractController
         $form = $this->createForm(DeliberationType::class, $deliberation, [
             'method' => 'POST',
             'examen' => $examen,
+            'type' => 'new',
             'action' => $this->generateUrl('app_direction_deliberation_new', ['id' => $examen->getId()])
         ]);
         $form->handleRequest($request);
@@ -643,6 +647,7 @@ class DeliberationController extends AbstractController
                     $inscription = new Inscription();
                     $inscription->setEtudiant($preinscription->getEtudiant());
                     $inscription->setNiveau($examen->getNiveau());
+                    $inscription->setDeliberation($deliberation);
                     //$inscription->setMontant($preinscription->getCode());
                     $inscription->setEtat('valide');
                     $inscription->setCode($preinscription->getCode());
@@ -749,6 +754,7 @@ class DeliberationController extends AbstractController
         $form = $this->createForm(DeliberationType::class, $deliberation, [
             'method' => 'POST',
             'examen' => $examen,
+            'type' => 'historique',
             'action' => $this->generateUrl('app_direction_deliberation_historique_new', ['id' => $examen->getId()])
         ]);
         $form->handleRequest($request);
@@ -863,7 +869,7 @@ class DeliberationController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_direction_deliberation_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Deliberation $deliberation, EntityManagerInterface $entityManager, FormError $formError, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
+    public function edit(Request $request, Deliberation $deliberation, DeliberationPreinscriptionRepository $deliberationPreinscriptionRepository, PreinscriptionRepository $preinscriptionRepository, InscriptionRepository $inscriptionRepository, EntityManagerInterface $entityManager, FormError $formError, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
 
         // $anneeScolaire = $session->get("anneeScolaire");
@@ -884,13 +890,17 @@ class DeliberationController extends AbstractController
         }
 
         $form = $this->createForm(DeliberationType::class, $deliberation, [
-            'method' => 'PATCH',
+            'method' => 'POST',
             'examen' => $examen,
+            'type' => 'edit',
             'action' => $this->generateUrl('app_direction_deliberation_edit', [
                 'id' =>  $deliberation->getId()
             ])
         ]);
 
+        $inscription = $inscriptionRepository->findOneBy(['deliberation' => $deliberation]);
+        $preinscription = $deliberationPreinscriptionRepository->findOneBy(['deliberation' => $deliberation])->getPreinscription();
+        //dd($preinscription);
 
         $form->remove('etudiant');
         $form->remove('dateExamen');
@@ -905,8 +915,8 @@ class DeliberationController extends AbstractController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_direction_deliberation_historique');
-
+            // $redirect = $this->generateUrl('app_direction_deliberation_historique');
+            $redirect = $this->generateUrl('app_direction_deliberation_new', ['id' => $examen->getId()]);
 
 
 
@@ -922,14 +932,38 @@ class DeliberationController extends AbstractController
                     }
                 }
 
+                $etat = $deliberation->getEtat();
 
-                $entityManager->persist($deliberation);
-                $entityManager->flush();
+                if ($inscription->getClasse() == null) {
+                    if ($etat != 'valide') {
+
+
+                        if ($inscription->getClasse() == null) {
+
+                            $inscription->setEtat('examen_echoue');
+                            $entityManager->persist($inscription);
+
+                            $preinscription->setEtat('ajourne_inscription');
+                            $entityManager->persist($preinscription);
+
+                            $entityManager->flush();
+                        }
+                    }
+                    $entityManager->persist($deliberation);
+                    $entityManager->flush();
+                    $message       = 'Opération effectuée avec succès';
+                    $this->addFlash('success', $message);
+                    $statut = 1;
+                } else {
+                    $statut = 0;
+                    $message       = 'Oups mais vous pouvez plus de modification dans cette deliberation ';
+                    $this->addFlash('danger', $message);
+                }
+
+
+
 
                 $data = true;
-                $message       = 'Opération effectuée avec succès';
-                $statut = 1;
-                $this->addFlash('success', $message);
             } else {
                 $message = $formError->all($form);
                 $statut = 0;
@@ -957,8 +991,11 @@ class DeliberationController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'app_direction_deliberation_delete', methods: ['DELETE', 'GET'])]
-    public function delete(Request $request, Deliberation $deliberation, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Deliberation $deliberation, InscriptionRepository $inscriptionRepository, DeliberationPreinscriptionRepository $deliberationPreinscriptionRepository, EntityManagerInterface $entityManager): Response
     {
+        $inscription = $inscriptionRepository->findOneBy(['deliberation' => $deliberation]);
+        $preinscription = $deliberationPreinscriptionRepository->findOneBy(['deliberation' => $deliberation])->getPreinscription();
+
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
@@ -971,21 +1008,44 @@ class DeliberationController extends AbstractController
             ->setMethod('DELETE')
             ->getForm();
         $form->handleRequest($request);
+
+
+
         if ($form->isSubmitted() && $form->isValid()) {
+            $redirect = $this->generateUrl('app_direction_deliberation_new', ['id' => $deliberation->getExamen()->getId()]);
+
             $data = true;
-            $entityManager->remove($deliberation);
-            $entityManager->flush();
+            if ($inscription->getClasse() == null) {
+                $entityManager->remove($deliberation);
+                $entityManager->flush();
 
-            $redirect = $this->generateUrl('app_direction_deliberation_index');
+                $preinscription->setEtat('attente_validation');
+                $entityManager->persist($preinscription);
+                $entityManager->flush();
 
-            $message = 'Opération effectuée avec succès';
+                $message = 'Opération effectuée avec succès';
 
-            $response = [
-                'statut'   => 1,
-                'message'  => $message,
-                'redirect' => $redirect,
-                'data' => $data
-            ];
+                $response = [
+                    'statut'   => 1,
+                    'message'  => $message,
+                    'redirect' => $redirect,
+                    'data' => $data
+                ];
+            } else {
+                $message = 'Oups mais vous pouvez plus de modification pour cette deliberation ';
+
+                $response = [
+                    'statut'   => 0,
+                    'message'  => $message,
+                    'redirect' => $redirect,
+                    'data' => $data
+                ];
+            }
+
+
+
+
+
 
             $this->addFlash('success', $message);
 

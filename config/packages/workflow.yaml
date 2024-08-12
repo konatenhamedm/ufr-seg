@@ -110,6 +110,7 @@ framework:
                 - echeance_soumis
                 - valide
                 - rejete
+                - examen_echoue
                 - solde
             transitions:
                 soumission:

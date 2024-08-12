@@ -12,6 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Security;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 use function PHPUnit\Framework\isEmpty;
 
 class Menu
@@ -23,6 +25,7 @@ class Menu
     private $security;
 
     private $resp;
+    private $session;
     private $tableau = [];
     private $anneeScolaireRepository;
 
@@ -36,6 +39,7 @@ class Menu
             $this->security = $security;
         }
         $this->anneeScolaireRepository = $anneeScolaireRepository;
+        //$this->session = $session;
     }
     public function getRoute()
     {
@@ -71,5 +75,15 @@ class Menu
     {
         $repo = $this->em->getRepository(Preinscription::class)->listeAnneScolaire($this->security->getUser()->getPersonne());
         return $repo;
+    }
+
+    public function getAnnneeScolaire()
+    {
+
+        /*  if($this->session->get('anneeScolaire') == null) {
+
+            $this->session->set('anneeScolaire', $this->anneeScolaireRepository->findOneBy(['actif' => 1]));
+        } */
+        return $this->anneeScolaireRepository->findOneBy(['actif' => 1]);
     }
 }
