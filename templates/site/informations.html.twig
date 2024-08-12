@@ -275,10 +275,12 @@ $('#etudiant_prenom').upperFirstAll()
             }); 
         }); 
      const etat = "{{etudiant.etat}}";
+     const nombre = "{{nombre}}";
+     const preinscription = "{{preinscription}}";
 
      $('#etudiant_infoEtudiants_0_habiteAvec_placeholder').closest( "label" ).hide()
 
-     if(etat == "pas_complet"){
+     if(etat == "pas_complet" && nombre != 1 ){
          Swal.fire({
         text: `Bienvenu (e) dans votre espace étudiant. Veuillez renseigner vos informations personnelles et les soumettre à validation`,
         icon: "warning",
@@ -289,6 +291,44 @@ $('#etudiant_prenom').upperFirstAll()
         }
     });
 
+     }else if(etat == "pas_complet" && nombre == 1){
+
+const url = "{{ path('default_print_iframe', {
+            'r': 'app_comptabilite_comptabilite_print',
+            'params': {
+                'id': preinscription
+            }
+        }) }}"
+   
+   Swal.fire({
+    html: `OPÉRATION EFFECTUÉE AVEC SUCCÈS. VEUILLEZ CLIQUER SUR CE LIEN POUR TÉLÉCHARGER LA FICHE DE PAIEMENT DE LA PRÉINSCRIPTION <a data-bs-toggle="modal" data-bs-target="#modal-lg" href="${url}">télécharger le reçu</a>`,
+    icon: "warning",
+    buttonsStyling: false,
+    confirmButtonText: "OK",
+    customClass: {
+        confirmButton: "btn btn-success"
+    }
+});
+
+
+     }else if(nombre == 1 && etat != "pas_complet")
+   {
+          const url = "{{ path('default_print_iframe', {
+            'r': 'app_comptabilite_comptabilite_print',
+            'params': {
+                'id': preinscription
+            }
+        }) }}"
+   
+   Swal.fire({
+    html: `OPÉRATION EFFECTUÉE AVEC SUCCÈS. VEUILLEZ CLIQUER SUR CE LIEN POUR TÉLÉCHARGER LA FICHE DE PAIEMENT DE LA PRÉINSCRIPTION <a data-bs-toggle="modal" data-bs-target="#modal-lg" href="${url}">télécharger le reçu</a>`,
+    icon: "warning",
+    buttonsStyling: false,
+    confirmButtonText: "OK",
+    customClass: {
+        confirmButton: "btn btn-success"
+    }
+});
      }
 
 

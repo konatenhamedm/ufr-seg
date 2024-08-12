@@ -653,7 +653,9 @@ class HomeController extends AbstractController
         UtilisateurRepository $utilisateurRepository,
         PreinscriptionRepository $preinscriptionRepository,
         SessionInterface $session,
-        AnneeScolaireRepository $anneeScolaireRepository
+        AnneeScolaireRepository $anneeScolaireRepository,
+        PreinscriptionRepository $prescriptionRepository
+
 
     ): Response {
         $etudiant = $etudiantRepository->find($user->getPersonne()->getId());
@@ -788,6 +790,10 @@ class HomeController extends AbstractController
         return $this->render('site/informations.html.twig', [
             'etudiant' => $etudiant,
             'etat' => 'ok',
+            'nombre' => $etudiant->getPreinscriptions()->filter(function ($preinscription) {
+                return $preinscription->getEtat() == 'attente_paiement';
+            })->count(),
+            'preinscription' => $preinscriptionRepository->findOneBy(array('etudiant' => $etudiant, 'etat' => 'attente_paiement'))->getId(),
             'form' => $form->createView(),
         ]);
 

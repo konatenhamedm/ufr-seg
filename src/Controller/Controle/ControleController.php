@@ -159,7 +159,7 @@ class ControleController extends AbstractController
             $sessionData->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
         }
 
-        $controleVefication = $controleRepository->findOneBy(['classe' => $classe, 'matiere' => $matiere, 'semestre' => $semestre, 'ue' => $ue]);
+        $controleVefication = $controleRepository->findOneBy(['classe' => $classe, 'anneeScolaire' => $annee,  'matiere' => $matiere, 'semestre' => $semestre, 'ue' => $ue]);
         // dd($controleVefication, $semestre);
         if ($controleVefication) {
             $form = $this->createForm(ControleType::class, $controleVefication, [
