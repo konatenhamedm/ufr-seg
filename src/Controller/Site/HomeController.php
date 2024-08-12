@@ -301,7 +301,13 @@ class HomeController extends AbstractController
                     $etudiant->setGenre($inscriptionDTO->getGenre());
                     $etudiant->setFonction($fonctionRepository->findOneBy(['code' => 'ETD']));
                     $etudiant->setLieuNaissance('');
-                    $etudiant->setEtat('pas_complet');
+
+                    if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+                        $etudiant->setEtat('pas_complet');
+                    } else {
+                        $etudiant->setEtat('complete');
+                    }
+
                     $etudiant->setEmail($inscriptionDTO->getEmail());
                     $etudiant->setContact($inscriptionDTO->getContact());
                     $etudiant->setFonction($fonction);
@@ -493,7 +499,11 @@ class HomeController extends AbstractController
                     $etudiant->setGenre($inscriptionDTO->getGenre());
                     $etudiant->setFonction($fonctionRepository->findOneBy(['code' => 'ETD']));
                     $etudiant->setLieuNaissance('');
-                    $etudiant->setEtat('pas_complet');
+                    if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+                        $etudiant->setEtat('pas_complet');
+                    } else {
+                        $etudiant->setEtat('complete');
+                    }
                     $etudiant->setEmail($inscriptionDTO->getEmail());
                     $etudiant->setContact($inscriptionDTO->getContact());
                     $etudiant->setFonction($fonction);
