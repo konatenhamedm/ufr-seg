@@ -106,7 +106,11 @@ class PreinscriptionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Preinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -215,7 +219,11 @@ class PreinscriptionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Preinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -330,7 +338,8 @@ class PreinscriptionController extends AbstractController
                 } else {
                     return false;
                 }
-            }),   'imprime' =>  new ActionRender(function () use ($etat) {
+            }),
+            'imprime' =>  new ActionRender(function () use ($etat) {
                 if ($etat == 'valide') {
                     return true;
                 } else {
@@ -358,7 +367,11 @@ class PreinscriptionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Preinscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Preinscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -383,7 +396,7 @@ class PreinscriptionController extends AbstractController
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-check',
                                 'attrs' => ['class' => 'btn-main'],
-                                'render' => new ActionRender(fn () => $context->getEtat() == 'paiement_confirmation')
+                                'render' => new ActionRender(fn() => $context->getEtat() == 'paiement_confirmation')
                             ],
                             'paiement' => [
                                 'url' => $this->generateUrl('app_comptabilite_paiement_etudiant_edit', ['id' => $value]),
@@ -391,7 +404,7 @@ class PreinscriptionController extends AbstractController
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-cash',
                                 'attrs' => ['class' => 'btn-warning', 'title' => 'Paiements'],
-                                'render' => new ActionRender(fn () => $context->getEtat() == 'paiement_confirmation')
+                                'render' => new ActionRender(fn() => $context->getEtat() == 'paiement_confirmation')
                             ],
                         ]
 
@@ -549,9 +562,16 @@ class PreinscriptionController extends AbstractController
                 $entityManager->persist($preinscription);
                 $entityManager->flush();
 
+                $url = $this->generateUrl('default_print_iframe', [
+                    'r' => 'app_comptabilite_comptabilite_print',
+                    'params' => [
+                        'id' => $preinscription->getId()
+                    ]
+                ]);
+
                 $data = true;
                 $showAlert = true;
-                $message       = sprintf('Votre demande pour le niveau [%s] a été enregistrée. Elle sera traitée par nos services pour la suite de votre parcours', $preinscription->getNiveau()->getLibelle());
+                $message       = sprintf('Votre demande pour le niveau [%s] a été enregistrée. Elle sera traitée par nos services pour la suite de votre parcours. Voici le lien de téléchargement du reçu : %s', $preinscription->getNiveau()->getLibelle(), '<a data-bs-toggle="modal" data-bs-target="#modal-lg" href="' . $url . '">télécharger le reçu</a>');
 
                 $statut = 1;
                 $this->addFlash('success', $message);
