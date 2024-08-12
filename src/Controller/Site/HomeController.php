@@ -793,7 +793,7 @@ class HomeController extends AbstractController
             'nombre' => $etudiant->getPreinscriptions()->filter(function ($preinscription) {
                 return $preinscription->getEtat() == 'attente_paiement';
             })->count(),
-            'preinscription' => $preinscriptionRepository->findOneBy(array('etudiant' => $etudiant, 'etat' => 'attente_paiement'))->getId(),
+            'preinscription' => $preinscriptionRepository->findOneBy(array('etudiant' => $etudiant, 'etat' => 'attente_paiement')) ? $preinscriptionRepository->findOneBy(array('etudiant' => $etudiant, 'etat' => 'attente_paiement'))->getId() : 0,
             'form' => $form->createView(),
         ]);
 
