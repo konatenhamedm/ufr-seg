@@ -1219,7 +1219,7 @@ class NiveauEtudiantController extends AbstractController
 
         $data = null;
         $statutCode = Response::HTTP_OK;
-
+        $showAlert = false;
         $isAjax = $request->isXmlHttpRequest();
 
         if ($preinscription->getEtat() == "paiement_confirmation") {
@@ -1295,11 +1295,27 @@ class NiveauEtudiantController extends AbstractController
                     $preinscriptionRepository->add($preinscription, true);
                 }
 
+
+
                 /* $entityManager->persist($niveauEtudiant);
                 $entityManager->flush();*/
-                $data = true;
-                $message       = 'Opération effectuée avec succès';
+
+                $url = $this->generateUrl('default_print_iframe', [
+                    'r' => 'app_comptabilite_comptabilite_print',
+                    'params' => [
+                        'id' => $preinscription->getId()
+                    ]
+                ]);
+
+                $showAlert = true;
                 $statut = 1;
+                $message = sprintf(
+                    'Merci beaucoup pour cette opération. Voici le lien de téléchargement du reçu : %s',
+                    '<a data-bs-toggle="modal" data-bs-target="#modal-lg" href="' . $url . '">télécharger le reçu</a>'
+                );
+                $data = true;
+                //$message       = 'Opération effectuée avec succès';
+                /* $statut = 1; */
                 $this->addFlash('success', $message);
             } else {
                 $message = $formError->all($form);
@@ -1311,7 +1327,7 @@ class NiveauEtudiantController extends AbstractController
             }
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'showAlert'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
