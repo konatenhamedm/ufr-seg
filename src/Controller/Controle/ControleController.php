@@ -259,13 +259,21 @@ class ControleController extends AbstractController
         $matiere = null,
         $ue = null,
         Service $service,
+        AnneeScolaireRepository $anneeScolaireRepository
     ): Response {
+        $annee = $sessionData->get('anneeScolaire');
+
+
+        if ($annee == null) {
+
+            $sessionData->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
 
 
 
         $all = $request->query->all();
 
-        $controleVefication = $controleRepository->findOneBy(['classe' => $classe, 'matiere' => $matiere, 'semestre' => $semestre, 'ue' => $ue]);
+        $controleVefication = $controleRepository->findOneBy(['classe' => $classe, 'anneeScolaire' => $annee,  'matiere' => $matiere, 'semestre' => $semestre, 'ue' => $ue]);
 
         //dd($controleVefication);
 
