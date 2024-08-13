@@ -210,10 +210,10 @@
                 load_principal({semestre: $semestre.val(),classe:val,matiere: $matiere.val(),ue: $ue.val()})
           });
           $ue.on('change', function () {
-     
               const $this = $(this);
               const val = $(this).val();
 
+     //alert(val)
                 load_content(`/admin/controle/controle/new/load/${$semestre.val()}/${$classe.val()}/${$matiere.val()}/${val}`,{semestre: $semestre.val(),classe:$classe.val(),matiere: $matiere.val(),ue: val})
                 //load_matiere(val)
                 load_ue_matiere(val)
