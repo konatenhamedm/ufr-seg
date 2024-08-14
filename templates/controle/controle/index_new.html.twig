@@ -228,9 +228,9 @@
                  load_content(`/admin/controle/controle/new/load/${$semestre.val()}/${$classe.val()}/${val}/${$ue.val()}`,{semestre: $semestre.val(),classe:$classe.val(),matiere: val,ue: $ue.val()})
                 load_principal({semestre: $semestre.val(),classe:$classe.val(),matiere: val,ue: $ue.val()})
           });
-           load_ue($classe.val())
+          load_classe()
+          load_ue($classe.val())
            load_ue_matiere($ue.val())
-            load_classe()
           load_content(`/admin/controle/controle/new/load/${$semestre.val()}/${$classe.val()}/${$matiere.val()}/${$ue.val()}`,{semestre: $semestre.val(),classe:$classe.val(),matiere: $matiere.val(),ue: $ue.val()})
           load_principal({semestre: $semestre.val(),classe:$classe.val(),matiere: $matiere.val(),ue: $ue.val()})
 
