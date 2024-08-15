@@ -155,7 +155,7 @@ class DeliberationController extends AbstractController
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
-            ->add('niveau', TextColumn::class, ['label' => 'Niveau', 'field' => 'niveau.libelle'])
+            ->add('niveau', TextColumn::class, ['label' => 'Niveau', 'field' => 'n.code'])
             ->add('dateExamen', DateTimeColumn::class, ['label' => 'Date Prévue', 'format' => 'd-m-Y'])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Examen::class,

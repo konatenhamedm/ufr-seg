@@ -433,6 +433,7 @@ class NiveauEtudiantController extends AbstractController
                 ->add('datePreinscription', DateTimeColumn::class, ['label' => 'Date de demande', 'format' => 'd-m-Y', 'searchable' => false])
                 /* ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.libelle']) */
                 ->add('niveau', TextColumn::class, ['label' => 'Niveau', 'field' => 'niveau.libelle'])
+                //->add('niveau2', TextColumn::class, ['label' => 'Niveau', 'field' => 'niveau.code'])
                 ->add('montant', NumberFormatColumn::class, ['label' => 'Mnt. Préinscr.', 'field' => 'filiere.montantPreinscription'])
                 ->createAdapter(ORMAdapter::class, [
                     'entity' => Preinscription::class,
@@ -644,6 +645,7 @@ class NiveauEtudiantController extends AbstractController
     #[Route('/', name: 'app_comptabilite_niveau_etudiant_index', methods: ['GET', 'POST'])]
     public function index(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session): Response
     {
+
         $anneeScolaire = $session->get('anneeScolaire');
         //dd("dd");
         $ver = $this->isGranted('ROLE_ETUDIANT');
@@ -672,7 +674,9 @@ class NiveauEtudiantController extends AbstractController
                         ->join('niveau.responsable', 'res')
                         ->leftJoin('e.caissiere', 'c')
                         ->andWhere('e.etat = :statut')
+                        /*  ->andWhere('etudiant.etat = :etat') */
                         ->setParameter('statut', 'attente_paiement')
+                        /*  ->setParameter('etat', 'complete') */
                         ->orderBy('e.datePreinscription', 'DESC');
 
                     if ($this->isGranted('ROLE_ETUDIANT')) {
@@ -689,6 +693,9 @@ class NiveauEtudiantController extends AbstractController
                         $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
                             ->setParameter('anneeScolaire', $anneeScolaire);
                     }
+                    $qb
+                        ->andWhere('etudiant.etat = :etat')
+                        ->setParameter('etat', 'complete');
                 }
             ])
             ->setName('dt_app_comptabilite_niveau_etudiant');
@@ -1271,7 +1278,7 @@ class NiveauEtudiantController extends AbstractController
                     $preinscription->setDateValidation($form->get('datePaiement')->getData());
                     $preinscriptionRepository->add($preinscription, true);
 
-                    if (!$preinscription->getNiveau()->getFiliere()->isPassageExamen()) {
+                    if (!$preinscription->getNiveau()->isPassageExamen()) {
                         $inscription = new Inscription();
 
                         // $inscription->setCaissiere();

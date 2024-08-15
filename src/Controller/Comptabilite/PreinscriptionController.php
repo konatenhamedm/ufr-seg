@@ -550,15 +550,18 @@ class PreinscriptionController extends AbstractController
                 /*  $preinscription->setEtat('attente_validation');
                 $preinscription->setEtatDeliberation('pas_deliberer');
  */
-                if ($preinscription->getNiveau()->getFiliere()->isPassageExamen()) {
 
-                    $preinscription->setEtat('attente_validation');
+                if ($preinscription->getNiveau()->isPassageExamen()) {
+
+                    $preinscription->setEtat('attente_paiement');
                     $preinscription->setEtatDeliberation('pas_deliberer');
                 } else {
 
-                    $preinscription->setEtat('attente_paiement');
+                    $preinscription->setEtat('attente_validation');
                     $preinscription->setEtatDeliberation('deliberer');
                 }
+
+
                 $entityManager->persist($preinscription);
                 $entityManager->flush();
 

@@ -17,10 +17,7 @@ class FiliereType extends AbstractType
     {
         $builder
             ->add('code', null, ['label' => 'Code'])
-            ->add('passageExamen', CheckboxType::class, [
-                'label' => "Passage Examens",
-                'required' => false,
-            ])
+
             ->add('libelle', null, ['label' => 'Libellé'])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',

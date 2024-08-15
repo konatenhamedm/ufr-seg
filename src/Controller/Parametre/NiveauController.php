@@ -328,7 +328,7 @@ class NiveauController extends AbstractController
     #[Route('/{id}/edit', name: 'app_parametre_niveau_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Niveau $niveau, EntityManagerInterface $entityManager, FormError $formError): Response
     {
-        $typeFrais = $entityManager->getRepository(TypeFrais::class)->findAll();
+        /* $typeFrais = $entityManager->getRepository(TypeFrais::class)->findAll();
         $oldFrais = $niveau->getFrais();
         foreach ($typeFrais as $type) {
             $frais = $oldFrais->filter(fn(Frais $frais) => $frais->getTypeFrais() == $type)->current();
@@ -338,7 +338,7 @@ class NiveauController extends AbstractController
 
             $frais->setTypeFrais($type);
             $niveau->addFrai($frais);
-        }
+        } */
 
 
 

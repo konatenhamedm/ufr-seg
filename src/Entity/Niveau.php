@@ -78,6 +78,11 @@ class Niveau
     private Collection $echeancierNiveaux;
 
 
+    #[ORM\Column]
+    private ?bool $passageExamen = null;
+
+
+
 
 
     public function __construct()
@@ -477,6 +482,18 @@ class Niveau
                 $echeancierNiveau->setNiveau(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isPassageExamen(): ?bool
+    {
+        return $this->passageExamen;
+    }
+
+    public function setPassageExamen(bool $passageExamen): static
+    {
+        $this->passageExamen = $passageExamen;
 
         return $this;
     }

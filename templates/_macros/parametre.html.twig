@@ -1,9 +1,16 @@
-{% macro prototype_ligne_frais(form) %}
+{% macro prototype_ligne_frais(form,etat) %}
  <div class="proto-container" data-prototype="{{ _self.ligne_frais(form.frais.vars.prototype)|e }}"></div>
    {#  <button type="button" data-protoname="__name__" class="btn btn-default add-collection add-ligne btn-xs" id="add_ligne" data-protoclass=".proto-container" data-container=".row-container">
         <i class="fa fa-plus"></i>
         Ajouter une ligne
     </button> #}
+
+    {% if etat == 'edit' %}
+    <button type="button" data-protoname="__name__" class="btn btn-default add-collection add-ligne btn-xs" id="add_ligne" data-protoclass=".proto-container" data-container=".row-container">
+        <i class="fa fa-plus"></i>
+        Ajouter une ligne
+    </button>
+    {% endif %}
 
     <table class="table table-bordered table-custom">
         <thead class="thead-dark">
@@ -64,7 +71,8 @@
            {{ dump(frais.typeFrais.vars)}}
            {% endif %} #}
            
-            <div style="display:nonei">{{ form_widget(frais.typeFrais,{attr: {'readonly':'true'}}) }}</div>
+            <div style="display:nonei">{{ form_widget(frais.typeFrais) }}</div>
+            {# <div style="display:nonei">{{ form_widget(frais.typeFrais,{attr: {'readonly':'true'}}) }}</div> #}
         </td>
         <td class="p-2">{{ form_widget(frais.montant) }}</td>
          <td class="p-2 text-center del-col"></td>

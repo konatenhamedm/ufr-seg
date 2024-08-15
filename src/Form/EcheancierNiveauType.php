@@ -27,7 +27,7 @@ class EcheancierNiveauType extends AbstractType
                 'label'   => false,
                 // 'format'  => 'dd/MM/yyyy',
                 'html5' => true,
-                'data'   => new DateTime(),
+                //'data'   => new DateTime(),
 
                 "constraints" => array(
                     new NotNull(null, "S'il vous veillez renseigner la date écheancier")

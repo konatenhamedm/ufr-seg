@@ -56,7 +56,7 @@ class PreinscriptionRepository extends ServiceEntityRepository
             ->innerJoin('n.filiere', 'f')
             ->andWhere('p.etudiant = :etudiant')
             ->andWhere('p.etat = :status')
-            ->andWhere('f.passageExamen = :etat')
+            ->andWhere('n.passageExamen = :etat')
             ->setParameter('etudiant', $etudiant)
             ->setParameter('status', 'attente_paiement')
             ->setParameter('etat', 1)
@@ -146,6 +146,16 @@ class PreinscriptionRepository extends ServiceEntityRepository
             ->orderBy("a.id")
             ->getQuery()
             ->getResult();
+    }
+    public function getPreinscriptionNewInscription($etudiant): ?Preinscription
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.etudiant = :etudiant')
+            ->andWhere('p.etat in (:etat)')
+            ->setParameter("etudiant", $etudiant)
+            ->setParameter("etat", ["attente_paiement", "attente_validation"])
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
 

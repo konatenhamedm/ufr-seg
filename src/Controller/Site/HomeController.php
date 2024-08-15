@@ -301,12 +301,13 @@ class HomeController extends AbstractController
                     $etudiant->setGenre($inscriptionDTO->getGenre());
                     $etudiant->setFonction($fonctionRepository->findOneBy(['code' => 'ETD']));
                     $etudiant->setLieuNaissance('');
+                    $etudiant->setEtat('pas_complet');
 
-                    if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+                    /* if ($inscriptionDTO->getNiveau()->isPassageExamen()) {
                         $etudiant->setEtat('pas_complet');
                     } else {
                         $etudiant->setEtat('complete');
-                    }
+                    } */
 
                     $etudiant->setEmail($inscriptionDTO->getEmail());
                     $etudiant->setContact($inscriptionDTO->getContact());
@@ -337,8 +338,8 @@ class HomeController extends AbstractController
                     );
                     //attente_paiement
                     $preinscription = new Preinscription();
-
-                    if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+                    /* 
+                    if ($inscriptionDTO->getNiveau()->isPassageExamen()) {
 
                         $preinscription->setEtat('attente_validation');
                         $preinscription->setEtatDeliberation('pas_deliberer');
@@ -346,6 +347,16 @@ class HomeController extends AbstractController
 
                         $preinscription->setEtatDeliberation('deliberer');
                         $preinscription->setEtat('attente_paiement');
+                    } */
+
+                    if ($inscriptionDTO->getNiveau()->isPassageExamen()) {
+
+                        $preinscription->setEtat('attente_paiement');
+                        $preinscription->setEtatDeliberation('pas_deliberer');
+                    } else {
+
+                        $preinscription->setEtat('attente_validation');
+                        $preinscription->setEtatDeliberation('deliberer');
                     }
                     $preinscription->setEtudiant($etudiant);
                     $preinscription->setDatePreinscription(new \DateTime());
@@ -384,7 +395,7 @@ class HomeController extends AbstractController
                     } else {
 
                         $preinscription = new Preinscription();
-                        if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+                        /*  if ($inscriptionDTO->getNiveau()->isPassageExamen()) {
 
                             $preinscription->setEtat('attente_validation');
                             $preinscription->setEtatDeliberation('pas_deliberer');
@@ -392,6 +403,15 @@ class HomeController extends AbstractController
 
                             $preinscription->setEtatDeliberation('deliberer');
                             $preinscription->setEtat('attente_paiement');
+                        } */
+                        if ($inscriptionDTO->getNiveau()->isPassageExamen()) {
+
+                            $preinscription->setEtat('attente_paiement');
+                            $preinscription->setEtatDeliberation('pas_deliberer');
+                        } else {
+
+                            $preinscription->setEtat('attente_validation');
+                            $preinscription->setEtatDeliberation('deliberer');
                         }
                         $preinscription->setEtudiant($user->getPersonne());
                         $preinscription->setDatePreinscription(new \DateTime());
@@ -499,11 +519,11 @@ class HomeController extends AbstractController
                     $etudiant->setGenre($inscriptionDTO->getGenre());
                     $etudiant->setFonction($fonctionRepository->findOneBy(['code' => 'ETD']));
                     $etudiant->setLieuNaissance('');
-                    if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
-                        $etudiant->setEtat('pas_complet');
+                    $etudiant->setEtat('pas_complet');
+                    /*  if ($inscriptionDTO->getNiveau()->isPassageExamen()) {
                     } else {
                         $etudiant->setEtat('complete');
-                    }
+                    } */
                     $etudiant->setEmail($inscriptionDTO->getEmail());
                     $etudiant->setContact($inscriptionDTO->getContact());
                     $etudiant->setFonction($fonction);
@@ -532,13 +552,13 @@ class HomeController extends AbstractController
                         $request
                     );
                     $preinscription = new Preinscription();
-                    if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+                    if ($inscriptionDTO->getNiveau()->isPassageExamen()) {
 
-                        $preinscription->setEtat('attente_validation');
+                        $preinscription->setEtat('attente_paiement');
                         $preinscription->setEtatDeliberation('pas_deliberer');
                     } else {
 
-                        $preinscription->setEtat('attente_paiement');
+                        $preinscription->setEtat('attente_validation');
                         $preinscription->setEtatDeliberation('deliberer');
                     }
                     $preinscription->setEtudiant($etudiant);
@@ -549,7 +569,7 @@ class HomeController extends AbstractController
                     $preinscription->setCode($this->numeroPreinscription($inscriptionDTO->getNiveau()->getCode()));
                     $preinscriptionRepository->add($preinscription, true);
 
-                    /*  if (!$preinscription->getNiveau()->getFiliere()->isPassageExamen()) {
+                    /*  if (!$preinscription->getNiveau()->isPassageExamen()) {
                         $inscription = new Inscription();
 
                         // $inscription->setCaissiere();
@@ -595,12 +615,13 @@ class HomeController extends AbstractController
                     } else {
 
                         $preinscription = new Preinscription();
-                        if ($inscriptionDTO->getNiveau()->getFiliere()->isPassageExamen()) {
+                        if ($inscriptionDTO->getNiveau()->isPassageExamen()) {
 
-                            $preinscription->setEtat('attente_validation');
+                            $preinscription->setEtat('attente_paiement');
                             $preinscription->setEtatDeliberation('pas_deliberer');
                         } else {
-                            $preinscription->setEtat('attente_paiement');
+
+                            $preinscription->setEtat('attente_validation');
                             $preinscription->setEtatDeliberation('deliberer');
                         }
                         $preinscription->setEtudiant($user->getPersonne());
@@ -731,18 +752,19 @@ class HomeController extends AbstractController
 
         $data = null;
         $statutCode = Response::HTTP_OK;
-
+        $showAlert = false;
         $isAjax = $request->isXmlHttpRequest();
-
-
+        $boutonVisible = true;
+        $fullRedirect = false;
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
             $response = [];
             $redirect = $this->generateUrl('site_information');
             $datas = $preinscriptionRepository->findBy(array('etudiant' => $etudiant, 'etat' => 'attente_informations'));
+            $preinscriptionData = $preinscriptionRepository->getPreinscriptionNewInscription($etudiant);
             $dataFilireWithoutExamen = $preinscriptionRepository->dataFilireWithoutExamen($etudiant);
-
+            // $preinscriptionData->getNiveau()
             $prenoms = '';
             $explodePrenom = explode(" ", $form->get('prenom')->getData());
             for ($i = 0; $i < count($explodePrenom); $i++) {
@@ -754,26 +776,37 @@ class HomeController extends AbstractController
                 $etudiant->setPrenom($prenoms);
                 if ($form->getClickedButton()->getName() === 'valider') {
                     $etudiant->setEtat('complete');
-                    if ($dataFilireWithoutExamen > 0) {
+                    $url = $this->generateUrl('default_print_iframe', [
+                        'r' => 'app_comptabilite_comptabilite_print',
+                        'params' => [
+                            'id' => $preinscriptionData->getId()
+                        ]
+                    ]);
 
-                        $message       = 'VOTRE DOSSIER A ETE VALIDE! RENDEZ-VOUS DIRECTEMENT DANS SUIVI DOSSIER, ATTENTE DE PAIEMENT POUR IMPRIMER LA FICHE ET PAYER LA PREINSCRIPTION';
+
+
+                    if ($preinscriptionData->getNiveau()->isPassageExamen()) {
+                        $showAlert = true;
+                        $message = sprintf(
+                            'OPÉRATION EFFECTUÉE AVEC SUCCÈS. VEUILLEZ CLIQUER SUR CE LIEN POUR TÉLÉCHARGER LA FICHE DE PAIEMENT DE LA PRÉINSCRIPTION.  %s',
+                            '<a data-bs-toggle="modal" data-bs-target="#modal-lg" href="' . $url . '">télécharger le reçu</a>'
+                        );
                     } else {
-
-                        $message       = 'Votre dossier a bien été transmis pour validation. Vous recevrez une notification après traitement.';
+                        $showAlert = true;
+                        $message = sprintf(
+                            'OPÉRATION EFFECTUÉE AVEC SUCCÈS.'
+                        );
                     }
 
+                    $statut = 1;
                     $etudiantRepository->add($etudiant, true);
-
-                    foreach ($datas as $key => $value) {
-                        $value->setEtat('attente_validation');
-                        $preinscriptionRepository->add($value, true);
-                    }
+                    $boutonVisible = false;
+                    $fullRedirect = true;
                 } else {
                     $etudiantRepository->add($etudiant, true);
                     $message       = 'Opération effectuée avec succès';
+                    // $fullRedirect = false;
                 }
-
-
 
                 $data = true;
 
@@ -789,7 +822,7 @@ class HomeController extends AbstractController
             }
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'showAlert', 'fullRedirect'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);
@@ -803,8 +836,9 @@ class HomeController extends AbstractController
             'nombre' => $etudiant->getPreinscriptions()->filter(function ($preinscription) {
                 return $preinscription->getEtat() == 'attente_paiement';
             })->count(),
-            'preinscription' => $preinscriptionRepository->findOneBy(array('etudiant' => $etudiant, 'etat' => 'attente_paiement')) ? $preinscriptionRepository->findOneBy(array('etudiant' => $etudiant, 'etat' => 'attente_paiement'))->getId() : 0,
+            'preinscription' => $preinscriptionRepository->getPreinscriptionNewInscription($etudiant)->getId(),
             'form' => $form->createView(),
+            'boutonVisible' => $boutonVisible,
         ]);
 
         //return $this->render('site/admin/pages/informations.html.twig');
