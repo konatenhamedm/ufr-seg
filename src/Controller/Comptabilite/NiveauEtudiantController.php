@@ -483,6 +483,10 @@ class NiveauEtudiantController extends AbstractController
                     return false;
                 }
             }),
+            'edit_preinscription' =>  new ActionRender(function () use ($etat) {
+
+                return true;
+            }),
             'verification' =>  new ActionRender(function () use ($etat, $isEtudiant) {
                 if ($etat == 'attente_validation' &&  $isEtudiant == false) {
                     return true;
@@ -581,6 +585,14 @@ class NiveauEtudiantController extends AbstractController
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
+                            ],
+                            'edit_preinscription' => [
+                                'url' => $this->generateUrl('app_comptabilite_preinscription_edit_preinscription', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-pen',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['edit_preinscription']
                             ],
                             'delete' => [
                                 'target' => '#modal-small',

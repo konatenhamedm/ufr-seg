@@ -733,6 +733,65 @@ class PreinscriptionController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    #[Route('/{id}/edit/preinscription', name: 'app_comptabilite_preinscription_edit_preinscription', methods: ['GET', 'POST'])]
+    public function editPreinscription(Request $request, Preinscription $preinscription, SessionInterface $session, EntityManagerInterface $entityManager, FormError $formError): Response
+    {
+
+        $form = $this->createForm(PreinscriptionEudiantConnecteType::class, $preinscription, [
+            'method' => 'POST',
+            'anneeScolaire' => $session->get('anneeScolaire'),
+            'action' => $this->generateUrl('app_comptabilite_preinscription_edit_preinscription', [
+                'id' =>  $preinscription->getId()
+            ])
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_comptabilite_preinscription_index');
+
+
+
+
+            if ($form->isValid()) {
+
+                $entityManager->persist($preinscription);
+                $entityManager->flush();
+
+                $data = true;
+                $message       = 'Opération effectuée avec succès';
+                $statut = 1;
+                $this->addFlash('success', $message);
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->render('comptabilite/preinscription/edit_preinscription.html.twig', [
+            'preinscription' => $preinscription,
+            'form' => $form->createView(),
+        ]);
+    }
 
 
 
