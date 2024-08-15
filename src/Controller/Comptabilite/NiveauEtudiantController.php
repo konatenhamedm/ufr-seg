@@ -491,7 +491,7 @@ class NiveauEtudiantController extends AbstractController
                 }
             }),
             'delete' => new ActionRender(function () {
-                return false;
+                return true;
             }),
             'show' => new ActionRender(function () use ($etat, $isEtudiant) {
                 if ($etat == 'attente_validation' && $isEtudiant == false) {
@@ -584,7 +584,7 @@ class NiveauEtudiantController extends AbstractController
                             ],
                             'delete' => [
                                 'target' => '#modal-small',
-                                'url' => $this->generateUrl('app_comptabilite_niveau_etudiant_delete', ['id' => $value]),
+                                'url' => $this->generateUrl('app_comptabilite_preinscription_delete', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-trash',
@@ -1491,7 +1491,7 @@ class NiveauEtudiantController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_comptabilite_niveau_etudiant_delete', methods: ['DELETE', 'GET'])]
+    #[Route('/{id}/delete/dossier', name: 'app_comptabilite_niveau_etudiant_delete', methods: ['DELETE', 'GET'])]
     public function delete(Request $request, NiveauEtudiant $niveauEtudiant, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createFormBuilder()
