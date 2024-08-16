@@ -26,6 +26,7 @@ use App\Entity\Utilisateur;
 use App\Entity\UtilisateurGroupe;
 use App\Form\CiviliteType;
 use App\Form\EtudiantAdminNewType;
+use App\Form\EtudiantAdminReinscriptionType;
 use App\Form\EtudiantAdminType;
 use App\Form\EtudiantDocumentType;
 use App\Form\EtudiantType;
@@ -1126,6 +1127,185 @@ class HomeController extends AbstractController
         ]);
     }
 
+
+    #[Route('/reinscription/etudiant/admin', name: 'app_reinscription_etudiant_admin_index', methods: ['GET', 'POST'], options: ['expose' => true])]
+    public function indexReinscription(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
+    {
+        $classe = $request->query->get('classe');
+        $niveau = $request->query->get('niveau');
+        $filiere = $request->query->get('filiere');
+        // dd($niveau, $filiere);
+
+        $anneeScolaire = $session->get('anneeScolaire');
+
+        if ($anneeScolaire == null) {
+            // dd($anneeScolaireRepository->findOneBy(['actif' => 1]));
+            //unset($annee);
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
+        $builder = $this->createFormBuilder(null, [
+            'method' => 'GET',
+            'action' => $this->generateUrl('app_reinscription_etudiant_admin_index', compact('classe', 'niveau', 'filiere')),
+        ])->add('classe', EntityType::class, [
+            'class' => Classe::class,
+            'choice_label' => 'libelle',
+            'label' => 'Affichage par classe',
+            'placeholder' => '---',
+            'required' => false,
+            'attr' => ['class' => 'form-control-sm has-select2'],
+            'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                return $er->createQueryBuilder('c')
+                    ->where('c.anneeScolaire = :anneeScolaire')
+                    ->setParameter('anneeScolaire', $anneeScolaire)
+                    ->orderBy('c.id', 'ASC');
+            },
+        ])
+            ->add('niveau', EntityType::class, [
+                'class' => Niveau::class,
+                'choice_label' => 'getFullCodeAnneeScolaire',
+                'label' => 'Niveau',
+                'placeholder' => '---',
+                'required' => false,
+                'attr' => ['class' => 'form-control-sm has-select2'],
+                'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                    return $er->createQueryBuilder('c')
+                        ->where('c.anneeScolaire = :anneeScolaire')
+                        ->setParameter('anneeScolaire', $anneeScolaire)
+                        ->orderBy('c.id', 'ASC');
+                },
+            ])
+            ->add('filiere', EntityType::class, [
+                'class' => Filiere::class,
+                'choice_label' => 'libelle',
+                'label' => 'Filiere',
+                // 'placeholder' => '---',
+                'required' => false,
+                'attr' => ['class' => 'form-control-sm has-select2']
+            ]);
+
+
+
+        $table = $dataTableFactory->create()
+            /*  ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code']) */
+            ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'etudiant.nom'])
+            ->add('prenom', TextColumn::class, ['label' => 'Prénoms', 'field' => 'etudiant.prenom'])
+            ->add('contact', TextColumn::class, ['label' => 'Contact', 'field' => 'etudiant.contact'])
+            ->add('classe', TextColumn::class, ['label' => 'Classe', 'field' => 'classe.libelle'])
+
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => Inscription::class,
+                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau, $user, $anneeScolaire) {
+                    $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                        ->from(Inscription::class, 'p')
+                        ->join('p.classe', 'classe', 'res')
+                        ->join('p.niveau', 'niveau')
+                        ->join('niveau.filiere', 'filiere')
+                        ->join('niveau.responsable', 'res')
+                        ->join('p.etudiant', 'etudiant')
+                        ->leftJoin('p.caissiere', 'c')
+                        ->andWhere('p.classe is not null')
+                        ->orderBy('etudiant.nom', 'ASC');
+
+                    //dd($classe, $niveau, $filiere);
+
+                    if ($classe || $niveau || $filiere) {
+                        if ($classe) {
+                            $qb->andWhere('classe.id = :classe')
+                                ->setParameter('classe', $classe);
+                        }
+                        if ($niveau) {
+                            $qb->andWhere('niveau.id = :niveau')
+                                ->setParameter('niveau', $niveau);
+                        }
+                        if ($filiere) {
+                            $qb->andWhere('filiere.id = :filiere')
+                                ->setParameter('filiere', $filiere);
+                        }
+                    }
+
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
+                    }
+
+                    if ($anneeScolaire) {
+                        $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
+                    }
+                }
+
+            ])
+            ->setName('dt_app_reinscription_etudiant_admin_' . $classe . '_' . $niveau . '_' . $filiere);
+
+        $renders = [
+            'edit' =>  new ActionRender(function () {
+                return true;
+            }),
+            'new' =>  new ActionRender(function () {
+                return true;
+            }),
+            'delete' => new ActionRender(function () {
+                return true;
+            }),
+        ];
+
+        $gridId = $classe . '_' . $niveau . '_' . $filiere;
+        $hasActions = false;
+
+        foreach ($renders as $_ => $cb) {
+            if ($cb->execute()) {
+                $hasActions = true;
+                break;
+            }
+        }
+
+        if ($hasActions) {
+            $table->add('id', TextColumn::class, [
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
+                    $options = [
+                        'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                        'target' => '#modal-lg',
+
+                        'actions' => [
+
+                            'new' => [
+                                'target' => '#exampleModalSizeSm2',
+                                'url' => $this->generateUrl('site_reinscription_etudiant', ['id' =>  $context->getEtudiant()->getId(), 'niveau' => $context->getNiveau()->getId()]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-plus-square',
+                                'attrs' => ['class' => 'btn-primary', 'title' => 'Nouvelle inscription'],
+                                'render' => $renders['new']
+                            ],
+
+                        ]
+
+                    ];
+                    return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                }
+            ]);
+        }
+
+
+        $table->handleRequest($request);
+
+        if ($table->isCallback()) {
+            return $table->getResponse();
+        }
+
+
+        return $this->render('site/admin/index_reinscription.html.twig', [
+            'datatable' => $table,
+            'form' => $builder->getForm(),
+            'grid_id' => $gridId
+        ]);
+    }
+
     #[Route('/liste/inscription/etudiant/admin', name: 'app_liste_inscription_etudiant_admin_index', methods: ['GET', 'POST'])]
     public function indexListeInscris(Request $request, UserInterface $user, AnneeScolaireRepository $anneeScolaireRepository, DataTableFactory $dataTableFactory, SessionInterface $session): Response
     {
@@ -1867,6 +2047,146 @@ class HomeController extends AbstractController
 
         //return $this->render('site/admin/pages/informations.html.twig');
     }
+
+
+    #[Route(path: '/site/reinscription/etudiant/{id}/{niveau}', name: 'site_reinscription_etudiant', methods: ['GET', 'POST'])]
+    public function reinscription(
+        Request $request,
+        EtudiantRepository $etudiantRepository,
+        PersonneRepository $personneRepository,
+        FormError $formError,
+        NiveauRepository $niveauRepository,
+        UtilisateurRepository $utilisateurRepository,
+        PreinscriptionRepository $preinscriptionRepository,
+        $id,
+        $niveau,
+        SendMailService $sendMailService,
+        UserPasswordHasherInterface $userPasswordHasher,
+        ClasseRepository $classeRepository,
+        InscriptionRepository $inscriptionRepository,
+        EcheancierRepository $echeancierRepository,
+        EntityManagerInterface $entityManager,
+        Service $service,
+        SessionInterface $session,
+        EcheancierNiveauRepository $echeancierNiveauRepository
+    ): Response {
+
+        $etudiant = $etudiantRepository->find($id);
+
+        ///dd(count($etudiant->getBlocEcheanciers()));
+
+        if (count($etudiant->getBlocEcheanciers()) == 0) {
+
+            /* foreach ($frais as $key => $value) {
+            $sommeFrais += (int)$value->getMontant();
+        } */
+            $bloc_echeancier = new BlocEcheancier();
+
+            // $bloc_echeancier->setClasse($classeRepository->find(7));
+            $bloc_echeancier->setDateInscription(new DateTime());
+            $bloc_echeancier->setTotal('0');
+
+            $etudiant->addBlocEcheancier($bloc_echeancier);
+
+
+            /*  $etudiant->addBlocEcheancier($bloc_echeancier);
+            $echeancierProvisoire = new EcheancierProvisoire();
+            $echeancierProvisoire->setDateVersement(new DateTime());
+            $echeancierProvisoire->setNumero('1');
+            $echeancierProvisoire->setMontant('0'); */
+
+            //$bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
+
+            foreach ($echeancierNiveauRepository->findBy(["niveau" => $niveau]) as $key => $echeancierNiveau) {
+                $echeancierProvisoire = new EcheancierProvisoire();
+                $echeancierProvisoire->setDateVersement($echeancierNiveau->getDateVersement());
+                $echeancierProvisoire->setNumero($echeancierNiveau->getNumero());
+                $echeancierProvisoire->setMontant($echeancierNiveau->getMontant());
+
+                $bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
+            }
+        }
+        $info = new InfoEtudiant();
+
+
+
+        $validationGroups = ['Default', 'FileRequired', 'autre'];
+        //dd($niveauRepository->findNiveauDisponible(21));
+
+        $form = $this->createForm(EtudiantAdminReinscriptionType::class, $etudiant, [
+            'method' => 'POST',
+            "anneeScolaire" => $session->get("anneeScolaire"),
+            "niveau" => $niveauRepository->find($niveau),
+            'doc_options' => [
+                'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
+                'attrs' => ['class' => 'filestyle'],
+            ],
+            'validation_groups' => $validationGroups,
+            'action' => $this->generateUrl('site_reinscription_etudiant', [
+                'id' =>  $id,
+                'niveau' => $niveau
+            ])
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_inscription_etudiant_admin_index');
+
+            $user = $utilisateurRepository->findOneBy(['personne' => $etudiant]);
+            $blocEcheanciers = $form->get('blocEcheanciers')->getData();
+
+            if ($form->isValid()) {
+
+                $responseRegister = $service->registerEcheancierAdmin($blocEcheanciers, $etudiant);
+                if ($responseRegister) {
+                    $etudiantRepository->add($etudiant, true);
+                    $statut = 1;
+                    $message       = 'Opération effectuée avec succès';
+                    $this->addFlash('success', $message);
+                } else {
+                    $statut = 0;
+                    $message       = "Opération échouée car le montant total à payer est different du montant total de l 'échanece";
+                    $this->addFlash('danger', $message);
+                }
+
+
+                $data = true;
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->render('site/admin/new_reinscription.html.twig', [
+            'etudiant' => $etudiant,
+            'etat' => 'ok',
+            'form' => $form->createView(),
+            'frais' => 3,
+        ]);
+
+        //return $this->render('site/admin/pages/informations.html.twig');
+    }
+
     #[Route(path: '/site/information/validation/direct/after/demande/{id}', name: 'site_information_validation_direct_after_demande', methods: ['GET', 'POST'])]
     public function informationAdminNewDirectAfterDemandeEtudiant(
         Request $request,

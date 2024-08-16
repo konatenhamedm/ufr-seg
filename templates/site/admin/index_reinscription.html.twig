@@ -1,0 +1,238 @@
+{% extends 'base-layout.html.twig' %}
+
+{% block title %}Etudiants{% endblock %}
+{% block header %}Inscription{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block body %}
+<div class="card shadow-sm">
+    <div class="card-header card-header-sm">
+        <h3 class="card-title"> {{ title | default('Inscription étudiant') }}</h3>
+        <div class="card-toolbar">
+           {#  <a href="{{ path('site_information_admin_new') }}" class="btn btn-main btn-sm">
+                <i class="bi bi-plus-square text-light"></i>
+                Nouveau
+            </a> #}
+        </div>
+    </div>
+    <div class="card-body">
+    <div class="row">
+        {% form_theme form 'widget/fields-block.html.twig' %}
+            {{ form_start(form,{'attr':{'id':'form'}})}}
+            <fieldset>
+
+             
+              <div class="row small" style="position:relative">
+               {# <div class="col-md-3"></div> #}
+               <div class="col-md-4">{{ form_row(form.filiere) }}</div>
+               <div class="col-md-4">{{ form_row(form.niveau) }}</div>
+               <div class="col-md-4">{{ form_row(form.classe) }}</div>
+               {# <div class="col-md-3 pt-5"> <button class="btn btn-main btn-filter btn-sm" type="button">Valider</button></div> #}
+                
+                {# <div class="col-md-1 pt-5">
+                  <button class="btn btn-main btn-filter btn-sm" type="button">Rechercher</button>
+                </div> #}
+                
+                
+              </div>
+            </fieldset>
+            {{ form_end(form, {render_rest: false}) }}
+      </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="grid_app_reinscription_etudiant_admin_{{ grid_id }}" class="grid-dt-wrapper">Chargement....</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block java %}
+  <script src="{{ asset('assets/js/datatables.js') }}"></script>
+  <script>
+    
+    $(function () {
+      const grid_prefix_id = "{{ grid_id }}";
+      const $old_grid = $('#grid_app_reinscription_etudiant_admin_' + grid_prefix_id);
+      init_select2('.has-select2');
+
+      function loadDataTable($grid, classe,niveau,filiere ,options = null, contents = '') {
+        $grid.initDataTables(
+          options
+          ? options
+          : {{ datatable_settings(datatable) }}, {
+          searching: true,
+          ajaxUrl: Routing.generate('app_reinscription_etudiant_admin_index', {
+            classe: classe,
+            niveau: niveau,
+            filiere: filiere,
+            
+          }),
+          language: {
+            url: asset_base_path + "/js/i18n/French.json"
+          },
+          headerCallback: function (tHead, aData, iStart, iEnd, aiDisplay) {},
+          initComplete: function (e, oSettings, json) {},
+        
+          drawCallback: function (row, data) {}
+        });
+      }
+      function loadDataTableBene($grid, classe,niveau,filiere ,options = null, contents = '') {
+        $grid.initDataTables(
+          options
+          ? options
+          : {{ datatable_settings(datatable) }}, {
+          searching: true,
+          ajaxUrl: Routing.generate('app_reinscription_etudiant_admin_index', {
+            classe: classe,
+            niveau: niveau,
+            filiere: filiere,
+            
+          }),
+          language: {
+            url: asset_base_path + "/js/i18n/French.json"
+          },
+          headerCallback: function (tHead, aData, iStart, iEnd, aiDisplay) {},
+          initComplete: function (e, oSettings, json) {},
+        
+          drawCallback: function (row, data) {}
+        });
+      }
+
+      const $classe = $('#{{ form.classe.vars.id }}');
+      const $niveau = $('#{{ form.niveau.vars.id }}');
+      const $filiere = $('#{{ form.filiere.vars.id }}');
+      
+      
+
+     
+
+      loadDataTable($old_grid, null,null,null, {{ datatable_settings(datatable) }});
+      load_content($niveau.val(),false)
+      load_content($filiere.val(),true)
+     $classe.on('change', function (e) {
+      
+        const $this = $(this);
+
+         
+        //alert($dateDebut.val());
+         //loadDataTableBene($old_gride, $this.val(),$niveau.val(),$filiere.val(), {{ datatable_settings(datatable) }});
+         load_grid_data(null, $this, $this.val(),$niveau.val(),$filiere.val());
+         //load_content($filiere.val(),'')
+      });
+       $filiere.on('change', function (e) {
+      
+        const $this = $(this);
+         load_grid_data(null, $this, $classe.val(),$niveau.val(),$this.val());
+         load_content($this.val(),true)
+         load_content($niveau.val(),false)
+      });
+       $niveau.on('change', function (e) {
+      
+        const $this = $(this);
+         load_grid_data(null, $this, $classe.val(),$this.val(),$filiere.val());
+         load_content($this.val(),false)
+      });
+
+
+      function load_content(id,type) {
+               if(type == true){
+                 $.ajax({
+                    url:  '/liste/niveau/par/filiere/'+id,
+                    method: 'GET',
+                      async: false,
+                    dataType: 'json',
+                    success: function(json){
+                      $('#form_niveau').html('');
+                 
+                          $('#form_niveau').append('<option value selected="default">Choisissez</option>');
+                          $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $('#form_niveau').append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          }); 
+
+                    }
+                });
+               } else{
+                 $.ajax({
+                    url:  '/liste/classe/par/niveau/'+id,
+                    method: 'GET',
+                      async: false,
+                    dataType: 'json',
+                    success: function(json){
+                      $('#form_classe').html('');
+                 
+                          $('#form_classe').append('<option value selected="default">Choisissez</option>');
+                          $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $('#form_classe').append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          }); 
+
+                    }
+                });
+               }         
+         
+        }
+
+
+
+
+
+      function load_grid_data($form, $button, classe,niveau,filiere) {
+        const id = $old_grid.find('table').attr('id');
+        const $table = $old_grid.find(`#${id}`);
+        const table = $table.DataTable();
+        $.ajax({
+          url: '/inscription/etudiant/admin',
+          type: 'GET',
+         // url: $form.attr('action'),
+          //type: $form.attr('method'),
+          data: {
+             classe: classe,
+             niveau: niveau,
+             filiere: filiere
+            
+          },
+          beforeSend: function () {
+            $button.append('<span class="spinner-border spinner-ajax spinner-border-sm" role="status" aria-hidden="true"></span> ');
+            $button.prop('disabled', true);
+          },
+          complete: function () {
+            $button.prop('disabled', false);
+            $button.find('.spinner-ajax').remove();
+          },
+          success: function (html) {
+            table.destroy();
+            if ($table.length) {
+              $table.empty();
+            }
+
+           // let grid_val = `${niveau}_${caissiere}_${dateDebut}_${dateFin}`;
+            let grid_val = `${classe}_${niveau}_${filiere}`;
+
+            //alert(grid_val)
+
+            $old_grid.attr('id', `grid_app_reinscription_etudiant_admin_${grid_val}`).empty().html(`
+                                    <div class="spinner spinner-track spinner-primary mr-15 text-primary">
+                                        <div class="ml-15">Chargement des données de la grille</div>
+                                    </div>
+                            `);
+            var options = {{ datatable_settings(datatable) }};
+            var name = `dt_app_reinscription_etudiant_admin_${grid_val}`;
+
+            options['name'] = name;
+
+            console.log(name);
+
+            loadDataTable($old_grid, classe,niveau,filiere ,options)
+          }
+        });
+      }
+      
+
+    });
+  </script>
+{% endblock %}
