@@ -45,7 +45,6 @@ class BlocEcheancierType extends AbstractType
                         ->setParameter('annee', $anneeScolaire);
 
                     if ($niveau != null) {
-
                         $er->andWhere("c.niveau = :niveau")
                             ->setParameter('niveau', $niveau);
                     }

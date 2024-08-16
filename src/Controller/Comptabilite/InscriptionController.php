@@ -59,18 +59,24 @@ class InscriptionController extends AbstractController
         $dateDebut = $request->query->get('dateDebut');
         $dateFin = $request->query->get('dateFin');
         $mode = $request->query->get('mode');
-        //dd($niveau, $dateDebut);
+        //dd((int) $niveau);
 
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
             'action' => $this->generateUrl('app_comptabilite_inscription_index', compact('niveau', 'caissiere', 'dateDebut', 'dateFin', 'mode'))
         ])->add('niveau', EntityType::class, [
             'class' => Niveau::class,
-            'choice_label' => 'libelle',
+            'choice_label' => 'code',
             'label' => 'Niveau',
             'placeholder' => '---',
             'required' => false,
-            'attr' => ['class' => 'form-control-sm has-select2']
+            'attr' => ['class' => 'form-control-sm has-select2'],
+            'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                return $er->createQueryBuilder('c')
+                    ->andWhere('c.anneeScolaire = :anneeScolaire')
+                    ->setParameter('anneeScolaire', $anneeScolaire)
+                    ->orderBy('c.id', 'DESC');
+            },
         ])
             ->add('mode', EntityType::class, [
                 'class' => NaturePaiement::class,
