@@ -74,7 +74,11 @@ class AnneeScolaireController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, AnneeScolaire $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, AnneeScolaire $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg225',
@@ -122,6 +126,8 @@ class AnneeScolaireController extends AbstractController
     #[Route('/new', name: 'app_parametre_annee_scolaire_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, FormError $formError, AnneeScolaireRepository $anneeScolaireRepository): Response
     {
+
+        // dd($anneeScolaireRepository->findLast());
         $anneeScolaire = new AnneeScolaire();
         $form = $this->createForm(AnneeScolaireType::class, $anneeScolaire, [
             'method' => 'POST',
@@ -141,6 +147,7 @@ class AnneeScolaireController extends AbstractController
             $data = $anneeScolaireRepository->findAll();
 
             $actif = $form->get('actif')->getData();
+            $lastAnnee = $anneeScolaireRepository->findLast();
             //$anneeScolaire->setActif($actif);
 
             /// dd($actif);
@@ -155,6 +162,7 @@ class AnneeScolaireController extends AbstractController
                     }
                 }
 
+                $anneeScolaire->setNumero($lastAnnee->getNumero() + 1);
                 $entityManager->persist($anneeScolaire);
                 $entityManager->flush();
 

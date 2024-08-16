@@ -51,6 +51,9 @@ class AnneeScolaire
     #[ORM\OneToMany(mappedBy: 'anneeScolaire', targetEntity: Niveau::class)]
     private Collection $niveaux;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $numero = null;
+
 
     public function __construct()
     {
@@ -305,6 +308,18 @@ class AnneeScolaire
                 $niveau->setAnneeScolaire(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNumero(): ?int
+    {
+        return $this->numero;
+    }
+
+    public function setNumero(?int $numero): static
+    {
+        $this->numero = $numero;
 
         return $this;
     }

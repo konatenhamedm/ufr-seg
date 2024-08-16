@@ -1137,6 +1137,7 @@ class HomeController extends AbstractController
         // dd($niveau, $filiere);
 
         $anneeScolaire = $session->get('anneeScolaire');
+        //dd($anneeScolaire);
 
         if ($anneeScolaire == null) {
             // dd($anneeScolaireRepository->findOneBy(['actif' => 1]));
@@ -1195,7 +1196,7 @@ class HomeController extends AbstractController
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Inscription::class,
-                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau, $user, $anneeScolaire) {
+                'query' => function (QueryBuilder $qb) use ($classe, $filiere, $niveau, $user, $anneeScolaire, $anneeScolaireRepository) {
                     $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
                         ->from(Inscription::class, 'p')
                         ->join('p.classe', 'classe', 'res')
@@ -1231,7 +1232,7 @@ class HomeController extends AbstractController
 
                     if ($anneeScolaire) {
                         $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
-                            ->setParameter('anneeScolaire', $anneeScolaire);
+                            ->setParameter('anneeScolaire', $anneeScolaireRepository->findOneBy(['numero' => ($anneeScolaire->getNumero() - 1)]));
                     }
                 }
 
