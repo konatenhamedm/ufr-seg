@@ -596,7 +596,7 @@ class InscriptionController extends AbstractController
     {
 
         // $niveau = $request->query->get('niveau');
-        dd($dateDebut, $dateFin);
+        // dd($dateDebut, $dateFin);
 
         $totalImpaye = 0;
         $totalPayer = 0;
