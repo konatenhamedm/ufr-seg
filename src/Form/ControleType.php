@@ -37,7 +37,7 @@ class ControleType extends AbstractType
             ->add('classe', EntityType::class, [
                 /* 'placeholder' => 'choisissez une classe', */
                 'class' => Classe::class,
-                'choice_label' => 'id',
+                'choice_label' => 'libelle',
                 'attr' => ['class' => 'has-select2 form-select classe'],
                 'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
                     return $er->createQueryBuilder('c')

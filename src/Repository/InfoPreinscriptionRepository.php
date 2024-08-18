@@ -113,7 +113,35 @@ SQL;
 
             //dd($dateDebut);
 
-            if ($dateDebut != "null" && $dateFin == "null") {
+            if ($dateDebut && $dateFin == null) {
+                $truc = explode('-', str_replace("/", "-", $dateDebut));
+                $new_date_debut = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
+
+                $sql->andWhere('i.datePaiement = :dateDebut')
+                    ->setParameter('dateDebut', $new_date_debut);
+            }
+            if ($dateFin && $dateDebut == null) {
+
+                $truc = explode('-', str_replace("/", "-", $dateDebut));
+                $new_date_fin = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
+
+                $sql->andWhere('i.datePaiement  = :dateFin')
+                    ->setParameter('dateFin', $new_date_fin);
+            }
+            if ($dateDebut && $dateFin) {
+
+                $truc_debut = explode('-', str_replace("/", "-", $dateDebut));
+                $new_date_debut = $truc_debut[2] . '-' . $truc_debut[1] . '-' . $truc_debut[0];
+
+                $truc = explode('-', str_replace("/", "-", $dateFin));
+                $new_date_fin = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
+
+                $sql->andWhere('i.datePaiement BETWEEN :dateDebut AND :dateFin')
+                    ->setParameter('dateDebut', $new_date_debut)
+                    ->setParameter("dateFin", $new_date_fin);
+            }
+
+            /*  if ($dateDebut != "null" && $dateFin == "null") {
                 $sql->andWhere('i.datePaiement = :dateDebut')
                     ->setParameter('dateDebut', $dateDebut);
             }
@@ -125,7 +153,7 @@ SQL;
                 $sql->andWhere('i.datePaiement BETWEEN :dateDebut AND :dateFin')
                     ->setParameter('dateDebut', $dateDebut)
                     ->setParameter("dateFin", $dateFin);
-            }
+            } */
         }
 
         return $sql->getQuery()->getResult();

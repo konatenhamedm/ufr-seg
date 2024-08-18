@@ -192,7 +192,7 @@ class InscriptionController extends AbstractController
 
                             $truc = explode('-', str_replace("/", "-", $dateFin));
                             $new_date_fin = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
-                            // dd($new_date_debut, $new_date_fin);
+                            dd($new_date_debut, $new_date_fin);
 
                             $qb->andWhere('info.datePaiement BETWEEN :dateDebut AND :dateFin')
                                 ->setParameter('dateDebut', $new_date_debut)
@@ -596,7 +596,7 @@ class InscriptionController extends AbstractController
     {
 
         // $niveau = $request->query->get('niveau');
-
+        dd($dateDebut, $dateFin);
 
         $totalImpaye = 0;
         $totalPayer = 0;
