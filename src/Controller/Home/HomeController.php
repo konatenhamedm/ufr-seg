@@ -149,21 +149,24 @@ class HomeController extends AbstractController
         }
         $modules = [
             /* [
-                'label' => 'Etude de dossier',
+                 'label' => 'Traitement après examen',
                 'icon' => 'bi bi-list',
-                'module' => 'general',
-                'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_preinscription_index', ['etat' => 'attente_validation'])
+                'module' => 'traitement',
+                'id' => 'module_traitement',
+                'href' => $this->generateUrl('app_config_traitement_examen')
             ], */
             [
                 'label' => 'En attente de paiement préinscription',
                 'icon' => 'bi bi-list',
                 'module' => 'general',
+                'id' => 'module_attent_paiement',
                 'href' => $this->generateUrl('app_config_preinscription_index')
                 //'href' => $this->generateUrl('app_comptabilite_niveau_etudiant_index')
             ],
             [
                 'label' => 'Traitement après examen',
                 'icon' => 'bi bi-list',
+                'id' => 'module_examen',
                 'module' => 'gestion',
                 'href' => $this->generateUrl('app_deliberation_preinscription_index')
             ],
@@ -184,17 +187,19 @@ class HomeController extends AbstractController
                 'label' => 'En cours de paiement ',
                 'icon' => 'bi bi-list',
                 'module' => 'gestion',
+                'id' => 'module_paiement',
                 'href' => $this->generateUrl('app_inscription_inscription_list_ls', ['etat' => 'valide'])
             ],
             [
                 'label' => 'Dossiers soldés',
                 'icon' => 'bi bi-list',
                 'module' => 'gestion',
+                'id' => 'module_dossier',
                 'href' => $this->generateUrl('app_inscription_inscription_list_ls', ['etat' => 'solde'])
             ]
         ];
 
-        return $this->render('home/time_index.html.twig', [
+        return $this->render('home/config/index_etudiant.html.twig', [
             'modules' => $modules,
         ]);
     }
