@@ -2,6 +2,7 @@
 
 namespace App\Controller\Comptabilite;
 
+use App\Entity\Etudiant;
 use App\Entity\InfoPreinscription;
 use App\Entity\Inscription;
 use App\Entity\Preinscription;
@@ -9,6 +10,7 @@ use App\Entity\Validation;
 use App\Form\InfoPreinscriptionType;
 use App\Form\PreinscriptionEudiantConnecteType;
 use App\Form\PreinscriptionType;
+use App\Repository\EtudiantRepository;
 use App\Repository\NiveauRepository;
 use App\Repository\PreinscriptionRepository;
 use App\Service\ActionRender;
@@ -526,6 +528,7 @@ class PreinscriptionController extends AbstractController
         $form = $this->createForm(PreinscriptionEudiantConnecteType::class, $preinscription, [
             'method' => 'POST',
             "anneeScolaire" => $session->get('anneeScolaire'),
+            'etudiant' => null,
             'action' => $this->generateUrl('app_comptabilite_preinscription_demande_new')
         ]);
         $form->handleRequest($request);
@@ -733,15 +736,17 @@ class PreinscriptionController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-    #[Route('/{id}/edit/preinscription', name: 'app_comptabilite_preinscription_edit_preinscription', methods: ['GET', 'POST'])]
-    public function editPreinscription(Request $request, Preinscription $preinscription, SessionInterface $session, EntityManagerInterface $entityManager, FormError $formError): Response
+    #[Route('/{id}/{idEtudiant}/edit/preinscription', name: 'app_comptabilite_preinscription_edit_preinscription', methods: ['GET', 'POST'])]
+    public function editPreinscription(Request $request, int $idEtudiant, EtudiantRepository $etudiantRepository, Preinscription $preinscription, SessionInterface $session, EntityManagerInterface $entityManager, FormError $formError): Response
     {
 
         $form = $this->createForm(PreinscriptionEudiantConnecteType::class, $preinscription, [
             'method' => 'POST',
             'anneeScolaire' => $session->get('anneeScolaire'),
+            'etudiant' => $idEtudiant,
             'action' => $this->generateUrl('app_comptabilite_preinscription_edit_preinscription', [
-                'id' =>  $preinscription->getId()
+                'id' =>  $preinscription->getId(),
+                'idEtudiant' =>  $idEtudiant
             ])
         ]);
 

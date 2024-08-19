@@ -19,10 +19,11 @@ class PreinscriptionEudiantConnecteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $anneeScolaire = $options['anneeScolaire'];
+        $etudiant = $options['etudiant'];
         //dd($anneeScolaire);
-        $builder
 
-            /*
+
+        /*
             ->add('niveau', EntityType::class, [
                'class' => Niveau::class,
                 'required' => false,
@@ -33,8 +34,8 @@ class PreinscriptionEudiantConnecteType extends AbstractType
                 'attr' => ['class' => 'has-select2']
             ])*/
 
-
-            ->add(
+        if ($etudiant == null) {
+            $builder->add(
                 'niveau',
                 EntityType::class,
                 [
@@ -45,6 +46,19 @@ class PreinscriptionEudiantConnecteType extends AbstractType
                     }
                 ]
             );
+        } else {
+            $builder->add(
+                'niveau',
+                EntityType::class,
+                [
+                    'class' => Niveau::class,
+                    'choice_label' => 'getFullCodeLibelle',
+                    'query_builder' => function (EntityRepository $er) use ($anneeScolaire, $etudiant) {
+                        return $er->findNiveauDisponibleAdmin($anneeScolaire, $etudiant);
+                    }
+                ]
+            );
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -63,5 +77,6 @@ class PreinscriptionEudiantConnecteType extends AbstractType
 
         $resolver->setRequired('validate');
         $resolver->setRequired(['anneeScolaire']);
+        $resolver->setRequired(['etudiant']);
     }
 }

@@ -587,7 +587,7 @@ class NiveauEtudiantController extends AbstractController
                                 'render' => $renders['edit']
                             ],
                             'edit_preinscription' => [
-                                'url' => $this->generateUrl('app_comptabilite_preinscription_edit_preinscription', ['id' => $value]),
+                                'url' => $this->generateUrl('app_comptabilite_preinscription_edit_preinscription', ['id' => $value, 'idEtudiant' => $context->getEtudiant()->getId()]),
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-pen',
