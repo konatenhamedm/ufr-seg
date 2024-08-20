@@ -154,6 +154,7 @@ class PreinscriptionRepository extends ServiceEntityRepository
             ->andWhere('p.etat IN (:etat)')
             ->setParameter('etudiant', $etudiant)
             ->setParameter('etat', ['attente_paiement', 'attente_validation'])
+            ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
     }
