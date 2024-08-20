@@ -150,13 +150,14 @@ class PreinscriptionRepository extends ServiceEntityRepository
     public function getPreinscriptionNewInscription($etudiant): ?Preinscription
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.etudiant = :etudiant')
-            ->andWhere('p.etat in (:etat)')
-            ->setParameter("etudiant", $etudiant)
-            ->setParameter("etat", ["attente_paiement", "attente_validation"])
+            ->where('p.etudiant = :etudiant')
+            ->andWhere('p.etat IN (:etat)')
+            ->setParameter('etudiant', $etudiant)
+            ->setParameter('etat', ['attente_paiement', 'attente_validation'])
             ->getQuery()
             ->getOneOrNullResult();
     }
+
 
 
     //    /**

@@ -837,7 +837,7 @@ class HomeController extends AbstractController
             'nombre' => $etudiant->getPreinscriptions()->filter(function ($preinscription) {
                 return $preinscription->getEtat() == 'attente_paiement';
             })->count(),
-            'preinscription' => $preinscriptionRepository->getPreinscriptionNewInscription($etudiant) ? $preinscriptionRepository->getPreinscriptionNewInscription($etudiant)->getId() : null,
+            'preinscription' => $preinscriptionRepository->getPreinscriptionNewInscription($etudiant) != null ? $preinscriptionRepository->getPreinscriptionNewInscription($etudiant)->getId() : null,
             'form' => $form->createView(),
             'boutonVisible' => $boutonVisible,
         ]);
