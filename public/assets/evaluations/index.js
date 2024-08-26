@@ -92,7 +92,7 @@ function refreshColone()
             nombre_note++;
             nombre_note_groupe++;
 
-           // alert('')
+            alert('')
 
            var resIntervention;
                 $.ajax({
@@ -101,6 +101,8 @@ function refreshColone()
                     async: false,
                     dataType:   'json',
                     success: function(json){
+
+                        console.log(json)
                        
                         $.each(json, function(index, value) {      
                       

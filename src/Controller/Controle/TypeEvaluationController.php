@@ -31,13 +31,14 @@ class TypeEvaluationController extends AbstractController
 
         $typeControles = $typeEvaluationRepository->findAll();
 
+
+        //dd($tabTypeContrrole);
         $i = 0;
 
         foreach ($typeControles as $e) {
             // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
             $tabTypeContrrole[$i]['id'] = $e->getId();
             $tabTypeContrrole[$i]['libelle'] = $e->getCode();
-
             $i++;
         }
 
