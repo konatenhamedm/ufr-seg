@@ -30,6 +30,17 @@ class InscriptionRepository extends ServiceEntityRepository
         }
     }
 
+    public function countInscriptionFordelete($etudiant)
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.etudiant = :etudiant')
+            ->andWhere('i.etat IN (:etat)')
+            ->setParameter('etudiant', $etudiant)
+            ->setParameter('etat', ['examen_echoue', 'rejete', 'valide', 'solde'])
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Inscription[] Returns an array of Inscription objects
     //     */

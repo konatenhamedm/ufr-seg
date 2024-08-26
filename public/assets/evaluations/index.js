@@ -52,7 +52,7 @@ function refreshColone()
 
     
         $addLink.click(function (e) {
-     alert("")
+   
             addLine($container);
             e.preventDefault(); // évite qu'un # apparaisse dans l'URL
             refreshColone();

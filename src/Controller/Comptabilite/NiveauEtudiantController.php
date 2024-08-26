@@ -519,6 +519,10 @@ class NiveauEtudiantController extends AbstractController
                     return false;
                 }
             }),
+            'delete_etudiant' => new ActionRender(function () use ($etat, $isEtudiant) {
+                return true;
+            }),
+
         ];
 
 
@@ -603,6 +607,14 @@ class NiveauEtudiantController extends AbstractController
                                 'attrs' => ['class' => 'btn-danger'],
                                 'render' => $renders['delete']
                             ]
+                            /*   'delete_etudiant' => [
+                                'target' => '#exampleModalSizeNormal',
+                                'url' => $this->generateUrl('app_utilisateur_utilisateur_delete', ['id' => $context->getEtudiant()->getId()]),
+                                'ajax' => true,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['delete']
+                            ] */
                         ]
 
                     ];

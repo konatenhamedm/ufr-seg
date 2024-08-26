@@ -11,6 +11,7 @@ use App\Form\InfoPreinscriptionType;
 use App\Form\PreinscriptionEudiantConnecteType;
 use App\Form\PreinscriptionType;
 use App\Repository\EtudiantRepository;
+use App\Repository\InscriptionRepository;
 use App\Repository\NiveauRepository;
 use App\Repository\PreinscriptionRepository;
 use App\Service\ActionRender;
@@ -865,8 +866,11 @@ class PreinscriptionController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'app_comptabilite_preinscription_delete', methods: ['DELETE', 'GET'])]
-    public function delete(Request $request, Preinscription $preinscription, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Preinscription $preinscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, PreinscriptionRepository $preprescriptionRepository): Response
     {
+
+        $count = count($preprescriptionRepository->findBy(['etudiant' => $preinscription->getEtudiant(), 'etat' => 'valide'])) + count($inscriptionRepository->countInscriptionFordelete($preinscription->getEtudiant()));
+
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
@@ -880,20 +884,38 @@ class PreinscriptionController extends AbstractController
             ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = true;
-            $entityManager->remove($preinscription);
-            $entityManager->flush();
-
             $redirect = $this->generateUrl('app_comptabilite_preinscription_index');
 
-            $message = 'Opération effectuée avec succès';
+            if ($count > 0) {
+                $data = false;
+                $message = 'Vous ne pouvez effectuer cette opération cet utilisateur a deja des dossiers en cours';
 
-            $response = [
-                'statut'   => 1,
-                'message'  => $message,
-                'redirect' => $redirect,
-                'data' => $data
-            ];
+                $response = [
+                    'statut'   => 0,
+                    'message'  => $message,
+                    'redirect' => $redirect,
+                    'data' => $data
+                ];
+            } else {
+                $data = true;
+                $entityManager->remove($preinscription);
+                $entityManager->remove($preinscription->getEtudiant());
+                $entityManager->flush();
+
+
+                $message = 'Opération effectuée avec succès';
+
+                $response = [
+                    'statut'   => 1,
+                    'message'  => $message,
+                    'redirect' => $redirect,
+                    'data' => $data
+                ];
+            }
+
+
+
+
 
             $this->addFlash('success', $message);
 

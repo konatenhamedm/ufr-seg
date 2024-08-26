@@ -1035,7 +1035,7 @@ class HomeController extends AbstractController
 
         $renders = [
             'edit' =>  new ActionRender(function () {
-                return true;
+                return false;
             }),
             'new' =>  new ActionRender(function () {
                 return true;

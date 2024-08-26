@@ -193,8 +193,8 @@
 
                         {% if preinscription.etat != 'attente_informations' %}
              <a title="Traiter la demande" href="{{ path('site_information_validation_direct_after_demande_since_precription',{'id':etudiant.id,'preinscription':preinscription.id }) }}" class="btn btn-primary btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2" >Valider inscription</a>
-             <a title="Traiter la demande" href="{{ path('app_demande_rejeter',{'id':preinscription.id }) }}" class="btn btn-main btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2">Traiter la demande</a>
-             
+             {# <a title="Traiter la demande" href="{{ path('app_demande_rejeter',{'id':preinscription.id }) }}" class="btn btn-main btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2">Traiter la demande</a>
+              #}
                         
                         {% endif %}
                         
