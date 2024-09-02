@@ -28,6 +28,7 @@ use App\Repository\InfoInscriptionRepository;
 use App\Repository\InfoPreinscriptionRepository;
 use App\Repository\InscriptionRepository;
 use App\Repository\NaturePaiementRepository;
+use App\Repository\PreinscriptionRepository;
 use App\Repository\TypeFraisRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
@@ -271,15 +272,15 @@ class InscriptionController extends AbstractController
             ->setName('dt_app_inscription_inscription_suivi_formation' . $etat  . $id);
 
         $renders = [
-            'edit_etudiant' => new ActionRender(fn () => $etat == 'attente_echeance' || $etat == 'rejete'),
-            'edit' => new ActionRender(fn () => $etat == 'echeance_soumis'),
+            'edit_etudiant' => new ActionRender(fn() => $etat == 'attente_echeance' || $etat == 'rejete'),
+            'edit' => new ActionRender(fn() => $etat == 'echeance_soumis'),
             'delete' => new ActionRender(function () {
                 return false;
             }),
             'confirmation' => new ActionRender(function () use ($etat) {
                 return $etat == 'valide';
             }),
-            'payer' => new ActionRender(fn () => $etat == 'valide' && $isEtudiant == false),
+            'payer' => new ActionRender(fn() => $etat == 'valide' && $isEtudiant == false),
 
         ];
 
@@ -295,7 +296,11 @@ class InscriptionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-xl2',
@@ -444,7 +449,11 @@ class InscriptionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-xl2',
@@ -669,8 +678,8 @@ class InscriptionController extends AbstractController
             ->setName('dt_app_inscription_inscription_' . $etat);
 
         $renders = [
-            'edit_etudiant' => new ActionRender(fn () => $etat == 'attente_echeance' || $etat == 'rejete'),
-            'edit' => new ActionRender(fn () => $etat == 'echeance_soumis'),
+            'edit_etudiant' => new ActionRender(fn() => $etat == 'attente_echeance' || $etat == 'rejete'),
+            'edit' => new ActionRender(fn() => $etat == 'echeance_soumis'),
             'recu' => new ActionRender(function () use ($etat) {
                 if ($etat == 'solde') {
                     return true;
@@ -687,7 +696,7 @@ class InscriptionController extends AbstractController
             'classe' => new ActionRender(function () use ($etat) {
                 return $etat == 'valide_classe';
             }),
-            'payer' => new ActionRender(fn () => $etat == 'valide' && $isEtudiant == false),
+            'payer' => new ActionRender(fn() => $etat == 'valide' && $isEtudiant == false),
             //'recu' => new ActionRender(fn () => $etat == 'solde'),
 
         ];
@@ -704,7 +713,11 @@ class InscriptionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-xl2',
@@ -746,7 +759,7 @@ class InscriptionController extends AbstractController
                                 'target' =>  '#exampleModalSizeSm2',
                                 'icon' => '%icon% bi bi-printer',
                                 'attrs' => ['class' => 'btn-primary btn-stack'],
-                                'render' => new ActionRender(fn () => $context->getInfoInscriptions()->filter(function (InfoInscription $ligne) {
+                                'render' => new ActionRender(fn() => $context->getInfoInscriptions()->filter(function (InfoInscription $ligne) {
                                     return $ligne->getEtat() == 'attente_confirmation';
                                 })->count() >= 1 && $context->getEtat() == 'valide')
                             ],
@@ -761,7 +774,7 @@ class InscriptionController extends AbstractController
                                 'target' =>  '#exampleModalSizeSm2',
                                 'icon' => '%icon% bi bi-printer',
                                 'attrs' => ['class' => 'btn-main btn-stack'],
-                                'render' => new ActionRender(fn () => $context->getInfoInscriptions()->filter(function (InfoInscription $ligne) {
+                                'render' => new ActionRender(fn() => $context->getInfoInscriptions()->filter(function (InfoInscription $ligne) {
                                     return $ligne->getEtat() == 'attente_confirmation';
                                 })->count() == 0 && $context->getEtat() == 'valide')
                             ],
@@ -1036,9 +1049,9 @@ class InscriptionController extends AbstractController
             /* 'edit' =>  new ActionRender(function () {
                 return true;
             }), */
-            'edit_etudiant' => new ActionRender(fn () => $etat == 'attente_echeancier' || $etat == 'rejete'),
-            'edit' => new ActionRender(fn () => $etat == 'echeance_soumis'),
-            'payer' => new ActionRender(fn () => $etat == 'valide'),
+            'edit_etudiant' => new ActionRender(fn() => $etat == 'attente_echeancier' || $etat == 'rejete'),
+            'edit' => new ActionRender(fn() => $etat == 'echeance_soumis'),
+            'payer' => new ActionRender(fn() => $etat == 'valide'),
             'delete' => new ActionRender(function () {
                 return true;
             }),
@@ -1057,7 +1070,11 @@ class InscriptionController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Inscription $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -1816,8 +1833,11 @@ class InscriptionController extends AbstractController
     }
 
     #[Route('/def/{id}/delete', name: 'app_inscription_inscription_delete', methods: ['DELETE', 'GET'])]
-    public function delete(Request $request, Inscription $inscription, InscriptionRepository $inscriptionRepository, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Inscription $inscription, PreinscriptionRepository $preprescriptionRepository, InscriptionRepository $inscriptionRepository, EntityManagerInterface $entityManager): Response
     {
+
+        $count = count($preprescriptionRepository->findBy(['etudiant' => $inscription->getEtudiant(), 'etat' => 'valide'])) + count($inscriptionRepository->countInscriptionFordelete($inscription->getEtudiant()));
+
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
@@ -1840,10 +1860,18 @@ class InscriptionController extends AbstractController
 
             if (count($inscriptionRepository->findBy(['etudiant' => $inscription->getEtudiant()])) > 1) {
                 $showAlert = true;
-                $message = 'Nous avons supprimer cette inscription mais Implossibe de supprimer le comptae car cet étudiant à d\'autres inscriptions';
+                $message = 'Nous avons supprimer cette inscription mais Implossibe de supprimer le compte car cet étudiant à d\'autres inscriptions';
             } else {
-                $entityManager->remove($inscription->getEtudiant());
-                $message = 'Opération effectuée avec succès';
+
+                /* $entityManager->remove($inscription->getEtudiant()); */
+                if ($preprescriptionRepository->findBy(['etudiant' => $inscription->getEtudiant(), 'etat' => 'valide']) > 0) {
+                    $showAlert = true;
+                    $message = 'Nous avons supprimer cette inscription mais Implossibe de supprimer le compte car cet étudiant à des préinscriptions associées';
+                } else {
+
+                    $entityManager->remove($inscription->getEtudiant());
+                    $message = 'Opération effectuée avec succès';
+                }
             }
 
             $entityManager->flush();
