@@ -871,6 +871,9 @@ class NiveauEtudiantController extends AbstractController
             'delete' => new ActionRender(function () {
                 return false;
             }),
+            'edit_preinscription' => new ActionRender(function () {
+                return true;
+            }),
             'show' => new ActionRender(function () {
                 return true;
             }),
@@ -913,6 +916,14 @@ class NiveauEtudiantController extends AbstractController
                                 'icon' => '%icon% bi bi-printer',
                                 'attrs' => ['class' => 'btn-main btn-stack']
                                 //, 'render' => new ActionRender(fn() => $source || $etat != 'cree')
+                            ],
+                            'edit_preinscription' => [
+                                'url' => $this->generateUrl('app_comptabilite_preinscription_edit_preinscription', ['id' => $value, 'idEtudiant' => $context->getEtudiant()->getId()]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-pen',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['edit_preinscription']
                             ],
 
                         ]
