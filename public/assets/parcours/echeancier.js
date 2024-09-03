@@ -114,7 +114,7 @@ $(function () {
         // Ajout du listener sur le clic du lien
         $deleteLink.click(function (e) {
              const $this = $(this);
-           //  alert('')
+           //  RASS
             const $parent =  $this.closest('.row-colonne');
             $parent.remove();
  refresh();

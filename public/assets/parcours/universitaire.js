@@ -37,7 +37,7 @@ $(function () {
 
         /*$(".checkAll").change(function () {
 
-            alert('')
+            RASS
             $("input:checkbox").prop('checked', $(this).prop("checked"));
         });*/
     });

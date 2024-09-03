@@ -19,7 +19,6 @@ function refreshColone()
 
 
      $(function () {
-       // alert('ok');
         refresh();
         refreshColone();
         //init_select2('select');
@@ -50,9 +49,7 @@ function refreshColone()
 
         const $addLink = $('.add-ligne');
 
-    
         $addLink.click(function (e) {
-   
             addLine($container);
             e.preventDefault(); // évite qu'un # apparaisse dans l'URL
             refreshColone();
@@ -84,15 +81,9 @@ function refreshColone()
             addDeleteLink($prototype);
             // On ajoute le prototype modifié à la fin de la balise <div>
            // $container.append($prototype);
-         //alert(__name__)
-        
-     
-        
-
+      
             nombre_note++;
             nombre_note_groupe++;
-
-            alert('')
 
            var resIntervention;
                 $.ajax({
@@ -213,6 +204,8 @@ function refreshColone()
         }
 
         function addDeleteLink($prototype) {
+
+           
             // Création du lien
             let $deleteLink = $('<a href="#" class="btn btn-danger btn-xs"><span class="bi bi-trash"></span></a>');
             // Ajout du lien
@@ -236,7 +229,7 @@ function refreshColone()
         }
 
         $(".del-col").on("click", function(){
-           // alert('ok');
+          
 
            
             $("table tbody tr").find("td:eq(-3)").remove();

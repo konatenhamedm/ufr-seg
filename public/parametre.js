@@ -25,7 +25,7 @@ $(function () {
 
 
     $addLink.click(function (e) {
-        alert('')
+        RASS
         const $this  = $(this);
         const $container = $('.proto-container').find($this.attr('data-container')).closest('.row-container');
         addLine($container);
@@ -85,7 +85,7 @@ $(function () {
         // Ajout du listener sur le clic du lien
         $deleteLink.click(function (e) {
              const $this = $(this);
-           //  alert('')
+           //  RASS
             const $parent =  $this.closest('.row-colonne');
             $parent.remove();
 
