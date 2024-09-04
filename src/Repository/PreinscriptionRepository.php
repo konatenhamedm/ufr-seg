@@ -48,6 +48,48 @@ class PreinscriptionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getListeEtudiantExamen($niveau, $anneeScolaire)
+    {
+        //dd($niveau);
+        if ($niveau != "null") {
+            return $this->createQueryBuilder('p')
+                ->innerJoin('p.etudiant', 'u')
+                ->innerJoin('p.niveau', 'niveau')
+                ->andWhere('p.etatDeliberation = :etatDeliberation')
+                ->andWhere('p.etat = :etat')
+                ->andWhere('p.niveau = :niveau')
+                ->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                ->setParameter('niveau', $niveau)
+                ->setParameter('etatDeliberation', 'pas_deliberer')
+                ->setParameter('etat', 'valide')
+                ->setParameter('anneeScolaire', $anneeScolaire)
+                ->orderBy('u.nom', 'ASC')
+                ->getQuery()
+                ->getResult();
+
+            if ($anneeScolaire != null) {
+
+                $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                    ->setParameter('anneeScolaire', $anneeScolaire);
+            }
+        } else {
+
+            // dd('');
+            return $this->createQueryBuilder('p')
+                ->innerJoin('p.etudiant', 'u')
+                ->innerJoin('p.niveau', 'niveau')
+                ->andWhere('p.etatDeliberation = :etatDeliberation')
+                ->andWhere('p.etat = :etat')
+                ->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                ->setParameter('etatDeliberation', 'pas_deliberer')
+                ->setParameter('etat', 'valide')
+                ->setParameter('anneeScolaire', $anneeScolaire)
+                ->orderBy('u.nom', 'ASC')
+                ->getQuery()
+                ->getResult();
+        }
+    }
     public function dataFilireWithoutExamen($etudiant)
     {
         return $this->createQueryBuilder('p')

@@ -19,6 +19,33 @@
         </div>
     </div>
     <div class="card-body">
+
+    {% if etat == "attente_validation" %}
+     <div class="row">
+        {% form_theme form 'widget/fields-block.html.twig' %}
+            {{ form_start(form)}}
+            <fieldset>
+
+             <div class="row small" style="position:relative">
+               
+             </div>
+              <div class="row small" style="position:relative">
+            
+                <div class="col-md-10">{{ form_row(form.niveau) }}</div>
+              
+                <div class="col-md-1 p-5">
+              
+                 <a href="" {# target="_blank" #} type="button" style="height: 35px;margin-top:0px" class="btn btn-warning btn-sm imprimer" name="search[imprime]"><i class="fa fa-print text-light"></i></a>
+                </div>
+                
+              </div>
+            </fieldset>
+            {{ form_end(form, {render_rest: false}) }}
+      </div>
+
+    {% endif %}
+    
+   
         <div class="row">
             <div class="col-sm-12">
                 <div id="grid_app_direction_deliberation_liste_etudiant_traitement_exament" class="grid-dt-wrapper">Chargement....</div>
@@ -30,6 +57,24 @@
 {% block java %}
     <script src="{{ asset('assets/js/datatables.js') }}"></script>
     <script> 
+    init_select2('.has-select2');
+     const $niveau = $('#{{ form.niveau.vars.id }}');
+    function exexuteUrl(niveau){
+         var url = "{{ path('app_comptabilite_liste_etudiant_examen', {niveau: 'niveau'}) }}".replace('niveau', niveau);
+
+//alert(url)
+      window.open(url, '_blank')
+      }
+    
+       $('.imprimer').on('click', function (e) {
+
+        let niveau_data = $niveau.val() ? $niveau.val()  : null
+      
+       exexuteUrl(niveau_data)
+     
+      });
+
+    
         $(function() { 
               $('#grid_app_direction_deliberation_liste_etudiant_traitement_exament').initDataTables({{ datatable_settings(datatable) }}, {
                   searching: true,

@@ -10,6 +10,7 @@ use App\Entity\FraisInscription;
 use App\Entity\Inscription;
 use App\Entity\LigneDeliberation;
 use App\Entity\Mention;
+use App\Entity\Niveau;
 use App\Entity\Preinscription;
 use App\Form\DeliberationType;
 use App\Repository\AnneeScolaireRepository;
@@ -24,6 +25,7 @@ use App\Service\FormError;
 use App\Service\Omines\Column\NumberFormatColumn;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\BoolColumn;
@@ -31,6 +33,7 @@ use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\MapColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -400,7 +403,25 @@ class DeliberationController extends AbstractController
     {
         $anneeScolaire = $session->get("anneeScolaire");
 
-
+        $builder = $this->createFormBuilder(null, [
+            'method' => 'GET',
+            'action' => $this->generateUrl('app_direction_deliberation_liste_etudiant_traitement_exament', [
+                'etat' => $etat
+            ])
+        ])->add('niveau', EntityType::class, [
+            'class' => Niveau::class,
+            'choice_label' => 'code',
+            'label' => 'Niveau',
+            'placeholder' => '---',
+            'required' => false,
+            'attr' => ['class' => 'form-control-sm has-select2'],
+            'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                return $er->createQueryBuilder('c')
+                    ->andWhere('c.anneeScolaire = :anneeScolaire')
+                    ->setParameter('anneeScolaire', $anneeScolaire)
+                    ->orderBy('c.id', 'DESC');
+            },
+        ]);
 
 
         if ($anneeScolaire == null) {
@@ -571,6 +592,7 @@ class DeliberationController extends AbstractController
             'datatable' => $table,
             'title' => $titre,
             'etat' => $etat,
+            'form' => $builder->getForm(),
             //'examen' => $examenRepository->find($id)
         ]);
     }

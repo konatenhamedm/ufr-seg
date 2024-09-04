@@ -649,6 +649,49 @@ class InscriptionController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
+
+    /**
+     * @throws MpdfException
+     */
+    #[Route('/imprime/liste/inscrits/examen/{niveau}', name: 'app_comptabilite_liste_etudiant_examen', methods: ['GET', 'POST'])]
+    public function imprimerListeEtudiantExamen(Request $request, $niveau, SessionInterface $session, PreinscriptionRepository $preinscriptionRepository): Response
+    {
+
+        $anneeScolaire = $session->get("anneeScolaire");
+        /* 
+        if ($niveau) {
+            $resultat = $preinscriptionRepository->findBy(['etatDeliberation' => 'pas_deliberer', 'etat' => 'valide'], ['etudiant.nom' => "ASC"]);
+        } else {
+            $resultat = $preinscriptionRepository->findBy(['etatDeliberation' => 'pas_deliberer', 'etat' => 'valide', 'niveau' => $niveau], ['nom' => "ASC"]);
+        } */
+
+
+        //dd($preinscriptionRepository->findBy(['etatDeliberation' => 'pas_deliberer', 'etat' => 'valide']));
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("direction/deliberation/liste_etudiant_examen.html.twig", [
+            'total_payer' => "",
+            'data' => $preinscriptionRepository->getListeEtudiantExamen($niveau, $anneeScolaire),
+            'total_impaye' => "",
+            'anneeScolaire' => $anneeScolaire->getLibelle()
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'p',
+            'protected' => true,
+            'file_name' => "point_versments",
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => null,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
     #[Route('/tester/imprime/uuu/{niveau}/{caissiere}/{dateDebut}/{dateFin}/{mode}/{classe}/{typeFrais}/{filiere}/point des versements', name: 'imprime_retour_achat_points', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function imprimerkk(Request $request, $niveau, $caissiere, $dateDebut, $dateFin, $mode, $classe, $typeFrais, $filiere, InfoInscriptionRepository $infoInscriptionRepository, NiveauRepository $niveauRepository, InscriptionRepository $inscriptionRepository): Response
     {

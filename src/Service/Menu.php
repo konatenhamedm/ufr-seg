@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\EncartBac;
 use App\Entity\InfoInscription;
 use App\Entity\Preinscription;
 use App\Repository\AnneeScolaireRepository;
@@ -85,5 +86,11 @@ class Menu
             $this->session->set('anneeScolaire', $this->anneeScolaireRepository->findOneBy(['actif' => 1]));
         } */
         return $this->anneeScolaireRepository->findOneBy(['actif' => 1]);
+    }
+
+    public function getEncartEtudiant($etudiantid)
+    {
+
+        return $this->em->getRepository(EncartBac::class)->getEncart($etudiantid)->getId();
     }
 }

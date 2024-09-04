@@ -154,8 +154,6 @@ class Etudiant extends Personne
 
 
 
-
-
     public function getNoms()
     {
         return $this->getNom();
