@@ -48,8 +48,8 @@
    
         <div class="row">
             <div class="col-sm-12">
-                {# <div id="grid_app_direction_deliberation_liste_etudiant_traitement_exament" class="grid-dt-wrapper">Chargement....</div> #}
-                 <div id="grid_app_direction_deliberation_liste_etudiant_traitement_exament_{{ grid_id }}" class="grid-dt-wrapper">Chargement....</div>
+                {# <div id="grid_app_direction_deliberation_liste_etudiant_traitement_exament_after_deliberation" class="grid-dt-wrapper">Chargement....</div> #}
+                 <div id="grid_app_direction_deliberation_liste_etudiant_traitement_exament_after_deliberation_{{ grid_id }}" class="grid-dt-wrapper">Chargement....</div>
             </div>
         </div>
     </div>
@@ -76,9 +76,9 @@
 
     
        {#  $(function() { 
-              $('#grid_app_direction_deliberation_liste_etudiant_traitement_exament').initDataTables({{ datatable_settings(datatable) }}, {
+              $('#grid_app_direction_deliberation_liste_etudiant_traitement_exament_after_deliberation').initDataTables({{ datatable_settings(datatable) }}, {
                   searching: true,
-                  ajaxUrl: "{{ path('app_direction_deliberation_liste_etudiant_traitement_exament',{'etat':etat}) }}",
+                  ajaxUrl: "{{ path('app_direction_deliberation_liste_etudiant_traitement_exament_after_deliberation',{'etat':etat}) }}",
                   language: {
                       url: asset_base_path + "/js/i18n/French.json"
                   }
@@ -91,7 +91,7 @@
     
     $(function () {
       const grid_prefix_id = "{{ grid_id }}";
-      const $old_grid = $('#grid_app_direction_deliberation_liste_etudiant_traitement_exament_' + grid_prefix_id);
+      const $old_grid = $('#grid_app_direction_deliberation_liste_etudiant_traitement_exament_after_deliberation_' + grid_prefix_id);
       init_select2('.has-select2');
 
       function loadDataTable($grid, niveau ,options = null, contents = '') {
@@ -100,7 +100,7 @@
           ? options
           : {{ datatable_settings(datatable) }}, {
           searching: true,
-          ajaxUrl: Routing.generate('app_direction_deliberation_liste_etudiant_traitement_exament_index', {
+          ajaxUrl: Routing.generate('app_direction_deliberation_liste_etudiant_traitement_exament_after_deliberation_index', {
             niveau: niveau,
             
           }),
@@ -183,13 +183,13 @@
 
             //alert(grid_val)
 
-            $old_grid.attr('id', `grid_app_direction_deliberation_liste_etudiant_traitement_exament_${grid_val}`).empty().html(`
+            $old_grid.attr('id', `grid_app_direction_deliberation_liste_etudiant_traitement_exament_after_deliberation_${grid_val}`).empty().html(`
                                     <div class="spinner spinner-track spinner-primary mr-15 text-primary">
                                         <div class="ml-15">Chargement des données de la grille</div>
                                     </div>
                             `);
             var options = {{ datatable_settings(datatable) }};
-            var name = `dt_app_direction_deliberation_liste_etudiant_traitement_exament_${grid_val}`;
+            var name = `dt_app_direction_deliberation_liste_etudiant_traitement_exament_after_deliberation_${grid_val}`;
 
             options['name'] = name;
 

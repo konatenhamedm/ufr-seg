@@ -1,31 +1,29 @@
-{% extends 'base-layout.html.twig' %}
+{% block page_content %}
 
-{% block title %}Mes informations{% endblock %}
- {# {% from '_macros/macro_document.html.twig' import prototype_ligne_colonne_document %} #}
-  {% from '_macros/macro_document.html.twig' import prototype_ligne_colonne_document %}
-
+{% from '_macros/macro_document.html.twig' import prototype_ligne_colonne_document %}
+     {% from '_macros/macro_info.html.twig' import prototype_ligne_colonne_info %}
    {% from '_macros/macro_cursus_universitaire.html.twig' import prototype_ligne_colonne %}
-   {% from '_macros/macro_info.html.twig' import prototype_ligne_colonne_info %}
-   {% from '_macros/macro_encart_bac.html.twig' import prototype_ligne_encart %}
    {% from '_macros/macro_cursus_professionnel.html.twig' import prototype_ligne_colonne_professionnel %}
    {% from '_macros/macro_cursus_stage.html.twig' import prototype_ligne_colonne_stage %}
-{% block body %}
-    <div class="card shadow-sm">
-        <div class="card-header card-header-sm">
-            <h3 class="card-title"> Informations étudiant</h3>
-            <div class="card-toolbar">
-               {# <a href="{{ path('app_utilisateur_utilisateur_new') }}" class="btn btn-main btn-sm"
-                   data-bs-toggle="modal" data-bs-target="#exampleModalSizeLg2">
-                    <i class="bi bi-plus-square text-light"></i>
-                    Nouveau
-                </a>#}
-            </div>
+      {% from '_macros/macro_encart_bac.html.twig' import prototype_ligne_encart %}
+    {% form_theme form 'widget/fields-block.html.twig' %}
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Informations etudiant   {{inscription.etudiant.getNomComplet| upper ~' | '~ inscription.niveau.code }}</h5>
+        <div class="btn btn-icon btn-sm  ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <span class="svg-icon svg-icon-2x text-white">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor"></rect>
+					<rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor"></rect>
+				</svg>
+            </span>
         </div>
-        <div class="card-body "  id="modal-lg">
-            {% form_theme form 'widget/fields-block.html.twig' %}
-            {{ form_start(form, {'attr': {'role':'form', 'class': 'form','enctype':'multipart/form-data'}}) }}
+    </div>
+    {{ form_start(form, {'attr': {'role':'form', 'class': 'form'}}) }}
+    <div class="modal-body">
+        {{ include('_includes/ajax/response.html.twig') }}
 
-                {{ include('_includes/ajax/response.html.twig') }}
+        {# {{ preinscription.etat }} #}
+       
             <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
                 <li class="nav-item">
                     <a class="nav-link active" data-bs-toggle="tab" href="#kt_tab_pane_1">ETAT CIVIL</a>
@@ -46,6 +44,25 @@
                 </li>
                 
             </ul>
+       {#    {% if preinscription.etat == 'attente_informations' %}
+            <div class="alert alert-danger d-flex align-items-center p-5">
+                <!--begin::Icon-->
+                <span class="svg-icon svg-icon-2hx svg-icon-primary me-3">...</span>
+                <!--end::Icon-->
+
+                <!--begin::Wrapper-->
+                <div class="d-flex flex-column">
+                    <!--begin::Title-->
+                    <h4 class="mb-1 text-dark">Alerte informations</h4>
+                    <!--end::Title-->
+                    <!--begin::Content-->
+                    <span>{{ preinscription.commentaire }}.</span>
+                    <!--end::Content-->
+                </div>
+                <!--end::Wrapper-->
+            </div>   
+          {% endif %} #}
+             
 
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="kt_tab_pane_1" role="tabpanel">
@@ -56,7 +73,8 @@
                         <div class="form-group  col-md-12 mb-2">{{ form_row(form.lieuNaissance) }}</div>
                         <div class="form-group  col-md-12 mb-2">{{ form_row(form.genre) }}</div>
                         <div class="form-group  col-md-12 mb-2">{{ form_row(form.nationalite) }}</div>
-                        {# <div class="form-group  col-md-12 mb-2">{{ form_row(form.civilite) }}</div> #}
+
+                       {#  <div class="form-group  col-md-12 mb-2">{{ form_row(form.civilite) }}</div> #}
                     </div>
                 </div>
                 <div class="tab-pane fade" id="kt_tab_pane_2" role="tabpanel">
@@ -118,9 +136,7 @@
                 </div> 
                 
                 <div class="tab-pane fade" id="kt_tab_pane_4" role="tabpanel">
-
-                      {{ prototype_ligne_encart(form) }}
-
+                  {{ prototype_ligne_encart(form) }}
                     <div class="row mb-4">
                         <h6>CURSUS UNIVERSITAIRE DEPUIS LE BAC </h6>
                     </div>
@@ -132,6 +148,7 @@
                     <div class="row mb-4">
                         <h6>Votre cursus professionnel</h6>
                     </div>
+                   
                     {{ prototype_ligne_colonne_professionnel(form) }}
                 <br>
                     <div class="row mb-4">
@@ -153,9 +170,6 @@
                      {{ prototype_ligne_colonne_document(form) }}
                     <br>
                    
-
-    
-
                 </div>
                 <div class="tab-pane fade" id="kt_tab_pane_6" role="tabpanel">
                     {{ prototype_ligne_colonne_info(form) }}
@@ -166,111 +180,59 @@
 
             </div>
 
-            <div class="row">
-                <div class="col-md-8"><button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal">Annuler</button>
-                     {{ form_widget(form.save) }}
+    </div>
+    <div class="modal-footer">
+        {# {{ include('_includes/ajax/loader.html.twig') }} #}
+       {#  <button type="button" class="btn btn-default btn-sm" data-bs-dismiss="modal">Annuler</button> #}
                         {% if etudiant.etat =="pas_complet" %}
-                        
                         {{ form_widget(form.valider) }}
                         {% endif %}
-                        </div>
-                <div class="col-md-4">
-
-                </div>
-            </div>
-
-            {{ form_widget(form._token) }}
-            {{ form_end(form, {render_rest: false}) }}
-
-
-
-        </div>
+ {{ form_widget(form.save) }}
+                       {#  {% if preinscription.etat != 'attente_informations' %} #}
+             <a title="Traiter la demande" href="{{ path('site_information_validation_direct_after_demande_since_inscription',{'id':etudiant.id,'inscription':inscription.id }) }}" class="btn btn-primary btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2" >Valider inscription</a>
+             {# <a title="Traiter la demande" href="{{ path('app_demande_rejeter',{'id':preinscription.id }) }}" class="btn btn-main btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2">Traiter la demande</a>
+              #}
+                        
+                       {#  {% endif %} #}
+                        
+        
+        
     </div>
+  {{ form_widget(form._token) }}
+    {{ form_end(form, {render_rest: false}) }}
 {% endblock %}
-
 
 {% block java %}
 <script src="{{ asset('assets/parcours/universitaire.js') }}"></script>
-<script src="{{ asset('assets/parcours/info.js') }}"></script>
 <script src="{{ asset('assets/parcours/professionnel.js') }}"></script>
 <script src="{{ asset('assets/parcours/stage.js') }}"></script>
-<script src="{{ asset('assets/parcours/document.js') }}"></script>
+{# <script src="{{ asset('assets/parcours/info.js') }}"></script> #}
     <script>
+    
+   var elements = Array.from(document.querySelectorAll("[data-bs-stacked-modal]"));
 
-            init_select2('select', null, '#modal-lg');
-        init_select2('select');
+            if (elements && elements.length > 0) {
+                elements.forEach((element) => {
+                    if (element.getAttribute("data-kt-initialized") === "1" ) {
+                        return;
+                    }
 
-     (function ($) {
-    $.fn.extend({
+                    const url = element.getAttribute('href');
+                    element.setAttribute("data-kt-initialized", "1");
 
-    // With every keystroke capitalize first letter of ALL words in the text
-    upperFirstAll: function() {
-        $(this).keyup(function(event) {
-            var box = event.target;
-            var txt = $(this).val();
-            var start = box.selectionStart;
-            var end = box.selectionEnd;
 
-            $(this).val(txt.toLowerCase().replace(/^(.)|(\s|\-)(.)/g,
-            function(c) {
-                return c.toUpperCase();
-            }));
-            box.setSelectionRange(start, end);
-        });
-        return this;
-    },
+                    element.addEventListener("click", function(e) {
+                        e.preventDefault();
 
-    // With every keystroke capitalize first letter of the FIRST word in the text
-    upperFirst: function() {
-        $(this).keyup(function(event) {
-            var box = event.target;
-            var txt = $(this).val();
-            var start = box.selectionStart;
-            var end = box.selectionEnd;
+                        const modalEl = document.querySelector(this.getAttribute("data-bs-stacked-modal"));
 
-            $(this).val(txt.toLowerCase().replace(/^(.)/g,
-            function(c) {
-                return c.toUpperCase();
-            }));
-            box.setSelectionRange(start, end);
-        });
-        return this;
-    },
-
-    // Converts with every keystroke the hole text to lowercase
-    lowerCase: function() {
-        $(this).keyup(function(event) {
-            var box = event.target;
-            var txt = $(this).val();
-            var start = box.selectionStart;
-            var end = box.selectionEnd;
-
-            $(this).val(txt.toLowerCase());
-            box.setSelectionRange(start, end);
-        });
-        return this;
-    },
-
-    // Converts with every keystroke the hole text to uppercase
-    upperCase: function() {
-        $(this).keyup(function(event) {
-            var box = event.target;
-            var txt = $(this).val();
-            var start = box.selectionStart;
-            var end = box.selectionEnd;
-
-            $(this).val(txt.toUpperCase());
-            box.setSelectionRange(start, end);
-        });
-        return this;
-    }
-
-    });
-}(jQuery));
-
-/*$(".checkAll").change(function () {
-$("input:checkbox").prop('checked', this.checked);
-});*/
+                        if (modalEl) {
+                            const modal = new bootstrap.Modal(modalEl);
+                            modal.show(element);
+                        }
+                    });
+                });
+            }
 
 $('#etudiant_prenom').upperFirstAll()
       $(function() { 
@@ -279,80 +241,33 @@ $('#etudiant_prenom').upperFirstAll()
             }); 
         }); 
      const etat = "{{etudiant.etat}}";
-     const nombre = "{{nombre}}";
-     const preinscription = "{{preinscription}}";
+     $('#etudiant_verification_infoEtudiants_0_habiteAvec_placeholder').closest( "label" ).hide()
+     $('.btn-default').hide()
 
-     $('#etudiant_infoEtudiants_0_habiteAvec_placeholder').closest( "label" ).hide()
-
-     if(etat == "pas_complet" && nombre != 1 ){
-         Swal.fire({
-        text: `Bienvenu (e) dans votre espace étudiant. Veuillez renseigner vos informations personnelles et les soumettre à validation`,
-        icon: "warning",
-        buttonsStyling: false,
-        confirmButtonText: "ok",
-        customClass: {
-            confirmButton: "btn btn-success"
-        }
-    });
-
-     }else if(etat == "complet" && nombre == 1){
-
-const url = "{{ path('default_print_iframe', {
-            'r': 'app_comptabilite_comptabilite_print',
-            'params': {
-                'id': preinscription
-            }
-        }) }}"
-   
-   Swal.fire({
-    html: `OPÉRATION EFFECTUÉE AVEC SUCCÈS. VEUILLEZ CLIQUER SUR CE LIEN POUR TÉLÉCHARGER LA FICHE DE PAIEMENT DE LA PRÉINSCRIPTION <a data-bs-toggle="modal" data-bs-target="#modal-lg" href="${url}">télécharger le reçu</a>`,
-    icon: "warning",
-    buttonsStyling: false,
-    confirmButtonText: "OK",
-    customClass: {
-        confirmButton: "btn btn-success"
-    }
-});
-
-
-     }else if(nombre == 1 && etat != "pas_complet")
-   {
-          const url = "{{ path('default_print_iframe', {
-            'r': 'app_comptabilite_comptabilite_print',
-            'params': {
-                'id': preinscription
-            }
-        }) }}"
-   
- {#   Swal.fire({
-    html: `OPÉRATION EFFECTUÉE AVEC SUCCÈS. VEUILLEZ CLIQUER SUR CE LIEN POUR TÉLÉCHARGER LA FICHE DE PAIEMENT DE LA PRÉINSCRIPTION <a data-bs-toggle="modal" data-bs-target="#modal-lg" href="${url}">télécharger le reçu</a>`,
-    icon: "warning",
-    buttonsStyling: false,
-    confirmButtonText: "OK",
-    customClass: {
-        confirmButton: "btn btn-success"
-    }
-}); #}
-     }
-
-
-       /* $('.no-auto').each(function () {
+         $(function () {
+            init_select2('select');
+        }); 
+        
+  $(function () {
+        
+           $('.no-auto').each(function () {
             const $this = $(this);
             const $id = $('#' + $this.attr('id'));
             init_date_picker($id,  'down', (start, e) => {
-
-                var start = new Date(1995, 11, 17);
-                $this.val(start.format('DD/MM/YYYY'));
+                //$this.val(start.format('DD/MM/YYYY'));
             }, null, null, false);
 
-            $id.on('apply.daterangepicker', function (ev, picker) {
+         /*   $id.on('apply.daterangepicker', function (ev, picker) {
                 $(this).val(picker.startDate.format('DD/MM/YYYY'));
-            });
-        });*/
-      if($("#etudiant_statutTravail_0").checked){
-        $('.travail').show()
-                }else{
-        $('.travail').hide()
+            });*/
+        });
+         
+        });
+
+          if($("#etudiant_statutTravail_0").checked){
+            $('.travail').show()
+        }else{
+            $('.travail').hide()
         }
        
 
@@ -364,7 +279,5 @@ const url = "{{ path('default_print_iframe', {
            $('.travail').hide()
 
         });
-
-     
     </script>
 {% endblock %}

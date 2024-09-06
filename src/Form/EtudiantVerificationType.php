@@ -42,7 +42,8 @@ class EtudiantVerificationType extends AbstractType
                     'label'   => 'Date de naissance',
                     'format'  => 'dd/MM/yyyy',
                     'html5' => false,
-                    'attr' => ['class' => 'datepicker no-auto skip-init'], 'widget' => 'single_text',   /*'format' => 'yyyy-MM-dd',*/
+                    'attr' => ['class' => 'datepicker no-auto skip-init'],
+                    'widget' => 'single_text',   /*'format' => 'yyyy-MM-dd',*/
                 ])
                 ->add('lieuNaissance', null, ['label' => 'Lieu de naissance', 'required' => false, 'empty_data' => ''])
                 ->add('email', EmailType::class, ['label' => 'Adresse E-mail', 'required' => false, 'empty_data' => ''])
@@ -290,7 +291,8 @@ class EtudiantVerificationType extends AbstractType
                     'label'   => 'Date de naissance',
                     'format'  => 'dd/MM/yyyy',
                     'html5' => false,
-                    'attr' => ['class' => 'datepicker no-auto skip-init'], 'widget' => 'single_text',   /*'format' => 'yyyy-MM-dd',*/
+                    'attr' => ['class' => 'datepicker no-auto skip-init'],
+                    'widget' => 'single_text',   /*'format' => 'yyyy-MM-dd',*/
                 ])
                 ->add('lieuNaissance', null, ['label' => 'Lieu de naissance', 'required' => false, 'empty_data' => ''])
                 ->add('email', EmailType::class, ['label' => 'Adresse E-mail', 'required' => false, 'empty_data' => ''])
@@ -317,6 +319,8 @@ class EtudiantVerificationType extends AbstractType
                 ]);
         }
         $builder->add('valider', SubmitType::class, ['label' => 'ENVOYER A LA VALIDATION', 'attr' => ['class' => 'btn btn-danger btn-ajax']]);
+        $builder->add('save', SubmitType::class, ['label' => 'Valider', 'attr' => ['class' => 'btn btn-main btn-ajax']]);
+
         // $builder->add('valider', Link::class, ['label' => 'ENVOYER A LA VALIDATION', 'attr' => ['class' => 'btn btn-danger btn-ajax']]);
         //$builder->add('save', SubmitType::class, ['label' => 'Valider inscription', 'attr' => ['class' => 'btn btn-main btn-ajax']]);
     }

@@ -654,28 +654,22 @@ class InscriptionController extends AbstractController
      * @throws MpdfException
      */
     #[Route('/imprime/liste/inscrits/examen/{niveau}', name: 'app_comptabilite_liste_etudiant_examen', methods: ['GET', 'POST'])]
-    public function imprimerListeEtudiantExamen(Request $request, $niveau, SessionInterface $session, PreinscriptionRepository $preinscriptionRepository): Response
+    public function imprimerListeEtudiantExamen(Request $request, $niveau, NiveauRepository $niveauRepository, SessionInterface $session, PreinscriptionRepository $preinscriptionRepository): Response
     {
 
         $anneeScolaire = $session->get("anneeScolaire");
-        /* 
-        if ($niveau) {
-            $resultat = $preinscriptionRepository->findBy(['etatDeliberation' => 'pas_deliberer', 'etat' => 'valide'], ['etudiant.nom' => "ASC"]);
-        } else {
-            $resultat = $preinscriptionRepository->findBy(['etatDeliberation' => 'pas_deliberer', 'etat' => 'valide', 'niveau' => $niveau], ['nom' => "ASC"]);
-        } */
 
-
-        //dd($preinscriptionRepository->findBy(['etatDeliberation' => 'pas_deliberer', 'etat' => 'valide']));
+        //dd($preinscriptionRepository->getListeEtudiantExamenDistinctNiveau($anneeScolaire));
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
         return $this->renderPdf("direction/deliberation/liste_etudiant_examen.html.twig", [
             'total_payer' => "",
             'data' => $preinscriptionRepository->getListeEtudiantExamen($niveau, $anneeScolaire),
+            'niveaux' => $niveau == "null" ? $preinscriptionRepository->getListeEtudiantExamenDistinctNiveau($anneeScolaire) : $niveauRepository->find($niveau)->getCode(),
             'total_impaye' => "",
             'anneeScolaire' => $anneeScolaire->getLibelle()
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
         ], [
-            'orientation' => 'p',
+            'orientation' => 'P',
             'protected' => true,
             'file_name' => "point_versments",
 

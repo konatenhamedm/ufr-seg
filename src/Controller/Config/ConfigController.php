@@ -98,14 +98,14 @@ class ConfigController extends AbstractController
                 'icon' => 'bi bi-list',
                 'module' => 'attente_validation',
                 'etat' => 'attente_validation',
-                'href' => $this->generateUrl('app_direction_deliberation_liste_etudiant_traitement_exament', ['etat' => 'attente_validation'])
+                'href' => $this->generateUrl('app_direction_deliberation_liste_etudiant_traitement_exament_index'/* , ['etat' => 'attente_validation'] */)
             ],
             [
                 'label' => 'APRES DELIBERATION',
                 'icon' => 'bi bi-list',
                 'module' => 'gestion',
                 'etat' => 'delibere',
-                'href' => $this->generateUrl('app_direction_deliberation_liste_etudiant_traitement_exament', ['etat' => 'delibere'])
+                'href' => $this->generateUrl('app_direction_deliberation_liste_etudiant_traitement_exament_after_deliberation_index'/* , ['etat' => 'delibere'] */)
             ],
 
         ];

@@ -29,7 +29,7 @@
 
 {% macro prototype_ligne_colonne_professionnel(form) %}
     <div class="list-colonne_professionnel"  data-prototype="{{ _self.colonne(form.cursusProfessionnels.vars.prototype)|e }}"></div>
-   {% if app.user.personne.fonction.code !="ADM" %}
+   {% if app.user.personne.fonction.code !="ADM_OLD" %}
     <button type="button" data-protoname="__name__" class="btn btn-default add_line_professionnel btn-xs" id="add_ligne_professionnel"  data-protoclass=".list-colonne_professionnel" data-container=".column-container_professionnel">
         <i class="fa fa-plus"></i> Ajouter une ligne
     </button>

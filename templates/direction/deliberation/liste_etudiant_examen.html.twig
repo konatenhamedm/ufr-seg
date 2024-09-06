@@ -1,28 +1,17 @@
-{# {% set code =facture.typeFacture.code(true) %} #}
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{# {{ code =='a' ? 'AVOIR': 'FACTURE' }} {{ facture.numero }} #}Liste étudiants examen</title>
+    <title>Liste étudiants examen</title>
     <style>
       {% block page_css %}
         @page {
-
           margin-footer: 0.5cm;
-
-          /*header: html_headerContent;*/
           footer: html_pageFooter;
           margin-top: 0.5cm;
           margin-header: 0cm;
-         
-          /*background: ...
-  background-image: ...
-  background-position ...
-  background-repeat ...
-  background-color ...
-  background-gradient: ...*/
         }
-        .clearfix:after,
-        {% endblock %} .clearfix:before {
+
+        .clearfix:after {
           content: " ";
           display: table;
         }
@@ -31,200 +20,208 @@
           clear: both;
         }
 
-        .mention {
-  position: absolute;
-  bottom: 100px;
-}
-
-        /*@page :first {
-   header: html_headerContent;
-}*/
-caption{
-  margin-bottom: 15px;
-}
-      fieldset 
-	{
-		border: 1px solid #000 !important;
-		margin: 0;
-		xmin-width: 0;
-		padding: 5px;       
-		position: relative;
-		border-radius:4px;
-		background-color:#fff;
-		padding-left:10px!important;
-	}	
-	
-		legend
-		{
-       padding: 0 10px; 
-      margin-left: 100px;
-			font-size:14px;
-			font-weight:bold;
-			margin-bottom: 0px; 
-			width: 35%; 
-			border: 1px solid #ddd;
-			border-radius: 4px; 
-			background-color: #ffffff;
-		}
-
+        fieldset {
+          border: 1px solid #000 !important;
+          margin: 0;
+          padding: 5px;
+          position: relative;
+          border-radius: 4px;
+          background-color: #fff;
+        }
+        
         table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+        }
 
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
 
-tr:nth-child(even) {
-  
-}
         @media all {
-          /*.content { display: block; page-break-inside: avoid; }*/
+          /* Prevent page break inside a content block */
         }
-
-        .content {
-          /*margin-top: 18cm;*/
-        }
-
-        {# .table-responsive.table-bordered {
-          border: 0;
-        } #}
 
         .double_underline {
-            text-decoration:underline;
-            border-bottom: 1px solid #000;
-            text-align: center;
+          text-decoration: underline;
+          border-bottom: 1px solid #000;
+          text-align: center;
         }
+      {% endblock %}
     </style>
   </head>
   <body style="font-size:12px;">
-    <div class="clearfix">
-     <div style="width:10%;text-align:left;float:left;"  class="">
-     {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
-        <img src="{{ var |replace({'/': "\\"}) }}" width="100px" />
-        {# <img src="{{ absolute_url(asset(var)) }}" width="100px" /> #}
-       {#  <div style="text-align:left;border: 1px solid #000;padding:8px;width:70%"  class="">
-              CC N° 9904215 D<br>
-              Régime d'imposition: Réel Normal<br>
-              Centre des impôts: D G E<br>
-        </div>
-        {{ "facture.typeFacture.libelle" | upper }} N° {{ 'facture.numero' }} #}
-      </div>
-     
-       <div style="width:65%;text-align:right;float:center;">
-            <div style="text-align:center;"  class="">
-                    <b>UFR-SEG</b><br>
-                  BP V 43 ABIDJAN ,TEL :01 01 15 44 44  ufrseg-filierespro-ufhb.ci <br>
-                  Abidjan-Cocody
-               {# <div style="border-top:1px solid #000"></div> #}
-              </div>
-           
-        </div>
-       <div style="width:25%;text-align:right;float:right;margin-top:0px,padding:8px">
-
-           <div style="text-align:center;margin-top:-45px"  class="">
+    {% for item in niveaux %}
+      <div style="page-break-after: always;">
+        <div class="clearfix">
+          <div style="width:10%;text-align:left;float:left;">
+            {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
+            <img src="{{ var | replace({'/': "\\"}) }}" width="100px" />
+          </div>
+          <div style="width:65%;text-align:center;float:center;">
+            <b>UFR-SEG</b><br>
+            BP V 43 ABIDJAN, TEL :01 01 15 44 44 ufrseg-filierespro-ufhb.ci <br>
+            Abidjan-Cocody
+          </div>
+          <div style="width:25%;text-align:right;float:right;">
+             <div style="text-align:center;margin-top:-45px"  class="">
                     République de COTE D'IVOIRE <br>
                 <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
                <b style="font-weight: bolder;">Année scolaire : {{ anneeScolaire }}</b>
-              </div>
-          
+            </div>
+          </div>
         </div>
-    </div>
-  
 
-    <br>
+        <br>
 
- <form action="/action_page.php">
-    <fieldset>
-        <legend></legend>
-       <h2 class="text-center" style="text-align: center;">LISTE D’EMARGEMENT TEST D’ENREE {{ anneeScolaire }}
+        <form action="/action_page.php">
+          <fieldset>
+            <legend></legend>
+            <h2 class="text-center" style="text-align: center;">
+              LISTE D’EMARGEMENT TEST D’ENTREE DU NIVEAU : {{ item['code'] }}
+            </h2>
+          </fieldset>
+        </form>
 
- <br>{# {{titre['min_year'] ~ '-'~ titre['max_year']}} #}</h2>
-       {# <h2 class="text-center" style="text-align: center;">ETAT DE VERSEMENTS <br>{{ id }}</h2> #}
-      </fieldset>
-   </form>
-   
-<br/>
+        <br/>
 
- <div class="clearfix">
-    
-       <div style="width:100%;text-align:right;float:center;">
-         
-            {# <div style="margin-top:-25px;text-align:center;bosrder: 1px solid #000;padding:8px;font-size:15px;font-weight:bold"  class=""> #}
-               {# <b>DOIT</b><br><br> #}
-              <table>
-            <head>
-            
-                    <tr style="background-color: white">
-                        <th style="width:4%;">N°</th>
-                        <th style="width:10%;">CODE PREINSCRIPTION</th>
-                        <th style="width:20%;">NOM ET PRÉNOMS</th>
-                        <th style="width:10%;">ETABLISSEMENT D’ORIGINE</th>
-                        <th style="width:10%;">DATE NAISSANCE</th>
-                        <th style="width:10%;">MENTION DU BAC</th>
-                        <th style="width:10%;">EMARGEMENT</th>
-                        
-                    </tr>
-            </head>
-
-            <tbody>
-               {% for key,item in data %}
-
-               {# {{ dump(menu.getEncartEtudiant(item.etudiant))}} #}
-                 <tr>
-                <td>{{ key+1 }}</td>
-                <td>{{ item.code }}</td>
-                <td>{{ item.etudiant.nomComplet }}</td>
-                <td></td>
-                <td>{{ item.etudiant.dateNaissance ? item.etudiant.dateNaissance|date('Y-m-d') : '' }}</td>
-                <td></td>
-                <td></td>
-                
+        <div class="clearfix">
+          <div style="width:100%;text-align:center;">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:4%;">N°</th>
+                  <th style="width:10%;">CODE PREINSCRIPTION</th>
+                  <th style="width:20%;">NOM ET PRÉNOMS</th>
+                  <th style="width:10%;">ETABLISSEMENT D’ORIGINE</th>
+                  <th style="width:10%;">DATE NAISSANCE</th>
+                  <th style="width:10%;">MENTION DU BAC</th>
+                  <th style="width:10%;">EMARGEMENT</th>
                 </tr>
-             {% else %}
+              </thead>
+              <tbody>
+                {% for key, liste in data %}
+
+                {% if liste.niveau.code == item['code']  %}
                  <tr>
-                   <td colspan="7" style="text-align: center;">Il n'y aucunes données disponibles</td>
-                 </tr>
-                  
-                 {% endfor %}
-            </tbody>
-                 
-          </table>
-           {#  </div> #}
-        </div>
-       </div>
-
+                    <td>{{ key+1 }}</td>
+                    <td>{{ liste.code }}</td>
+                    <td>{{ liste.etudiant.nomComplet }}</td>
+                    <td></td>
+                    <td>{{ liste.etudiant.dateNaissance ? liste.etudiant.dateNaissance|date('Y-m-d') : '' }}</td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                {% endif %}
                 
-</div>
-{# <br>
-  <div style="border-top:20px solid grey"></div>
-  <br> #}
+                 
+                {% else %}
+                  <tr>
+                    <td colspan="7" style="text-align: center;">Il n'y a aucunes données disponibles</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
+        <htmlpagefooter name="pageFooter">
+          <div style="border-top: 2px solid #000;"></div>
+          <p align="center" style="margin-top: -1px;">
+            COCODY ECOLE POLICE - 01 BP 5889 Abidjan 01 - e-mail: 
+            <a href="mailto:ufrseg-filierespro-ufhb.ci">ufrseg-filierespro-ufhb.ci</a><br>
+            TEL : 01 01 15 44 44
+          </p>
+          <div align="center" style="font-size: 10px;">
+            Page {PAGENO} sur {nbpg}
+          </div>
+        </htmlpagefooter>
+      </div>
+    {% else %}
+<div style="page-break-after4: always;">
+        <div class="clearfix">
+          <div style="width:10%;text-align:left;float:left;">
+            {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
+            <img src="{{ var | replace({'/': "\\"}) }}" width="100px" />
+          </div>
+          <div style="width:65%;text-align:center;float:center;">
+            <b>UFR-SEG</b><br>
+            BP V 43 ABIDJAN, TEL :01 01 15 44 44 ufrseg-filierespro-ufhb.ci <br>
+            Abidjan-Cocody
+          </div>
+          <div style="width:25%;text-align:right;float:right;">
+             <div style="text-align:center;margin-top:-45px"  class="">
+                    République de COTE D'IVOIRE <br>
+                <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
+               <b style="font-weight: bolder;">Année scolaire : {{ anneeScolaire }}</b>
+            </div>
+          </div>
+        </div>
 
+        <br>
 
-</div>
-    
-    <htmlpagefooter name="pageFooter">
-       {#  <table style="width:100%">
-          <tr>
-            <td style="width:50%;text-align:left;padding-bottom:8px">
-              <i><b>Client</b></i>
-            </td>
-            <td style="width:50%;text-align:right">
-              <i><b>Souche</b></i>
-            </td>
-          </tr>
-        </table> #}
-        <div style="border-top:2px solid #000"></div>
-       <p  align="center" style="align: center;margin-top:-1px">
-        COCODY ECOLE POLICEI - 01 BP 5889 Abidjan 01 - e-mail: 
-        <a href="mailto:ufrseg-filierespro-ufhb.ci">ufrseg-filierespro-ufhb.ci</a><br>
-        TEL :01 01 15 44 44
-       </p>
-    </htmlpagefooter>
+        <form action="/action_page.php">
+          <fieldset>
+            <legend></legend>
+            <h2 class="text-center" style="text-align: center;">
+              LISTE D’EMARGEMENT TEST D’ENTREE DU NIVEAU : {{ niveaux }}
+            </h2>
+          </fieldset>
+        </form>
+
+        <br/>
+
+        <div class="clearfix">
+          <div style="width:100%;text-align:center;">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:4%;">N°</th>
+                  <th style="width:10%;">CODE PREINSCRIPTION</th>
+                  <th style="width:20%;">NOM ET PRÉNOMS</th>
+                  <th style="width:10%;">ETABLISSEMENT D’ORIGINE</th>
+                  <th style="width:10%;">DATE NAISSANCE</th>
+                  <th style="width:10%;">MENTION DU BAC</th>
+                  <th style="width:10%;">EMARGEMENT</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for key, item in data %}
+                  <tr>
+                    <td>{{ key+1 }}</td>
+                    <td>{{ item.code }}</td>
+                    <td>{{ item.etudiant.nomComplet }}</td>
+                    <td></td>
+                    <td>{{ item.etudiant.dateNaissance ? item.etudiant.dateNaissance|date('Y-m-d') : '' }}</td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="7" style="text-align: center;">Il n'y a aucunes données disponibles</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <htmlpagefooter name="pageFooter">
+          <div style="border-top: 2px solid #000;"></div>
+          <p align="center" style="margin-top: -1px;">
+            COCODY ECOLE POLICE - 01 BP 5889 Abidjan 01 - e-mail: 
+            <a href="mailto:ufrseg-filierespro-ufhb.ci">ufrseg-filierespro-ufhb.ci</a><br>
+            TEL : 01 01 15 44 44
+          </p>
+          <div align="center" style="font-size: 10px;">
+            Page {PAGENO} sur {nbpg}
+          </div>
+        </htmlpagefooter>
+      </div>
+
+    {% endfor %}
   </body>
 </html>

@@ -40,6 +40,9 @@ class EncartBac
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $mention = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $ip = null;
+
 
     public function getId(): ?int
     {
@@ -138,6 +141,18 @@ class EncartBac
     public function setMention(?string $mention): static
     {
         $this->mention = $mention;
+
+        return $this;
+    }
+
+    public function getIp(): ?string
+    {
+        return $this->ip;
+    }
+
+    public function setIp(?string $ip): static
+    {
+        $this->ip = $ip;
 
         return $this;
     }

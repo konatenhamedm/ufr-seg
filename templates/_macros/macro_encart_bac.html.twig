@@ -10,7 +10,8 @@
                             
                         </div>
                             <div class="card-body">
-                               <div class="row">
+                            
+                               <div class="row mb-5">
                                     <div class="col-md-2 ">
                                         {{ form_row(colonne.matricule) }}
                                     </div>
@@ -36,12 +37,25 @@
 
 
                                                     <a class="btn btn-dark btn-sm" style="margin-top: 18px;" target="_blank" href="{{ path('fichier_index', {id:  colonne.vars.value.bac.id}) }}" download> <i class="bi bi-upload"></i>
-                </a>
+                                                    </a>
                                             </div>
                                         
                                         {% endif %}
                                     
                                </div>
+
+                               <div class="row">
+                                 <div class="col-md-4 ">
+                                        {{ form_row(colonne.etablissement) }}
+                                    </div>
+                                    <div class="col-md-4 ">
+                                        {{ form_row(colonne.mention) }}
+                                    </div>
+                                    <div class="col-md-4 ">
+                                        {{ form_row(colonne.ip) }}
+                                       
+                                    </div>
+                            </div>
                             </div>
                         </div><br>
 

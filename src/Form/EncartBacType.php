@@ -7,6 +7,7 @@ use App\Entity\Etudiant;
 use App\Entity\Fichier;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -23,6 +24,43 @@ class EncartBacType extends AbstractType
                     new NotNull(null, "S'il vous veillez renseigner le champ matricule")
                 )
             ])
+            ->add('etablissement', TextType::class, [
+                'label' => "Etablissement d'origine",
+                "constraints" => array(
+                    new NotNull(null, "S'il vous veillez renseigner le champ établissement")
+                )
+            ])
+            ->add('ip', TextType::class, [
+                'label' => "IDENTIFIANT PERMANENT (IP)",
+                "constraints" => array(
+                    new NotNull(null, "S'il vous veillez renseigner le champ ip")
+                )
+            ])
+            ->add(
+                'mention',
+
+                ChoiceType::class,
+                [
+                    'placeholder' => 'Choisir une mention',
+                    'label' => 'Mention bac',
+                    //'required'     => false,
+                    'expanded'     => false,
+                    'attr' => ['class' => 'has-select2'],
+                    'multiple' => false,
+                    'choices'  => array_flip([
+                        'BIEN' => 'Bien',
+                        'TRES_BIEN' => 'Très Bien',
+                        'PASSABLE' => 'Passable',
+
+                    ]),
+                    "constraints" => array(
+                        new NotNull(null, "S'il vous veillez renseigner le champ mention")
+                    )
+                ]
+
+            )
+
+
             ->add('numero', TextType::class, [
                 'label' => 'Numéro table Bac',
                 "constraints" => array(

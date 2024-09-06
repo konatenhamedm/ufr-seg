@@ -14,6 +14,7 @@ use App\Form\PreinscriptionValidationType;
 use App\Repository\AnneeScolaireRepository;
 use App\Repository\DecisionRepository;
 use App\Repository\EtudiantRepository;
+use App\Repository\InscriptionRepository;
 use App\Repository\NiveauRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\PreinscriptionRepository;
@@ -359,6 +360,86 @@ class HomeController extends AbstractController
         return $this->render('site/informations_verification.html.twig', [
             'etudiant' => $etudiant,
             'preinscription' => $preinscriptionRepository->find($preinscription),
+            'niveau' => $preinscriptionRepository->find($preinscription)->getNiveau()->getId(),
+            'form' => $form->createView(),
+        ]);
+
+        //return $this->render('site/admin/pages/informations.html.twig');
+    }
+    #[Route(path: '/verification/validation/dossier/inscription/{id}/{inscription}', name: 'verification_validation_dossier_inscription', methods: ['GET', 'POST'])]
+    public function informationInscription(Request $request, $inscription, UserInterface $user, Etudiant $etudiant, InscriptionRepository $inscriptionRepository, PersonneRepository $personneRepository, FormError $formError, NiveauRepository $niveauRepository, UtilisateurRepository $utilisateurRepository): Response
+    {
+        //$etudiant = $user->getPersonne();
+
+        //dd($niveauRepository->findNiveauDisponible(21));
+
+        //dd($preinscription);
+
+        $validationGroups = ['Default', 'FileRequired', 'autre'];
+        $form = $this->createForm(EtudiantVerificationType::class, $etudiant, [
+            'method' => 'POST',
+            'type' => 'info',
+            'doc_options' => [
+                'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
+                'attrs' => ['class' => 'filestyle'],
+            ],
+            'validation_groups' => $validationGroups,
+            'action' => $this->generateUrl('verification_validation_dossier_inscription', ['id' => $etudiant->getId(), 'inscription' => $inscription]),
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_home_timeline_index');
+            $preinscriptionData = $inscriptionRepository->find($inscription);
+
+
+
+            if ($form->isValid()) {
+
+                if ($form->getClickedButton()->getName() === 'valider') {
+                    $preinscriptionData->setEtat('attente_validation');
+                    $etudiant->setEtat('complete');
+                    // $inscriptionRepository->add($preinscriptionData, true);
+                }
+
+                $personneRepository->add($etudiant, true);
+
+                //$entityManager->flush();
+
+                $data = true;
+                $message       = 'Opération effectuée avec succès';
+                $statut = 1;
+                $this->addFlash('success', $message);
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->render('site/informations_verification_inscription.html.twig', [
+            'etudiant' => $etudiant,
+            'inscription' => $inscriptionRepository->find($inscription),
+            'niveau' => $inscriptionRepository->find($inscription)->getNiveau()->getId(),
             'form' => $form->createView(),
         ]);
 

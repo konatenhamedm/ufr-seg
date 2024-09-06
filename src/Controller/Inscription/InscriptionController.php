@@ -609,6 +609,18 @@ class InscriptionController extends AbstractController
                 }]);
             }
             $table->add('montant', NumberFormatColumn::class, ['label' => 'Coût formation', 'field' => 'p.montant']);
+        } elseif ($etat == 'valide_classe') {
+            $table = $dataTableFactory->create()
+                ->add('code', TextColumn::class, ['label' => 'Code'])
+                ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
+                ->add('niveau', TextColumn::class, ['field' => 'niveau.code', 'label' => 'Code niveau'])
+                ->add('nom', TextColumn::class, ['field' => 'etudiant.nom', 'visible' => false])
+                ->add('prenom', TextColumn::class, ['field' => 'etudiant.prenom', 'visible' => false])
+                ->add('nom_prenom', TextColumn::class, ['label' => 'Nom et prénoms', 'render' => function ($value, Inscription $preinscription) {
+                    return $preinscription->getEtudiant()->getNomComplet();
+                }])
+
+                ->add('dateInscription', DateTimeColumn::class, ['label' => "Date de la demande d'inscription", 'format' => 'd-m-Y']);
         } else {
 
             $table = $dataTableFactory->create()->add('code', TextColumn::class, ['label' => 'Code'])
@@ -724,9 +736,10 @@ class InscriptionController extends AbstractController
 
                         'actions' => [
                             'classe' => [
-                                'target' => '#modal-xl2',
+                                'target' => '#modal-xl',
+                                'url' => $this->generateUrl('verification_validation_dossier_inscription', ['id' => $context->getEtudiant()->getId(), 'inscription' => $value]),
 
-                                'url' => $this->generateUrl('validation_echeancier_affectation_classe', ['id' => $value]),
+                                //'url' => $this->generateUrl('validation_echeancier_affectation_classe', ['id' => $value]),
                                 //'url' => $this->generateUrl('app_inscription_affectation_classe', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
@@ -929,6 +942,7 @@ class InscriptionController extends AbstractController
 
             $blocEcheanciers = $form->get('blocEcheanciers')->getData();
 
+            //  dd($blocEcheanciers);
 
 
             if ($form->isValid()) {
@@ -987,28 +1001,44 @@ class InscriptionController extends AbstractController
         //dd($etat);
         $isEtudiant = $this->isGranted('ROLE_ETUDIANT');
         $anneeScolaire = $session->get('anneeScolaire');
-        $table = $dataTableFactory->create()
-            ->add('code', TextColumn::class, ['label' => 'Code'])
-            ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
-            ->add('niveau', TextColumn::class, ['field' => 'niveau.libelle', 'label' => 'Niveau'])
-            ->add('dateInscription', DateTimeColumn::class, ['label' => 'Date création', 'format' => 'd-m-Y']);
 
-        if ($etat != 'attente_echeancier') {
-            $table->add('caissiere', TextColumn::class, ['field' => 'c.getNomComplet', 'label' => 'Caissière ']);
-        }
-
-
-        if (!$isEtudiant) {
-            $table->add('nom', TextColumn::class, ['field' => 'etudiant.nom', 'visible' => false])
+        if ($etat == 'valide_classe') {
+            $table = $dataTableFactory->create()
+                ->add('code', TextColumn::class, ['label' => 'Code'])
+                ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
+                ->add('niveau', TextColumn::class, ['field' => 'niveau.code', 'label' => 'Code niveau'])
+                ->add('nom', TextColumn::class, ['field' => 'etudiant.nom', 'visible' => false])
                 ->add('prenom', TextColumn::class, ['field' => 'etudiant.prenom', 'visible' => false])
-                ->add('nom_prenom', TextColumn::class, ['label' => 'Demandeur', 'render' => function ($value, Inscription $preinscription) {
+                ->add('nom_prenom', TextColumn::class, ['label' => 'Nom et prénoms', 'render' => function ($value, Inscription $preinscription) {
                     return $preinscription->getEtudiant()->getNomComplet();
-                }]);
+                }])
+
+                ->add('dateInscription', DateTimeColumn::class, ['label' => "Date de la demande d'inscription", 'format' => 'd-m-Y']);
+        } else {
+            $table = $dataTableFactory->create()
+                ->add('code', TextColumn::class, ['label' => 'Code'])
+                ->add('filiere', TextColumn::class, ['field' => 'filiere.libelle', 'label' => 'Filière'])
+                ->add('niveau', TextColumn::class, ['field' => 'niveau.libelle', 'label' => 'Niveau'])
+                ->add('dateInscription', DateTimeColumn::class, ['label' => 'Date création', 'format' => 'd-m-Y']);
+
+            if ($etat != 'attente_echeancier') {
+                $table->add('caissiere', TextColumn::class, ['field' => 'c.getNomComplet', 'label' => 'Caissière ']);
+            }
+
+
+            if (!$isEtudiant) {
+                $table->add('nom', TextColumn::class, ['field' => 'etudiant.nom', 'visible' => false])
+                    ->add('prenom', TextColumn::class, ['field' => 'etudiant.prenom', 'visible' => false])
+                    ->add('nom_prenom', TextColumn::class, ['label' => 'Demandeur', 'render' => function ($value, Inscription $preinscription) {
+                        return $preinscription->getEtudiant()->getNomComplet();
+                    }]);
+            }
+            if ($etat == 'valide') {
+                $table->add('montant', NumberFormatColumn::class, ['label' => 'Montant', 'field' => 'info.montant']);
+                $table->add('datePaiement', DateTimeColumn::class, ['label' => 'Date de paiement', 'field' => 'info.datePaiement', 'format' => 'd-m-Y']);
+            }
         }
-        if ($etat == 'valide') {
-            $table->add('montant', NumberFormatColumn::class, ['label' => 'Montant', 'field' => 'info.montant']);
-            $table->add('datePaiement', DateTimeColumn::class, ['label' => 'Date de paiement', 'field' => 'info.datePaiement', 'format' => 'd-m-Y']);
-        }
+
         $table->createAdapter(ORMAdapter::class, [
             'entity' => Inscription::class,
             'query' => function (QueryBuilder $qb) use ($user, $etat, $isEtudiant, $anneeScolaire) {

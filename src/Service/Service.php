@@ -430,6 +430,8 @@ class Service
     }
     public function registerEcheancieOnlyInscription($blocEcheanciers, Inscription $inscription): bool
     {
+
+        //  dd($inscription);
         $somme = 0;
         $response = true;
         $classe = "";

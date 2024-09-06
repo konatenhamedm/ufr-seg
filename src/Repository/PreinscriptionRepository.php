@@ -90,6 +90,22 @@ class PreinscriptionRepository extends ServiceEntityRepository
                 ->getResult();
         }
     }
+    public function getListeEtudiantExamenDistinctNiveau($anneeScolaire)
+    {
+
+        return $this->createQueryBuilder('p')
+            ->select('distinct(niveau.id),niveau.code')
+            ->innerJoin('p.etudiant', 'u')
+            ->innerJoin('p.niveau', 'niveau')
+            ->andWhere('p.etatDeliberation = :etatDeliberation')
+            ->andWhere('p.etat = :etat')
+            ->andWhere('niveau.anneeScolaire = :anneeScolaire')
+            ->setParameter('etatDeliberation', 'pas_deliberer')
+            ->setParameter('etat', 'valide')
+            ->setParameter('anneeScolaire', $anneeScolaire)
+            ->getQuery()
+            ->getResult();
+    }
     public function dataFilireWithoutExamen($etudiant)
     {
         return $this->createQueryBuilder('p')

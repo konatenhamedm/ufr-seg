@@ -2414,7 +2414,7 @@ class HomeController extends AbstractController
 
         $data = null;
         $statutCode = Response::HTTP_OK;
-
+        $fullRedirect = false;
         $isAjax = $request->isXmlHttpRequest();
 
 
@@ -2449,7 +2449,7 @@ class HomeController extends AbstractController
                     $this->addFlash('danger', $message);
                 }
 
-
+                $fullRedirect = true;
                 $data = true;
             } else {
                 $message = $formError->all($form);
@@ -2461,7 +2461,144 @@ class HomeController extends AbstractController
             }
 
             if ($isAjax) {
-                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'fullRedirect'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+        return $this->render('site/admin/new_validation.html.twig', [
+            'etudiant' => $etudiant,
+            'etat' => 'ok',
+            'form' => $form->createView(),
+            'frais' => 3,
+        ]);
+
+        //return $this->render('site/admin/pages/informations.html.twig');
+    }
+    #[Route(path: '/site/information/validation/direct/after/demande/{id}/{inscription}/inscription', name: 'site_information_validation_direct_after_demande_since_inscription', methods: ['GET', 'POST'])]
+    public function informationAdminNewDirectAfterDemandeEtudiantSinceInscription(
+        Request $request,
+        EtudiantRepository $etudiantRepository,
+        PersonneRepository $personneRepository,
+        FormError $formError,
+        NiveauRepository $niveauRepository,
+        UtilisateurRepository $utilisateurRepository,
+        Etudiant $etudiant,
+        $inscription,
+        SendMailService $sendMailService,
+        UserPasswordHasherInterface $userPasswordHasher,
+        ClasseRepository $classeRepository,
+        InscriptionRepository $inscriptionRepository,
+        EcheancierRepository $echeancierRepository,
+        EntityManagerInterface $entityManager,
+        Service $service,
+        PreinscriptionRepository $preinscriptionRepository2,
+        SessionInterface $session,
+        EcheancierNiveauRepository $echeancierNiveauRepository
+    ): Response {
+
+
+
+        //dd($preinscriptionRepository->find($preinscription));
+
+
+        /* foreach ($frais as $key => $value) {
+            $sommeFrais += (int)$value->getMontant();
+        } */
+        $bloc_echeancier = new BlocEcheancier();
+
+        //$bloc_echeancier->setClasse($classeRepository->find(1));
+        $bloc_echeancier->setDateInscription(new DateTime());
+        $bloc_echeancier->setTotal('0');
+
+
+        $etudiant->addBlocEcheancier($bloc_echeancier);
+
+        foreach ($echeancierNiveauRepository->findBy(["niveau" => $inscriptionRepository->find($inscription)->getNiveau()]) as $key => $echeancierNiveau) {
+            $echeancierProvisoire = new EcheancierProvisoire();
+            $echeancierProvisoire->setDateVersement($echeancierNiveau->getDateVersement());
+            $echeancierProvisoire->setNumero($echeancierNiveau->getNumero());
+            $echeancierProvisoire->setMontant($echeancierNiveau->getMontant());
+
+            $bloc_echeancier->addEcheancierProvisoire($echeancierProvisoire);
+        }
+
+
+
+
+        $validationGroups = ['Default', 'FileRequired', 'autre'];
+        //dd($niveauRepository->findNiveauDisponible(21));
+
+        $form = $this->createForm(EtudiantAdminNewType::class, $etudiant, [
+            'method' => 'POST',
+            'anneeScolaire' => $session->get("anneeScolaire"),
+            "niveau" => $inscriptionRepository->find($inscription)->getNiveau(),
+            'doc_options' => [
+                'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
+                'attrs' => ['class' => 'filestyle'],
+            ],
+            'validation_groups' => $validationGroups,
+            'action' => $this->generateUrl('site_information_validation_direct_after_demande_since_inscription', [
+                'id' =>  $etudiant->getId(),
+                'inscription' => $inscription,
+
+            ])
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+        $fullRedirect = false;
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_home_timeline_index');
+
+            $user = $utilisateurRepository->findOneBy(['personne' => $etudiant]);
+            $blocEcheanciers = $form->get('blocEcheanciers')->getData();
+
+            $inscriptionData = $inscriptionRepository->find($inscription);
+
+            //dd($inscriptionData);
+
+            if ($form->isValid()) {
+
+
+                $responseRegister = $service->registerEcheancieOnlyInscription($blocEcheanciers, $inscriptionData);
+
+                if ($responseRegister) {
+                    // $inscription->setClasse()
+                    $inscriptionRepository->save($inscriptionData, true);
+
+
+                    $statut = 1;
+                    $message       = 'Opération effectuée avec succès';
+                    $this->addFlash('success', $message);
+                } else {
+                    $statut = 0;
+                    $message       = "Opération échouée car le montant total à payer est different du montant total de l 'échanece";
+                    $this->addFlash('danger', $message);
+                }
+
+                $fullRedirect = true;
+                $data = true;
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data', 'fullRedirect'), $statutCode);
             } else {
                 if ($statut == 1) {
                     return $this->redirect($redirect, Response::HTTP_OK);

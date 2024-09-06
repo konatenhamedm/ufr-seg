@@ -81,7 +81,7 @@
 
 {% macro prototype_ligne_colonne(form) %}
     <div class="list-colonne_universitaire"  data-prototype="{{ _self.colonne(form.cursusUniversitaires.vars.prototype)|e }}"></div>
-    {% if app.user.personne.fonction.code !="ADM" %}
+    {% if app.user.personne.fonction.code !="ADM_OLD" %}
     <button type="button" data-protoname="__name__" class="btn btn-default add_line_universitaire btn-xs" id="add_ligne_universitaire"  data-protoclass=".list-colonne_universitaire" data-container=".column-container_universitaire">
         <i class="fa fa-plus"></i> Ajouter une ligne
     </button>
