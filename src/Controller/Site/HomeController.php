@@ -1137,7 +1137,7 @@ class HomeController extends AbstractController
         // dd($niveau, $filiere);
 
         $anneeScolaire = $session->get('anneeScolaire');
-        //dd($anneeScolaire);
+        dd($anneeScolaire);
 
         if ($anneeScolaire == null) {
             // dd($anneeScolaireRepository->findOneBy(['actif' => 1]));
