@@ -1145,6 +1145,8 @@ class HomeController extends AbstractController
             $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
         }
 
+        $anneeScolaire = $session->get('anneeScolaire');
+        dd($anneeScolaireRepository->findOneBy(['numero' => ($anneeScolaire->getNumero() - 1)]));
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
             'action' => $this->generateUrl('app_reinscription_etudiant_admin_index', compact('classe', 'niveau', 'filiere')),

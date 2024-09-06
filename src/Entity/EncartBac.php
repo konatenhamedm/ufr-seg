@@ -34,6 +34,12 @@ class EncartBac
     #[ORM\ManyToOne(inversedBy: 'encartBacs')]
     private ?Etudiant $etudiant = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $etablissement = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $mention = null;
+
 
     public function getId(): ?int
     {
@@ -108,6 +114,30 @@ class EncartBac
     public function setEtudiant(?Etudiant $etudiant): static
     {
         $this->etudiant = $etudiant;
+
+        return $this;
+    }
+
+    public function getEtablissement(): ?string
+    {
+        return $this->etablissement;
+    }
+
+    public function setEtablissement(?string $etablissement): static
+    {
+        $this->etablissement = $etablissement;
+
+        return $this;
+    }
+
+    public function getMention(): ?string
+    {
+        return $this->mention;
+    }
+
+    public function setMention(?string $mention): static
+    {
+        $this->mention = $mention;
 
         return $this;
     }
