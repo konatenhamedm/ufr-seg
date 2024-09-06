@@ -1137,7 +1137,7 @@ class HomeController extends AbstractController
         // dd($niveau, $filiere);
 
         $anneeScolaire = $session->get('anneeScolaire');
-        dd($anneeScolaire);
+        //dd($anneeScolaire);
 
         if ($anneeScolaire == null) {
             // dd($anneeScolaireRepository->findOneBy(['actif' => 1]));
@@ -1146,7 +1146,7 @@ class HomeController extends AbstractController
         }
 
         $anneeScolaire = $session->get('anneeScolaire');
-        dd($anneeScolaire->getNumero(), $anneeScolaireRepository->findOneBy(['numero' => ($anneeScolaire->getNumero() - 1)]));
+        // dd($anneeScolaire->getNumero(), $anneeScolaireRepository->findOneBy(['numero' => ($anneeScolaire->getNumero() - 1)]));
         $builder = $this->createFormBuilder(null, [
             'method' => 'GET',
             'action' => $this->generateUrl('app_reinscription_etudiant_admin_index', compact('classe', 'niveau', 'filiere')),
