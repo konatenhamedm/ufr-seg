@@ -37,6 +37,7 @@
             init_select2('select');
               const $form_content = $(`#modal-xl2`).find('.place_frais');
             const $form_content_second = $(`#modal-xl2`).find('.place_frais_deux');
+            const $form_content_second2 = $(`#modal-xl2`).find('#echeancier');
      function load_content_second(id) {
 
         //alert(id)
@@ -85,11 +86,73 @@
                     }
                 });
         }
+     function load_content_echeancier(id) {
+                    var sommeEcheancier=0;
+
+                  var url = "{{ path('get_echeancier_classe', {id: 'id'}) }}".replace('id', id);
+    
+                $.ajax({
+                    url:  url,
+                    method: 'GET',
+                      async: false,
+                    dataType: 'json',
+                    success: function(json){
+                        
+                        $('#echeancier').html('')
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                            sommeEcheancier = sommeEcheancier + parseInt(value.montant)
+                            
+                    //$res.find("#"+$('.numero').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                         $form_content_second2.append(`
+                        
+                        <tr class="row-colonne even pointer table-light" data-numberkey="${index + 1}">
+                            <td class="p-2">
+                            
+                                <div style="display:no " class="field-matiere">  
+                                    <input class="form-control form-control-sm form-control numero " type="number" id="etudiant_admin_new_blocEcheanciers_0_echeancierProvisoires_${value.id}_numero" name="etudiant_admin_new[blocEcheanciers][0][echeancierProvisoires][${value.id}][numero]" required="required" placeholder="Numéro étape" readonly="readonly" value="${index + 1}">
+                                </div>
+                            </td>
+                            <td class="p-2">
+                                <div class="field-matiere">    
+                                        <div class="input-group">
+                                            <input class="form-control form-control-sm" type="date" id="etudiant_admin_new_blocEcheanciers_0_echeancierProvisoires_${value.id}_dateVersement" name="etudiant_admin_new[blocEcheanciers][0][echeancierProvisoires][${value.id}][dateVersement]" required="required" value="${value.dateVersement}">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    <span class="far fa-calendar"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                </div>
+                            </td>
+                            <td class="p-2">   
+                                <input class="form-control form-control-sm input-money input-mnt montant_echeancier" type="text" id="etudiant_admin_new_blocEcheanciers_0_echeancierProvisoires_${value.id}_montant" name="etudiant_admin_new[blocEcheanciers][0][echeancierProvisoires][${value.id}][montant]" required="required" value="${value.montant}">
+                            </td>
+                            <td class="p-2 text-center del-col">
+                                <a href="#" class="btn btn-danger btn-xs">
+                                    <span class="bi bi-trash"></span>
+                                </a>
+                            </td>
+                        </tr>
+
+                        `)
+                          }); 
+                       
+                         $('.col-total').text(sommeEcheancier)
+
+                    }
+                });
+        }
+
+
 
             load_content_second($('.classe').val());
+            load_content_echeancier($('.classe').val());
             
                 $('.classe').on('change',function(){
                     const $this = $(this);
+                    //$('#echeancier').html("")
+                    load_content_echeancier($this.val())
 
                 // load_content($this.val());
                     load_content_second($this.val());
@@ -103,10 +166,6 @@
                             })
                             $('.total').val(total)
                 })
-
-                
-
-            
         })
 
          $('.autre_fais').on('update-value', function (e, val, element) {

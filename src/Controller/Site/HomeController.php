@@ -1440,6 +1440,33 @@ class HomeController extends AbstractController
         }
         return $response;
     }
+    #[Route('/liste/echeancier/classe/{id}', name: 'get_echeancier_classe', methods: ['GET'])]
+    public function getEcheancier(Request $request, EcheancierNiveauRepository $echeancierNiveauRepository, $id, Classe $classe): Response
+    {
+        $response = new Response();
+        $tabEcheancier = array();
+
+        if ($id) {
+            $echeanciers = $echeancierNiveauRepository->findBy(["niveau" => $classe->getNiveau()]);
+
+            $i = 0;
+
+            foreach ($echeanciers as $e) {
+                // transformer la réponse de la requete en tableau qui remplira le select pour ensembles
+                $tabEcheancier[$i]['id'] = $e->getId();
+                $tabEcheancier[$i]['dateVersement'] = $e->getDateVersement()->format('d/m/Y');
+                $tabEcheancier[$i]['montant'] = $e->getMontant();
+
+                $i++;
+            }
+
+            $dataService = json_encode($tabEcheancier); // formater le résultat de la requête en json
+
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setContent($dataService);
+        }
+        return $response;
+    }
 
 
     #[Route(path: '/site/information/new', name: 'site_information_admin_new', methods: ['GET', 'POST'])]
