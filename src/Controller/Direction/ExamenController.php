@@ -290,6 +290,8 @@ class ExamenController extends AbstractController
                 }
 
                 $matiereExamen->setMatiere($matiere);
+                if ($matiereExamen->getCoefficient() == null)
+                    $matiereExamen->setCoefficient(1);
                 $examen->addMatiereExamen($matiereExamen);
             }
         }
