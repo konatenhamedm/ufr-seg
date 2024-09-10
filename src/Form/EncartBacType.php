@@ -31,6 +31,7 @@ class EncartBacType extends AbstractType
                 )
             ])
             ->add('ip', TextType::class, [
+                'required' => false,
                 'label' => "IDENTIFIANT PERMANENT (IP)",
                 /* "constraints" => array(
                     new NotNull(null, "S'il vous veillez renseigner le champ ip")
