@@ -26,6 +26,9 @@ class TypeEvaluation
     #[ORM\OneToMany(mappedBy: 'typeEvaluation', targetEntity: GroupeType::class)]
     private Collection $groupeTypes;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $coef = null;
+
     public function __construct()
     {
         $this->groupeTypes = new ArrayCollection();
@@ -88,6 +91,18 @@ class TypeEvaluation
                 $groupeType->setTypeEvaluation(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCoef(): ?int
+    {
+        return $this->coef;
+    }
+
+    public function setCoef(int $coef): static
+    {
+        $this->coef = $coef;
 
         return $this;
     }

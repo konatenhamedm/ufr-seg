@@ -14,6 +14,8 @@ class TypeEvaluationType extends AbstractType
         $builder
             ->add('code')
             ->add('libelle')
+            ->add('coef')
+
         ;
     }
 
