@@ -731,10 +731,9 @@ class DeliberationController extends AbstractController
                                 'render' => $renders['edit']
                             ],
 
-
                             'delete' => [
                                 'target' => '#modal-small',
-                                'url' => $this->generateUrl('app_direction_deliberation_delete', ['id' => $value]),
+                                'url' => $this->generateUrl('app_direction_deliberation_delete_only_deliberation', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-trash',
@@ -1206,7 +1205,7 @@ class DeliberationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $redirect = $this->generateUrl('app_direction_deliberation_new', ['id' => $deliberation->getExamen()->getId()]);
-            // dd($inscription);
+
             $data = true;
             if ($inscription->getClasse() == null) {
                 $entityManager->remove($deliberation);
@@ -1225,38 +1224,87 @@ class DeliberationController extends AbstractController
                     'data' => $data
                 ];
             } else {
-                // $message = 'Oups desolé  vous pouvez plus de modification pour cette deliberation ';
-
-                /*        ->andWhere('e.etat in (:statut)')
-                        ->andWhere('e.etatDeliberation = :etatDeliberation')
-                        ->setParameter('etatDeliberation', 'pas_deliberer')
-                        ->setParameter('statut', ['valide']); */
-
-
-                $preinscription->setEtat('valide');
-                $preinscription->setEtatDeliberation('pas_deliberer');
-                $entityManager->persist($preinscription);
-                $entityManager->flush();
-
-
-
-                $entityManager->remove($inscription);
-                $entityManager->flush();
-
-                $entityManager->remove($deliberation);
-                $entityManager->flush();
-
-
-
-                $message = 'Opération effectuée avec succès';
+                $message = 'Oups desolé  vous pouvez plus de modification pour cette deliberation ';
 
                 $response = [
-                    'statut'   => 1,
+                    'statut'   => 0,
                     'message'  => $message,
                     'redirect' => $redirect,
                     'data' => $data
                 ];
             }
+
+
+
+
+
+
+            $this->addFlash('success', $message);
+
+            if (!$request->isXmlHttpRequest()) {
+                return $this->redirect($redirect);
+            } else {
+                return $this->json($response);
+            }
+        }
+
+        return $this->render('direction/deliberation/delete.html.twig', [
+            'deliberation' => $deliberation,
+            'form' => $form,
+        ]);
+    }
+    #[Route('/{id}/delete/only/deliberation', name: 'app_direction_deliberation_delete_only_deliberation', methods: ['DELETE', 'GET'])]
+    public function deleteOnlyDeliberation(Request $request, Deliberation $deliberation, InscriptionRepository $inscriptionRepository, DeliberationPreinscriptionRepository $deliberationPreinscriptionRepository, EntityManagerInterface $entityManager): Response
+    {
+        $inscription = $inscriptionRepository->findOneBy(['deliberation' => $deliberation]);
+        $preinscription = $deliberationPreinscriptionRepository->findOneBy(['deliberation' => $deliberation])->getPreinscription();
+
+        $form = $this->createFormBuilder()
+            ->setAction(
+                $this->generateUrl(
+                    'app_direction_deliberation_delete_only_deliberation',
+                    [
+                        'id' => $deliberation->getId()
+                    ]
+                )
+            )
+            ->setMethod('DELETE')
+            ->getForm();
+        $form->handleRequest($request);
+
+
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $redirect = $this->generateUrl('app_config_traitement_examen');
+
+            $data = true;
+
+            /* ->andWhere('e.etat in (:statut)')
+                        ->andWhere('e.etatDeliberation = :etatDeliberation')
+                        ->setParameter('etatDeliberation', 'pas_deliberer')
+                        ->setParameter('statut', ['valide']); */
+
+            $preinscription->setEtat('valide');
+            $preinscription->setEtatDeliberation('pas_deliberer');
+            $entityManager->persist($preinscription);
+            $entityManager->flush();
+
+            $entityManager->remove(object: $inscription);
+            $entityManager->flush();
+
+            $entityManager->remove($deliberation);
+            $entityManager->flush();
+
+
+
+            $message = 'Opération effectuée avec succès';
+
+            $response = [
+                'statut'   => 1,
+                'message'  => $message,
+                'redirect' => $redirect,
+                'data' => $data
+            ];
 
 
 
