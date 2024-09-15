@@ -730,6 +730,18 @@ class DeliberationController extends AbstractController
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit']
                             ],
+
+
+                            'delete' => [
+                                'target' => '#modal-small',
+                                'url' => $this->generateUrl('app_direction_deliberation_delete', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-danger'],
+                                'render' => $renders['delete']
+                            ]
+
                         ]
 
                     ];
@@ -1194,7 +1206,7 @@ class DeliberationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $redirect = $this->generateUrl('app_direction_deliberation_new', ['id' => $deliberation->getExamen()->getId()]);
-
+            // dd($inscription);
             $data = true;
             if ($inscription->getClasse() == null) {
                 $entityManager->remove($deliberation);
@@ -1213,10 +1225,33 @@ class DeliberationController extends AbstractController
                     'data' => $data
                 ];
             } else {
-                $message = 'Oups mais vous pouvez plus de modification pour cette deliberation ';
+                // $message = 'Oups desolé  vous pouvez plus de modification pour cette deliberation ';
+
+                /*        ->andWhere('e.etat in (:statut)')
+                        ->andWhere('e.etatDeliberation = :etatDeliberation')
+                        ->setParameter('etatDeliberation', 'pas_deliberer')
+                        ->setParameter('statut', ['valide']); */
+
+
+                $preinscription->setEtat('valide');
+                $preinscription->setEtatDeliberation('pas_deliberer');
+                $entityManager->persist($preinscription);
+                $entityManager->flush();
+
+
+
+                $entityManager->remove($inscription);
+                $entityManager->flush();
+
+                $entityManager->remove($deliberation);
+                $entityManager->flush();
+
+
+
+                $message = 'Opération effectuée avec succès';
 
                 $response = [
-                    'statut'   => 0,
+                    'statut'   => 1,
                     'message'  => $message,
                     'redirect' => $redirect,
                     'data' => $data
