@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Liste étudiants examen</title>
+    <style>
+      {% block page_css %}
+        @page {
+          margin-footer: 0.5cm;
+          footer: html_pageFooter;
+          margin-top: 0.5cm;
+          margin-header: 0cm;
+        }
+
+        .clearfix:after {
+          content: " ";
+          display: table;
+        }
+
+        .clearfix:after {
+          clear: both;
+        }
+
+        fieldset {
+          border: 1px solid #000 !important;
+          margin: 0;
+          padding: 5px;
+          position: relative;
+          border-radius: 4px;
+          background-color: #fff;
+        }
+        
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+        }
+
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+
+        @media all {
+          /* Prevent page break inside a content block */
+        }
+
+        .double_underline {
+          text-decoration: underline;
+          border-bottom: 1px solid #000;
+          text-align: center;
+        }
+      {% endblock %}
+    </style>
+  </head>
+  <body style="font-size:12px;">
+    
+<div style="page-break-after: always;">
+        <div class="clearfix">
+          <div style="width:10%;text-align:left;float:left;">
+            {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
+            <img src="{{ var | replace({'/': "\\"}) }}" width="100px" />
+          </div>
+          <div style="width:65%;text-align:center;float:center;">
+            <b>UFR-SEG</b><br>
+            BP V 43 ABIDJAN, TEL :01 01 15 44 44 ufrseg-filierespro-ufhb.ci <br>
+            Abidjan-Cocody
+          </div>
+          <div style="width:25%;text-align:right;float:right;">
+             <div style="text-align:center;margin-top:-45px"  class="">
+                    République de COTE D'IVOIRE <br>
+                <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
+               <b style="font-weight: bolder;">Année scolaire : {{ anneeScolaire }}</b>
+            </div>
+          </div>
+        </div>
+
+        <br>
+
+        <form action="/action_page.php">
+          <fieldset>
+            <legend></legend>
+            <h2 class="text-center" style="text-align: center;">
+              LISTE DES NIVEAUX PAR ETUDIANT
+            </h2>
+          </fieldset>
+        </form>
+
+        <br/>
+
+        <div class="clearfix">
+          <div style="width:100%;text-align:center;">
+            <table>
+              <thead>
+                <tr>
+                  
+                  <th style="width:50%;">NOM ET PRENOMS</th>
+                  <th style="width:25%;">NIVEAU CHOISI</th>
+                  <th style="width:25%;">DATE INSCRIPTION</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for key, item in data %}
+                    {% for inscription in menu.getListeInscriptionByNiveau(item.etudiantId) %}
+                        <tr>
+                            {% if loop.first %}
+                                <td rowspan="{{ menu.getListeInscriptionByNiveau(item.etudiantId)|length }}">{{inscription.etudiant.nom  ~ '' ~ inscription.etudiant.prenom}}</td>
+                            {% else %}
+                               {#  <td></td> #}
+                            {% endif %}
+                            <td style="text-align:center;font-weight:bold">{{ inscription.niveau.code }}</td>
+                            <td style="text-align:center;font-weight:bold">{{ inscription.dateInscription|date('d/m/Y') }}</td>
+                        </tr>
+                     {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="3" style="text-align: center;">Il n'y a aucunes données disponibles</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div> 
+
+        <div class="p-10">
+        <br><br>
+        </div>
+
+        <htmlpagefooter name="pageFooter">
+       <div>
+       </div>
+          <div style="border-top: 2px solid #000;">
+          
+          </div>
+          <p align="center" style="margin-top: -1px;">
+            COCODY ECOLE POLICE - 01 BP 5889 Abidjan 01 - e-mail: 
+            <a href="mailto:ufrseg-filierespro-ufhb.ci">ufrseg-filierespro-ufhb.ci</a><br>
+            TEL : 01 01 15 44 44
+          </p>
+          <div align="center" style="font-size: 10px;">
+            Page {PAGENO} sur {nbpg}
+          </div>
+        </htmlpagefooter>
+      </div>
+
+   
+  </body>
+</html>

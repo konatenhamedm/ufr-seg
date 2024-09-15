@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\EncartBac;
 use App\Entity\InfoInscription;
+use App\Entity\Inscription;
 use App\Entity\Preinscription;
 use App\Repository\AnneeScolaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -92,5 +93,10 @@ class Menu
     {
 
         return $this->em->getRepository(EncartBac::class)->getEncart($etudiantid)->getId();
+    }
+    public function getListeInscriptionByNiveau($etudiantid)
+    {
+
+        return $this->em->getRepository(Inscription::class)->getListeInscription($etudiantid);
     }
 }

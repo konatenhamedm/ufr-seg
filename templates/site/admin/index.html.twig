@@ -10,7 +10,14 @@
         <div class="card-toolbar">
             <a href="{{ path('site_information_admin_new') }}" class="btn btn-main btn-sm">
                 <i class="bi bi-plus-square text-light"></i>
-                Nouveau
+                Nouveau 
+            </a>&nbsp;
+
+            <a href="{{ path('default_print_iframe', {
+    'r': 'app_comptabilite_liste_niveau_etudiant'
+}) }}" class="btn btn-primary btn-sm"  data-bs-toggle="modal" data-bs-target="#exampleModalSizeSm2">
+                <i class="bi bi-printer text-light"></i>
+                Imprimme
             </a>
         </div>
     </div>

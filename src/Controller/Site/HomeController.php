@@ -922,6 +922,42 @@ class HomeController extends AbstractController
 
 
 
+    /**
+     * @throws MpdfException
+     */
+    #[Route('/imprime/liste/niveau/etudiant', name: 'app_comptabilite_liste_niveau_etudiant', methods: ['GET', 'POST'])]
+    public function imprimerListeEtudiantExamen(Request $request, InscriptionRepository $inscriptionRepository, SessionInterface $session): Response
+    {
+
+        $anneeScolaire = $session->get("anneeScolaire");
+
+        //dd($preinscriptionRepository->getListeEtudiantExamenDistinctNiveau($anneeScolaire));
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("site/imprime_liste_niveau_etudiant.html.twig", [
+            'data' => $inscriptionRepository->getListeEtudiantInscris(),
+            'total_impaye' => "",
+            'anneeScolaire' => $anneeScolaire->getLibelle()
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'P',
+            'protected' => true,
+            'file_name' => "point_versments",
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => null,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
+
+
 
     #[Route('/inscription/etudiant/admin', name: 'app_inscription_etudiant_admin_index', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function indexInformationAdmin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
