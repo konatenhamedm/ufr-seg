@@ -1257,8 +1257,8 @@ class DeliberationController extends AbstractController
     public function deleteOnlyDeliberation(Request $request, Deliberation $deliberation, InscriptionRepository $inscriptionRepository, DeliberationPreinscriptionRepository $deliberationPreinscriptionRepository, EntityManagerInterface $entityManager): Response
     {
         $inscription = $inscriptionRepository->findOneBy(['deliberation' => $deliberation]);
-        $preinscription = $deliberationPreinscriptionRepository->findOneBy(['deliberation' => $deliberation])->getPreinscription();
-
+        $preinscriptionDeliberation = $deliberationPreinscriptionRepository->findOneBy(['deliberation' => $deliberation]);
+        $preinscription = $preinscriptionDeliberation->getPreinscription();
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
@@ -1283,14 +1283,16 @@ class DeliberationController extends AbstractController
                         ->andWhere('e.etatDeliberation = :etatDeliberation')
                         ->setParameter('etatDeliberation', 'pas_deliberer')
                         ->setParameter('statut', ['valide']); */
+            $entityManager->remove(object: $preinscriptionDeliberation);
+            $entityManager->flush();
 
             $preinscription->setEtat('valide');
             $preinscription->setEtatDeliberation('pas_deliberer');
             $entityManager->persist($preinscription);
             $entityManager->flush();
 
-            $entityManager->remove(object: $inscription);
-            $entityManager->flush();
+            /*  $entityManager->remove(object: $inscription);
+            $entityManager->flush(); */
 
             $entityManager->remove($deliberation);
             $entityManager->flush();
