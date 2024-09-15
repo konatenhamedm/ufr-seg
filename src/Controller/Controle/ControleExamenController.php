@@ -230,7 +230,7 @@ class ControleExamenController extends AbstractController
                 $controleExaman->addGroupeTypeExamen($groupe);
 
 
-            foreach ($inscriptionRepository->findBy(['niveau' => $promotion]) as $inscription) {
+            foreach ($inscriptionRepository->getListeEtudiant($promotion) as $inscription) {
                 $note = new NoteExamen();
                 $note->setEtudiant($inscription->getEtudiant());
                 //$note->setNote('');
@@ -349,7 +349,7 @@ class ControleExamenController extends AbstractController
             // dd($session);
             if ($session != "null") {
                 if ((int)$sessionRepository->find($session)->getNumero() == 1) {
-                    foreach ($inscriptionRepository->findBy(['niveau' => $niveau]) as $inscription) {
+                    foreach ($inscriptionRepository->getListeEtudiant($niveau) as $inscription) {
                         $note = new NoteExamen();
                         $note->setEtudiant($inscription->getEtudiant());
                         //$note->setNote('');

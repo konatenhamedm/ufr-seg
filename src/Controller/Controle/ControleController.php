@@ -178,7 +178,9 @@ class ControleController extends AbstractController
             if (count($inscriptionRepository->findBy(['classe' => $classe])) > 0)
                 $controle->addGroupeType($groupe);
 
-            foreach ($inscriptionRepository->findBy(['classe' => $classe]) as $inscription) {
+            // dd($inscriptionRepository->getListeEtudiantByClasse($classe));
+
+            foreach ($inscriptionRepository->getListeEtudiantByClasse($classe) as $inscription) {
                 $note = new Note();
                 $note->setEtudiant($inscription->getEtudiant());
                 //$note->setNote('');
@@ -277,6 +279,8 @@ class ControleController extends AbstractController
 
         //dd($controleVefication);
 
+        //dd($inscriptionRepository->getListeEtudiantByClasse($classe));
+
 
         if ($controleVefication) {
 
@@ -302,7 +306,7 @@ class ControleController extends AbstractController
             if (count($inscriptionRepository->findBy(['classe' => $classe])) > 0)
                 $controle->addGroupeType($groupe);
 
-            foreach ($inscriptionRepository->findBy(['classe' => $classe]) as $inscription) {
+            foreach ($inscriptionRepository->getListeEtudiantByClasse($classe) as $inscription) {
                 $note = new Note();
                 $note->setEtudiant($inscription->getEtudiant());
                 //$note->setNote('');
