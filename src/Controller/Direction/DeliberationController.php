@@ -1260,7 +1260,7 @@ class DeliberationController extends AbstractController
         $preinscriptionDeliberation = $deliberationPreinscriptionRepository->findOneBy(['deliberation' => $deliberation]);
         $preinscription = $preinscriptionDeliberation->getPreinscription();
 
-        dd($preinscriptionDeliberation);
+        // dd($preinscriptionDeliberation);
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
@@ -1285,27 +1285,25 @@ class DeliberationController extends AbstractController
                         ->andWhere('e.etatDeliberation = :etatDeliberation')
                         ->setParameter('etatDeliberation', 'pas_deliberer')
                         ->setParameter('statut', ['valide']); */
-            if ($preinscriptionDeliberation) {
+            /*   if ($preinscriptionDeliberation) {
                 $entityManager->remove(object: $preinscriptionDeliberation);
                 $entityManager->flush();
             }
-
+ */
 
             $preinscription->setEtat('valide');
             $preinscription->setEtatDeliberation('pas_deliberer');
             $entityManager->persist($preinscription);
             $entityManager->flush();
 
-            if ($inscription) {
+            /*   if ($inscription) {
                 $entityManager->remove(object: $inscription);
                 $entityManager->flush();
             }
-
+ */
 
             $entityManager->remove($deliberation);
             $entityManager->flush();
-
-
 
             $message = 'Opération effectuée avec succès';
 
@@ -1315,11 +1313,6 @@ class DeliberationController extends AbstractController
                 'redirect' => $redirect,
                 'data' => $data
             ];
-
-
-
-
-
 
             $this->addFlash('success', $message);
 
