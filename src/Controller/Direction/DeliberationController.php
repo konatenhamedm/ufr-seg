@@ -1259,6 +1259,8 @@ class DeliberationController extends AbstractController
         $inscription = $inscriptionRepository->findOneBy(['deliberation' => $deliberation]);
         $preinscriptionDeliberation = $deliberationPreinscriptionRepository->findOneBy(['deliberation' => $deliberation]);
         $preinscription = $preinscriptionDeliberation->getPreinscription();
+
+        dd($preinscriptionDeliberation);
         $form = $this->createFormBuilder()
             ->setAction(
                 $this->generateUrl(
