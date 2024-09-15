@@ -62,7 +62,7 @@ class InscriptionRepository extends ServiceEntityRepository
             ->innerJoin('i.etudiant', 'e')
             ->andWhere('c = :classe')
             ->setParameter('classe', $classe)
-            ->orderBy('e.nom', 'DESC')
+            ->orderBy('e.nom', 'ASC')
             ->getQuery()
             ->getResult();
     }
