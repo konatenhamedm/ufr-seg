@@ -16,13 +16,16 @@ use App\Service\ActionRender;
 use App\Service\FormError;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\BoolColumn;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -88,7 +91,11 @@ class ClasseController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Classe $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Classe $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -137,6 +144,164 @@ class ClasseController extends AbstractController
 
         return $this->render('parametre/classe/index.html.twig', [
             'datatable' => $table
+        ]);
+    }
+    #[Route('/imprime/filtre', name: 'app_parametre_classe_imprime_index', methods: ['GET', 'POST'], options: ['expose' => true])]
+    public function indexImprime(Request $request, DataTableFactory $dataTableFactory, UserInterface $user, SessionInterface $session): Response
+    {
+        $anneeScolaire = $session->get('anneeScolaire');
+
+        $builder = $this->createFormBuilder(null, [
+            'method' => 'GET',
+            'action' => $this->generateUrl('app_parametre_classe_imprime_index', [
+                /* 'etat' => $etat */])
+        ])->add('classe', EntityType::class, [
+            'class' => Classe::class,
+            'multiple' => true,
+            'choice_label' => 'libelle',
+            'label' => 'Classes',
+            'placeholder' => '---',
+            'required' => false,
+            'attr' => ['class' => 'form-control-sm has-select2'],
+            'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                return $er->createQueryBuilder('c')
+                    ->andWhere('c.anneeScolaire = :anneeScolaire')
+                    ->setParameter('anneeScolaire', $anneeScolaire)
+                    ->orderBy('c.id', 'DESC');
+            },
+        ])
+            ->add(
+                'etat',
+                ChoiceType::class,
+                [
+                    'placeholder' => "Choisir un type d'etat",
+                    'label' => 'Privilèges Supplémentaires',
+                    'required'     => false,
+                    'expanded'     => false,
+                    'attr' => ['class' => 'has-select2'],
+                    'multiple' => false,
+                    'choices'  => array_flip([
+                        'ETAT_CLASSE' => 'Liste des classes détaillés',
+                        'ETAT_PRESENCE' => 'Liste de présence',
+                        'ETAT_NOTE' => 'Fiche des notes',
+
+                    ]),
+                ]
+            );
+        $table = $dataTableFactory->create()
+            ->add('libelle', TextColumn::class, ['label' => 'Libelle'])
+            ->add('niveau', TextColumn::class, ['label' => 'Niveau', 'field' => 'niveau.code'])
+            ->add('annee', TextColumn::class, ['label' => 'Année', 'field' => 'annee.libelle'])
+            ->add('effectif', TextColumn::class, ['label' => 'Effectif', 'className' => 'text-center w-5', 'render' => function ($value, Classe $context) {
+                // if ($value == 'valide') {
+                return "52";
+                // }
+                // return sprintf('<span class="badge badge-success">Ajourné(e)</span>');
+            }])
+
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => Classe::class,
+                'query' => function (QueryBuilder $qb) use ($user, $anneeScolaire) {
+                    $qb->select('u, niveau, annee,res')
+                        ->from(Classe::class, 'u')
+                        ->join('u.niveau', 'niveau')
+                        ->leftJoin('niveau.responsable', 'res')
+                        ->join('u.anneeScolaire', 'annee');
+
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
+                    }
+
+                    if ($anneeScolaire != null) {
+
+                        $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
+                    }
+                }
+            ])
+            ->setName('dt_app_parametre_classe_imprime');
+
+        $renders = [
+            'edit' =>  new ActionRender(function () {
+                return true;
+            }),
+            'personnalise' =>  new ActionRender(function () {
+                return true;
+            }),
+
+            'delete' => new ActionRender(function () {
+                return true;
+            }),
+        ];
+
+
+        $hasActions = false;
+
+        foreach ($renders as $_ => $cb) {
+            if ($cb->execute()) {
+                $hasActions = false;
+                break;
+            }
+        }
+
+        if ($hasActions) {
+            $table->add('id', TextColumn::class, [
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Classe $context) use ($renders) {
+                    $options = [
+                        'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                        'target' => '#modal-lg',
+
+                        'actions' => [
+                            'edit' => [
+                                'url' => $this->generateUrl('app_parametre_classe_edit', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-pen',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['edit']
+                            ],
+                            'personnalise' => [
+                                'url' => $this->generateUrl('app_parametre_niveau_enseignant_matiere_edit', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-person-plus',
+                                'attrs' => ['class' => 'btn-warning'],
+                                'render' => $renders['personnalise']
+                            ],
+                            'delete' => [
+                                'target' => '#modal-small',
+                                'url' => $this->generateUrl('app_parametre_classe_delete', ['id' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-danger'],
+                                'render' => $renders['delete']
+                            ]
+                        ]
+
+                    ];
+                    return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                }
+            ]);
+        }
+
+
+        $table->handleRequest($request);
+
+        if ($table->isCallback()) {
+            return $table->getResponse();
+        }
+
+
+        return $this->render('parametre/classe/index_imprimer_filtre.html.twig', [
+            'datatable' => $table,
+            'form' => $builder->getForm(),
+
         ]);
     }
 

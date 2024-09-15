@@ -92,6 +92,20 @@ class InscriptionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function getListeEtudiantByClasseImprime($classe)
+    {
+
+        return $this->createQueryBuilder('i')
+            ->innerJoin('i.niveau', 'n')
+            ->innerJoin('i.classe', 'c')
+            ->innerJoin('i.etudiant', 'e')
+            ->andWhere('c.id = :classe')
+            ->setParameter('classe', $classe)
+            ->orderBy('e.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Inscription[] Returns an array of Inscription objects
     //     */

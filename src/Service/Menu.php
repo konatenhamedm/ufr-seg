@@ -99,4 +99,9 @@ class Menu
 
         return $this->em->getRepository(Inscription::class)->getListeInscription($etudiantid);
     }
+    public function getListeEtudiantByClasseImprime($classe)
+    {
+
+        return $this->em->getRepository(Inscription::class)->getListeEtudiantByClasseImprime($classe);
+    }
 }

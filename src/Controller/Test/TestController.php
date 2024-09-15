@@ -5,6 +5,7 @@ namespace App\Controller\Test;
 use App\Controller\FileTrait;
 use App\Entity\Test;
 use App\Form\TestType;
+use App\Repository\ClasseRepository;
 use App\Repository\TestRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
@@ -17,7 +18,9 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\Length;
 
 #[Route('/admin/test/test')]
 class TestController extends AbstractController
@@ -56,7 +59,11 @@ class TestController extends AbstractController
 
         if ($hasActions) {
             $table->add('id', TextColumn::class, [
-                'label' => 'Actions', 'orderable' => false, 'globalSearchable' => false, 'className' => 'grid_row_actions', 'render' => function ($value, Test $context) use ($renders) {
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Test $context) use ($renders) {
                     $options = [
                         'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
                         'target' => '#modal-lg',
@@ -372,9 +379,25 @@ class TestController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
-    #[Route('/test2', name: 'app_test2', methods: ['GET', 'POST'])]
-    public function imprimerAll2(Request $request): Response
+    #[Route('/test2/{etat}/{classe}', name: 'app_test2', methods: ['GET', 'POST'])]
+    public function imprimerAll2(Request $request,  $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
     {
+        //  $array = ;
+
+
+
+        $data = [];
+        $array_final = '[' . implode(',', explode(',', $etat)) . ']';
+        $tableaus = json_decode($array_final, true);
+
+        $longeur = count($tableaus);
+
+        // dd($longeur);
+        for ($i = 0; $i < $longeur; $i++) {
+            $data[] = $classeRepository->find($tableaus[$i]);
+        }
+
+
 
         $totalImpaye = 0;
         $totalPayer = 0;
@@ -382,8 +405,9 @@ class TestController extends AbstractController
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
         return $this->renderPdf("test/liste_de_class.html.twig", [
             'total_payer' => $totalPayer,
-            'data' => [],
-            'total_impaye' => $totalImpaye
+            'data' => $data,
+            'total_impaye' => $totalImpaye,
+            'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
         ], [
             'orientation' => 'P',
