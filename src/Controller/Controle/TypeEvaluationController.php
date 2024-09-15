@@ -63,6 +63,7 @@ class TypeEvaluationController extends AbstractController
         $table = $dataTableFactory->create()
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'libelle'])
+            ->add('coef', TextColumn::class, ['label' => 'Coefficient'])
 
             ->createAdapter(ORMAdapter::class, [
                 'entity' => TypeEvaluation::class,
