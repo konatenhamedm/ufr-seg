@@ -1548,7 +1548,16 @@ class HomeController extends AbstractController
             $etudiant->addInfoEtudiant($info);
         }
 
+        if (count($etudiant->getEncartBacs()) == 0) {
+            $encart = new EncartBac();
+            $encart->setMatricule('');
+            $encart->setNumero('');
+            $encart->setSerie('');
+            $encart->setAnnee('');
+            //$encart->setBac('');
 
+            $etudiant->addEncartBac($encart);
+        }
 
         $validationGroups = ['Default', 'FileRequired', 'autre'];
         //dd($niveauRepository->findNiveauDisponible(21));

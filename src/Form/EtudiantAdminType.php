@@ -46,6 +46,20 @@ class EtudiantAdminType extends AbstractType
                 'html5' => false,
                 'attr' => ['class' => 'datepicker no-auto skip-init'], 'widget' => 'single_text',
             ]) */
+            ->add('encartBacs', CollectionType::class, [
+                'entry_type' => EncartBacType::class,
+                'entry_options' => [
+                    'label' => false,
+                    'doc_options' => $options['doc_options'],
+                    'doc_required' => $options['doc_required'],
+                    'validation_groups' => $options['validation_groups'],
+                ],
+                'allow_add' => true,
+                'label' => false,
+                'by_reference' => false,
+                'allow_delete' => true,
+                'prototype' => true,
+            ])
             ->add('lieuNaissance', TextType::class, ['label' => 'Lieu de naissance', 'required' => true, 'empty_data' => '', "constraints" => array(
                 new NotNull(null, "S'il vous veillez renseigner le champs lieu de  naissance")
             ),])

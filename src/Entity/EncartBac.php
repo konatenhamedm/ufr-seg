@@ -37,11 +37,13 @@ class EncartBac
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $etablissement = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $mention = null;
+
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $ip = null;
+
+    #[ORM\ManyToOne(inversedBy: 'encartBacs')]
+    private ?Mention $mention = null;
 
 
     public function getId(): ?int
@@ -133,17 +135,7 @@ class EncartBac
         return $this;
     }
 
-    public function getMention(): ?string
-    {
-        return $this->mention;
-    }
 
-    public function setMention(?string $mention): static
-    {
-        $this->mention = $mention;
-
-        return $this;
-    }
 
     public function getIp(): ?string
     {
@@ -153,6 +145,18 @@ class EncartBac
     public function setIp(?string $ip): static
     {
         $this->ip = $ip;
+
+        return $this;
+    }
+
+    public function getMention(): ?Mention
+    {
+        return $this->mention;
+    }
+
+    public function setMention(?Mention $mention): static
+    {
+        $this->mention = $mention;
 
         return $this;
     }

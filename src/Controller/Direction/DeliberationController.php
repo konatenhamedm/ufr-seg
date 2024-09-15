@@ -1281,15 +1281,11 @@ class DeliberationController extends AbstractController
 
             $data = true;
 
-            /* ->andWhere('e.etat in (:statut)')
-                        ->andWhere('e.etatDeliberation = :etatDeliberation')
-                        ->setParameter('etatDeliberation', 'pas_deliberer')
-                        ->setParameter('statut', ['valide']); */
             /*   if ($preinscriptionDeliberation) {
                 $entityManager->remove(object: $preinscriptionDeliberation);
                 $entityManager->flush();
-            }
- */
+            }    
+            */
 
             $preinscription->setEtat('valide');
             $preinscription->setEtatDeliberation('pas_deliberer');
@@ -1300,7 +1296,7 @@ class DeliberationController extends AbstractController
                 $entityManager->remove(object: $inscription);
                 $entityManager->flush();
             }
- */
+            */
 
             $entityManager->remove($deliberation);
             $entityManager->flush();

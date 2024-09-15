@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MentionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
@@ -32,6 +34,14 @@ class Mention
 
     #[ORM\Column(type: Types::DECIMAL, precision: 4, scale: 2)]
     private ?string $moyenneMax = null;
+
+    #[ORM\OneToMany(mappedBy: 'mention', targetEntity: EncartBac::class)]
+    private Collection $encartBacs;
+
+    public function __construct()
+    {
+        $this->encartBacs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -82,6 +92,36 @@ class Mention
     public function setMoyenneMax(string $moyenneMax): static
     {
         $this->moyenneMax = $moyenneMax;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EncartBac>
+     */
+    public function getEncartBacs(): Collection
+    {
+        return $this->encartBacs;
+    }
+
+    public function addEncartBac(EncartBac $encartBac): static
+    {
+        if (!$this->encartBacs->contains($encartBac)) {
+            $this->encartBacs->add($encartBac);
+            $encartBac->setMention($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEncartBac(EncartBac $encartBac): static
+    {
+        if ($this->encartBacs->removeElement($encartBac)) {
+            // set the owning side to null (unless already changed)
+            if ($encartBac->getMention() === $this) {
+                $encartBac->setMention(null);
+            }
+        }
 
         return $this;
     }

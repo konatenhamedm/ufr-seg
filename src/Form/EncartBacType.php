@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\EncartBac;
 use App\Entity\Etudiant;
 use App\Entity\Fichier;
+use App\Entity\Mention;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -37,31 +38,18 @@ class EncartBacType extends AbstractType
                     new NotNull(null, "S'il vous veillez renseigner le champ ip")
                 ) */
             ])
-            ->add(
-                'mention',
-
-                ChoiceType::class,
-                [
-                    'placeholder' => 'Choisir une mention',
-                    'label' => 'Mention bac',
-                    //'required'     => false,
-                    'expanded'     => false,
-                    'attr' => ['class' => 'has-select2'],
-                    'multiple' => false,
-                    'choices'  => array_flip([
-                        'BIEN' => 'Bien',
-                        'TRES_BIEN' => 'Très Bien',
-                        'PASSABLE' => 'Passable',
-
-                    ]),
-                    "constraints" => array(
-                        new NotNull(null, "S'il vous veillez renseigner le champ mention")
-                    )
-                ]
-
-            )
-
-
+            ->add('mention', EntityType::class, [
+                'class' => Mention::class,
+                'required' => false,
+                'placeholder' => '----',
+                'label_attr' => ['class' => 'label-required'],
+                'choice_label' => 'libelle',
+                'label' => 'Reponsable de niveau',
+                'attr' => ['class' => 'has-select2 form-select'],
+                "constraints" => array(
+                    new NotNull(null, "S'il vous veillez renseigner le champ mention")
+                )
+            ])
             ->add('numero', TextType::class, [
                 'label' => 'Numéro table Bac',
                 "constraints" => array(
@@ -84,7 +72,6 @@ class EncartBacType extends AbstractType
                 'bac',
                 FichierType::class,
                 [
-                    'label' => 'Fichier',
                     'label' => 'Diplome',
                     'doc_options' => $options['doc_options'],
                     'required' => $options['doc_required'] ?? true
