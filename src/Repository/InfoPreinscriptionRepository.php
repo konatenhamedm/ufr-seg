@@ -111,7 +111,7 @@ SQL;
                     ->setParameter('caissiere', $caissiere);
             }
 
-            //dd($dateDebut);
+            dd($dateDebut);
 
             if ($dateDebut != null && $dateFin == null) {
                 $truc = explode('-', str_replace("/", "-", $dateDebut));
