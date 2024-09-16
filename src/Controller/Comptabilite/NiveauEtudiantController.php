@@ -854,7 +854,7 @@ class NiveauEtudiantController extends AbstractController
                         ->join('e.niveau', 'niveau')
                         ->join('niveau.filiere', 'filiere')
                         ->join('niveau.responsable', 'res')
-                        ->leftJoin('e.caissiere', 'c')
+                        ->join('e.caissiere', 'c')
                         ->andWhere('e.etat = :statut')
                         ->setParameter('statut', 'valide')
                         ->orderBy('e.datePreinscription', 'DESC');
