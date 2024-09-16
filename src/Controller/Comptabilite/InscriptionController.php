@@ -152,8 +152,8 @@ class InscriptionController extends AbstractController
                         ->join('niveau.responsable', 'res')
                         ->join('p.etudiant', 'etudiant')
                         ->leftJoin('info.modePaiement', 'mode')
-                        ->andWhere('p.etat = :etat')
-                        ->setParameter('etat', 'valide')
+                        /* ->andWhere('p.etat = :etat')
+                        ->setParameter('etat', 'valide') */
                         ->orderBy('p.datePreinscription', 'DESC');
 
                     if ($niveau || $caissiere || $dateDebut || $dateFin || $mode) {
@@ -192,7 +192,7 @@ class InscriptionController extends AbstractController
 
                             $truc = explode('-', str_replace("/", "-", $dateFin));
                             $new_date_fin = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
-                            dd($new_date_debut, $new_date_fin);
+                            // dd($new_date_debut, $new_date_fin);
 
                             $qb->andWhere('info.datePaiement BETWEEN :dateDebut AND :dateFin')
                                 ->setParameter('dateDebut', $new_date_debut)
