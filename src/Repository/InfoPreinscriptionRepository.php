@@ -113,22 +113,22 @@ SQL;
 
             //dd($dateDebut);
 
-            if ($dateDebut && $dateFin == null) {
+            if ($dateDebut != null && $dateFin == null) {
                 $truc = explode('-', str_replace("/", "-", $dateDebut));
                 $new_date_debut = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
 
                 $sql->andWhere('i.datePaiement = :dateDebut')
                     ->setParameter('dateDebut', $new_date_debut);
             }
-            if ($dateFin && $dateDebut == null) {
+            if ($dateFin != null && $dateDebut == null) {
 
-                $truc = explode('-', str_replace("/", "-", $dateDebut));
+                $truc = explode('-', str_replace("/", "-", $dateFin));
                 $new_date_fin = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
 
                 $sql->andWhere('i.datePaiement  = :dateFin')
                     ->setParameter('dateFin', $new_date_fin);
             }
-            if ($dateDebut && $dateFin) {
+            if ($dateDebut != null && $dateFin != null) {
 
                 $truc_debut = explode('-', str_replace("/", "-", $dateDebut));
                 $new_date_debut = $truc_debut[2] . '-' . $truc_debut[1] . '-' . $truc_debut[0];
