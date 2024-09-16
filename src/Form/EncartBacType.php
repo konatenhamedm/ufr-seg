@@ -44,7 +44,7 @@ class EncartBacType extends AbstractType
                 'placeholder' => '----',
                 'label_attr' => ['class' => 'label-required'],
                 'choice_label' => 'libelle',
-                'label' => 'Reponsable de niveau',
+                'label' => 'Mention au Bac',
                 'attr' => ['class' => 'has-select2 form-select'],
                 "constraints" => array(
                     new NotNull(null, "S'il vous veillez renseigner le champ mention")
