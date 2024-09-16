@@ -190,8 +190,10 @@ class InscriptionController extends AbstractController
                             $truc_debut = explode('-', str_replace("/", "-", $dateDebut));
                             $new_date_debut = $truc_debut[2] . '-' . $truc_debut[1] . '-' . $truc_debut[0];
 
+
                             $truc = explode('-', str_replace("/", "-", $dateFin));
                             $new_date_fin = $truc[2] . '-' . $truc[1] . '-' . $truc[0];
+                            dd($truc_debut, $new_date_debut);
                             // dd($new_date_debut, $new_date_fin);
 
                             $qb->andWhere('info.datePaiement BETWEEN :dateDebut AND :dateFin')
