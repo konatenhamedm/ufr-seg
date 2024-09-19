@@ -330,6 +330,7 @@ class InscriptionController extends AbstractController
 
         $builder = $this->createForm(SearchType::class, $search, [
             'method' => 'GET',
+            'anneeScolaire' => $anneeScolaire,
             'action' => $this->generateUrl('app_comptabilite_paiement_scolarite_index', compact('niveau', 'caissiere', 'dateDebut', 'dateFin', 'mode', 'filiere', 'classe', 'typeFrais')),
 
         ]);
@@ -695,7 +696,8 @@ class InscriptionController extends AbstractController
         $totalImpaye = 0;
         $totalPayer = 0;
 
-
+        // dd($niveau, $caissiere);
+        /*  dd(); */
 
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
         return $this->renderPdf("site/liste_versement.html.twig", [

@@ -56,7 +56,7 @@ class InfoInscriptionRepository extends ServiceEntityRepository
         $sql = $this->createQueryBuilder('i')
             ->join('i.inscription', 'p')
             ->join('i.modePaiement', 'mode')
-            ->join('p.niveau', 'niveau')
+            ->leftJoin('p.niveau', 'niveau')
             ->join('i.typeFrais', 'typeFrais')
             ->join('p.classe', 'classe')
             ->leftJoin('i.caissiere', 'ca')

@@ -31,6 +31,12 @@ class SearchType extends AbstractType
             'label' => 'Niveau',
             'placeholder' => '---',
             'required' => false,
+            'query_builder' => function (EntityRepository $er) use ($options) {
+                return $er->createQueryBuilder('n')
+                    ->andWhere('n.anneeScolaire = :anneeScolaire')
+                    ->setParameter('anneeScolaire', $options['anneeScolaire'])
+                    ->orderBy('n.id', 'DESC');
+            },
             'attr' => ['class' => 'form-control-sm has-select2']
         ])
             ->add('filiere', EntityType::class, [
@@ -108,5 +114,6 @@ class SearchType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Search::class,
         ]);
+        $resolver->setRequired(['anneeScolaire']);
     }
 }
