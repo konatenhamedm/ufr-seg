@@ -46,9 +46,6 @@ class Filiere
     private Collection $promotions;
 
 
-    #[ORM\ManyToOne(cascade: ["persist"], fetch: "EAGER")]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Fichier $fichier = null;
     public function __construct()
     {
         $this->niveaux = new ArrayCollection();
@@ -197,26 +194,6 @@ class Filiere
                 $promotion->setFiliere(null);
             }
         }
-
-        return $this;
-    }
-
-    /**
-     * Get the value of fichier
-     */ 
-    public function getFichier()
-    {
-        return $this->fichier;
-    }
-
-    /**
-     * Set the value of fichier
-     *
-     * @return  self
-     */ 
-    public function setFichier($fichier)
-    {
-        $this->fichier = $fichier;
 
         return $this;
     }

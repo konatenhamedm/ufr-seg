@@ -26,17 +26,7 @@ class FiliereType extends AbstractType
             ->add('montantPreinscription', TextType::class, [
                 'label' => 'Montant Préinscription',
                 'attr' => ['class' => 'input-money']
-            ])
-            
-            ->add(
-                'fichier',
-                FichierType::class,
-                [
-                    'label' => 'Logo',
-                    'doc_options' => $options['doc_options'],
-                    'required' => $options['doc_required'] ?? true
-                ]
-                );
+            ]);
 
         $builder->get('montantPreinscription')->addModelTransformer(new ThousandNumberTransformer());
     }
@@ -45,11 +35,6 @@ class FiliereType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Filiere::class,
-
-            'doc_required' => true,
-            'allow_extra_fields' => true
         ]);
-        $resolver->setRequired('doc_options');
-        $resolver->setRequired('doc_required');
     }
 }

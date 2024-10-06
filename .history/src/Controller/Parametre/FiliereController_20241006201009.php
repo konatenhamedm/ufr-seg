@@ -31,21 +31,12 @@ class FiliereController extends AbstractController
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
     {
         $table = $dataTableFactory->create()
-            ->add('fichier', TextColumn::class, [
-                'label' => 'Logo',
-                'render' => function ($value, Filiere $filiere) {
-
-                    if ($filiere->getFichier() == null) {
-                        return '<img src="https://plus.unsplash.com/premium_photo-1680087014917-904bb37c5191?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width="20px" height="20px" alt="">';
-                    } else {
-                        return "<img src='/uploads/" . $filiere->getFichier()->getPath() . "/" . $filiere->getFichier()->getAlt() . "' width='40px' height='20px' alt=''>" ;
-                    }
-                }
-            ])
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
             ->add('montantPreinscription', NumberFormatColumn::class, ['label' => 'Mnt. Préinscr.'])
-     
+            ->add('fichier', TextColumn::class, ['label' => 'Logo', 'render' => function ($value, Filiere $filiere) {
+                    return "<img src='" . $filiere->getFichier()->getAvatar() . "' width='20px' height='20px' alt=''>" . $preinscription->getEtudiant()->getNomComplet();
+                }])
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Filiere::class,
             ])

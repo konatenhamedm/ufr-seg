@@ -45,7 +45,7 @@ class FiliereType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Filiere::class,
-
+            
             'doc_required' => true,
             'allow_extra_fields' => true
         ]);

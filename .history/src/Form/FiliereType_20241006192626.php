@@ -32,7 +32,8 @@ class FiliereType extends AbstractType
                 'fichier',
                 FichierType::class,
                 [
-                    'label' => 'Logo',
+                    'label' => 'Fichier',
+                    'label' => 'Document',
                     'doc_options' => $options['doc_options'],
                     'required' => $options['doc_required'] ?? true
                 ]
@@ -45,11 +46,6 @@ class FiliereType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Filiere::class,
-
-            'doc_required' => true,
-            'allow_extra_fields' => true
         ]);
-        $resolver->setRequired('doc_options');
-        $resolver->setRequired('doc_required');
     }
 }

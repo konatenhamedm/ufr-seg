@@ -200,24 +200,4 @@ class Filiere
 
         return $this;
     }
-
-    /**
-     * Get the value of fichier
-     */ 
-    public function getFichier()
-    {
-        return $this->fichier;
-    }
-
-    /**
-     * Set the value of fichier
-     *
-     * @return  self
-     */ 
-    public function setFichier($fichier)
-    {
-        $this->fichier = $fichier;
-
-        return $this;
-    }
 }

@@ -26,26 +26,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class FiliereController extends AbstractController
 {
     use FileTrait;
-    protected const UPLOAD_PATH = 'logo';
+    protected const UPLAOD_PATH = 'logo';
     #[Route('/', name: 'app_parametre_filiere_index', methods: ['GET', 'POST'])]
     public function index(Request $request, DataTableFactory $dataTableFactory): Response
     {
         $table = $dataTableFactory->create()
-            ->add('fichier', TextColumn::class, [
-                'label' => 'Logo',
-                'render' => function ($value, Filiere $filiere) {
-
-                    if ($filiere->getFichier() == null) {
-                        return '<img src="https://plus.unsplash.com/premium_photo-1680087014917-904bb37c5191?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width="20px" height="20px" alt="">';
-                    } else {
-                        return "<img src='/uploads/" . $filiere->getFichier()->getPath() . "/" . $filiere->getFichier()->getAlt() . "' width='40px' height='20px' alt=''>" ;
-                    }
-                }
-            ])
             ->add('code', TextColumn::class, ['label' => 'Code'])
             ->add('libelle', TextColumn::class, ['label' => 'Libellé'])
             ->add('montantPreinscription', NumberFormatColumn::class, ['label' => 'Mnt. Préinscr.'])
-     
             ->createAdapter(ORMAdapter::class, [
                 'entity' => Filiere::class,
             ])
@@ -217,10 +205,9 @@ class FiliereController extends AbstractController
         $filiere = new Filiere();
         $form = $this->createForm(FiliereType::class, $filiere, [
             'method' => 'POST',
-            'doc_options' => [
-                'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
-                'attrs' => ['class' => 'filestyle'],
-            ],
+            'doc_options'=>[
+                
+            ]
             'action' => $this->generateUrl('app_parametre_filiere_new')
         ]);
         $form->handleRequest($request);
@@ -285,11 +272,6 @@ class FiliereController extends AbstractController
 
         $form = $this->createForm(FiliereType::class, $filiere, [
             'method' => 'POST',
-            'method' => 'POST',
-            'doc_options' => [
-                'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
-                'attrs' => ['class' => 'filestyle'],
-            ],
             'action' => $this->generateUrl('app_parametre_filiere_edit', [
                 'id' =>  $filiere->getId()
             ])
