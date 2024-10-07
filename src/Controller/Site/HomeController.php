@@ -1071,7 +1071,7 @@ class HomeController extends AbstractController
 
         $renders = [
             'edit' =>  new ActionRender(function () {
-                return false;
+                return true;
             }),
             'new' =>  new ActionRender(function () {
                 return true;
@@ -1105,7 +1105,7 @@ class HomeController extends AbstractController
                         'actions' => [
                             'deliberation' => [
                                 'target' => '#exampleModalSizeSm2',
-                                'url' => $this->generateUrl('site_information_edit', ['id' => $context->getEtudiant()->getId()]),
+                                'url' => $this->generateUrl('verification_validation_dossier_simple_inscription', ['id' => $context->getEtudiant()->getId(), 'inscription' => $context->getId()]),
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-pen',
@@ -1749,12 +1749,13 @@ class HomeController extends AbstractController
         InscriptionRepository $inscriptionRepository,
         EcheancierRepository $echeancierRepository,
         EntityManagerInterface $entityManager,
-        Service $service
+        Service $service,
+        SessionInterface $session,
     ): Response {
 
 
 
-
+        $anneeScolaire = $session->get('anneeScolaire');
         if (count($etudiant->getBlocEcheanciers()) == 0) {
 
             /* foreach ($frais as $key => $value) {
@@ -1804,6 +1805,8 @@ class HomeController extends AbstractController
                 'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
                 'attrs' => ['class' => 'filestyle'],
             ],
+            'anneeScolaire' => $anneeScolaire,
+            'niveau' => $anneeScolaire,
             'validation_groups' => $validationGroups,
             'action' => $this->generateUrl('site_information_edit', [
                 'id' =>  $etudiant->getId()

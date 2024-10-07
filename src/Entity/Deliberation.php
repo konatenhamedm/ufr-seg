@@ -20,7 +20,7 @@ class Deliberation
     #[ORM\Column]
     private ?int $id = null;
 
-   
+
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -70,7 +70,7 @@ class Deliberation
         return $this->id;
     }
 
-   
+
 
     public function getExamen(): ?Examen
     {

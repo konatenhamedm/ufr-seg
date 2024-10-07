@@ -188,7 +188,7 @@ class ControleController extends AbstractController
 
                 $controle->addNote($note);
                 $valeurNote = new ValeurNote();
-                $valeurNote->setNote("0");
+                $valeurNote->setNote("");
                 $note->addValeurNote($valeurNote);
             }
 
@@ -314,7 +314,7 @@ class ControleController extends AbstractController
 
                 $controle->addNote($note);
                 $valeurNote = new ValeurNote();
-                $valeurNote->setNote("0");
+                $valeurNote->setNote("");
                 $note->addValeurNote($valeurNote);
             }
 

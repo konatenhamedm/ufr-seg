@@ -16,7 +16,7 @@ class DeliberationPreinscription
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'deliberation', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'deliberation'/* , cascade: ['persist', 'remove'] */)]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: 'Veuillez sélectionner un candidat')]
     private ?Preinscription $preinscription = null;

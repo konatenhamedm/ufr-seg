@@ -789,43 +789,40 @@ class Service
     {
         $compteIfNoteSuperieurMax = 0;
         foreach ($dataNotes as $key => $row) {
-            $somme = 0;
             $coef = 0;
+            $somme = 0;
+            $moyenneEtudiant = 0;
+            $permutNombre = 0;
+            $nbreTour = 0;
             foreach ($row->getValeurNotes() as $key1 => $value) {
-                $nbreTour = 0;
-                foreach ($groupeTypes as $key => $groupe) {
-                    //$note = 0;
-                    /*  if ($key1 == $key) {
+                $groupe = $groupeTypes[$key1];
+                $coef = (int)$groupe->getCoef();
+                $note = $value->getNote();
 
-                        $note = (int)$groupe->getCoef() == 10 ? $value->getNote() * 2 * (int)$groupe->getType()->getCoef() : $value->getNote() * (int)$groupe->getType()->getCoef();
+                // Vérifie si la note n'est ni "NC" ni vide
+                if ($note !== "NC" && $note !== "") {
+                    $somme += (int)$note;
 
-
-                        $note2 = 
-                        if ($value->getNote() > 10 && $groupe->getCoef() == 10) {
-                            $compteIfNoteSuperieurMax++;
-                        }
-                    }
-                    if ($groupe->getType())
-                        $coef = $coef + (int)$groupe->getType()->getCoef(); */
-
-                    if ((int)$groupe->getCoef() == 10)
+                    // Ajoute à nbreTour en fonction du coef
+                    if ($coef == 10) {
                         $nbreTour += 0.5;
-                    if ((int)$groupe->getCoef() == 20)
+                    } elseif ($coef == 20) {
                         $nbreTour += 1;
-                    if ((int)$groupe->getCoef() == 40)
+                    } elseif ($coef == 40) {
                         $nbreTour += 2;
+                    }
                 }
+            }
 
 
-
-                $somme = $somme + $value->getNote();
-                // dd()
-
+            if ($nbreTour !== 0) {
+                //  dd($nbreTour);
+                $moyenneEtudiant = $somme / $nbreTour;
+                $row->setMoyenneMatiere($moyenneEtudiant);
             }
             //dd($somme / ($coef / 2), $note, $coef);
-            $moyenneEtudiant = $somme / $nbreTour;
+
             // $moyenneEtudiant = $somme / ($nbreTour == 1 ? $coef : $coef / 2);
-            $row->setMoyenneMatiere($moyenneEtudiant);
 
             $moyenneMatiere = $this->moyenneMatiereRepository->findOneBy(['matiere' => $data['matiere'], 'etudiant' => $row->getEtudiant(), 'ue' => $data['ue']]);
             if ($moyenneMatiere) {
@@ -883,18 +880,60 @@ class Service
         foreach ($dataNotes as $key => $ligne) {
             $somme = 0;
             $noteExamen = 0;
-            foreach ($ligne->getValeurNoteExamens() as $valeur) {
-                $nbreTour = 0;
-                foreach ($groupeTypes as $key => $groupe) {
+            $nbreTour = 0;
+            foreach ($ligne->getValeurNoteExamens() as $key1 => $valeur) {
+                /*  foreach ($groupeTypes as $key => $groupe) {
                     if ((int)$groupe->getMax() == 10)
                         $nbreTour += 0.5;
                     if ((int)$groupe->getMax() == 20)
                         $nbreTour += 1;
                     if ((int)$groupe->getMax() == 40)
                         $nbreTour += 2;
+                } */
+                $groupe = $groupeTypes[$key1];
+                $coef = (int)$groupe->getCoef();
+                $note = $valeur->getNote();
+
+                // Vérifie si la note n'est ni "NC" ni vide
+                if ($note !== "NC" && $note !== "") {
+                    $somme += (int)$note;
+
+                    // Ajoute à nbreTour en fonction du coef
+                    if ($coef == 10) {
+                        $nbreTour += 0.5;
+                    } elseif ($coef == 20) {
+                        $nbreTour += 1;
+                    } elseif ($coef == 40) {
+                        $nbreTour += 2;
+                    }
                 }
-                $noteExamen = $valeur->getNote();
-                $somme += $valeur->getNote();
+
+                /*    $groupe = $groupeTypes[$key1];
+
+                if ((int)$groupe->getCoef() == 10) {
+                    //dd($value->getGroupeTypes());
+                    if ($valeur->getNote() != "NC" || $valeur->getNote() != "") {
+                        //dd($value->getNote());
+                        $nbreTour = $nbreTour + 0.5;
+                    }
+                }
+                if ((int)$groupe->getCoef() == 20) {
+                    if ($valeur->getNote() != "NC" || $valeur->getNote() != "") {
+                        //dd($value->getNote());
+                        $nbreTour = $nbreTour + 1;
+                    }
+                }
+                if ((int)$groupe->getCoef() == 40) {
+
+                    if ($valeur->getNote() != "NC" || $valeur->getNote() != "") {
+                        //dd($value->getNote());
+                        $nbreTour = $nbreTour + 2;
+                    }
+                } */
+
+
+                $noteExamen = $note;
+                /* $somme += (int)$valeur->getNote(); */
             }
             $moyenneEXamen = $somme / $nbreTour;
 

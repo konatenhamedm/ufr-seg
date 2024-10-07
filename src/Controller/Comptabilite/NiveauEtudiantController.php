@@ -683,7 +683,7 @@ class NiveauEtudiantController extends AbstractController
             /* ->add('etudiant', TextColumn::class, ['field' => 'etudiant.nom', 'label' => 'Nom'])
             ->add('prenoms', TextColumn::class, ['field' => 'etudiant.prenom', 'label' => 'Prénoms']) */
             ->add('dateNaissance', DateTimeColumn::class, ['label' => 'Date de naissance', 'format' => 'd-m-Y', "searchable" => false, 'field' => 'etudiant.dateNaissance'])
-            ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.libelle'])
+            ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.code'])
             ->add('datePreinscription', DateTimeColumn::class, ['label' => 'Date pré-inscription', 'format' => 'd/m/Y', "searchable" => false,])
             /*   ->add('caissiere', TextColumn::class, ['field' => 'c.getNomComplet', 'label' => 'Caissière ']) */
             //->add('montantPreinscription', NumberFormatColumn::class, ['label' => 'Mnt. Préinscr.'])
@@ -727,7 +727,7 @@ class NiveauEtudiantController extends AbstractController
         $renders = [
             'edit' => new ActionRender(fn() => $ver == false),
             'delete' => new ActionRender(function () {
-                return false;
+                return true;
             }),
             'edit_preinscription' => new ActionRender(function () {
                 return true;
@@ -802,7 +802,7 @@ class NiveauEtudiantController extends AbstractController
                             ],
                             'delete' => [
                                 'target' => '#modal-small',
-                                'url' => $this->generateUrl('app_comptabilite_niveau_etudiant_delete', ['id' => $value]),
+                                'url' => $this->generateUrl('app_comptabilite_preinscription_delete', ['id' => $value]),
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-trash',
@@ -840,7 +840,7 @@ class NiveauEtudiantController extends AbstractController
             ->add('etudiant', TextColumn::class, ['label' => 'Nom et Prénoms', 'render' => function ($value, Preinscription $preinscription) {
                 return   $preinscription->getEtudiant()->getNomComplet();
             }])
-            ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.libelle'])
+            ->add('filiere', TextColumn::class, ['label' => 'Filiere', 'field' => 'filiere.code'])
             ->add('datePreinscription', DateTimeColumn::class, ['label' => 'Date pré-inscription', 'format' => 'd/m/Y', "searchable" => false,])
             /*   ->add('caissiere', TextColumn::class, ['field' => 'c.getNomComplet', 'label' => 'Caissière ']) */
             ->add('montantPreinscription', NumberFormatColumn::class, ['label' => 'Montant paiemen'])
@@ -880,7 +880,7 @@ class NiveauEtudiantController extends AbstractController
         $renders = [
             'edit' => new ActionRender(fn() => $ver == false),
             'delete' => new ActionRender(function () {
-                return false;
+                return true;
             }),
             'edit_preinscription' => new ActionRender(function () {
                 return true;
@@ -936,6 +936,15 @@ class NiveauEtudiantController extends AbstractController
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['edit_preinscription']
                             ],
+                            'delete' => [
+                                'target' => '#modal-small',
+                                'url' => $this->generateUrl('app_comptabilite_preinscription_delete_paiment', ['id' => $context->getInfoPreinscription()->getId()]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-danger'],
+                                'render' => $renders['delete']
+                            ]
 
                         ]
 

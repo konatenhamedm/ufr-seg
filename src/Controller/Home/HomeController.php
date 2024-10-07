@@ -5,7 +5,9 @@ namespace App\Controller\Home;
 use App\Controller\FileTrait;
 use App\Entity\AnneeScolaire;
 use App\Entity\Decision;
+use App\Entity\EncartBac;
 use App\Entity\Etudiant;
+use App\Entity\InfoEtudiant;
 use App\Entity\Inscription;
 use App\Entity\Preinscription;
 use App\Form\EtudiantType;
@@ -31,6 +33,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -366,14 +369,54 @@ class HomeController extends AbstractController
 
         //return $this->render('site/admin/pages/informations.html.twig');
     }
+
+    private $requestStack;
+
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
+
     #[Route(path: '/verification/validation/dossier/inscription/{id}/{inscription}', name: 'verification_validation_dossier_inscription', methods: ['GET', 'POST'])]
     public function informationInscription(Request $request, $inscription, UserInterface $user, Etudiant $etudiant, InscriptionRepository $inscriptionRepository, PersonneRepository $personneRepository, FormError $formError, NiveauRepository $niveauRepository, UtilisateurRepository $utilisateurRepository): Response
     {
+
+
         //$etudiant = $user->getPersonne();
 
         //dd($niveauRepository->findNiveauDisponible(21));
 
         //dd($preinscription);
+        $info = new InfoEtudiant();
+
+        //dd($etudiant->getEncartBacs());
+        if (count($etudiant->getInfoEtudiants()) == 0) {
+            $info->setTuteurNomPrenoms('');
+            $info->setTuteurFonction('');
+            $info->setTuteurContact('');
+            $info->setTuteurDomicile('');
+            $info->setTuteurEmail('');
+
+            $info->setCorresNomPrenoms('');
+            $info->setCorresFonction('');
+            $info->setCorresContacts('');
+            $info->setCorresDomicile('');
+            $info->setCorresEmail('');
+
+            $etudiant->addInfoEtudiant($info);
+        }
+
+        if (count($etudiant->getEncartBacs()) == 0) {
+            $encart = new EncartBac();
+            $encart->setMatricule('');
+            $encart->setNumero('');
+            $encart->setSerie('');
+            $encart->setAnnee('');
+            //$encart->setBac('');
+
+            $etudiant->addEncartBac($encart);
+        }
+
 
         $validationGroups = ['Default', 'FileRequired', 'autre'];
         $form = $this->createForm(EtudiantVerificationType::class, $etudiant, [
@@ -436,11 +479,128 @@ class HomeController extends AbstractController
             }
         }
 
+
+
         return $this->render('site/informations_verification_inscription.html.twig', [
             'etudiant' => $etudiant,
             'inscription' => $inscriptionRepository->find($inscription),
             'niveau' => $inscriptionRepository->find($inscription)->getNiveau()->getId(),
             'form' => $form->createView(),
+            'routeName' => 'admin_classe'
+        ]);
+
+        //return $this->render('site/admin/pages/informations.html.twig');
+    }
+    #[Route(path: '/verification/validation/dossier/simple/inscription/{id}/{inscription}', name: 'verification_validation_dossier_simple_inscription', methods: ['GET', 'POST'])]
+    public function informationInscriptionSimpleInscription(Request $request, $inscription, UserInterface $user, Etudiant $etudiant, InscriptionRepository $inscriptionRepository, PersonneRepository $personneRepository, FormError $formError, NiveauRepository $niveauRepository, UtilisateurRepository $utilisateurRepository): Response
+    {
+
+
+        //$etudiant = $user->getPersonne();
+
+        //dd($niveauRepository->findNiveauDisponible(21));
+
+        //dd($preinscription);
+        $info = new InfoEtudiant();
+
+        //dd($etudiant->getEncartBacs());
+        if (count($etudiant->getInfoEtudiants()) == 0) {
+            $info->setTuteurNomPrenoms('');
+            $info->setTuteurFonction('');
+            $info->setTuteurContact('');
+            $info->setTuteurDomicile('');
+            $info->setTuteurEmail('');
+
+            $info->setCorresNomPrenoms('');
+            $info->setCorresFonction('');
+            $info->setCorresContacts('');
+            $info->setCorresDomicile('');
+            $info->setCorresEmail('');
+
+            $etudiant->addInfoEtudiant($info);
+        }
+
+        if (count($etudiant->getEncartBacs()) == 0) {
+            $encart = new EncartBac();
+            $encart->setMatricule('');
+            $encart->setNumero('');
+            $encart->setSerie('');
+            $encart->setAnnee('');
+            //$encart->setBac('');
+
+            $etudiant->addEncartBac($encart);
+        }
+
+
+        $validationGroups = ['Default', 'FileRequired', 'autre'];
+        $form = $this->createForm(EtudiantVerificationType::class, $etudiant, [
+            'method' => 'POST',
+            'type' => 'info',
+            'doc_options' => [
+                'uploadDir' => $this->getUploadDir(self::UPLOAD_PATH, true),
+                'attrs' => ['class' => 'filestyle'],
+            ],
+            'validation_groups' => $validationGroups,
+            'action' => $this->generateUrl('verification_validation_dossier_simple_inscription', ['id' => $etudiant->getId(), 'inscription' => $inscription]),
+        ]);
+
+        $data = null;
+        $statutCode = Response::HTTP_OK;
+
+        $isAjax = $request->isXmlHttpRequest();
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $response = [];
+            $redirect = $this->generateUrl('app_home_timeline_index');
+            $preinscriptionData = $inscriptionRepository->find($inscription);
+
+
+
+            if ($form->isValid()) {
+
+                if ($form->getClickedButton()->getName() === 'valider') {
+                    $preinscriptionData->setEtat('attente_validation');
+                    $etudiant->setEtat('complete');
+                    // $inscriptionRepository->add($preinscriptionData, true);
+                }
+
+                $personneRepository->add($etudiant, true);
+
+                //$entityManager->flush();
+
+                $data = true;
+                $message       = 'Opération effectuée avec succès';
+                $statut = 1;
+                $this->addFlash('success', $message);
+            } else {
+                $message = $formError->all($form);
+                $statut = 0;
+                $statutCode = 500;
+                if (!$isAjax) {
+                    $this->addFlash('warning', $message);
+                }
+            }
+
+            if ($isAjax) {
+                return $this->json(compact('statut', 'message', 'redirect', 'data'), $statutCode);
+            } else {
+                if ($statut == 1) {
+                    return $this->redirect($redirect, Response::HTTP_OK);
+                }
+            }
+        }
+
+
+
+        return $this->render('site/informations_verification_inscription.html.twig', [
+            'etudiant' => $etudiant,
+            'inscription' => $inscriptionRepository->find($inscription),
+            'niveau' => $inscriptionRepository->find($inscription)->getNiveau()->getId(),
+            'form' => $form->createView(),
+            'routeName' => 'admin_simple'
         ]);
 
         //return $this->render('site/admin/pages/informations.html.twig');

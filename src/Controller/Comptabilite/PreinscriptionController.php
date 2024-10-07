@@ -11,6 +11,7 @@ use App\Form\InfoPreinscriptionType;
 use App\Form\PreinscriptionEudiantConnecteType;
 use App\Form\PreinscriptionType;
 use App\Repository\EtudiantRepository;
+use App\Repository\InfoPreinscriptionRepository;
 use App\Repository\InscriptionRepository;
 use App\Repository\NiveauRepository;
 use App\Repository\PreinscriptionRepository;
@@ -887,7 +888,21 @@ class PreinscriptionController extends AbstractController
             $redirect = $this->generateUrl('app_comptabilite_preinscription_index');
 
             if ($count > 0) {
-                $data = false;
+                $data = true;
+                $entityManager->remove($preinscription);
+                $entityManager->flush();
+
+
+                $message = 'Opération effectuée avec succès';
+
+                $response = [
+                    'statut'   => 1,
+                    'message'  => $message,
+                    'redirect' => $redirect,
+                    'data' => $data
+                ];
+                /* C'est ce qui etait fais avant */
+                /*  $data = false;
                 $message = 'Vous ne pouvez effectuer cette opération cet utilisateur a deja des dossiers en cours';
 
                 $response = [
@@ -895,7 +910,7 @@ class PreinscriptionController extends AbstractController
                     'message'  => $message,
                     'redirect' => $redirect,
                     'data' => $data
-                ];
+                ]; */
             } else {
                 $data = true;
                 $entityManager->remove($preinscription);
@@ -928,6 +943,139 @@ class PreinscriptionController extends AbstractController
 
         return $this->render('comptabilite/preinscription/delete.html.twig', [
             'preinscription' => $preinscription,
+            'form' => $form,
+        ]);
+    }
+    #[Route('/{id}/update/delete', name: 'app_comptabilite_preinscription_update_delete', methods: ['DELETE', 'GET'])]
+    public function deleteUpdatepreinscription(Request $request, InfoPreinscription $infoPreinscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, PreinscriptionRepository $preprescriptionRepository): Response
+    {
+
+        //$count = count($preprescriptionRepository->findBy(['etudiant' => $preinscription->getEtudiant(), 'etat' => 'valide'])) + count($inscriptionRepository->countInscriptionFordelete($preinscription->getEtudiant()));
+
+        $form = $this->createFormBuilder()
+            ->setAction(
+                $this->generateUrl(
+                    'app_comptabilite_preinscription_update_delete',
+                    [
+                        'id' => $infoPreinscription->getId()
+                    ]
+                )
+            )
+            ->setMethod('DELETE')
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $redirect = $this->generateUrl('app_home_timeline_index');
+
+            $data = true;
+            $infoPreinscription->getPreinscription()->setEtat('attente_paiement');
+            $entityManager->persist($infoPreinscription->getPreinscription());
+            $entityManager->flush();
+
+            $entityManager->remove($infoPreinscription);
+            $entityManager->flush();
+
+
+
+
+
+            $message = 'Opération effectuée avec succès';
+
+            $response = [
+                'statut'   => 1,
+                'message'  => $message,
+                'redirect' => $redirect,
+                'data' => $data
+            ];
+
+
+            $this->addFlash('success', $message);
+
+            if (!$request->isXmlHttpRequest()) {
+                return $this->redirect($redirect);
+            } else {
+                return $this->json($response);
+            }
+        }
+
+        return $this->render('comptabilite/preinscription/delete.html.twig', [
+            'preinscription' => $infoPreinscription,
+            'form' => $form,
+        ]);
+    }
+    #[Route('/{id}/paiement/delete', name: 'app_comptabilite_preinscription_delete_paiment', methods: ['DELETE', 'GET'])]
+    public function deleteAfterPaiment(Request $request, InfoPreinscriptionRepository $infoPreprescriptionRepository, InfoPreinscription $infoPreinscription, EntityManagerInterface $entityManager, InscriptionRepository $inscriptionRepository, PreinscriptionRepository $preprescriptionRepository): Response
+    {
+
+        /*   $count = count($preprescriptionRepository->findBy(['etudiant' => $preinscription->getEtudiant(), 'etat' => 'valide'])) + count($inscriptionRepository->countInscriptionFordelete($preinscription->getEtudiant()));
+ */
+        $form = $this->createFormBuilder()
+            ->setAction(
+                $this->generateUrl(
+                    'app_comptabilite_preinscription_delete_paiment',
+                    [
+                        'id' => $infoPreinscription->getId()
+                    ]
+                )
+            )
+            ->setMethod('DELETE')
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $redirect = $this->generateUrl('app_home_timeline_index');
+
+            $data = true;
+            $entityManager->remove($infoPreinscription);
+            $entityManager->flush();
+            $infoPreinscription->getPreinscription()->setEtat('attente_paiement');
+
+            $entityManager->persist($infoPreinscription->getPreinscription());
+            $entityManager->flush();
+
+
+            $message = 'Opération effectuée avec succès';
+
+            $response = [
+                'statut'   => 1,
+                'message'  => $message,
+                'redirect' => $redirect,
+                'data' => $data
+            ];
+
+            /* 
+            if ($count > 0) {
+            } else {
+                $data = true;
+                $entityManager->remove($preinscription);
+                $entityManager->remove($preinscription->getEtudiant());
+                $entityManager->flush();
+
+
+                $message = 'Opération effectuée avec succès';
+
+                $response = [
+                    'statut'   => 1,
+                    'message'  => $message,
+                    'redirect' => $redirect,
+                    'data' => $data
+                ];
+            } */
+
+
+
+
+
+            $this->addFlash('success', $message);
+
+            if (!$request->isXmlHttpRequest()) {
+                return $this->redirect($redirect);
+            } else {
+                return $this->json($response);
+            }
+        }
+
+        return $this->render('comptabilite/preinscription/delete_paiement.html.twig', [
+            'preinscription' => $infoPreinscription,
             'form' => $form,
         ]);
     }

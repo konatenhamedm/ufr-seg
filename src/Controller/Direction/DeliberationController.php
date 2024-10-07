@@ -553,35 +553,34 @@ class DeliberationController extends AbstractController
         }
 
         if ($hasActions) {
-            /*     if ($etat == 'delibere') {
-                $table->add('id', TextColumn::class, [
-                    'label' => 'Actions',
-                    'orderable' => false,
-                    'globalSearchable' => false,
-                    'className' => 'grid_row_actions',
-                    'render' => function ($value, Deliberation $context) use ($renders) {
-                        $options = [
-                            'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
-                            'target' => '#modal-lg',
 
-                            'actions' => [
-                              
-                                'show' => [
-                                    'url' => $this->generateUrl('app_direction_deliberation_show', ['id' => $value]),
-                                    'ajax' => true,
-                                    'stacked' => false,
-                                    'icon' => '%icon% bi bi-eye',
-                                    'attrs' => ['class' => 'btn-main'],
-                                    'render' => $renders['edit']
-                                ],
+            $table->add('id', TextColumn::class, [
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Preinscription $context) use ($renders) {
+                    $options = [
+                        'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                        'target' => '#modal-lg',
+
+                        'actions' => [
+
+                            'delete' => [
+                                'target' => '#modal-small',
+                                'url' => $this->generateUrl('app_comptabilite_preinscription_update_delete', ['id' => $context->getInfoPreinscription()->getId()]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-trash',
+                                'attrs' => ['class' => 'btn-danger'],
+                                'render' => $renders['delete']
                             ]
+                        ]
 
-                        ];
-                        return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
-                    }
-                ]);
-            } else {
-            } */
+                    ];
+                    return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                }
+            ]);
         }
 
 
@@ -1288,7 +1287,7 @@ class DeliberationController extends AbstractController
             */
 
             $preinscription->setEtat('valide');
-            $preinscription->setEtatDeliberation('pas_deliberer');
+            $preinscription->setEtatDeliberation(etatDeliberation: 'pas_deliberer');
             $entityManager->persist($preinscription);
             $entityManager->flush();
 

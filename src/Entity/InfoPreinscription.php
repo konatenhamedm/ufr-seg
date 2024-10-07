@@ -31,11 +31,11 @@ class InfoPreinscription
     #[Gedmo\Blameable(on: 'create')]
     private ?Utilisateur $utilisateur = null;
 
-    #[ORM\OneToOne(inversedBy: 'infoPreinscription', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'infoPreinscription')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Preinscription $preinscription = null;
 
-    #[ORM\ManyToOne(inversedBy: 'infoPreinscriptions', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'infoPreinscriptions')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?NaturePaiement $modePaiement = null;
 

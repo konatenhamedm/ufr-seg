@@ -50,6 +50,7 @@ function refreshColone()
         const $addLink = $('.add-ligne');
 
         $addLink.click(function (e) {
+            /* alert('') */
             addLine($container);
             e.preventDefault(); // évite qu'un # apparaisse dans l'URL
             refreshColone();
@@ -72,6 +73,7 @@ function refreshColone()
    
     // La fonction qui ajoute un formulaire Categorie
         function addLine($container) {
+            
         // Dans le contenu de l'attribut « data-prototype », on remplace :
         // - le texte "__name__label__" qu'il contient par le label du champ
         // - le texte "__name__" qu'il contient par le numéro du champ
@@ -110,13 +112,15 @@ function refreshColone()
             
             $('#tutorial').find('.ligne').each(function(){ 
                  // const $this = $(this);
+
+                
                     
                 var index_note = $(this).find('.numero').val()-1;
                 var index_note_value = $(this).find('.numero').val();
 
                // $(this).find('.source').eq(-3).after('<td width="10%" class="p-2">ffff</td>'); 
                 $(this).find('th').eq(-3).after('<th width="10%" class="p-2">Note '+nombre_note+'</th>'); 
-                $(this).find('td').eq(-3).after('<td class="p-2 row-colonne"><input class="form-control form-control-sm " type="text" id="controle_notes_'+index_note+'_valeurNotes_'+nombre_note_groupe+'_note" name="controle[notes]['+index_note+'][valeurNotes]['+nombre_note_groupe+'][note]" required="required" maxlength="255" value="0"></td>');
+                $(this).find('td').eq(-3).after('<td class="p-2 row-colonne"><input class="form-control form-control-sm " type="text" id="controle_notes_'+index_note+'_valeurNotes_'+nombre_note_groupe+'_note" name="controle[notes]['+index_note+'][valeurNotes]['+nombre_note_groupe+'][note]" required="required" maxlength="255" value=""></td>');
             });
             $('#tutorial').find('.ligne_head').each(function(){ 
                

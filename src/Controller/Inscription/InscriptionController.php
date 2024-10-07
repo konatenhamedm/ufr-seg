@@ -691,6 +691,7 @@ class InscriptionController extends AbstractController
 
         $renders = [
             'edit_etudiant' => new ActionRender(fn() => $etat == 'attente_echeance' || $etat == 'rejete'),
+            'delete' => new ActionRender(fn() => $etat == 'valide_classe'),
             'edit' => new ActionRender(fn() => $etat == 'echeance_soumis'),
             'recu' => new ActionRender(function () use ($etat) {
                 if ($etat == 'solde') {
@@ -699,9 +700,9 @@ class InscriptionController extends AbstractController
                     return false;
                 }
             }),
-            'delete' => new ActionRender(function () {
-                return false;
-            }),
+            /* 'delete' => new ActionRender(function () {
+                return true;
+            }), */
             'confirmation' => new ActionRender(function () use ($etat) {
                 return $etat == 'valide';
             }),
@@ -1917,6 +1918,65 @@ class InscriptionController extends AbstractController
                 'redirect' => $redirect,
                 'data' => $data,
                 'showAlert' => $showAlert
+            ];
+
+            $this->addFlash('success', $message);
+
+            if (!$request->isXmlHttpRequest()) {
+                return $this->redirect($redirect);
+            } else {
+                return $this->json($response);
+            }
+        }
+
+        return $this->render('inscription/inscription/delete.html.twig', [
+            'inscription' => $inscription,
+            'form' => $form,
+        ]);
+    }
+    #[Route('/retour/prinscription/{id}/delete', name: 'app_inscription_inscription_retour_preinscription_delete', methods: ['DELETE', 'GET'])]
+    public function deleteRetourPreinscription(Request $request, Inscription $inscription, PreinscriptionRepository $preprescriptionRepository, InscriptionRepository $inscriptionRepository, EntityManagerInterface $entityManager): Response
+    {
+
+        $count = count($preprescriptionRepository->findBy(['etudiant' => $inscription->getEtudiant(), 'etat' => 'valide'])) + count($inscriptionRepository->countInscriptionFordelete($inscription->getEtudiant()));
+
+        $form = $this->createFormBuilder()
+            ->setAction(
+                $this->generateUrl(
+                    'app_inscription_inscription_retour_preinscription_delete',
+                    [
+                        'id' => $inscription->getId()
+                    ]
+                )
+            )
+            ->setMethod('DELETE')
+            ->getForm();
+        $form->handleRequest($request);
+        $showAlert = false;
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $redirect = $this->generateUrl('app_home_timeline_index');
+
+            $data = true;
+
+            $entityManager->remove($inscription);
+            $entityManager->flush();
+
+            $entityManager->remove($inscription->getDeliberation());
+            $entityManager->flush();
+
+            $inscription->getDeliberation()->getPreinscription()->setEtat('valide');
+            $inscription->getDeliberation()->getPreinscription()->setEtatDeliberation(etatDeliberation: 'pas_deliberer');
+            $entityManager->persist($inscription->getDeliberation()->getPreinscription());
+            $entityManager->flush();
+
+            $message = 'Opération effectuée avec succès';
+
+            $response = [
+                'statut'   => 1,
+                'message'  => $message,
+                'redirect' => $redirect,
+                'data' => $data
             ];
 
             $this->addFlash('success', $message);
