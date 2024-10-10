@@ -327,7 +327,7 @@ class TestController extends AbstractController
         $totalPayer = 0;
 
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
-        return $this->renderPdf("test/attestation.html.twig", [
+        return $this->renderPdf("test/certification.html.twig", [
             'total_payer' => $totalPayer,
             'data' => [],
             'total_impaye' => $totalImpaye
@@ -359,7 +359,7 @@ class TestController extends AbstractController
         $totalPayer = 0;
 
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
-        return $this->renderPdf("test/certification.html.twig", [
+        return $this->renderPdf("test/attestation.html.twig", [
             'total_payer' => $totalPayer,
             'data' => [],
             'total_impaye' => $totalImpaye
