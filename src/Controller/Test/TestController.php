@@ -9,6 +9,7 @@ use App\Repository\ClasseRepository;
 use App\Repository\TestRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
+use App\Service\Menu;
 use Doctrine\ORM\EntityManagerInterface;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\BoolColumn;
@@ -318,7 +319,7 @@ class TestController extends AbstractController
 
     }
 
-    #[Route('/attesta', name: 'app_test', methods: ['GET', 'POST'])]
+    #[Route('/attestation', name: 'app_attestation', methods: ['GET', 'POST'])]
     public function imprimerAttesta(Request $request): Response
     {
 
@@ -350,7 +351,7 @@ class TestController extends AbstractController
 
     }
 
-    #[Route('/certif', name: 'app_test', methods: ['GET', 'POST'])]
+    #[Route('/certificat', name: 'app_certificat', methods: ['GET', 'POST'])]
     public function imprimercertif(Request $request): Response
     {
 
@@ -445,7 +446,7 @@ class TestController extends AbstractController
     }
 
     #[Route('/test2', name: 'app_test2', methods: ['GET', 'POST'])]
-    public function imprimerAll21(Request $request,  ): Response
+    public function imprimerAll21(Request $request,): Response
     {
         //  $array = ;
 
@@ -453,9 +454,9 @@ class TestController extends AbstractController
 
         $data = [];
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
-      //  $tableaus = json_decode($array_final, true);
+        //  $tableaus = json_decode($array_final, true);
 
-       // $longeur = count($tableaus);
+        // $longeur = count($tableaus);
 
         // dd($longeur);
         // for ($i = 0; $i < $longeur; $i++) {
@@ -561,4 +562,50 @@ class TestController extends AbstractController
     //     //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     // }
+
+
+    #[Route('/test2/{etat}/{classe}', name: 'app_classe_detaille', methods: ['GET', 'POST'])]
+    public function imprimerAll2(Request $request, Menu $menu, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
+    {
+        /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
+            dd($value->getEtudiant()->getEncartBacs()[0]);
+        } */
+        //  $array = ;
+        $data = [];
+        $array_final = '[' . implode(',', explode(',', $etat)) . ']';
+        $tableaus = json_decode($array_final, true);
+        $longeur = count($tableaus);
+        // dd($longeur);
+        for ($i = 0; $i < $longeur; $i++) {
+            $data[] = $classeRepository->find($tableaus[$i]);
+        }
+
+        $totalImpaye = 0;
+        $totalPayer = 0;
+
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("test/liste_de_class.html.twig", [
+            'total_payer' => $totalPayer,
+            'total_impaye' => $totalImpaye,
+            'data' => $data,
+            //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'P',
+            'protected' => true,
+            'file_name' => "point_versments",
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
 }
