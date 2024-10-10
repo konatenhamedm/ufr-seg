@@ -1,0 +1,281 @@
+{# {% set code =facture.typeFacture.code(true) %} #}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{# {{ code =='a' ? 'AVOIR': 'FACTURE' }} {{ facture.numero }} #}dd</title>
+    <style>
+        /* {
+            % block page_css %
+        } */
+
+        @page {
+
+            margin-footer: 0.5cm;
+
+            /*header: html_headerContent;*/
+            /* footer: html_pageFooter; */
+            margin-top: 0.5cm;
+            margin-header: 0cm;
+
+            /*background: ...
+  background-image: ...
+  background-position ...
+  background-repeat ...
+  background-color ...
+  background-gradient: ...*/
+        }
+
+        .clearfix:after,
+        {
+        % endblock %
+        }
+
+        .clearfix:before {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .mention {
+            position: absolute;
+            bottom: 100px;
+        }
+
+        /*@page :first {
+   header: html_headerContent;
+}*/
+        caption {
+            margin-bottom: 15px;
+        }
+
+        fieldset {
+            border: 1px solid #000 !important;
+            margin: 0;
+            xmin-width: 0;
+            padding: 10px;
+            position: relative;
+            border-radius: 4px;
+            background-color: #fff;
+            padding-left: 10px !important;
+        }
+
+        legend {
+            padding: 0 10px;
+            margin-left: 100px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 0px;
+            width: 35%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #ffffff;
+        }
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {}
+
+        @media all {
+            /*.content { display: block; page-break-inside: avoid; }*/
+        }
+
+        .content {
+            /*margin-top: 18cm;*/
+        }
+
+            {
+            # .table-responsive.table-bordered {
+                border: 0;
+            }
+
+            #
+        }
+
+        .double_underline {
+            text-decoration: underline;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        /* .contenu {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} */
+        .contenu {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%; /* Pour que body et html occupent toute la hauteur */
+        }
+
+        .clearfix {
+            width: 100%;
+            height: 100%; 
+            /* Prend toute la hauteur du body */
+            border: 5px solid black; /* Bordure noire autour de la page */
+            box-sizing: border-box; /* Inclut la bordure et le padding dans la taille */
+        }
+    </style>
+</head>
+
+<body style="font-size:12px;">
+    <div class="clearfix">
+        
+        <div class="content">
+        
+         
+                <table class="details">
+                    <tr>
+                        <td  class=" table-container contenu "
+                            style="width: 50%;height: 20px; border-bottom: 1px solid #000; border-left: 0px solid #000;border-top: 0px solid #000;border-right: 0px solid #000; ">
+                            <strong>MINISTERE DE L’ENSEIGNEMENT SUPERIEUR</strong>
+                        </td>
+                        <td  class=" table-container contenu "
+                            style="width: 50%;height: 20px; border-bottom: 1px solid #000; border-left: 0px solid #000;border-top: 0px solid #000;border-right: 0px solid #000; ">
+                            <strong>REPUBLIQUE DE COTE D’IVOIRE</strong>
+                        </td>
+        
+                    </tr>
+                   
+                    <tr>
+                        <td class=" table-container contenu "
+                            style="width: 50%;height: 20px; border-bottom: 1px solid #000; border-left: 0px solid #000;border-top: 0px solid #000;border-right: 0px solid #000; ">
+                            <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180" width="100px" />
+                            <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180" width="100px" />
+                        </td>
+                        <td class=" table-container contenu "
+                            style="width: 50%;height: 20px; border-bottom: 1px solid #000; border-left: 0px solid #000;border-top: 0px solid #000;border-right: 0px solid #000; ">
+                            <strong>REPUBLIQUE DE COTE D’IVOIRE</strong><br>
+                            <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180" width="100px" />
+                    
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class=" table-container contenu "
+                            style="width: 50%;height: 20px; border-bottom: 1px solid #000; border-left: 0px solid #000;border-top: 0px solid #000;border-right: 0px solid #000; ">
+                            <strong>UNITE DE FORMATION ET DE RECHERCHES<br>
+                                DES SCIENCES ECONOMIQUES ET DE GESTION</strong>
+                        </td>
+                        <td class=" table-container contenu "
+                            style="width: 50%;height: 20px; border-bottom: 1px solid #000; border-left: 0px solid #000;border-top: 0px solid #000;border-right: 0px solid #000; ">
+                            <strong>Diplôme D’Etudes Supérieures de<br>
+                                Comptabilité et Gestion Financière</strong>
+                    
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan ="2" class=" table-container contenu "
+                            style="width: 100%;height: 20px; border-bottom: 1px solid #000; border-left: 0px solid #000;border-top: 0px solid #000;border-right: 0px solid #000; ">
+                            <strong>TEL: (225) 01 01 15 47 47 / 07 77 02 66 42</strong>
+                        </td>
+                      
+                    </tr>
+                  
+
+                </table>
+                <table class="details">
+                   
+                    <tr style=" border: 0px !important;">
+                        <td class="contenu" style="width:5%; border: 0px !important;"></td>
+                        <td class="contenu" style="width:90%; border: 10px !important; background-color: #beb7b7;">
+                            {# box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.5); border: 3px solid rgb(255, 255, 255); #}
+                            <div align="center" style="align: center; " class="text-center">
+                                <b style=" font-size: 33bx;">CERTIFICAT DE FREQUENTATION</b> <br>
+                    
+                                <b style=" font-size: 10px;">PROGRAMME DU DIPLOME D’ETUDES SUPERIEURES DE COMPTABILITE ET GESTION FINANCIERE
+                                    (DESCOGEF)</b>
+                            </div>
+                        </td>
+                        <td class="contenu" style="width:5%; border: 0px !important;"></td>
+                    </tr>
+                    <tr style=" border: 0px !important;">
+                        <td class="contenu" style="width:5%; border: 0px !important;"></td>
+                        <td class="contenu" style="width:90%; border: 10px !important; ">
+                            {# box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.5); border: 3px solid rgb(255, 255, 255); #}
+                            <div align="center" style="align: center; " class="text-center">
+                                <b style=" font-size: 20bx;">ANNEE UNIVERSITAIRE 2022 - 2023</b> <br>
+                    
+                              
+                            </div>
+                        </td>
+                        <td class="contenu" style="width:5%; border: 0px !important;"></td>
+                    </tr>
+                    <tr style=" border: 0px !important;">
+                        <td class="contenu" style="width:2%; border: 0px !important;"></td>
+                        <td  class="contenu" style="width:96%; border: 10px !important; ">
+                            {# box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.5); border: 3px solid rgb(255, 255, 255); #}
+                            <div align="center" style="align: center;font-size: 12bx; " class="text-center">
+                                Le Coordonnateur du Programme du Diplôme D’Etudes Supérieures de Comptabilité et Gestion Financière
+                                (DESCOGEF) de l’UFR des Sciences économiques et de Gestion de l’université de Cocody, certifie que:
+                    
+                    
+                            </div>
+                        </td>
+                    <td class="contenu" style="width:2%; border: 0px !important;"></td>
+                    </tr>
+
+                
+                </table>
+
+               
+
+    <div style="width:50%;text-align:left;float:left;" class="">
+    
+    
+        {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
+        <b>MINISTERE DE L’ENSEIGNEMENT SUPERIEUR</b>
+     
+        {# <img src="{{ absolute_url(asset(var)) }}" width="100px" /> #}
+        {# <div style="text-align:left;border: 1px solid #000;padding:8px;width:70%" class="">
+            CC N° 9904215 D<br>
+            Régime d'imposition: Réel Normal<br>
+            Centre des impôts: D G E<br>
+        </div>
+        {{ "facture.typeFacture.libelle" | upper }} N° {{ 'facture.numero' }} #}
+    </div>
+    
+    <div style="width:40%;float:right;margin-top:0px,padding:8px">
+    
+        <div style="width:10%;text-align:left;float:left;" class="">
+            {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
+          
+            {# <img src="{{ absolute_url(asset(var)) }}" width="100px" /> #}
+            {# <div style="text-align:left;border: 1px solid #000;padding:8px;width:70%" class="">
+                CC N° 9904215 D<br>
+                Régime d'imposition: Réel Normal<br>
+                Centre des impôts: D G E<br>
+            </div>
+            {{ "facture.typeFacture.libelle" | upper }} N° {{ 'facture.numero' }} #}
+        </div>
+    </div>
+      <br>
+ 
+
+        
+    </div>
+
+   
+</body>
+
+</html>
