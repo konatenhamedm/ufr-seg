@@ -54,16 +54,14 @@
       const $old_grid = $('#grid_app_inscription_etudiant_etats_' + grid_prefix_id);
       init_select2('.has-select2');
 
-      function loadDataTable($grid, classe,niveau,filiere ,options = null, contents = '') {
+      function loadDataTable($grid, classe ,options = null, contents = '') {
         $grid.initDataTables(
           options
           ? options
           : {{ datatable_settings(datatable) }}, {
           searching: true,
           ajaxUrl: Routing.generate('app_inscription_etudiant_etats_index', {
-            classe: classe,
-            niveau: niveau,
-            filiere: filiere,
+            classe: classe
             
           }),
           language: {
@@ -75,16 +73,14 @@
           drawCallback: function (row, data) {}
         });
       }
-      function loadDataTableBene($grid, classe,niveau,filiere ,options = null, contents = '') {
+      function loadDataTableBene($grid, classe ,options = null, contents = '') {
         $grid.initDataTables(
           options
           ? options
           : {{ datatable_settings(datatable) }}, {
           searching: true,
           ajaxUrl: Routing.generate('app_inscription_etudiant_etats_index', {
-            classe: classe,
-            niveau: niveau,
-            filiere: filiere,
+            classe: classe
             
           }),
           language: {
@@ -104,13 +100,9 @@
      
 
       loadDataTable($old_grid, null, {{ datatable_settings(datatable) }});
-      load_content($niveau.val(),false)
-      load_content($filiere.val(),true)
+    
      $classe.on('change', function (e) {
-      
         const $this = $(this);
-
-         
         //alert($dateDebut.val());
          //loadDataTableBene($old_gride, $this.val(),$niveau.val(),$filiere.val(), {{ datatable_settings(datatable) }});
          load_grid_data(null, $this, $this.val());
