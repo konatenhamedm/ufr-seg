@@ -1,0 +1,421 @@
+{# {% set code =facture.typeFacture.code(true) %} #}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{# {{ code =='a' ? 'AVOIR': 'FACTURE' }} {{ facture.numero }} #}dd</title>
+    <style>
+        /* {
+            % block page_css %
+        } */
+
+        @page {
+
+            margin-footer: 0.5cm;
+
+            /*header: html_headerContent;*/
+            /* footer: html_pageFooter; */
+            margin-top: 0.5cm;
+            margin-header: 0cm;
+
+            /*background: ...
+  background-image: ...
+  background-position ...
+  background-repeat ...
+  background-color ...
+  background-gradient: ...*/
+        }
+
+        .clearfix:after,
+        {
+        % endblock %
+        }
+
+        .clearfix:before {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .mention {
+            position: absolute;
+            bottom: 100px;
+        }
+
+        /*@page :first {
+   header: html_headerContent;
+}*/
+        caption {
+            margin-bottom: 15px;
+        }
+
+        fieldset {
+            border: 1px solid #000 !important;
+            margin: 0;
+            xmin-width: 0;
+            padding: 10px;
+            position: relative;
+            border-radius: 4px;
+            background-color: #fff;
+            padding-left: 10px !important;
+        }
+
+        legend {
+            padding: 0 10px;
+            margin-left: 100px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 0px;
+            width: 35%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #ffffff;
+        }
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {}
+
+        @media all {
+            /*.content { display: block; page-break-inside: avoid; }*/
+        }
+
+        .content {
+            /*margin-top: 18cm;*/
+        }
+
+            {
+            # .table-responsive.table-bordered {
+                border: 0;
+            }
+
+            #
+        }
+
+        .double_underline {
+            text-decoration: underline;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        /* .contenu {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} */
+        .contenu {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            /* Pour que body et html occupent toute la hauteur */
+        }
+
+        .clearfix {
+            width: 100%;
+            height: 100%;
+            /* Prend toute la hauteur du body */
+            border: 5px solid black;
+            /* Bordure noire autour de la page */
+            box-sizing: border-box;
+            /* Inclut la bordure et le padding dans la taille */
+        }
+    </style>
+</head>
+
+<body style="font-size:12px;">
+    <div class="clearfix">
+
+        <div class="content">
+            <table class="details">
+                <tr>
+                    <td class=" table-container contenu " style="width: 50%;height: 20px; border:0px !important; ">
+                        <strong>MINISTERE DE L’ENSEIGNEMENT SUPERIEUR</strong>
+                    </td>
+                    <td class=" table-container contenu " style="width: 50%;height: 20px; border:0px !important;  ">
+                        <strong>REPUBLIQUE DE COTE D’IVOIRE</strong><br>
+
+
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td class=" table-container contenu display: flex !important;align-items: left !important;justify-content: left !important;"
+                        style="width: 50%; border:0px !important;  ">
+                        <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180"
+                            width="100px" />
+
+                        <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180"
+                            width="100px" />
+                    </td>
+                    <td class=" table-container contenu " style="width: 50%; border:0px !important;  ">
+                        <hr style="height: 2px; background-color: black; border: 0px;width: 30%;">
+                        <strong>UNION-DISCIPLINE-TRAVAIL</strong><br>
+                       
+
+                    </td>
+                </tr>
+                
+
+
+            </table>
+            <table class="details">
+                
+                <tr>
+                    <td class=" table-container contenu " style="width: 50%;height: 20px; border:0px !important;  ">
+                        <strong>UNIVERSITE FELIX HOUPHOUÊT-BOIGNY EN PARTENARIAT<br>
+                            AVEC L’UNIVERSITE DE PARIS XII VAL DE MARNE</strong>
+                        <hr style="height: 2px; background-color: black; border: 0px;width: 30%;">
+                    </td><br>
+                
+                    <td rowspan="2" class=" table-container contenu " style="width: 50%;height: 20px; border:0px !important;  ">
+                        <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180" width="100px" />
+                
+                    </td>
+                
+                  
+                </tr>
+
+                <tr>
+                   
+                
+                    <td class=" table-container contenu " style="width: 50%;height: 20px; border:0px !important;  ">
+                        <strong>BP V 43 ABIDJAN<br>
+                            TEL : (225) 01 01 15 47 47 / 07 77 02 66 42</strong>
+                    </td>
+                </tr>
+               
+
+
+            </table>
+            <br><br>
+            <table class="details">
+
+                <tr style=" border: 0px !important;">
+                    <td class="contenu" style="width:10%; border: 0px !important;"></td>
+                    <td class="contenu" style="width:80%; border: 0px !important; background-color: #c2d69b;">
+                        {# box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.5); border: 3px solid rgb(255, 255, 255); #}
+                        <div align="center" style="align: center; " class="text-center">
+                            <b style=" font-size: 30px;color: red;">ATTESTATION DE PRISE EN CHARGE DES FRAIS DE SCOLARITE</b> <br>
+
+                            <b style=" font-size: 9px;">Année Académique 2023-2024
+                            SALARIE
+</b>
+                        </div>
+                    </td>
+                    <td class="contenu" style="width:10%; border: 0px !important;"></td>
+                </tr>
+
+
+
+
+            </table>
+            <br><br>
+            <table class="details">
+
+
+                <tr style=" border: 0px !important;">
+                    <td class="contenu" style="width:5%; border: 0px !important;"></td>
+                    <td class="contenu" style="width:90%; border: 10px !important; ">
+                        {# box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.5); border: 3px solid rgb(255, 255, 255); #}
+                        <div align="center" style="align: left;" class="text-center">
+                            <b style=" font-size: 20bx;">ANNEE UNIVERSITAIRE 2022 - 2023</b> <br>
+
+
+                        </div>
+                    </td>
+                    <td class="contenu" style="width:5%; border: 0px !important;"></td>
+                </tr>
+
+
+
+            </table>
+        </div>
+        <br>
+        <table class="details">
+
+            <tr style=" border: 0px !important;">
+
+                <td class="contenu" style=" border: 10px !important; align: center;font-size: 13px;">
+                    <div style="display: flex;justify-content: center;align-items: center; width: 80%;" class="">
+
+                        <b>Le Coordonnateur</b> du Programme <b>du Diplôme D’Etudes Supérieures de Comptabilité et
+                            Gestion Financière
+                            (DESCOGEF)</b> de l’UFR des Sciences économiques et de Gestion de l’université de Cocody,
+                        certifie que:
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+
+        </table>
+        <br>
+        <div class="container">
+            <table class="">
+
+                <tr style=" border: 0px !important;">
+                    <td style="width: 10; border: 0px !important;"></td>
+                    <td class="contenu" style=" width:20%; border: 10px !important; text-align: left;font-size: 13px;">
+                        <b>Monsieur:</b>
+                    </td>
+                    <td class="contenu" style=" width:60%; border: 10px !important; text-align: left;font-size: 13px;">
+                        <b>TOURE Mohamed Saliou</b>
+                    </td>
+                    <td style="width: 10; border: 0px !important;"></td>
+                </tr>
+                <tr style=" border: 0px !important;">
+                    <td style="width: 10;  border: 0px !important;"></td>
+                    <td class="contenu"
+                        style=" width:20%; border: 10px !important; text-align: left;font-size: 13px; border: 0px !important;">
+
+                        Né le:
+                    </td>
+                    <td class="contenu"
+                        style=" width:60%; border: 10px !important; text-align: left;font-size: 13px; border: 0px !important;">
+                        24 Juin 1999 à Yamoussoukro / RCI
+                    </td>
+                    <td style="width: 10; border: 0px !important;"></td>
+                </tr>
+                <tr style=" border: 0px !important;">
+                    <td style="width: 10; border: 0px !important;"></td>
+                    <td class="contenu"
+                        style=" width:20%; border: 10px !important; text-align: left;font-size: 13px; border: 0px !important;">
+
+                        Niveau d’Etudes:
+                    </td>
+                    <td class="contenu"
+                        style=" width:60%; border: 10px !important; text-align: left;font-size: 13px; border: 0px !important;">
+
+                        DESCOGEF
+                    </td>
+                    <td style="width: 10; border: 0px !important;"></td>
+                </tr>
+
+
+            </table>
+            <br><br>
+            <table class="details">
+
+                <tr style=" border: 0px !important;">
+                    <td style="width: 10; border: 0px !important;"></td>
+                    <td class="contenu" style=" border: 10px !important; text-align: left;font-size: 13px;">
+
+                        <div style="display: flex;justify-content: left;align-items: left; width: 80%;" class="">
+
+                            Est régulièrement inscrit(e) pour l’année Universitaire dans l’UFR et pour les Etudes
+                            ci-dessus
+                            mentionnées
+
+                        </div>
+
+                    </td>
+                    <td style="width: 10; border: 0px !important;"></td>
+                </tr>
+
+
+            </table>
+            <table class="">
+
+                <tr style=" border: 0px !important;">
+                    <td style="width: 5%; border: 0px !important;"></td>
+                    <td class="contenu"
+                        style=" width:40%; border: 10px !important; text-align: left;float: left !important; font-size: 13px;">
+                        Abidjan, le 24 Novembre 2022
+                    </td>
+                    <td class="contenu" style=" width:40%; border: 10px !important; text-align: right;font-size: 13px;">
+                        P/O. le coordonnateur DESCOGEF<br>
+                        Le Secrétaire Administratif
+                    </td>
+                    <td style="width: 5%; border: 0px !important;"></td>
+                </tr>
+
+
+
+            </table>
+            <br><br><br>
+            <table class="">
+
+                <tr style=" border: 0px !important;">
+                    <td style="width: 5%; border: 0px !important;"></td>
+                    <td class="contenu"
+                        style=" width:40%; border: 10px !important; text-align: left;float: left !important; font-size: 13px;">
+
+                    </td>
+                    <td class="contenu" style=" width:40%; border: 10px !important; text-align: right;font-size: 13px;">
+                        <b>M. KOUASSI Assouan</b>
+                    </td>
+                    <td style="width: 5%; border: 0px !important;"></td>
+                </tr>
+
+
+            </table>
+            <br><br><br>
+            <table class="">
+
+                <tr style=" border: 0px !important;">
+                    <td style="width: 5%; border: 0px !important;"></td>
+                    <td class="contenu"
+                        style=" width:90%!important ;border: 0px !important; text-align: left;float: left; font-size: 13px; border: 0px !important;">
+                        <b><i>Très important: L’authenticité du présent document peut être vérifiée auprès de la
+                                Direction de la filière ou
+                                du Secrétariat administratif</i></b>
+                    </td>
+                    <td style="width: 5%; border: 0px !important;"></td>
+                </tr>
+
+
+
+            </table>
+
+            <table class="">
+                <tr style="">
+                    <td style="width: 5%; border: 0px !important;"></td>
+                    <td class="table-container contenu"
+                        style="width: 90% !important; border: 0px !important; text-align: center; float: center; font-size: 13px;">
+                        <hr style="height: 2px; background-color: black; border: 0px;">
+                        BP V 43 ABIDJAN TEL: (225) 01 01 15 47 47/ 07 77 02 66 42
+
+                    </td>
+                    <td style="width: 5%; border: 0px !important;"></td>
+                </tr>
+            </table>
+
+
+
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+</body>
+
+</html>
