@@ -205,6 +205,13 @@ class NiveauEtudiantController extends AbstractController
                     return false;
                 }
             }),
+            'validation_classe' =>  new ActionRender(function () use ($etat, $isEtudiant) {
+                if ($etat == 'attente_validation' && $isEtudiant == false) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }),
             'delete' => new ActionRender(function () {
                 return false;
             }),
@@ -248,6 +255,16 @@ class NiveauEtudiantController extends AbstractController
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['verification']
+                            ],
+                            'validation_classe' => [
+                                //hhdhhdhdhdhd  'site_information_validation_direct_after_demande_since_precription',{'id':etudiant.id,'preinscription':preinscription.id
+                                'target' => '#modal-xl',
+                                'url' => $this->generateUrl('site_information_validation_direct_after_demande_since_precription', ['id' => $context->getEtudiant()->getId(), 'preinscription' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-check-circle',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['validation_classe']
                             ],
                             'edit' => [
                                 'url' => $this->generateUrl('app_comptabilite_niveau_etudiant_payer', ['id' => $value]),
@@ -494,6 +511,13 @@ class NiveauEtudiantController extends AbstractController
                     return false;
                 }
             }),
+            'validation_classe' =>  new ActionRender(function () use ($etat, $isEtudiant) {
+                if ($etat == 'attente_validation' &&  $isEtudiant == false) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }),
             'delete' => new ActionRender(function () {
                 return true;
             }),
@@ -505,6 +529,13 @@ class NiveauEtudiantController extends AbstractController
                 }
             }),
             'show_attente_information' => new ActionRender(function () use ($etat, $isEtudiant) {
+                if ($etat == 'attente_informations' && $isEtudiant == true) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }),
+            'validation_classe_dossier' => new ActionRender(function () use ($etat, $isEtudiant) {
                 if ($etat == 'attente_informations' && $isEtudiant == true) {
                     return true;
                 } else {
@@ -565,6 +596,16 @@ class NiveauEtudiantController extends AbstractController
                                 'attrs' => ['class' => 'btn-primary'],
                                 'render' => $renders['show_attente_information']
                             ],
+                            'validation_classe_dossier' => [
+                                //hhdhhdhdhdhd  'site_information_validation_direct_after_demande_since_precription',{'id':etudiant.id,'preinscription':preinscription.id
+                                'target' => '#modal-xl',
+                                'url' => $this->generateUrl('site_information_validation_direct_after_demande_since_precription', ['id' => $context->getEtudiant()->getId(), 'preinscription' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-check-circle',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['validation_classe_dossier']
+                            ],
                             'show_etudiant' => [
                                 'url' => $this->generateUrl('site_information'),
                                 'ajax' => false,
@@ -574,6 +615,7 @@ class NiveauEtudiantController extends AbstractController
                                 'render' => $renders['show_etudiant']
                             ],
                             'verification' => [
+                                //hhdhhdhdhdhd  'site_information_validation_direct_after_demande_since_precription',{'id':etudiant.id,'preinscription':preinscription.id
                                 'target' => '#modal-xl',
                                 'url' => $this->generateUrl('verification_validation_dossier', ['id' => $context->getEtudiant()->getId(), 'preinscription' => $value]),
                                 'ajax' => true,
@@ -581,6 +623,16 @@ class NiveauEtudiantController extends AbstractController
                                 'icon' => '%icon% bi bi-folder',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['verification']
+                            ],
+                            'validation_classe' => [
+                                //hhdhhdhdhdhd  'site_information_validation_direct_after_demande_since_precription',{'id':etudiant.id,'preinscription':preinscription.id
+                                'target' => '#modal-xl',
+                                'url' => $this->generateUrl('site_information_validation_direct_after_demande_since_precription', ['id' => $context->getEtudiant()->getId(), 'preinscription' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-check-circle',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['validation_classe']
                             ],
                             'edit' => [
                                 'url' => $this->generateUrl('app_comptabilite_niveau_etudiant_payer', ['id' => $value]),

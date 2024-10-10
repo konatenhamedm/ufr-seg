@@ -313,9 +313,7 @@ class HomeController extends AbstractController
 
         $data = null;
         $statutCode = Response::HTTP_OK;
-
         $isAjax = $request->isXmlHttpRequest();
-
 
         $form->handleRequest($request);
 
