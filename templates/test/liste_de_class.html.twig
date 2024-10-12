@@ -112,15 +112,16 @@
                         </tr>
 
                         {% for key,etudiant in menu.getListeEtudiantByClasseImprime(item.id) %}
+                       {% set etat_encart = menu.getEncoreByEtudiant(etudiant.etudiant.id) %}
                                <tr>
                             <td style="width:4%;">{{key+1}}</td>
                             <td style="">{{ etudiant.code}}</td>
-                            <td style="">{{etudiant.etudiant.encartBacs[0].ip ? etudiant.etudiant.encartBacs[0].ip : 'RAS'}}</td>
+                            <td style="">{{etat_encart > 0 ? etudiant.etudiant.encartBacs[0].ip : 'RAS'}}</td>
                             <td style="">{{etudiant.etudiant.nom ~' ' ~etudiant.etudiant.prenom}}</td>
                             <td style="">{{etudiant.etudiant.dateNaissance | date('d/m/Y')}}</td>
                             <td style="">{{etudiant.etudiant.lieuNaissance}}</td>
-                            <td style="">{{etudiant.etudiant.encartBacs[0].matricule ? etudiant.etudiant.encartBacs[0].matricule : 'RAS'}}</td>
-                            <td style="">{{etudiant.etudiant.encartBacs[0].serie ? etudiant.etudiant.encartBacs[0].serie : 'RAS'}}</td>
+                            <td style="">{{etat_encart > 0 ? etudiant.etudiant.encartBacs[0].matricule : 'RAS'}}</td>
+                            <td style="">{{etat_encart > 0 ? etudiant.etudiant.encartBacs[0].serie : 'RAS'}}</td>
 
                         </tr>
                         {% else %}

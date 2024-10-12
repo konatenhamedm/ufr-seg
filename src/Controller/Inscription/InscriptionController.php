@@ -709,6 +709,9 @@ class InscriptionController extends AbstractController
             'classe' => new ActionRender(function () use ($etat) {
                 return $etat == 'valide_classe';
             }),
+            'validation_classe' => new ActionRender(function () use ($etat) {
+                return $etat == 'valide_classe';
+            }),
             'payer' => new ActionRender(fn() => $etat == 'valide' && $isEtudiant == false),
             //'recu' => new ActionRender(fn () => $etat == 'solde'),
 
@@ -748,6 +751,16 @@ class InscriptionController extends AbstractController
                                 'icon' => '%icon% bi bi-pen',
                                 'attrs' => ['class' => 'btn-main'],
                                 'render' => $renders['classe']
+                            ],
+                            'validation_classe' => [
+                                //hhdhhdhdhdhd  'site_information_validation_direct_after_demande_since_precription',{'id':etudiant.id,'preinscription':preinscription.id
+                                'target' => '#modal-xl',
+                                'url' => $this->generateUrl('site_information_validation_direct_after_demande_since_inscription', ['id' => $context->getEtudiant()->getId(), 'inscription' => $value]),
+                                'ajax' => true,
+                                'stacked' => false,
+                                'icon' => '%icon% bi bi-check-circle',
+                                'attrs' => ['class' => 'btn-main'],
+                                'render' => $renders['validation_classe']
                             ],
                             'recu' => [
                                 'url' => $this->generateUrl('default_print_iframe', [
@@ -1138,7 +1151,7 @@ class InscriptionController extends AbstractController
                                 'ajax' => true,
                                 'stacked' => false,
                                 'icon' => '%icon% bi bi-pen',
-                                'attrs' => ['class' => 'btn-main'],
+                                'attrs' => ['class' => 'btn-main', 'title' => 'Editer l\'etudiant'],
                                 'render' => $renders['edit_etudiant']
                             ],
                             'edit' => [

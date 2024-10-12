@@ -564,8 +564,127 @@ class TestController extends AbstractController
     // }
 
 
-    #[Route('/test2/{etat}/{classe}', name: 'app_classe_detaille', methods: ['GET', 'POST'])]
+    #[Route('/test2/{classe}/{etat}', name: 'app_classe_detaille', methods: ['GET', 'POST'])]
     public function imprimerAll2(Request $request, Menu $menu, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
+    {
+        /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
+            dd($value->getEtudiant()->getEncartBacs()[0]);
+        } */
+        //  $array = ;
+        $data = [];
+        $array_final = '[' . implode(',', explode(',', $classe)) . ']';
+        $tableaus = json_decode($array_final, true);
+        $longeur = count($tableaus);
+        // dd($longeur);
+        for ($i = 0; $i < $longeur; $i++) {
+            $data[] = $classeRepository->find($tableaus[$i]);
+        }
+
+        $totalImpaye = 0;
+        $totalPayer = 0;
+
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+
+        //dd($etat);
+
+        if ($etat == 'ETAT_CLASSE') {
+            $rest = $this->renderPdf("test/liste_de_class.html.twig", [
+                'total_payer' => $totalPayer,
+                'total_impaye' => $totalImpaye,
+                'data' => $data,
+                //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
+                //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+            ], [
+                'orientation' => 'P',
+                'protected' => true,
+                'file_name' => "point_versments",
+
+                'format' => 'A4',
+
+                'showWaterkText' => true,
+                'fontDir' => [
+                    $this->getParameter('font_dir') . '/arial',
+                    $this->getParameter('font_dir') . '/trebuchet',
+                ],
+                'watermarkImg' => $imgFiligrame,
+                'entreprise' => ''
+            ], true);
+            //return $this->renderForm("stock/sortie/imprime.html.twig");
+        } elseif ($etat == 'ETAT_PRESENCE') {
+            $rest = $this->renderPdf("test/liste_presence.html.twig", [
+                'total_payer' => $totalPayer,
+                'total_impaye' => $totalImpaye,
+                'data' => $data,
+                //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
+                //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+            ], [
+                'orientation' => 'P',
+                'protected' => true,
+                'file_name' => "point_versments",
+
+                'format' => 'A4',
+
+                'showWaterkText' => true,
+                'fontDir' => [
+                    $this->getParameter('font_dir') . '/arial',
+                    $this->getParameter('font_dir') . '/trebuchet',
+                ],
+                'watermarkImg' => $imgFiligrame,
+                'entreprise' => ''
+            ], true);
+            //return $this->renderForm("stock/sortie/imprime.html.twig");
+        } elseif ($etat == 'ETAT_NOTE') {
+            $rest = $this->renderPdf("test/fiche_de_note.html.twig", [
+                'total_payer' => $totalPayer,
+                'total_impaye' => $totalImpaye,
+                'data' => $data,
+                //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
+                //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+            ], [
+                'orientation' => 'P',
+                'protected' => true,
+                'file_name' => "point_versments",
+
+                'format' => 'A4',
+
+                'showWaterkText' => true,
+                'fontDir' => [
+                    $this->getParameter('font_dir') . '/arial',
+                    $this->getParameter('font_dir') . '/trebuchet',
+                ],
+                'watermarkImg' => $imgFiligrame,
+                'entreprise' => ''
+            ], true);
+            //return $this->renderForm("stock/sortie/imprime.html.twig");
+        } else {
+            $rest = $this->renderPdf("test/liste_de_class.html.twig", [
+                'total_payer' => $totalPayer,
+                'total_impaye' => $totalImpaye,
+                'data' => $data,
+                //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
+                //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+            ], [
+                'orientation' => 'P',
+                'protected' => true,
+                'file_name' => "point_versments",
+
+                'format' => 'A4',
+
+                'showWaterkText' => true,
+                'fontDir' => [
+                    $this->getParameter('font_dir') . '/arial',
+                    $this->getParameter('font_dir') . '/trebuchet',
+                ],
+                'watermarkImg' => $imgFiligrame,
+                'entreprise' => ''
+            ], true);
+            //return $this->renderForm("stock/sortie/imprime.html.twig");
+        }
+
+        return $rest;
+    }
+    #[Route('/fiche/notes/{etat}/{classe}', name: 'app_classe_fiche_note', methods: ['GET', 'POST'])]
+    public function imprimerFicheNote(Request $request, Menu $menu, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
     {
         /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
             dd($value->getEtudiant()->getEncartBacs()[0]);
@@ -584,7 +703,95 @@ class TestController extends AbstractController
         $totalPayer = 0;
 
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
-        return $this->renderPdf("test/liste_de_class.html.twig", [
+        return $this->renderPdf("test/fiche_note_classe.html.twig", [
+            'total_payer' => $totalPayer,
+            'total_impaye' => $totalImpaye,
+            'data' => $data,
+            //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'P',
+            'protected' => true,
+            'file_name' => "point_versments",
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
+    #[Route('/fiche/notes/{etat}/{classe}', name: 'app_classe_fiche_note', methods: ['GET', 'POST'])]
+    public function imprimerFicheNotes(Request $request, Menu $menu, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
+    {
+        /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
+            dd($value->getEtudiant()->getEncartBacs()[0]);
+        } */
+        //  $array = ;
+        $data = [];
+        $array_final = '[' . implode(',', explode(',', $etat)) . ']';
+        $tableaus = json_decode($array_final, true);
+        $longeur = count($tableaus);
+        // dd($longeur);
+        for ($i = 0; $i < $longeur; $i++) {
+            $data[] = $classeRepository->find($tableaus[$i]);
+        }
+
+        $totalImpaye = 0;
+        $totalPayer = 0;
+
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("test/fiche_note_classe.html.twig", [
+            'total_payer' => $totalPayer,
+            'total_impaye' => $totalImpaye,
+            'data' => $data,
+            //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'P',
+            'protected' => true,
+            'file_name' => "point_versments",
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
+    #[Route('/fiche/presence/{etat}/{classe}', name: 'app_classe_fiche_presence', methods: ['GET', 'POST'])]
+    public function imprimerFichePreesence(Request $request, Menu $menu, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
+    {
+        /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
+            dd($value->getEtudiant()->getEncartBacs()[0]);
+        } */
+        //  $array = ;
+        $data = [];
+        $array_final = '[' . implode(',', explode(',', $etat)) . ']';
+        $tableaus = json_decode($array_final, true);
+        $longeur = count($tableaus);
+        // dd($longeur);
+        for ($i = 0; $i < $longeur; $i++) {
+            $data[] = $classeRepository->find($tableaus[$i]);
+        }
+
+        $totalImpaye = 0;
+        $totalPayer = 0;
+
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("test/liste_presence.html.twig", [
             'total_payer' => $totalPayer,
             'total_impaye' => $totalImpaye,
             'data' => $data,

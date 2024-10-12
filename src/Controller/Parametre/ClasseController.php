@@ -175,7 +175,7 @@ class ClasseController extends AbstractController
                 ChoiceType::class,
                 [
                     'placeholder' => "Choisir un type d'etat",
-                    'label' => 'Privilèges Supplémentaires',
+                    'label' => 'Choisissez un état',
                     'required'     => false,
                     'expanded'     => false,
                     'attr' => ['class' => 'has-select2'],

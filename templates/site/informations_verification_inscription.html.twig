@@ -175,9 +175,6 @@
                     {{ prototype_ligne_colonne_info(form) }}
                 
                 </div>
-               
-
-
             </div>
 
     </div>
@@ -190,10 +187,10 @@
  {{ form_widget(form.save) }}
                         {% if routeName != 'admin_simple' %}
                        {#  {{routeName}} #}
-             <a title="Traiter la demande" href="{{ path('site_information_validation_direct_after_demande_since_inscription',{'id':etudiant.id,'inscription':inscription.id }) }}" class="btn btn-primary btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2" >Valider inscription</a>
-             {# <a title="Traiter la demande" href="{{ path('app_demande_rejeter',{'id':preinscription.id }) }}" class="btn btn-main btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2">Traiter la demande</a>
-              #}
-                        
+                        {#    <a title="Traiter la demande" href="{{ path('site_information_validation_direct_after_demande_since_inscription',{'id':etudiant.id,'inscription':inscription.id }) }}" class="btn btn-primary btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2" >Valider inscription</a>
+                            #}
+                            {# <a title="Traiter la demande" href="{{ path('app_demande_rejeter',{'id':preinscription.id }) }}" class="btn btn-main btn-sm test" data-bs-stacked-toggle="modal" data-bs-stacked-modal="#modal-xl2">Traiter la demande</a>
+                            #}
                         {% endif %}
                         
         

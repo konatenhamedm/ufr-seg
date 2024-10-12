@@ -104,4 +104,9 @@ class Menu
 
         return $this->em->getRepository(Inscription::class)->getListeEtudiantByClasseImprime($classe);
     }
+    public function getEncoreByEtudiant($etudiant)
+    {
+
+        return $this->em->getRepository(EncartBac::class)->getEncoreByEtudiant($etudiant);
+    }
 }

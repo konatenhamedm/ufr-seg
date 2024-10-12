@@ -67,6 +67,22 @@
       const $classe = $('#{{ form.classe.vars.id }}');
       const $etat = $('#{{ form.etat.vars.id }}');
 
+ /*function exexuteUrl(classe,etat){
+       
+       if(etat == "ETAT_CLASSE")
+            var urlTemplate = "{{ path('app_classe_detaille', {etat: 'etat', classe: 'classe'}) }}";
+       if(etat == "ETAT_NOTE")
+            var urlTemplate = "{{ path('app_classe_fiche_note', {etat: 'etat', classe: 'classe'}) }}";
+       if(etat == "ETAT_PRESENCE")
+            var urlTemplate = "{{ path('app_classe_fiche_presence', {etat: 'etat', classe: 'classe'}) }}";
+
+// Remplacer les espaces réservés par les valeurs
+        var url = urlTemplate
+        .replace('etat', etat)
+        .replace('classe', classe);
+
+      window.open(url, '_blank')
+      }*/
 
     function exexuteUrl(classe,etat){
        

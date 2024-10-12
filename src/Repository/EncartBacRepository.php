@@ -31,6 +31,16 @@ class EncartBacRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+    public function getEncoreByEtudiant($etudiant)
+    {
+        return $this->createQueryBuilder('e')
+            ->select('count(e.id)')
+            ->andWhere('e.etudiant = :val')
+            ->setParameter('val', $etudiant)
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
 
     //    /**
     //     * @return EncartBac[] Returns an array of EncartBac objects
