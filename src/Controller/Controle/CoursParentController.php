@@ -230,12 +230,14 @@ class CoursParentController extends AbstractController
         $annee = $session->get('anneeScolaire');
         $all = $request->query->all();
 
+       
+
 
         $coursParentVerification = $coursParentRepository->findOneBy(['classe' => $classe]);
+        //dd($coursParentVerification);
         if ($coursParentVerification) {
-            //dd($coursParentVerification);
-
-            $form = $this->createForm(CoursParentType::class, $coursParentVerification, [
+            $coursParent = $coursParentVerification;
+            $form = $this->createForm(CoursParentType::class, $coursParent, [
                 'method' => 'POST',
                 'anneeScolaire' => $session->get("anneeScolaire"),
                 'action' => $this->generateUrl('app_controle_cours_parent_new_load', [
@@ -244,10 +246,10 @@ class CoursParentController extends AbstractController
             ]);
         } else {
             $coursParent = new CoursParent();
+          //  dd($matieresUe);
 
             $matieresUe = $matiereUeRepository->getAllMatiereWithouLimit($classe, $annee);
 
-            //dd($matieresUe);
 
             foreach ($matieresUe as $key => $matiereUe) {
                 // dd($matiereUe->getMatiere());
@@ -287,7 +289,7 @@ class CoursParentController extends AbstractController
 
 
             if ($form->isValid()) {
-
+                $coursParent->setClasse($classeRepository->find($classe));
                 $entityManager->persist($coursParent);
                 $entityManager->flush();
 

@@ -21,7 +21,7 @@ class Cours
     #[ORM\ManyToOne(inversedBy: 'cours')]
     private ?Matiere $matiere = null;
 
-    #[ORM\ManyToOne(inversedBy: 'cours')]
+    #[ORM\ManyToOne(inversedBy: 'cours',cascade: ['persist'])]
     private ?AnneeScolaire $anneeScolaire = null;
 
     #[ORM\ManyToOne(inversedBy: 'cours')]
