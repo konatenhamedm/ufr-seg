@@ -564,7 +564,7 @@ class TestController extends AbstractController
     // }
 
 
-    #[Route('/test2/{classe}/{etat}', name: 'app_classe_detaille', methods: ['GET', 'POST'])]
+    #[Route('/test2/{etat}/{classe}', name: 'app_classe_detaille', methods: ['GET', 'POST'])]
     public function imprimerAll2(Request $request, Menu $menu, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
     {
         /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
