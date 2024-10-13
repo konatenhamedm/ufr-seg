@@ -718,7 +718,42 @@ class TestController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
-    #[Route('/edition/bulletin//{etat}/{classe}', name: 'app_classe_edition_bulletin', methods: ['GET', 'POST'])]
+    #[Route('/imprime/pv/{periode}/{classe}', name: 'app_imprime_pv', methods: ['GET', 'POST'])]
+    public function imprimerPv(Request $request, Menu $menu,$periode,$classe, ClasseRepository $classeRepository, SessionInterface $session): Response
+    {
+        /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
+            dd($value->getEtudiant()->getEncartBacs()[0]);
+        } */
+        //  $array = ;
+       
+      
+
+        $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
+        return $this->renderPdf("test/pv.html.twig", [
+            'total_payer' =>null,
+            'total_impaye' => null,
+            'data' => null,
+            //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
+            //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+        ], [
+            'orientation' => 'P',
+            'protected' => true,
+            'file_name' => "point_versments",
+
+            'format' => 'A4',
+
+            'showWaterkText' => true,
+            'fontDir' => [
+                $this->getParameter('font_dir') . '/arial',
+                $this->getParameter('font_dir') . '/trebuchet',
+            ],
+            'watermarkImg' => $imgFiligrame,
+            'entreprise' => ''
+        ], true);
+        //return $this->renderForm("stock/sortie/imprime.html.twig");
+
+    }
+    #[Route('/edition/bulletin/{etat}/{classe}', name: 'app_classe_edition_bulletin', methods: ['GET', 'POST'])]
     public function imprimerFicheNotes(Request $request, Menu $menu, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
     {
         /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {

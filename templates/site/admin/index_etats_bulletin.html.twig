@@ -27,7 +27,7 @@
                <div class="col-md-4 pt-5 ">
               
                  <a href="" {# target="_blank" #} type="button" style="height: 35px;margin-top:0px" class="btn btn-warning btn-sm imprimer" name="search[imprime]"><i class="fa fa-print text-light"></i>Edition bulletin</a>
-                 <a href="" {# target="_blank" #} type="button" style="height: 35px;margin-top:0px" class="btn btn-warning btn-sm imprimer" name="search[imprime]"><i class="fa fa-print text-light"></i>Edition PV</a>
+                 <a href="" {# target="_blank" #} type="button" style="height: 35px;margin-top:0px" class="btn btn-warning btn-sm imprimer_pv" name="search[impirme_pv]"><i class="fa fa-print text-light"></i>Imprime PV</a>
                 
                 </div>
              
@@ -189,12 +189,32 @@
       window.open(url, '_blank')
       }
     
+         function exexuteUrlPv(classe,periode){
+       
+         var urlTemplate = "{{ path('app_imprime_pv', {periode: 'periode', classe: 'classe'}) }}";
+
+// Remplacer les espaces réservés par les valeurs
+        var url = urlTemplate
+        .replace('periode', periode)
+        .replace('classe', classe);
+
+      window.open(url, '_blank')
+      }
+    
        $('.imprimer').on('click', function (e) {
 
+       let classe = $classe.val() ? $classe.val()  : null
+        let periode = $periode.val() ? $periode.val()  : null
+      
+       exexuteUrl(classe,periode)
+     
+      });
+       $('.imprimer_pv').on('click', function (e) {
+alert('')
        let classes = $classe.val() ? $classe.val()  : null
         let periode = $periode.val() ? $periode.val()  : null
       
-       exexuteUrl(classes,periode)
+       exexuteUrlPv(classes,periode)
      
       });
       
