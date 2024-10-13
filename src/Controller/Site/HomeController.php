@@ -22,6 +22,7 @@ use App\Entity\Niveau;
 use App\Entity\NiveauEtudiant;
 use App\Entity\Pays;
 use App\Entity\Preinscription;
+use App\Entity\Semestre;
 use App\Entity\Utilisateur;
 use App\Entity\UtilisateurGroupe;
 use App\Form\CiviliteType;
@@ -1318,6 +1319,188 @@ class HomeController extends AbstractController
 
 
         return $this->render('site/admin/index_etats_etudiant.html.twig', [
+            'datatable' => $table,
+            'form' => $builder->getForm(),
+            'grid_id' => $gridId
+        ]);
+    }
+    #[Route('/inscription/edition/bulletin/etats', name: 'app_inscription_edition_bulletin_etats_index', methods: ['GET', 'POST'], options: ['expose' => true])]
+    public function editionBulletin(Request $request, UserInterface $user, DataTableFactory $dataTableFactory, SessionInterface $session, AnneeScolaireRepository $anneeScolaireRepository): Response
+    {
+        $classe = $request->query->get('classe');
+        $periode = $request->query->get('periode');
+        
+        $array_final = '[' . implode(',', explode(',', $classe)) . ']';
+        $tableaus = json_decode($array_final, true);
+
+      
+        
+
+        $anneeScolaire = $session->get('anneeScolaire');
+
+        if ($anneeScolaire == null) {
+            // dd($anneeScolaireRepository->findOneBy(['actif' => 1]));
+            //unset($annee);
+            $session->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
+        }
+
+        $builder = $this->createFormBuilder(null, [
+            'method' => 'GET',
+            'action' => $this->generateUrl('app_inscription_edition_bulletin_etats_index', compact('classe','periode')),
+        ])->add('classe', EntityType::class, [
+            'class' => Classe::class,
+            'choice_label' => 'libelle',
+            //'multiple' => true,
+            'label' => 'Classe',
+            'placeholder' => '---',
+            'required' => false,
+            'attr' => ['class' => 'form-control-sm has-select2'],
+            'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                return $er->createQueryBuilder('c')
+                    ->where('c.anneeScolaire = :anneeScolaire')
+                    ->setParameter('anneeScolaire', $anneeScolaire)
+                    ->orderBy('c.id', 'ASC');
+            },
+        ])
+      ->add('periode', EntityType::class, [
+            'class' => Semestre::class,
+            'choice_label' => 'libelle',
+            'label' => 'Période',
+            'placeholder' => '---',
+            'required' => false,
+            'attr' => ['class' => 'form-control-sm has-select2'],
+            'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                return $er->createQueryBuilder('c')
+                    ->where('c.anneeScolaire = :anneeScolaire')
+                    ->setParameter('anneeScolaire', $anneeScolaire)
+                    ->orderBy('c.id', 'ASC');
+            },
+        ]);
+
+
+
+        $table = $dataTableFactory->create()
+            ->add('code', TextColumn::class, ['label' => 'Code', 'field' => 'p.code'])
+            ->add('nom', TextColumn::class, ['label' => 'Nom', 'field' => 'etudiant.nom'])
+            ->add('prenom', TextColumn::class, ['label' => 'Prénoms', 'field' => 'etudiant.prenom'])
+            ->add('contact', TextColumn::class, ['label' => 'Contact', 'field' => 'etudiant.contact'])
+            ->add('classe', TextColumn::class, ['label' => 'Classe', 'field' => 'classe.libelle'])
+
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => Inscription::class,
+                'query' => function (QueryBuilder $qb) use ($classe, $periode, $user, $anneeScolaire) {
+                    $qb->select(['p', 'niveau', 'c', 'filiere', 'etudiant', 'classe'])
+                        ->from(Inscription::class, 'p')
+                        ->join('p.classe', 'classe', 'res')
+                        ->join('p.niveau', 'niveau')
+                        ->join('niveau.filiere', 'filiere')
+                        ->join('niveau.responsable', 'res')
+                        ->join('p.etudiant', 'etudiant')
+                        ->leftJoin('p.caissiere', 'c')
+                        ->andWhere('p.classe is not null')
+                        ->orderBy('etudiant.nom', 'ASC');
+
+                    //dd($classe, $niveau, $filiere);
+
+                 
+                    if ($classe) {
+                        $qb->andWhere('classe.id = :classe')
+                            ->setParameter('classe', $classe);
+                    }
+
+
+
+                    if ($user->getPersonne()->getFonction()->getCode() == 'DR') {
+                        $qb->andWhere("res = :user")
+                            ->setParameter('user', $user->getPersonne());
+                    }
+
+                    if ($anneeScolaire) {
+                        $qb->andWhere('niveau.anneeScolaire = :anneeScolaire')
+                            ->setParameter('anneeScolaire', $anneeScolaire);
+                    }
+                }
+
+            ])
+            ->setName('dt_app_inscription_edition_bulletin_etats_' . $classe.'_'.$periode);
+
+        $renders = [
+            'bulletin' =>  new ActionRender(function () {
+                return true;
+            }),
+            'attestation' =>  new ActionRender(function () {
+                return true;
+            }),
+
+        ];
+
+        $gridId = $classe.'_'.$periode;
+        $hasActions = false;
+
+        foreach ($renders as $_ => $cb) {
+            if ($cb->execute()) {
+                $hasActions = true;
+                break;
+            }
+        }
+
+        if ($hasActions) {
+            $table->add('id', TextColumn::class, [
+                'label' => 'Actions',
+                'orderable' => false,
+                'globalSearchable' => false,
+                'className' => 'grid_row_actions',
+                'render' => function ($value, Inscription $context) use ($renders) {
+                    $options = [
+                        'default_class' => 'btn btn-sm btn-clean btn-icon mr-2 ',
+                        'target' => '#modal-lg',
+
+                        'actions' => [
+                            'bulletin' => [
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_edition_bulletin',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'target' =>  '#exampleModalSizeSm2',
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' => 'btn-main btn-stack', 'title' => 'Certification'],
+                                'render' => $renders['bulletin']
+                            ],
+                          /*   'attestation' => [
+                                'url' => $this->generateUrl('default_print_iframe', [
+                                    'r' => 'app_attestation',
+                                    'params' => [
+                                        'id' => $value,
+                                    ]
+                                ]),
+                                'ajax' => true,
+                                'target' =>  '#exampleModalSizeSm2',
+                                'icon' => '%icon% bi bi-printer',
+                                'attrs' => ['class' =>  'btn-primary btn-stack', 'title' => 'Attestation'],
+                                'render' => $renders['attestation']
+                            ], */
+
+
+                        ]
+
+                    ];
+                    return $this->renderView('_includes/default_actions.html.twig', compact('options', 'context'));
+                }
+            ]);
+        }
+
+
+        $table->handleRequest($request);
+
+        if ($table->isCallback()) {
+            return $table->getResponse();
+        }
+
+
+        return $this->render('site/admin/index_etats_bulletin.html.twig', [
             'datatable' => $table,
             'form' => $builder->getForm(),
             'grid_id' => $gridId

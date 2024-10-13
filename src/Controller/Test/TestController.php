@@ -683,30 +683,21 @@ class TestController extends AbstractController
 
         return $rest;
     }
-    #[Route('/fiche/notes/{etat}/{classe}', name: 'app_classe_fiche_note', methods: ['GET', 'POST'])]
-    public function imprimerFicheNote(Request $request, Menu $menu, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
+    #[Route('/edition/bulletin', name: 'app_edition_bulletin', methods: ['GET', 'POST'])]
+    public function imprimerFicheNote(Request $request, Menu $menu, ClasseRepository $classeRepository, SessionInterface $session): Response
     {
         /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
             dd($value->getEtudiant()->getEncartBacs()[0]);
         } */
         //  $array = ;
-        $data = [];
-        $array_final = '[' . implode(',', explode(',', $etat)) . ']';
-        $tableaus = json_decode($array_final, true);
-        $longeur = count($tableaus);
-        // dd($longeur);
-        for ($i = 0; $i < $longeur; $i++) {
-            $data[] = $classeRepository->find($tableaus[$i]);
-        }
-
-        $totalImpaye = 0;
-        $totalPayer = 0;
+       
+      
 
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
-        return $this->renderPdf("test/fiche_note_classe.html.twig", [
-            'total_payer' => $totalPayer,
-            'total_impaye' => $totalImpaye,
-            'data' => $data,
+        return $this->renderPdf("test/bulletin.html.twig", [
+            'total_payer' =>null,
+            'total_impaye' => null,
+            'data' => null,
             //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
         ], [
@@ -727,7 +718,7 @@ class TestController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
-    #[Route('/fiche/notes/{etat}/{classe}', name: 'app_classe_fiche_note', methods: ['GET', 'POST'])]
+    #[Route('/edition/bulletin//{etat}/{classe}', name: 'app_classe_edition_bulletin', methods: ['GET', 'POST'])]
     public function imprimerFicheNotes(Request $request, Menu $menu, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
     {
         /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
@@ -747,7 +738,7 @@ class TestController extends AbstractController
         $totalPayer = 0;
 
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
-        return $this->renderPdf("test/fiche_note_classe.html.twig", [
+        return $this->renderPdf("test/bulletin_multiple.html.twig", [
             'total_payer' => $totalPayer,
             'total_impaye' => $totalImpaye,
             'data' => $data,

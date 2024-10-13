@@ -63,6 +63,12 @@ class DashboardController extends AbstractController
                     'module' => 'gestion',
                     'href' => $this->generateUrl('app_parametre_dashboard_ls', ['module' => 'gestion'])
                 ],
+                [
+                    'label' => 'Evaluations',
+                    'icon' => 'bi bi-list',
+                    'module' => 'general',
+                    'href' => $this->generateUrl('app_parametre_dashboard_ls', ['module' => 'evaluation'])
+                ],
             ];
         }
 
@@ -232,7 +238,7 @@ class DashboardController extends AbstractController
                 [
                     'label' => 'Type de Controles',
                     'id' => 'param_evaluation_type',
-                    'href' => $this->generateUrl('app_controle_type_controle_index')
+                    'href' => $this->generateUrl('app_controle_type_evaluation_index')
                 ],
 
                 [
@@ -241,9 +247,9 @@ class DashboardController extends AbstractController
                     'href' => $this->generateUrl('app_parametre_session_index')
                 ],
                 [
-                    'label' => 'Cours',
+                    'label' => ' ENSEIGNANTS PAR CLASSE',
                     'id' => 'param_evaluation_cour',
-                    'href' => $this->generateUrl('app_controle_cours_index')
+                    'href' => $this->generateUrl('app_controle_cours_parent_new')
                 ],
 
             ]

@@ -428,6 +428,65 @@ class Service
 
         return $response;
     }
+    public function addNewStudentAdmin($blocEcheanciers, $etudiant): bool
+    {
+        $somme = 0;
+        $response = true;
+        foreach ($blocEcheanciers as $key => $value) {
+
+
+            foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                $somme += $echeancier->getMontant();
+            }
+            $verifExistenceInscription = $this->inscriptionRepository->findOneBy(['classe' => $value->getClasse(), 'etudiant' => $etudiant]);
+
+            if ($verifExistenceInscription == null) {
+                if ($somme == (int)$value->getTotal()) {
+
+                    $inscription = new Inscription();
+
+                    $inscription->setCaissiere($this->getUser());
+                    $inscription->setMontant($value->getTotal());
+                    $inscription->setNiveau($this->classeRepository->find($value->getClasse())->getNiveau());
+                    $inscription->setCode($this->numero($this->classeRepository->find($value->getClasse())->getNiveau()->getCode()));
+                    $inscription->setClasse($value->getClasse());
+                    $inscription->setCodeUtilisateur($this->getUser()->getEmail());
+                    $inscription->setEtudiant($etudiant);
+                    $inscription->setEtat('valide');
+                    $inscription->setDateInscription($value->getDateInscription());
+                    $inscription->setTotalPaye('0');
+                    $this->inscriptionRepository->save($inscription, true);
+
+                    $value->setInscription($inscription);
+
+                    foreach ($value->getEcheancierProvisoires() as $key => $echeancier) {
+                        $echeancierReel = new Echeancier();
+                        $echeancierReel->setDateCreation(new DateTime());
+                        $echeancierReel->setEtat('pas_payer');
+                        $echeancierReel->setInscription($inscription);
+                        $echeancierReel->setMontant($echeancier->getMontant());
+                        $echeancierReel->setTotaPayer('0');
+                        $this->echeancierRepository->save($echeancierReel, true);
+                    }
+
+                    //dd($value->getFraisBlocs()->count());
+                    foreach ($value->getFraisBlocs() as $key => $fraisItem) {
+                        $frais = new FraisInscription();
+                        $frais->setMontant($fraisItem->getMontant());
+                        $frais->setInscription($inscription);
+                        $frais->setTypeFrais($fraisItem->getTypeFrais());
+                        $this->em->persist($frais);
+                        $this->em->flush();
+                    }
+                    $response;
+                } else {
+                    $response = false;
+                }
+            }
+        }
+
+        return $response;
+    }
     public function registerEcheancieOnlyInscription($blocEcheanciers, Inscription $inscription): bool
     {
 

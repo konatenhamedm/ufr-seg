@@ -1,0 +1,204 @@
+{% extends 'base-layout.html.twig' %}
+
+{% block title %}Etudiants{% endblock %}
+{% block header %}Inscription{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block body %}
+<div class="card shadow-sm">
+    <div class="card-header card-header-sm">
+        <h3 class="card-title"> {{ title | default('Edition bulletin') }}</h3>
+        <div class="card-toolbar">
+           
+        </div>
+    </div>
+    <div class="card-body">
+    <div class="row">
+        {% form_theme form 'widget/fields-block.html.twig' %}
+            {{ form_start(form,{'attr':{'id':'form'}})}}
+            <fieldset>
+
+             
+              <div class="row small" style="position:relative">
+               {# <div class="col-md-3"></div> #}
+               <div class="col-md-4">{{ form_row(form.classe) }}</div>
+               <div class="col-md-4">{{ form_row(form.periode) }}</div>
+            
+
+               <div class="col-md-4 pt-5 ">
+              
+                 <a href="" {# target="_blank" #} type="button" style="height: 35px;margin-top:0px" class="btn btn-warning btn-sm imprimer" name="search[imprime]"><i class="fa fa-print text-light"></i>Edition bulletin</a>
+                 <a href="" {# target="_blank" #} type="button" style="height: 35px;margin-top:0px" class="btn btn-warning btn-sm imprimer" name="search[imprime]"><i class="fa fa-print text-light"></i>Edition PV</a>
+                
+                </div>
+             
+               {# <div class="col-md-3 pt-5"> <button class="btn btn-main btn-filter btn-sm" type="button">Valider</button></div> #}
+                
+                {# <div class="col-md-1 pt-5">
+                  <button class="btn btn-main btn-filter btn-sm" type="button">Rechercher</button>
+                </div> #}
+                
+                
+          
+            </fieldset>
+            {{ form_end(form, {render_rest: false}) }}
+      </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="grid_app_inscription_edition_bulletin_etats_{{ grid_id }}" class="grid-dt-wrapper">Chargement....</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block java %}
+  <script src="{{ asset('assets/js/datatables.js') }}"></script>
+  <script>
+    
+    $(function () {
+      const grid_prefix_id = "{{ grid_id }}";
+      const $old_grid = $('#grid_app_inscription_edition_bulletin_etats_' + grid_prefix_id);
+      init_select2('.has-select2');
+
+      function loadDataTable($grid, classe,periode ,options = null, contents = '') {
+        $grid.initDataTables(
+          options
+          ? options
+          : {{ datatable_settings(datatable) }}, {
+          searching: true,
+          ajaxUrl: Routing.generate('app_inscription_edition_bulletin_etats_index', {
+            classe: classe,
+            periode: periode,
+            
+          }),
+          language: {
+            url: asset_base_path + "/js/i18n/French.json"
+          },
+          headerCallback: function (tHead, aData, iStart, iEnd, aiDisplay) {},
+          initComplete: function (e, oSettings, json) {},
+        
+          drawCallback: function (row, data) {}
+        });
+      }
+      function loadDataTableBene($grid, classe,periode ,options = null, contents = '') {
+        $grid.initDataTables(
+          options
+          ? options
+          : {{ datatable_settings(datatable) }}, {
+          searching: true,
+          ajaxUrl: Routing.generate('app_inscription_edition_bulletin_etats_index', {
+            classe: classe,
+            periode: periode,
+            
+          }),
+          language: {
+            url: asset_base_path + "/js/i18n/French.json"
+          },
+          headerCallback: function (tHead, aData, iStart, iEnd, aiDisplay) {},
+          initComplete: function (e, oSettings, json) {},
+        
+          drawCallback: function (row, data) {}
+        });
+      }
+
+      const $classe = $('#{{ form.classe.vars.id }}');
+      const $periode = $('#{{ form.periode.vars.id }}');
+      
+      
+
+     
+
+      loadDataTable($old_grid, null,null, {{ datatable_settings(datatable) }});
+    
+     $classe.on('change', function (e) {
+        const $this = $(this);
+        //alert($dateDebut.val());
+         //loadDataTableBene($old_gride, $this.val(),$niveau.val(),$filiere.val(), {{ datatable_settings(datatable) }});
+         load_grid_data(null, $this, $this.val(),$periode.val());
+         //load_content($filiere.val(),'')
+      });
+     $periode.on('change', function (e) {
+        const $this = $(this);
+        //alert($dateDebut.val());
+         //loadDataTableBene($old_gride, $this.val(),$niveau.val(),$filiere.val(), {{ datatable_settings(datatable) }});
+         load_grid_data(null, $this,$classe.val(), $this.val());
+         //load_content($filiere.val(),'')
+      });
+     
+      function load_grid_data($form, $button, classe,periode) {
+        const id = $old_grid.find('table').attr('id');
+        const $table = $old_grid.find(`#${id}`);
+        const table = $table.DataTable();
+        $.ajax({
+          url: '/inscription/etudiant/etats',
+          type: 'GET',
+         // url: $form.attr('action'),
+          //type: $form.attr('method'),
+          data: {
+             classe: classe,
+             periode: periode,
+            
+          },
+          beforeSend: function () {
+            $button.append('<span class="spinner-border spinner-ajax spinner-border-sm" role="status" aria-hidden="true"></span> ');
+            $button.prop('disabled', true);
+          },
+          complete: function () {
+            $button.prop('disabled', false);
+            $button.find('.spinner-ajax').remove();
+          },
+          success: function (html) {
+            table.destroy();
+            if ($table.length) {
+              $table.empty();
+            }
+
+           // let grid_val = `${niveau}_${caissiere}_${dateDebut}_${dateFin}`;
+            let grid_val = `${classe}_${periode}`;
+
+            //alert(grid_val)
+
+            $old_grid.attr('id', `grid_app_inscription_edition_bulletin_etats_${grid_val}`).empty().html(`
+                                    <div class="spinner spinner-track spinner-primary mr-15 text-primary">
+                                        <div class="ml-15">Chargement des données de la grille</div>
+                                    </div>
+                            `);
+            var options = {{ datatable_settings(datatable) }};
+            var name = `dt_app_inscription_edition_bulletin_etats_${grid_val}`;
+
+            options['name'] = name;
+
+            console.log(name);
+
+            loadDataTable($old_grid, classe,periode ,options)
+          }
+        });
+      }
+
+         function exexuteUrl(classe,etat){
+       
+         var urlTemplate = "{{ path('app_classe_edition_bulletin', {etat: 'etat', classe: 'classe'}) }}";
+
+// Remplacer les espaces réservés par les valeurs
+        var url = urlTemplate
+        .replace('etat', etat)
+        .replace('classe', classe);
+
+      window.open(url, '_blank')
+      }
+    
+       $('.imprimer').on('click', function (e) {
+
+       let classes = $classe.val() ? $classe.val()  : null
+        let periode = $periode.val() ? $periode.val()  : null
+      
+       exexuteUrl(classes,periode)
+     
+      });
+      
+
+    });
+  </script>
+{% endblock %}
