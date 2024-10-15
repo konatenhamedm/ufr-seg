@@ -2,9 +2,14 @@
 
 namespace App\Service;
 
+use App\Entity\Controle;
+use App\Entity\Cours;
 use App\Entity\EncartBac;
 use App\Entity\InfoInscription;
 use App\Entity\Inscription;
+use App\Entity\MatiereUe;
+use App\Entity\MoyenneMatiere;
+use App\Entity\Note;
 use App\Entity\Preinscription;
 use App\Repository\AnneeScolaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -108,5 +113,30 @@ class Menu
     {
 
         return $this->em->getRepository(EncartBac::class)->getEncoreByEtudiant($etudiant);
+    }
+    public function getAllUeByClasse($classe,$semestre)
+    {
+
+        return $this->em->getRepository(Controle::class)->getUe($classe,$semestre);
+    }
+    public function getAllMatiereByUeByEtudiant($ue,$etudiant)
+    {
+
+        return $this->em->getRepository(MoyenneMatiere::class)->getMatieres($ue,$etudiant);
+    }
+    public function getRangInfo($controle,$etudiant)
+    {
+
+        return $this->em->getRepository(Note::class)->getRangInfo($controle,$etudiant);
+    }
+    public function getUeMatiere($matiere,$ue)
+    {
+
+        return $this->em->getRepository(MatiereUe::class)->getUeMatiere($matiere,$ue);
+    }
+    public function getCoursMatiereClasse($matiere,$classe)
+    {
+
+        return $this->em->getRepository(Cours::class)->getCoursMatiereClasse($matiere,$classe);
     }
 }

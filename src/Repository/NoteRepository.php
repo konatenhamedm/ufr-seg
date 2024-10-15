@@ -20,7 +20,16 @@ class NoteRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Note::class);
     }
-
+    public function getRangInfo( $controle,$etudiant): ?Note
+    {
+        return $this->createQueryBuilder("n")
+        ->andWhere("n.controle = :controle")
+        ->andWhere("n.etudiant = :etudiant")
+        ->setParameter("controle",$controle)
+        ->setParameter("etudiant",$etudiant)
+        ->getQuery()
+        ->getOneOrNullResult();
+    }
 //    /**
 //     * @return Note[] Returns an array of Note objects
 //     */

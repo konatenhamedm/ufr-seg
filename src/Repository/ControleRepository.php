@@ -37,6 +37,20 @@ class ControleRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    
+    public function getUe($classe,$semestre){
+        return $this->createQueryBuilder("c")
+        ->select("distinct(ue.id),ue.id ueId,ue.libelle,ue.codeUe,ue.coef,c.id ")
+        ->innerJoin("c.ue","ue")
+        ->innerJoin("c.semestre","s")
+        ->andWhere("c.classe = :classe")
+        ->andWhere("s.id = :semestre")
+        ->setParameter("classe",$classe)
+        ->setParameter("semestre",$semestre)
+        ->getQuery()
+        ->getResult();
+    }
+
     //    /**
     //     * @return Controle[] Returns an array of Controle objects
     //     */

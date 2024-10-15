@@ -129,7 +129,8 @@
     <div class="clearfix">
         <div style="width:10%;text-align:left;float:left;" class="">
             {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
-            <img src="https://tse3.mm.bing.net/th?id=OIP.UqXnC0ih7H54cZhWfjrr-QHaHa&pid=Api&P=0&h=180" width="100px" />
+                    <img src="{{ var |replace({'/': "\\"}) }}" width="100px" height="60px"/>
+
             {# <img src="{{ absolute_url(asset(var)) }}" width="100px" /> #}
             {# <div style="text-align:left;border: 1px solid #000;padding:8px;width:70%" class="">
                 CC N° 9904215 D<br>

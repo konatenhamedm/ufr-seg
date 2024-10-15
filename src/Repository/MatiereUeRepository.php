@@ -41,6 +41,18 @@ class MatiereUeRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function getUeMatiere($matiere, $ue): ?MatiereUe
+    {
+        return $this->createQueryBuilder('d')
+            ->innerJoin('d.uniteEnseignement', 'u')
+            ->innerJoin('d.matiere', 'mat')
+            ->andWhere('u.id = :ue')
+            ->andWhere('mat.id = :matiere')
+            ->setParameter('ue', $ue)
+            ->setParameter('matiere', $matiere)
+            ->getQuery()
+            ->getResult()[0];
+    }
     public function getAllMatiereWithouLimit($classe, $annee)
     {
         return $this->createQueryBuilder('d')

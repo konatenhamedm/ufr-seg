@@ -6,6 +6,10 @@ use App\Controller\FileTrait;
 use App\Entity\Test;
 use App\Form\TestType;
 use App\Repository\ClasseRepository;
+use App\Repository\ControleRepository;
+use App\Repository\EtudiantRepository;
+use App\Repository\InscriptionRepository;
+use App\Repository\MoyenneMatiereRepository;
 use App\Repository\TestRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
@@ -683,21 +687,29 @@ class TestController extends AbstractController
 
         return $rest;
     }
-    #[Route('/edition/bulletin', name: 'app_edition_bulletin', methods: ['GET', 'POST'])]
-    public function imprimerFicheNote(Request $request, Menu $menu, ClasseRepository $classeRepository, SessionInterface $session): Response
+    #[Route('/edition/bulletin/{classe}/{etudiant}', name: 'app_edition_bulletin', methods: ['GET', 'POST'])]
+    public function imprimerFicheNote($classe,$etudiant,
+    EtudiantRepository $etudiantRepository,
+    ControleRepository $controleRepository,
+    MoyenneMatiereRepository $moyenneMatiereRepository,
+   ClasseRepository $classeRepository,InscriptionRepository $inscriptionRepository): Response
     {
-        /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
-            dd($value->getEtudiant()->getEncartBacs()[0]);
-        } */
-        //  $array = ;
+        $semestres = $moyenneMatiereRepository->getSemestres($classe, $etudiant);
+        $classeData = $classeRepository->find($classe);
+        //$ues = $controleRepository->getUe($classe,3);
+
+      //dd($moyenneMatiereRepository->getMatieres(29,200));
        
       
 
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
         return $this->renderPdf("test/bulletin.html.twig", [
-            'total_payer' =>null,
-            'total_impaye' => null,
-            'data' => null,
+            'semestres' =>$semestres,
+            'classe' => $classe,
+            'classeData' => $classeData,
+            'etudiant' => $etudiant,
+            'etudiantData' => $etudiantRepository->find($etudiant),
+            'effectif'=>count( $inscriptionRepository->findBy(['classe'=> $classe])),
             //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
         ], [

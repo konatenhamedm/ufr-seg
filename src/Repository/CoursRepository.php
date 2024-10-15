@@ -33,6 +33,18 @@ class CoursRepository extends ServiceEntityRepository
         }
     }
 
+    public function getCoursMatiereClasse($matiere, $classe): ?Cours
+    {
+        return $this->createQueryBuilder('c')
+          
+            ->andWhere('c.classe = :classe')
+            ->andWhere('c.matiere = :matiere')
+            ->setParameter('classe', $classe)
+            ->setParameter('matiere', $matiere)
+            ->getQuery()
+            ->getResult()[0];
+    }
+
     public function getMatiere($classe)
     {
         return $this->createQueryBuilder('c')

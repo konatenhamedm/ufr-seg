@@ -1460,7 +1460,8 @@ class HomeController extends AbstractController
                                 'url' => $this->generateUrl('default_print_iframe', [
                                     'r' => 'app_edition_bulletin',
                                     'params' => [
-                                        'id' => $value,
+                                        'classe' => $context->getClasse()->getId(),
+                                        'etudiant' => $context->getEtudiant()->getId(),
                                     ]
                                 ]),
                                 'ajax' => true,
