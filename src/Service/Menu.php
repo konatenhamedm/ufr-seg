@@ -12,7 +12,9 @@ use App\Entity\MoyenneMatiere;
 use App\Entity\Note;
 use App\Entity\Preinscription;
 use App\Repository\AnneeScolaireRepository;
+use App\Repository\InscriptionRepository;
 use App\Repository\MentionRepository;
+use App\Repository\SemestreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -37,9 +39,12 @@ class Menu
     private $tableau = [];
     private $anneeScolaireRepository;
     private $mentionRepository;
+    private $inscriptionRepo;
+    private $semestreRepo;
+   
 
 
-    public function __construct(EntityManagerInterface $em,MentionRepository $mentionRepository, AnneeScolaireRepository $anneeScolaireRepository, RequestStack $requestStack, RouterInterface $router, Security $security)
+    public function __construct(EntityManagerInterface $em,SemestreRepository $semestreRepo,InscriptionRepository $inscriptionRepo,MentionRepository $mentionRepository, AnneeScolaireRepository $anneeScolaireRepository, RequestStack $requestStack, RouterInterface $router, Security $security)
     {
         $this->em = $em;
         if ($requestStack->getCurrentRequest()) {
@@ -49,6 +54,8 @@ class Menu
             $this->mentionRepository = $mentionRepository;
         }
         $this->anneeScolaireRepository = $anneeScolaireRepository;
+        $this->inscriptionRepo = $inscriptionRepo;
+        $this->semestreRepo = $semestreRepo;
         //$this->session = $session;
     }
     public function getRoute()
@@ -162,5 +169,80 @@ class Menu
         }
     
         return 'N/A';
+    }
+
+    public function getRang($classe,$semestre,$etudiantId,$ueId,$type = true){
+
+        // jerecupere les etudiants
+
+        $tableau = [];
+        $tableauP = [];
+
+
+        $etudiants = $this->inscriptionRepo->findBy(array('classe'=> $classe));
+        $ueClasses =  $this->em->getRepository(Controle::class)->getUe($classe,$semestre);
+
+        foreach ($etudiants as $key => $etudiant) {
+
+            $sommeT=0;
+            $nbreT=0;
+            foreach ($ueClasses as $key => $ueClasse) {
+                $somme=0;
+                $nbre=0;
+                foreach ($this->em->getRepository(MoyenneMatiere::class)->getMatieres($ueClasse['ueId'],$etudiant->getEtudiant()->getId()) as $key => $mue) {
+                    
+                    $somme += $mue->getMoyenne();
+                    $nbre ++;
+                }
+                $sommeT += $somme;
+                $nbreT +=$nbre;
+                $tableauP[$etudiant->getEtudiant()->getId().'-'.$ueClasse['ueId']] = $somme/$nbre;
+            }
+
+            $moyenne = $sommeT/$nbreT;
+           $tableau[$etudiant->getEtudiant()->getId()] = $moyenne;
+        }
+    /* dd('', $tableauP); */
+
+ /*    foreach ($tableau as $key => $value) {
+
+        // dd($key, $tableau[$allNotes->getEtudiant()->getId()] ==);
+        if ($tableau[$etudiantId .'-'.$ueId] == $tableau[$key]) {
+            $rang = $this->Rangeleve($key, $tableau, count($tableau));
+        
+        }
+    } */
+
+    if($type){
+        $rang = $this->Rangeleve($etudiantId.'-'.$ueId, $tableauP, count($tableauP));
+    }else{
+        $rang = $this->Rangeleve($etudiantId, $tableau, count($tableau));
+    }
+    if ($rang == 1) {
+     $stringRang = $rang.' '.'er';
+    } else {
+        $stringRang = $rang.' '.'e';
+
+    }
+
+
+    return $stringRang;
+    }
+
+    function Rangeleve($case, $tab, $Nbr)
+    {
+        $rang = 1;
+
+        foreach ($tab as $key => $value) {
+            if ($value > $tab[$case]) {
+                $rang = $rang + 1;
+            }
+        }
+        /*   for ($i = 1; $i < $Nbr; $i++) {
+            if ($tab[$i] > $tab[$case]) {
+                $rang = $rang + 1;
+            }
+        } */
+        return $rang;
     }
 }
