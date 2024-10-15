@@ -46,7 +46,7 @@ class MatiereUeRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('d')
             ->innerJoin('d.uniteEnseignement', 'u')
             ->innerJoin('d.matiere', 'mat')
-            ->andWhere('u.id = :ue')
+            ->andWhere('d.uniteEnseignement = :ue')
             ->andWhere('mat.id = :matiere')
             ->setParameter('ue', $ue)
             ->setParameter('matiere', $matiere)

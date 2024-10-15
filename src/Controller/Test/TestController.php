@@ -9,6 +9,7 @@ use App\Repository\ClasseRepository;
 use App\Repository\ControleRepository;
 use App\Repository\EtudiantRepository;
 use App\Repository\InscriptionRepository;
+use App\Repository\MentionRepository;
 use App\Repository\MoyenneMatiereRepository;
 use App\Repository\TestRepository;
 use App\Service\ActionRender;
@@ -692,13 +693,20 @@ class TestController extends AbstractController
     EtudiantRepository $etudiantRepository,
     ControleRepository $controleRepository,
     MoyenneMatiereRepository $moyenneMatiereRepository,
-   ClasseRepository $classeRepository,InscriptionRepository $inscriptionRepository): Response
+   ClasseRepository $classeRepository,InscriptionRepository $inscriptionRepository,MentionRepository $mentionRepository,Menu $menu): Response
     {
+
+        //dd($menu->getUeMatiere(47,1));
         $semestres = $moyenneMatiereRepository->getSemestres($classe, $etudiant);
         $classeData = $classeRepository->find($classe);
         //$ues = $controleRepository->getUe($classe,3);
 
       //dd($moyenneMatiereRepository->getMatieres(29,200));
+     $mentions = $mentionRepository->findAll();
+      $results = [];
+      foreach ($mentions as $mention) {
+          $results["{$mention->getMoyenneMin()}-{$mention->getMoyenneMax()}"] = $mention->getLibelle();
+      }
        
       
 
@@ -710,6 +718,7 @@ class TestController extends AbstractController
             'etudiant' => $etudiant,
             'etudiantData' => $etudiantRepository->find($etudiant),
             'effectif'=>count( $inscriptionRepository->findBy(['classe'=> $classe])),
+            'mentions' => json_encode($results),
             //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
         ], [

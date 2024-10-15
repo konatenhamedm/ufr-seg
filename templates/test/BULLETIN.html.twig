@@ -298,13 +298,13 @@
             <br>
             <table class="details">
                 <tr>
-                    <td colspan="6" style="width: 70%;  border-left: 1px solid #000; border-right: 1px solid #000;border-top: 1px solid #000;"
+                    <td colspan="4" style="width: 70%;  border-left: 1px solid #000; border-right: 1px solid #000;border-top: 1px solid #000;"
                         class="contenu"><strong>Nom et Prénoms:</strong> {{etudiantData.nom}}  {{etudiantData.prenom}}</td>
                     <td style="width: 30%; border-right: 1px solid #000;border-top: 1px solid #000;" class="contenu"><strong>Sexe :</strong> {{etudiantData.genre.libelle}}</td>
                 </tr>
                
                 <tr>
-                    <td colspan="6"
+                    <td colspan="4"
                         style="width: 70%;  border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
                         class="contenu"><strong>Né le :</strong> {{etudiantData.dateNaissance | date('d/m/Y')}} à {{etudiantData.lieuNaissance}}</td>
                     <td style="width: 30%; border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
@@ -317,11 +317,11 @@
                     <td style="width: 5%; border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
                         <strong>Moy/20</strong>
                     </td>
-                    <td style=" width: 5%; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
+                   {#  <td style=" width: 5%; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
                         class="contenu"><strong>Crédits</strong></td>
                     <td style="width: 5%; border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
                         <strong>Validé</strong>
-                    </td>
+                    </td> #}
                     <td style="width: 5%;  border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
                         class="contenu"> <strong>Rang</strong></td>
                     <td style=" width: 10%; border-right: 1px solid #000;border-bottom: 1px solid #000;"
@@ -333,7 +333,7 @@
                     </td>
                 </tr>
                 <tr >
-                 <td  colspan="7" style="width: 5%;  border-left: 0px solid #000;  border-right: 0px solid #000;border-bottom: 1px solid #000;"
+                 <td  colspan="5" style="width: 5%;  border-left: 0px solid #000;  border-right: 0px solid #000;border-bottom: 1px solid #000;"
                         class="contenu"> 
 
                         </td>
@@ -356,7 +356,7 @@
                         {% set sommeT = 0 %}
                     {% for ue in menu.getAllUeByClasse(classe,semestre.id) %}
                         <tr style="background-color: #dddddd">
-                                    <td colspan="6"
+                                    <td colspan="4"
                                         style="width: 70%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 0px solid #000;border-bottom: 1px solid #000;">
                                         {{ue.codeUe}} : {{ue.libelle}}</td>
 
@@ -367,6 +367,7 @@
 
                                  {% set somme = 0 %}
                                 {% set nbre = 0 %}
+                                {% set cpte = 0 %}
 
                                 {% for matiere in menu.getAllMatiereByUeByEtudiant(ue.ueId,etudiant) %}
                                 
@@ -376,17 +377,17 @@
                                         {{matiere.matiere.libelle}}</td>
                                     <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
                                         {{matiere.moyenne}}&nbsp;</td>
-                                    <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                                    {# <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
                                         </td>
                                     <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
-                                        {{matiere.moyenne >= menu.getUeMatiere(matiere.matiere.id,ue.ueId).moyenneValidation ? 'Oui':'Non'}}</td>
+                                        {{ matiere.matiere.id}}{{ue.id}}</td> #}
                                     <td
                                         style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
-                                        {{menu.getRangInfo(ue.id,etudiant).rang }}{{menu.getRangInfo(ue.id,etudiant).exposant }}</td>
+                                        {{menu.getRangInfo(ue.id,etudiant).rang }}{{menu.getRangInfo(ue.id,etudiant).exposant }} </td>
                                     <td width="10%"
                                         style="width: 10%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
                                         
-                                        2</td>
+                                        {{ menu.get_mention(matiere.moyenne) }}</td>
                                     <td
                                         style="width: 30%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
                                         {{menu.getCoursMatiereClasse(matiere.matiere.id,classe).employe.nom}} {{menu.getCoursMatiereClasse(matiere.matiere.id,classe).employe.prenom}} </td>
@@ -394,42 +395,59 @@
                                 </tr>
                                 {% set somme = somme + matiere.moyenne %}
                                 {% set nbre = nbre + 1%}
+                                {% if menu.getUeMatiere(matiere.matiere.id,ue.ueId) %}
+                                    {% if matiere.moyenne <= menu.getUeMatiere(matiere.matiere.id,ue.ueId).noteEliminatoire %}
+                                         {% set cpte = cpte + 1 %}
+                                   {% endif %}
+                                {% endif %}
+                              
                             {% endfor %}
                             {% set sommeT = sommeT + somme %}
                             {% set nbreT = nbreT + nbre %}
                                 <tr style="background-color: #dddddd">
                                     <td class="contenu"
                                         style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
-                                        Bilan {{ue.codeUe}}</td>
+                                        Bilan </td>
                                     <td
                                         style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
                                         {{somme/nbre}}</td>
-                                    <td
+                                    {# <td
                                         style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
                                         22</td>
                                     <td
                                         style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
-                                        Non</td>
+                                        Non</td> #}
                                     <td
                                         style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
-                                        2</td>
+                                        {{ menu.get_mention(somme/nbre) }}</td>
                                     <td class="contenu"
                                         style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 0px solid #000;border-bottom: 1px solid #000;" class="contenu">
-                                        Crédits : 12 </td>
+                                        {% if cpte == 0 and (somme / nbre) >= 10   %}
+                                            Validé
+                                        {% else %}
+                                        Invalidé
+                                        {% endif %}
+                                         </td>
                                     <td class="contenu"
                                         style="width: 20%;border-top: 1px solid #000; border-left: 0px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
-                                        Crédits requis : 16 </td>
+                                        Crédits :   {% if cpte == 0 and (somme / nbre) >= 10   %}
+                                            {{ ue.coef }}
+                                        {% else %}
+                                        N/A
+                                        {% endif %}
+                                        
+                                        </td>
 
                                 </tr>
 
                     {% endfor %}
                      {% set moy = sommeT/nbreT %}
                        <tr style="background-color:#c8c8c8;">
-                                    <th class="contenu" colspan="5" style="width: 60%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Moyenne générale {{semestre.numero == 1 ? "1er":"2eme"}} Semestre :
+                                    <th class="contenu" colspan="3" style="width: 60%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Moyenne générale {{semestre.numero == 1 ? "1er":"2eme"}} Semestre :
                                         {{moy}} / 20</th>
 
-                                    <th class="contenu" style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">Rang : er / {{effectif}} </th>
-                                    <th class="contenu" style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">1/3 UE Validées </th>
+                                    <th class="contenu" style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">{# Rang : er / {{effectif}}  #}</th>
+                                    <th class="contenu" style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"></th>
 
                                 </tr>
                 {% endfor %}

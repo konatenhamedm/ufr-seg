@@ -47,6 +47,7 @@ class ControleRepository extends ServiceEntityRepository
         ->andWhere("s.id = :semestre")
         ->setParameter("classe",$classe)
         ->setParameter("semestre",$semestre)
+        ->groupBy("ueId")
         ->getQuery()
         ->getResult();
     }

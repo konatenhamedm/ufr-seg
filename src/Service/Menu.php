@@ -139,4 +139,27 @@ class Menu
 
         return $this->em->getRepository(Cours::class)->getCoursMatiereClasse($matiere,$classe);
     }
+   
+    function get_mention($moyenne) {
+        $mentions = [
+            "0-10" => "Insuffisant",
+            "10-12" => "Passable",
+            "12-14" => "Assez bien",
+            "14-16" => "Bien",
+            "16-18" => "Très bien",
+            "18-20" => "Excellent"
+        ];
+    
+        foreach ($mentions as $range => $mention) {
+            list($min, $max) = explode('-', $range);
+            $min = (float)$min;
+            $max = (float)$max;
+    
+            if ($moyenne >= $min && $moyenne < $max) {
+                return $mention;
+            }
+        }
+    
+        return 'N/A';
+    }
 }
