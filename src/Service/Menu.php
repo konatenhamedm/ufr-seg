@@ -12,6 +12,7 @@ use App\Entity\MoyenneMatiere;
 use App\Entity\Note;
 use App\Entity\Preinscription;
 use App\Repository\AnneeScolaireRepository;
+use App\Repository\MentionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -35,15 +36,17 @@ class Menu
     private $session;
     private $tableau = [];
     private $anneeScolaireRepository;
+    private $mentionRepository;
 
 
-    public function __construct(EntityManagerInterface $em, AnneeScolaireRepository $anneeScolaireRepository, RequestStack $requestStack, RouterInterface $router, Security $security)
+    public function __construct(EntityManagerInterface $em,MentionRepository $mentionRepository, AnneeScolaireRepository $anneeScolaireRepository, RequestStack $requestStack, RouterInterface $router, Security $security)
     {
         $this->em = $em;
         if ($requestStack->getCurrentRequest()) {
             $this->route = $requestStack->getCurrentRequest()->attributes->get('_route');
             $this->container = $router->getRouteCollection()->all();
             $this->security = $security;
+            $this->mentionRepository = $mentionRepository;
         }
         $this->anneeScolaireRepository = $anneeScolaireRepository;
         //$this->session = $session;
@@ -141,16 +144,14 @@ class Menu
     }
    
     function get_mention($moyenne) {
-        $mentions = [
-            "0-10" => "Insuffisant",
-            "10-12" => "Passable",
-            "12-14" => "Assez bien",
-            "14-16" => "Bien",
-            "16-18" => "Très bien",
-            "18-20" => "Excellent"
-        ];
+        $mentions = $this->mentionRepository->findAll();
+
+        $mentionsResultat = [];
+        foreach ($mentions as $mention) {
+            $mentionsResultat["{$mention->getMoyenneMin()}-{$mention->getMoyenneMax()}"] = $mention->getLibelle();
+        }
     
-        foreach ($mentions as $range => $mention) {
+        foreach ($mentionsResultat as $range => $mention) {
             list($min, $max) = explode('-', $range);
             $min = (float)$min;
             $max = (float)$max;
