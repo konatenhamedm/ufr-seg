@@ -308,7 +308,7 @@
                         style="width: 70%;  border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;"
                         class="contenu"><strong>Né le :</strong> {{etudiantData.dateNaissance | date('d/m/Y')}} à {{etudiantData.lieuNaissance}}</td>
                     <td style="width: 30%; border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
-                        <strong>Promotion :   {{classeData.niveau.promotion.libelle}} </strong>
+                        <strong>Promotion :   {{classeData.niveau.promotion ? classeData.niveau.promotion.libelle : ""}} </strong>
                     </td>
                 </tr>
                 <tr style="background-color: #dddddd">
