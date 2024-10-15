@@ -355,7 +355,7 @@
                       {% set nbreT = 0 %}
                         {% set sommeT = 0 %}
                     {% for ue in menu.getAllUeByClasse(classe,semestre.id) %}
-                        <tr style="background-color: #dddddd">
+                                <tr style="background-color: #dddddd">
                                     <td colspan="4"
                                         style="width: 70%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 0px solid #000;border-bottom: 1px solid #000;">
                                         {{ue.codeUe}} : {{ue.libelle}}</td>
@@ -368,12 +368,13 @@
                                  {% set somme = 0 %}
                                 {% set nbre = 0 %}
                                 {% set cpte = 0 %}
+                                {% set cpteMoyenneValidation = 0 %}
 
                                 {% for matiere in menu.getAllMatiereByUeByEtudiant(ue.ueId,etudiant) %}
                                 
                                 <tr>
                                     <td
-                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                                        style="width: 40%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" >
                                         {{matiere.matiere.libelle}}</td>
                                     <td style="width: 5%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
                                         {{matiere.moyenne}}&nbsp;</td>
@@ -395,10 +396,18 @@
                                 </tr>
                                 {% set somme = somme + matiere.moyenne %}
                                 {% set nbre = nbre + 1%}
-                                {% if menu.getUeMatiere(matiere.matiere.id,ue.ueId) %}
-                                    {% if matiere.moyenne <= menu.getUeMatiere(matiere.matiere.id,ue.ueId).noteEliminatoire %}
+                               
+                               {% for item in menu.getAllNote(ue.id,matiere.matiere.id,etudiant) %}
+                                  {% if item.note <= menu.getUeMatiere(matiere.matiere.id,ue.ueId).noteEliminatoire %}
                                          {% set cpte = cpte + 1 %}
-                                   {% endif %}
+                                    {% endif %}
+                               {% endfor %}
+
+
+                                {% if menu.getUeMatiere(matiere.matiere.id,ue.ueId) %}
+                                    {% if matiere.moyenne < menu.getUeMatiere(matiere.matiere.id,ue.ueId).moyenneValidation %}
+                                         {% set cpteMoyenneValidation = cpteMoyenneValidation + 1 %}
+                                    {% endif %}
                                 {% endif %}
                               
                             {% endfor %}
@@ -422,6 +431,8 @@
                                         {{ menu.getRang(classe,semestre.id,etudiant,ue.ueId,true)}}</td>
                                     <td class="contenu"
                                         style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 0px solid #000;border-bottom: 1px solid #000;" class="contenu">
+                                      
+                                        
                                         {% if cpte == 0 and (somme / nbre) >= 10   %}
                                             Validé
                                         {% else %}

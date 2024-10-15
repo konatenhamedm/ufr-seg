@@ -11,6 +11,7 @@ use App\Entity\MatiereUe;
 use App\Entity\MoyenneMatiere;
 use App\Entity\Note;
 use App\Entity\Preinscription;
+use App\Entity\ValeurNote;
 use App\Repository\AnneeScolaireRepository;
 use App\Repository\InscriptionRepository;
 use App\Repository\MentionRepository;
@@ -149,6 +150,14 @@ class Menu
 
         return $this->em->getRepository(Cours::class)->getCoursMatiereClasse($matiere,$classe);
     }
+
+    public function getAllNote($ue,$matiere,$etudiant){
+        $conrole =  $this->em->getRepository(Controle::class)->findOneBy(['ue'=> $ue,'matiere'=> $matiere]);
+        $note =  $this->em->getRepository(Note::class)->findOneBy(['controle'=> $conrole,'etudiant'=> $etudiant]);
+        $valeurNotes =  $this->em->getRepository(ValeurNote::class)->findBy(['noteEntity'=> $note]);
+
+        return $valeurNotes;
+    }
    
     function get_mention($moyenne) {
         $mentions = $this->mentionRepository->findAll();
@@ -244,5 +253,13 @@ class Menu
             }
         } */
         return $rang;
+    }
+
+    public function getNoteTable($controle,$etudiant)
+    {
+        $noteTable = array();
+
+
+        return $this->em->getRepository(Note::class)->getCoursMatiereClasse($matiere,$classe);
     }
 }

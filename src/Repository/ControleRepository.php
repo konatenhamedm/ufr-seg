@@ -31,8 +31,8 @@ class ControleRepository extends ServiceEntityRepository
             ->join('s.anneeScolaire', 'sa')
             ->andWhere('cours.id = :cours')
             ->andWhere('sa = :annee')
-            ->setParameter('cours', 3)
-            ->setParameter('annee', 1)
+            ->setParameter('cours', $cours)
+            ->setParameter('annee', $annee)
             ->getQuery()
             ->getOneOrNullResult();
     }
