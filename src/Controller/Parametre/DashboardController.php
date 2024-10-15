@@ -186,7 +186,7 @@ class DashboardController extends AbstractController
                     'href' => $this->generateUrl('app_parametre_cours_index')
                 ], */
                 [
-                    'label' => "Unité d'enseigenement",
+                    'label' => "Unité d'enseignement",
                     'id' => 'param_ue',
                     'href' => $this->generateUrl('app_parametre_unite_enseignement_index')
                 ],
@@ -226,7 +226,7 @@ class DashboardController extends AbstractController
                     'href' => $this->generateUrl('app_parametre_matiere_ue_index')
                 ],
                 [
-                    'label' => "Unité d'enseigenement",
+                    'label' => "Unité d'enseignement",
                     'id' => 'param_ue',
                     'href' => $this->generateUrl('app_parametre_unite_enseignement_index')
                 ]
