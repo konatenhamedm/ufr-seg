@@ -703,7 +703,7 @@ class TestController extends AbstractController
       
 
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
-        return $this->renderPdf("test/bulletin.html.twig", [
+        return $this->renderPdf("test/BULLETIN.html.twig", [
             'semestres' =>$semestres,
             'classe' => $classe,
             'classeData' => $classeData,
