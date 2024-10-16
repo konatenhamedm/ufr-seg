@@ -207,7 +207,7 @@
             <div style="text-align:center;margin-top:-45px" class="">
                 République de COTE D'IVOIRE <br>
                 <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
-                <b style="font-weight: bolder;">Année scolaire : 2021-2022</b>
+                <b style="font-weight: bolder;">Année scolaire : {{classeData.anneeScolaire.libelle}}</b>
             </div>
 
         </div>
@@ -341,7 +341,7 @@
                 {% for semestre in semestres %}
                     <tr style="background-color: #646464;text-align:center;"  class="contenu">
                     <td colspan="7" class="contenu" style="width: 5%;  border-left: 1px solid #646464;  border-right: 1px solid #646464;">
-                            <h3 style="background-color: #646464;text-align:center;">
+                            <h3 style="background-color: #646464;text-align:center;color:white">
                      {% if semestre.numero == 1 %}
                             PREMIER
                         {% else %}
@@ -359,7 +359,6 @@
                                     <td colspan="4"
                                         style="width: 70%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 0px solid #000;border-bottom: 1px solid #000;">
                                         {{ue.codeUe}} : {{ue.libelle}}</td>
-
                                     <td
                                         style="width: 30%; border-top: 1px solid #000; border-left: 0px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;">
                                         Nombre de crédits : {{ue.coef }}</td>
@@ -441,7 +440,7 @@
                                          </td>
                                     <td class="contenu"
                                         style="width: 20%;border-top: 1px solid #000; border-left: 0px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
-                                        Crédits :   {% if cpte == 0 and (somme / nbre) >= 10   %}
+                                        Crédits :   {% if cpte == 0 and (somme / nbre) >= 10 and  cpteMoyenneValidation == 0  %}
                                             {{ ue.coef }}
                                         {% else %}
                                         N/A

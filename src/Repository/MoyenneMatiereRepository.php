@@ -36,6 +36,20 @@ class MoyenneMatiereRepository extends ServiceEntityRepository
         ->getQuery()
         ->getResult();
     }
+    public function getMatieresPv( $ue,$matiere,$etudiant): ?MoyenneMatiere
+    {
+        return $this->createQueryBuilder("m")
+       /*  ->select("distinct(s.id)") */
+        ->innerJoin("m.matiere","mat")
+        ->andWhere("m.ue = :ue")
+        ->andWhere("mat.id = :matiere")
+        ->andWhere("m.etudiant = :etudiant")
+        ->setParameter("ue",$ue)
+        ->setParameter("matiere",$matiere)
+        ->setParameter("etudiant",$etudiant)
+        ->getQuery()
+        ->getOneOrNullResult();
+    }
 
     public function getSemestres( $classe,$etudiant)
     {

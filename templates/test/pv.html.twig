@@ -70,7 +70,7 @@
              <div style="text-align:center;margin-top:-45px"  class="">
                     République de COTE D'IVOIRE <br>
                 <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
-               {# <b style="font-weight: bolder;">Année scolaire : {{ anneeScolaire }}</b> #}
+               <b style="font-weight: bolder;">Année scolaire : {{ classeData.anneeScolaire.libelle }}</b>
             </div>
           </div>
         </div>
@@ -89,22 +89,21 @@
 
         <br/>
 
-        <div class="clearfix">
-
+        {% for ue in ues %}
+            <div class="clearfix">
+{# {{ dump( )}} #}
             <div style="width:100%;text-align:right;float:right;">
-                {% set ecu_nombre = 4 %}
+                {% set ecu_nombre = menu.getUeMatierepv(ue.id) | length %}
                 {% set ecu_nombre_first = ecu_nombre + 6 %}
                 {% set ecu_nombre_seconde = ecu_nombre + 2 %}
-                
-               
                     <table>
 
                       <tr>
-                            <td colspan="{{ ecu_nombre_first}}">{{"1"}}</td>
+                            <td colspan="{{ ecu_nombre_first}}"><b>{{classeData.libelle}} - {{classeData.niveau.promotion ? classeData.niveau.promotion.libelle : ""}} </b></td> 
                         
                       </tr>
                       <tr>
-                            <td colspan="{{ ecu_nombre_seconde }}">{{"1"}}</td>
+                            <td colspan="{{ ecu_nombre_seconde }}">{{ue.codeUe}}  {{ue.libelle}} {{ue.id}}</td>
                             <td ></td>
                             <td ></td>
                             <td ></td>
@@ -117,9 +116,8 @@
                             <th style="width:4%;">N</th>
                             <th style="">Nom et prénoms</th>
                             {% if ecu_nombre > 0 %}
-                                {% for item in 1..ecu_nombre %}
-                                
-                                  <th style="">ECU1</th>
+                                {% for item in menu.getUeMatierepv(ue.id) %}
+                                  <th style="">{{item.code}}</th>
                                  {% endfor %} 
                             {% endif %}
                            
@@ -133,35 +131,64 @@
                         <tr>
                         {% if ecu_nombre > 0 %}
                                 {% for item in 1..ecu_nombre_first %}    
-                            <td ></td>
-                                 
+                                  <td ></td>
                                  {% endfor %} 
                             {% endif %}
                       </tr>
 
-                      {#   {% for key,etudiant in menu.getListeEtudiantByClasseImprime(item.id) %}
-                       {% set etat_encart = menu.getEncoreByEtudiant(etudiant.etudiant.id) %} #}
+                        {% for key,etudiant in etudiants %}
+                       {# {% set etat_encart = menu.getEncoreByEtudiant(etudiant.etudiant.id) %} #}
+
+                       {% set total = 0 %}
+                       {% set nbre = 0 %}
+                          {% set cpte = 0 %}
                                <tr>
-                            <td style="width:4%;">{{"1"}}</td>
-                            <td style="width:4%;">{{"1"}}</td>
+                            <td style="">{{key+1}}</td>
+                            <td style="">{{etudiant.etudiant.nom }} {{ etudiant.etudiant.prenom }}</td>
                                {% if ecu_nombre > 0 %}
-                                {% for item in 1..ecu_nombre %}
-                            <td style="width:4%;">{{"1"}}</td>
+                                {% for item in menu.getUeMatierepv(ue.id) %}
+                                    {# <td style=";">{{ ue.id }} {{item.matiere.id}} {{etudiant.etudiant.id }}</td> #}
+                                      {% set nbre = nbre + 1 %}
+                                    {% if menu.getAllMatiereByUeByEtudiantPV(ue.id,item.matiere.id,etudiant.etudiant.id) %}
+                                      {% set total = total + menu.getAllMatiereByUeByEtudiantPV(ue.id,item.matiere.id,etudiant.etudiant.id).moyenne %}
+                                      
+                                    {% endif %}
+                                     <td style=";">{{ menu.getAllMatiereByUeByEtudiantPV(ue.id,item.matiere.id,etudiant.etudiant.id) ? menu.getAllMatiereByUeByEtudiantPV(ue.id,item.matiere.id,etudiant.etudiant.id).moyenne :'RAS' }}</td>
+                                
+
+                                        {% for item2 in menu.getAllNote(ue.id,item.matiere.id,etudiant.etudiant.id) %}
+                                          {% if item2.note <= menu.getUeMatiere(item.matiere.id,ue.id).noteEliminatoire %}
+                                                {% set cpte = cpte + 1 %}
+                                            {% endif %}
+                                          {% endfor %}
+                                        
                                  {% endfor %} 
                             {% endif %}
-                            <td style="width:4%;">{{"1"}}</td>
-                            <td style="width:4%;">{{"1"}}</td>
-                            <td style="width:4%;">{{"1"}}</td>
-                            <td style="width:4%;">{{"1"}}</td>
+                            <td style="">{{total}}</td>
+                            <td style="">{{total/nbre }}</td>
+                            <td style="">
+                            {% if cpte == 0 and (total / nbre) >= 10   %}
+                                            {{ ue.coef }}
+                                        {% else %}
+                                        N/A
+                                        {% endif %}
+                            </td>
+                            <td style="">
+                            {% if cpte == 0 and (total / nbre) >= 10   %}
+                                            Validé
+                                        {% else %}
+                                        Invalidé
+                                        {% endif %}
+                            </td>
                           
 
                         </tr>
-                       {#  {% else %}
+                        {% else %}
                         <tr>
-                          <td colspan="11" style="text-align: center;">Il n'y a aucunes données disponibles</td>
+                          <td colspan="{{ ecu_nombre_first }}" style="text-align: center;">Il n'y a aucunes données disponibles</td>
                         </tr>
 
-                        {% endfor %} #}
+                        {% endfor %}
 
                     </table>
 
@@ -171,30 +198,30 @@
             </div>
         </div> <br><br>
      
+        {% endfor %}
+        
 
- <div for="">
+          <div for="">
                    <b>
                     Abidjan le ......../......../20......
                    </b>
                 </div>
-<br><br>
-    <div class="clearfix">
-          <div style="width:25%;text-align:left;float:left;">
-            <b>LE PRESIDENT DU JURY</b>
-          </div>
-          <div style="width:50%;text-align:center;float:center;">
-           
-          </div>
-          <div style="width:25%;text-align:right;float:right;">
-            LE DOYEN
+              <br><br>
+            <div class="clearfix">
+                  <div style="width:25%;text-align:left;float:left;">
+                    <b>LE PRESIDENT DU JURY</b>
+                  </div>
+                  <div style="width:50%;text-align:center;float:center;">
+                  
+                  </div>
+                  <div style="width:25%;text-align:right;float:right;">
+                    LE DOYEN
+                    </div>
+                  </div>
+                </div>
             </div>
-          </div>
-        </div>
-    </div>
 
-
-
-
+        
 
     <br>
     {# <div style="border-top:20px solid grey"></div> #}<br>

@@ -12,6 +12,7 @@ use App\Repository\InscriptionRepository;
 use App\Repository\MentionRepository;
 use App\Repository\MoyenneMatiereRepository;
 use App\Repository\TestRepository;
+use App\Repository\UniteEnseignementRepository;
 use App\Service\ActionRender;
 use App\Service\FormError;
 use App\Service\Menu;
@@ -740,20 +741,20 @@ class TestController extends AbstractController
 
     }
     #[Route('/imprime/pv/{periode}/{classe}', name: 'app_imprime_pv', methods: ['GET', 'POST'])]
-    public function imprimerPv(Request $request, Menu $menu,$periode,$classe, ClasseRepository $classeRepository, SessionInterface $session): Response
+    public function imprimerPv(Request $request,UniteEnseignementRepository $uniteEnseignementRepository, ControleRepository $controleRepository,InscriptionRepository $inscriptionRepository, Menu $menu,$periode,$classe, ClasseRepository $classeRepository, SessionInterface $session): Response
     {
-        /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
-            dd($value->getEtudiant()->getEncartBacs()[0]);
-        } */
-        //  $array = ;
-       
-      
 
+       // dd($menu->getAllMatiereByUeByEtudiantPV(2,61,93)->getMoyenne());
+        $listeUes = $controleRepository->getUe( $classe ,$periode);
+        $listeEtudiants = $inscriptionRepository->findBy(['classe'=> $classe]);
+      
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
         return $this->renderPdf("test/pv.html.twig", [
-            'total_payer' =>null,
-            'total_impaye' => null,
-            'data' => null,
+            'ues' =>$listeUes,
+            'etudiants' => $listeEtudiants,
+            'classeData' => $classeRepository->find($classe),
+            'periode'=>$periode,
+            //'uniteEnseignementRepository'=>$uniteEnseignementRepository,
             //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
         ], [

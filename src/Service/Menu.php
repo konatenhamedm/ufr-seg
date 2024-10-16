@@ -11,6 +11,7 @@ use App\Entity\MatiereUe;
 use App\Entity\MoyenneMatiere;
 use App\Entity\Note;
 use App\Entity\Preinscription;
+use App\Entity\UniteEnseignement;
 use App\Entity\ValeurNote;
 use App\Repository\AnneeScolaireRepository;
 use App\Repository\InscriptionRepository;
@@ -135,6 +136,11 @@ class Menu
 
         return $this->em->getRepository(MoyenneMatiere::class)->getMatieres($ue,$etudiant);
     }
+    public function getAllMatiereByUeByEtudiantPV($ue,$matiere,$etudiant,)
+    {
+
+        return $this->em->getRepository(MoyenneMatiere::class)->getMatieresPv($ue,$matiere,$etudiant);
+    }
     public function getRangInfo($controle,$etudiant)
     {
 
@@ -145,10 +151,20 @@ class Menu
 
         return $this->em->getRepository(MatiereUe::class)->getUeMatiere($matiere,$ue);
     }
+    public function getUeMatierepv($ue)
+    {
+
+        return $this->em->getRepository(MatiereUe::class)->getUeMatierepv($ue);
+    }
     public function getCoursMatiereClasse($matiere,$classe)
     {
 
         return $this->em->getRepository(Cours::class)->getCoursMatiereClasse($matiere,$classe);
+    }
+    public function getSizeUeEcue($ue,$semestre)
+    {
+
+        return $this->em->getRepository(UniteEnseignement::class)->find($ue);
     }
 
     public function getAllNote($ue,$matiere,$etudiant){

@@ -53,6 +53,16 @@ class MatiereUeRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()[0];
     }
+    public function getUeMatierepv( $ue)
+    {
+        return $this->createQueryBuilder('d')
+            ->innerJoin('d.uniteEnseignement', 'u')
+            ->innerJoin('d.matiere', 'mat')
+            ->andWhere('d.uniteEnseignement = :ue')
+            ->setParameter('ue', $ue)
+            ->getQuery()
+            ->getResult();
+    }
     public function getAllMatiereWithouLimit($classe, $annee)
     {
         return $this->createQueryBuilder('d')
@@ -60,6 +70,20 @@ class MatiereUeRepository extends ServiceEntityRepository
             ->innerJoin('u.niveau', 'niveau')
             ->andWhere('niveau.anneeScolaire = :annee')
             ->setParameter('annee', $annee)
+            ->getQuery()
+            ->getResult();
+    }
+    public function getSizeUeEcue($ue,$semestre)
+    {
+        return $this->createQueryBuilder('d')
+        ->select("ue.id,d.code")
+        ->innerJoin("d.uniteEnseignement ","ue")
+        ->innerJoin("ue.semestre ","s")
+            ->andWhere('ue.id = :ue')
+            ->andWhere('s.id = :semestre')
+            ->setParameter('ue', $ue)
+            ->setParameter('semestre', $semestre)
+            /* ->groupBy('ue.id') */
             ->getQuery()
             ->getResult();
     }
