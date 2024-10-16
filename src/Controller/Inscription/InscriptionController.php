@@ -1452,7 +1452,7 @@ class InscriptionController extends AbstractController
             $echeanciers = $form->get('echeanciers')->getData();
             $fraisInscription = $form->get('fraisInscriptions')->getData();
             $classe = $form->get('classe')->getData();
-
+          
             $allInscriptions = $inscriptionRepository->findOneBy(['etudiant' => $inscription->getEtudiant(), 'classe' => $classe]);
 
             $somme = 0;
@@ -1464,21 +1464,39 @@ class InscriptionController extends AbstractController
                 $sommeFraisInscription += (int)$frais->getMontant();
             }
 
+            //dd($somme);
+
             // dd($allInscriptions->getId(), $inscription->getId());
-
-
             if ($form->isValid()) {
                 if ((int)$inscription->getMontant() == $somme) {
 
                     $inscription->setMontant($somme);
                     $inscription->setTotalPaye('0');
 
-                    if (($allInscriptions->getId() == $inscription->getId()) || ($$allInscriptions == null)) {
+                    if($allInscriptions){
+                        if (($allInscriptions->getId() == $inscription->getId()) || ($allInscriptions == null)) {
+                            $entityManager->persist($inscription);
+                            $entityManager->flush();
+    
+                            if ($versements) {
+                                foreach ($versements as $key => $versement) {
+                                    $entityManager->remove($versement);
+                                    $entityManager->flush();
+                                }
+                            }
+    
+                            $statut = 1;
+                            $message       = 'Opération effectuée avec succès';
+                        } else {
+                            $statut = 0;
+                            $message       = 'Opération échouée car cet étudaiant à deja une inscription pour cette classe';
+                        }
+                    }else{
+                        $inscription->setClasse($classe);
                         $entityManager->persist($inscription);
                         $entityManager->flush();
 
                         if ($versements) {
-
                             foreach ($versements as $key => $versement) {
                                 $entityManager->remove($versement);
                                 $entityManager->flush();
@@ -1487,9 +1505,9 @@ class InscriptionController extends AbstractController
 
                         $statut = 1;
                         $message       = 'Opération effectuée avec succès';
-                    } else {
+/* 
                         $statut = 0;
-                        $message       = 'Opération échouée car cet étudaiant à deja une inscription pour cette classe';
+                        $message       = 'Opération échouée car nous ne trouvons aucune inscription correspondant à cette classe pour ce etudiant'; */
                     }
                 } else {
 
@@ -1656,14 +1674,20 @@ class InscriptionController extends AbstractController
             $fraisInscriptionData = $fraisInscriptionRepository->findOneBy(['inscription' => $inscription->getId(), 'typeFrais' => $typeFrais]);
             $infoInscriptiondata = $infoInscriptionRepository->findBy(['inscription' => $inscription->getId(), 'typeFrais' => $typeFrais]);
 
-            foreach ($infoInscriptiondata as $key => $info) {
+            if($infoInscriptiondata){
+
+                foreach ($infoInscriptiondata as $key => $info) {
                 $somme += (int)$info->getMontant();
+                $resteAPayer = abs((int)$inscription->getMontant() - $somme);
+
+            }
+            }else{
+                $resteAPayer = abs((int)$inscription->getMontant());
+        
             }
 
-            $resteAPayer = abs((int)$fraisInscriptionData->getMontant() - $somme);
-
-
-            /* dd($typeFrais); */
+            
+    
             $allData = [
 
                 'echeanciers' => $echeanciers,
@@ -1680,10 +1704,6 @@ class InscriptionController extends AbstractController
 
 
             if ($form->isValid()) {
-
-
-
-
 
                 if ($resteAPayer >= $montant) {
                     $service->paiementInscriptionNew($inscription, $allData);

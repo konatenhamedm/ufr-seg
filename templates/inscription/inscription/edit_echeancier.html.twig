@@ -42,31 +42,119 @@
 {% block java %}
 {# <script src="{{ asset('assets/parcours/frais_admin.js')}}"></script> #}
     <script>
-   
-
-
-
         $(function () {
+            init_select2('select');
+              const $form_content = $(`#exampleModalSizeSm2`).find('.place_frais');
+            const $form_content_second = $(`#exampleModalSizeSm2`).find('.place_frais_deux');
+            const $form_content_second2 = $(`#exampleModalSizeSm2`).find('#echeancier');
+     function load_content_second(id) {
+
+        //alert(id)
+
+                let resIntervention;
+
+                    var somme=0;
+        
+                $.ajax({
+                    url:  '/all/frais/niveau/'+id,
+                    method: 'GET',
+                      async: false,
+                    dataType: 'json',
+                    success: function(json){
+                        
+                        $('.place_frais_deux').html('')
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                            somme = somme + parseInt(value.montant)
+                    //$res.find("#"+$('.numero').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                         $form_content_second.append(`
+                        <div class="row">
+                            <div class="col-md-7 mb-4">
+                            
+                              <select  class="form-control form-control-sm has-select2 numero " id="inscription_admin_fraisInscriptions_${value.id}_typeFrais" name="inscription_admin[fraisInscriptions][${value.id}][typeFrais]" readOnly="true" data-select2-id="select2-data-inscription_admin_fraisInscriptions_${value.id}_typeFrais" >
+                             
+                                 
+                                 <option selected  value="${value.id}" data-select2-id="select2-data-1058-1szc">${value.libelle}</option>
+                       
+                           </select>
+
+                           
+                           
+                            </div>
+                            <div class="col-md-5 mb-4">
+                            <input class="form-control form-control-sm input-money input-mnt autre_fais" type="text" id="inscription_admin_fraisInscriptions_${value.id}_montant" name="etudiant_admin[fraisInscriptions][${value.id}][montant]" required="required" value="${value.montant}">
+                            </div>
+    
+                        </div>
+
+                        `)
+                          }); 
+                       
+                         $('.total').val(somme)
+
+                    }
+                });
+        }
+     function load_content_echeancier(id) {
+                    var sommeEcheancier=0;
+
+                  var url = "{{ path('get_echeancier_classe', {id: 'id'}) }}".replace('id', id);
+    
+                $.ajax({
+                    url:  url,
+                    method: 'GET',
+                      async: false,
+                    dataType: 'json',
+                    success: function(json){
+                        
+                        $('#echeancier').html('')
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                            sommeEcheancier = sommeEcheancier + parseInt(value.montant)
+                            
+                    //$res.find("#"+$('.numero').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                         $form_content_second2.append(`
+                        
+                        <tr class="row-colonne even pointer table-light" data-numberkey="${index + 1}">
+                            <td class="p-2">
+                            
+                                <div style="display:no " class="field-matiere">  
+                                    <input class="form-control form-control-sm form-control numero " type="number" id="inscription_admin_echeanciers_${value.id}_numero" name="etudiant_admin[echeanciers][${value.id}][numero]" required="required" placeholder="Numéro étape" readonly="readonly" value="${index + 1}">
+                                </div>
+                            </td>
+                            <td class="p-2">
+                                <div class="field-matiere">    
+                                        <div class="input-group">
+<input class="form-control form-control-sm" type="date" id="inscription_admin_echeanciers_${value.id}_dateCreation" name="inscription_admin[echeanciers][${value.id}][dateCreation]" required="required" autocomplete="off" value="${value.dateVersement}">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">
+                                                    <span class="far fa-calendar"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                </div>
+                            </td>
+                            <td class="p-2">   
+                                <input class="form-control form-control-sm input-money input-mnt montant_echeancier" type="text" id="inscription_admin_echeanciers_${value.id}_montant" name="inscription_admin[echeanciers][${value.id}][montant]" required="required" value="${value.montant}">
+                            </td>
+                            <td class="p-2 text-center del-col">
+                                <a href="#" class="btn btn-danger btn-xs">
+                                    <span class="bi bi-trash"></span>
+                                </a>
+                            </td>
+                        </tr>
+
+                        `)
+                          }); 
+                       
+                         $('.col-total').text(sommeEcheancier)
+
+                    }
+                });
+        }
 
 
-        $('.autre_frais').on('update-value', function (e, val, element) {
-      
-             total = 0;
-           $('.autre_frais').each(function(e){
-         const $this = $(this);
-             //somme = somme +parseInt($this.val())
-              total = total + parseInt($this.val().replaceAll(' ', ''));
-           })
-
-            $('.total').val(total)
-            
-        })
-
-
-            
-               update_totaux()
-
-    function update_totaux(){
+  function update_totaux(){
         total = 0;
         $('.montant_echeancier').each(function(e){
       const $this = $(this);
@@ -81,129 +169,55 @@
          $('.col-total').text(total)
     }
 
+            load_content_second($('#inscription_admin_classe').val());
+            load_content_echeancier($('#inscription_admin_classe').val());
+            
+                $('#inscription_admin_classe').on('change',function(){
+                    const $this = $(this);
+                    //$('#echeancier').html("")
+                    load_content_echeancier($this.val())
+
+                // load_content($this.val());
+                    load_content_second($this.val());
+
+                    $('.autre_fais').on('update-value', function (e, val, element) {
+                            total = 0;
+                            $('.autre_fais').each(function(e){
+                                    const $this = $(this);
+                                //somme = somme +parseInt($this.val())
+                                total = total + parseInt($this.val().replaceAll(' ', ''));
+                            })
+                            $('.total').val(total)
+                     })
+                  
     $('.montant_echeancier').on('update-value', function (e, val, element) {
         
         update_totaux()
        
     })
+        })
 
-            init_select2('select');
-             $('.no-auto').each(function () {
-                const $this = $(this);
-                const $id = $('#' + $this.attr('id'));
-                init_date_picker($id,  'down', (start, e) => {
-                    //$this.val(start.format('DD/MM/YYYY'));
-                }, null, null, false);
-
-                $id.on('apply.daterangepicker', function (ev, picker) {
-                    $(this).val(picker.startDate.format('DD/MM/YYYY'));
-                });
-            });
-
-
-
-           
-            const $container = $('.row-container');
-
-            var index = $container.find('.row-colonne').length;
-
-            const $addLink = $('.add-ligne');
-
-        
-            $addLink.click(function (e) {
-
-                addLine($container);
-
-   update_totaux()
-      $('.montant_echeancier').on('update-value', function (e, val, element) {
-        
-        update_totaux()
-       
-    })
-
-
-
-                e.preventDefault(); // évite qu'un # apparaisse dans l'URL
-            });
-        // On ajoute un premier champ automatiquement s'il n'en existe pas déjà un (cas d'une nouvelle annonce par exemple).
-       
-            if (index > 0) {
-                $container.children('.row-colonne').each(function () {
+         $('.autre_fais').on('update-value', function (e, val, element) {
+                        
+                        total = 0;
+                    $('.autre_fais').each(function(e){
                     const $this = $(this);
-                    addDeleteLink($this);
-                    $this.find("select").each(function () {
-                        const $this = $(this);
-                        init_select2($this, null, '#modal-lg');
-                    });
-                });
-            }
+                        //somme = somme +parseInt($this.val())
+                        total = total + parseInt($this.val().replaceAll(' ', ''));
+                    })
 
-        // La fonction qui ajoute un formulaire Categorie
-            function addLine($container) {
-            // Dans le contenu de l'attribut « data-prototype », on remplace :
-            // - le texte "__name__label__" qu'il contient par le label du champ
-            // - le texte "__name__" qu'il contient par le numéro du champ
-                var $prototype = $($(".proto-container").attr('data-prototype').replace(/__name__label__/g, 'Ligne ' + (
-                index + 1)).replace(/__name__/g, index));
-                // On ajoute au prototype un lien pour pouvoir supprimer la prestation
-                addDeleteLink($prototype);
-                // On ajoute le prototype modifié à la fin de la balise <div>
-                $container.append($prototype);
-
-                $prototype.find("select").each(function () {
-                const $this = $(this);
-                    init_select2($this, null, '#modal-lg');
-                });
-
-                $prototype.find('.field-matiere').css('display', 'block');
-
+                        $('.total').val(total)
             
-                index++;
+                })
+     
+        });
 
-                  $('.no-auto').each(function () {
-           const $this = $(this);
-           const $id = $('#' + $this.attr('id'));
-           init_date_picker($id,  'down', (start, e) => {
-               //$this.val(start.format('DD/MM/YYYY'));
-           }, null, null, null);
-
-           $id.on('apply.daterangepicker', function (ev, picker) {
-               $(this).val(picker.startDate.format('DD/MM/YYYY'));
-           });
-       });
-
-            }
-
-            function addDeleteLink($prototype) {
-                // Création du lien
-                let $deleteLink = $('<a href="#" class="btn btn-danger btn-xs"><span class="bi bi-trash"></span></a>');
-                // Ajout du lien
-                if ($prototype.find('.del-col').find('.btn-danger').length == 0) {
-                    $prototype.find(".del-col").append($deleteLink);
-                } else {
-                    $deleteLink = $prototype.find('.del-col').find('.btn-danger');
-                }
-                
-                // Ajout du listener sur le clic du lien
-                $deleteLink.click(function (e) {
-                    const $parent = $(this).closest('.row-colonne');
-                    $parent.remove();
-   update_totaux()
-      $('.montant_echeancier').on('update-value', function (e, val, element) {
+      
+    $('.montant_echeancier').on('update-value', function (e, val, element) {
         
         update_totaux()
        
     })
-
-                    if (index > 0) {
-                        index -= 1;
-                    }
-
-                    e.preventDefault(); // évite qu'un # apparaisse dans l'URL
-                });
-            }
-
-        });
        
     </script>
 {% endblock %}

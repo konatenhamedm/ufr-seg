@@ -34,7 +34,7 @@
                                                 <div class="place_frais_deux row-container-frais" >
                                                 {% for item in form.fraisInscriptions %}
                                                             {{ _self.ligne_frais(item|e) }}
-                                                        {% endfor %}
+                                                {% endfor %}
                                                 </div>
                                                 <div class="row">
                                                         
@@ -74,22 +74,28 @@
                                     <table class="table table-bordered table-custom">
                                             <thead class="thead-dark">
                                                 <tr>
-                                                    <th width="50%" class="p-2">Date versement</th>
-                                                    <th width="40%" class="p-2">Montant</th>
+                                                     <th width="15%" class="p-2">Numero</th>
+                                                    <th width="40%" class="p-2">Date versement</th>
+                                                    <th width="35%" class="p-2">Montant</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
-                                            <tbody  class="row-container">
+                                            <tbody  class="row-container" id="echeancier">
                                                 {% for item in form.echeanciers %}
                                                     {{ _self.ligne_echeancier(item|e) }}
                                                 {% endfor %}
                                             </tbody>
                                             <tfoot>
+                                            <tr>
+                                                 <th class="text-end p-2 col " colspan="2"  style="color:red;font-weight:bolder;font-size: 18px;"  >Montant total</th>
+                                                <th class="total text-center p-2 fw-bolder col-total"  style="color:red;font-weight:bolder;font-size: 18px;"  data-class="col-total">0</td>
+                                                <th class="total text-center p-2 fw-bolder " colspan="3"></td>
+                                            </tr>{# 
                                                     <tr>
                                                         <th class="text-end p-2 col "  style="color:red;font-weight:bolder;font-size: 18px;"  >Montant total</th>
                                                         <th class="total text-end p-2 fw-bolder col-total" style="color:red;font-weight:bolder;font-size: 18px;"  data-class="col-total">0</td>
                                                         <th class="total text-center p-2 fw-bolder " ></td>
-                                                    </tr>
+                                                    </tr> #}
                                                 
                                                 </tfoot>
                                     </table>
