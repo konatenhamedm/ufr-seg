@@ -119,7 +119,7 @@
      const $niveau = $('#{{ form.niveau.vars.id }}');
 
     function exexuteUrl(niveau){
-         var url = "{{ path('app_comptabilite_liste_etudiant_examen', {niveau: 'niveau'}) }}".replace('niveau', niveau);
+             var url = "{{ path('app_comptabilite_liste_etudiant_examen', {niveau: 'niveau',etat:'etat'}) }}".replace('niveau', niveau).replace('etat', 'deliberer');
 
       window.open(url, '_blank')
       }

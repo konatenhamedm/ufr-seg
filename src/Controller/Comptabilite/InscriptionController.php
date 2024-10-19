@@ -656,8 +656,8 @@ class InscriptionController extends AbstractController
     /**
      * @throws MpdfException
      */
-    #[Route('/imprime/liste/inscrits/examen/{niveau}', name: 'app_comptabilite_liste_etudiant_examen', methods: ['GET', 'POST'])]
-    public function imprimerListeEtudiantExamen(Request $request, $niveau, NiveauRepository $niveauRepository, SessionInterface $session, PreinscriptionRepository $preinscriptionRepository): Response
+    #[Route('/imprime/liste/inscrits/examen/{niveau}/{etat}', name: 'app_comptabilite_liste_etudiant_examen', methods: ['GET', 'POST'])]
+    public function imprimerListeEtudiantExamen(Request $request, $niveau,$etat, NiveauRepository $niveauRepository, SessionInterface $session, PreinscriptionRepository $preinscriptionRepository): Response
     {
 
         $anneeScolaire = $session->get("anneeScolaire");
@@ -666,7 +666,7 @@ class InscriptionController extends AbstractController
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
         return $this->renderPdf("direction/deliberation/liste_etudiant_examen.html.twig", [
             'total_payer' => "",
-            'data' => $preinscriptionRepository->getListeEtudiantExamen($niveau, $anneeScolaire),
+            'data' => $preinscriptionRepository->getListeEtudiantExamen($niveau, $anneeScolaire,$etat),
             'niveaux' => $niveau == "null" ? $preinscriptionRepository->getListeEtudiantExamenDistinctNiveau($anneeScolaire) : $niveauRepository->find($niveau)->getCode(),
             'total_impaye' => "",
             'anneeScolaire' => $anneeScolaire->getLibelle()

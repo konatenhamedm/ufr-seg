@@ -49,7 +49,7 @@ class PreinscriptionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getListeEtudiantExamen($niveau, $anneeScolaire)
+    public function getListeEtudiantExamen($niveau, $anneeScolaire,$etat)
     {
         //dd($niveau);
         if ($niveau != "null") {
@@ -61,7 +61,7 @@ class PreinscriptionRepository extends ServiceEntityRepository
                 ->andWhere('p.niveau = :niveau')
                 ->andWhere('niveau.anneeScolaire = :anneeScolaire')
                 ->setParameter('niveau', $niveau)
-                ->setParameter('etatDeliberation', 'pas_deliberer')
+                ->setParameter('etatDeliberation', $etat)
                 ->setParameter('etat', 'valide')
                 ->setParameter('anneeScolaire', $anneeScolaire)
                 ->orderBy('u.nom', 'ASC')
@@ -82,7 +82,7 @@ class PreinscriptionRepository extends ServiceEntityRepository
                 ->andWhere('p.etatDeliberation = :etatDeliberation')
                 ->andWhere('p.etat = :etat')
                 ->andWhere('niveau.anneeScolaire = :anneeScolaire')
-                ->setParameter('etatDeliberation', 'pas_deliberer')
+                ->setParameter('etatDeliberation', $etat)
                 ->setParameter('etat', 'valide')
                 ->setParameter('anneeScolaire', $anneeScolaire)
                 ->orderBy('u.nom', 'ASC')
