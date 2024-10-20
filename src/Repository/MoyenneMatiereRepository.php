@@ -81,6 +81,35 @@ SQL;
 
         return $stmt->fetchAllAssociative();
     }
+    public function getSemestresByClasse( $classe)
+    {
+        $em = $this->getEntityManager();
+        $connection = $em->getConnection();
+        $moyenneMatiere = $this->getTableName(MoyenneMatiere::class, $em);
+        $controle = $this->getTableName(Controle::class, $em);
+        $semestre = $this->getTableName(Semestre::class, $em);
+
+        //dd($dateDebut,$dateFin);
+
+       
+            $sql = <<<SQL
+SELECT  DISTINCT(s.id) as id,s.numero,s.libelle
+FROM {$moyenneMatiere} m
+JOIN {$controle} c ON c.ue_id = m.ue_id
+JOIN {$semestre} s ON s.id = c.semestre_id
+WHERE   c.classe_id = :classe
+ORDER BY  s.numero
+SQL;
+        
+
+
+        $params['classe'] = $classe;
+
+
+        $stmt = $connection->executeQuery($sql, $params);
+
+        return $stmt->fetchAllAssociative();
+    }
 
 //    /**
 //     * @return MoyenneMatiere[] Returns an array of MoyenneMatiere objects

@@ -167,6 +167,42 @@ class Menu
         return $this->em->getRepository(UniteEnseignement::class)->find($ue);
     }
 
+    public function getMatieresBySemestre($classe,$semestre)
+    {
+        return $this->em->getRepository(Controle::class)->findBy(['classe'=> $classe,'semestre'=> $semestre]);
+
+    }
+    public function getCours($classe,$matiere)
+    {
+        return $this->em->getRepository(Cours::class)->findOneBy(['classe'=> $classe,'matiere'=> $matiere]);
+
+    }
+
+    public function getNoteTotalByControle($controle,$classe){
+        $inscription = $this->em->getRepository(Inscription::class)->findOneBy(['classe'=> $classe]);
+        $note = $this->em->getRepository(Note::class)->findOneBy(['controle'=> $controle,'etudiant'=> $inscription->getEtudiant()]);
+      $cpte = count($this->em->getRepository(ValeurNote::class)->findBy(['noteEntity'=> $note]));
+
+        return $cpte;
+
+    }
+    public function getNotesByControleClasseEtudiant($controle,$etudiant){
+      
+        $note = $this->em->getRepository(Note::class)->findOneBy(['controle'=> $controle,'etudiant'=> $etudiant]);
+      $valeursNotes = $this->em->getRepository(ValeurNote::class)->findBy(['noteEntity'=> $note]);
+
+        return $valeursNotes;
+
+    }
+    public function getMoyenneMatiereEtudiant($controle,$etudiant){
+      
+        $note = $this->em->getRepository(Note::class)->findOneBy(['controle'=> $controle,'etudiant'=> $etudiant]);
+    
+
+        return $note;
+
+    }
+
     public function getAllNote($ue,$matiere,$etudiant){
         $conrole =  $this->em->getRepository(Controle::class)->findOneBy(['ue'=> $ue,'matiere'=> $matiere]);
         $note =  $this->em->getRepository(Note::class)->findOneBy(['controle'=> $conrole,'etudiant'=> $etudiant]);

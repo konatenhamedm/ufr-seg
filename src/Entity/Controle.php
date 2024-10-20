@@ -16,7 +16,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ControleRepository::class)]
 //#[UniqueEntity(fields: 'cour', message: 'Impossible car ce cour existe deja')]
-#[UniqueConstraint(name: "classe_matiere", fields: ['classe', 'matiere', 'cour'])]
+#[UniqueConstraint(name: "classe_matiere", fields: ['classe', 'matiere', 'cour', 'ue'])]
 #[UniqueEntity(fields: ['classe', 'matiere', 'cour'], message: 'Impossible car ce cour existe deja')]
 #[Table(name: 'evaluation_controle')]
 class Controle

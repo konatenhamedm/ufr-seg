@@ -125,6 +125,8 @@
 </head>
 
 <body style="font-size:12px;">
+  {% for item in data %} 
+<div style="page-break-after: always;">
     <div class="clearfix">
         <div style="width:10%;text-align:left;float:left;" class="">
             {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
@@ -152,146 +154,121 @@
             <div style="text-align:center;margin-top:-45px" class="">
                 République de COTE D'IVOIRE <br>
                 <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
-                <b style="font-weight: bolder;">Année scolaire : 2021-2022</b>
+                <b style="font-weight: bolder;">Année scolaire : {{item.anneeScolaire.libelle}}</b>
             </div>
 
         </div>
     </div>
 
+   <form action="/action_page.php">
+            <fieldset>
+                <legend></legend>
+                <h2 class="text-center" style="text-align: center;">
+                FICHE DE NOTE CLASSE : {{ item.libelle }}
+                </h2>
+            </fieldset>
+        </form>
+
+
+<br>
 
     <br>
-<form action="/action_page.php">
-          <fieldset>
-            <legend></legend>
-            <h2 class="text-center" style="text-align: center;">
-              FICHE DE NOTE CLASSE : {{ "dd"}}
-            </h2>
-          </fieldset>
-        </form>
-    <form action="/action_page.php">
-           
-        <table style=" ">
+    {% for semestre in semestres %}
+     {% for key,controle in menu.getMatieresBySemestre(item.id,semestre.id) %}
+     {% if key > 0 %}
+          {#    <div style="page-break-after: always;">
+     </div> #}
+     {% endif %}
+ 
+     
+<br>
+ 
+     <form action="/action_page.php">
+            
+            <table style=" ">
+                
+                
+                <tr style=" border: 0px !important;">
+                    <th style="width:50%; border: 0px !important;">Matiere : {{ controle.matiere.libelle}}</th>
+                    <th style="width:50% ; border: 0px !important;">{# Coefficient :................. #}</th>
+                </tr>
+                <tr style=" border: 0px !important;">
+                    <th style="width:50% border: 0px !important;">Enseignant : {{ menu.getCours(item.id,controle.matiere).employe.getNomComplet}}</th>
+                    <th style="width:50% border: 0px !important;">Trimestre : {{ semestre.libelle}}</th>
+                </tr>
             
             
-            <tr style=" border: 0px !important;">
-                <th style="width:50%; border: 0px !important;">Matiere :.................</th>
-                <th style="width:50% ; border: 0px !important;">Coefficient :.................</th>
-            </tr>
-            <tr style=" border: 0px !important;">
-                <th style="width:50% border: 0px !important;">Enseignant :.................</th>
-                <th style="width:50% border: 0px !important;">Trimestre :.................</th>
-            </tr>
-        
-        
-        
-        </table>
+            
+            </table>
     </form>
 
-    <br />
+            <br />
 
-    <div class="clearfix">
-       
-        <div style="width:100%;text-align:right;float:right;">
+        <div class="clearfix">
+        
+            <div style="width:100%;text-align:right;float:right;">
 
-            {# <div
-                style="margin-top:-25px;text-align:center;bosrder: 1px solid #000;padding:8px;font-size:15px;font-weight:bold"
-                class=""> #}
-                {# <b>DOIT</b><br><br> #}
-                <table>
-                   
-                    <tr style="background-color: #dddddd">
-                        <th style="width:4%;">N</th>
-                        <th style="width:10%;">Matricule</th>
-                        <th style="width:20%;">Nom et Prénoms</th>
-                        <th style="width:10%;">Note 1</th>
-                        <th style="width:10%;">Note 2</th>
-                        <th style="width:10%;">Note 3</th>
-                        <th style="width:10%;">Note 4</th>
-                        <th style="width:10%;">Note 5</th>
-                        <th style="width:10%;">Note 6</th>
-                        <th style="width:10%;">Moy</th>
-                        <th style="width:6%;">Rang</th>
-                      
-                    </tr>
-
-                    <tr>
-                    <td style="width:2%;">N</td>
-                    <td style="width:10%;">Matricule</td>
-                    <td style="width:20%;">Nom et Prénoms</td>
-                    <td style="width:10%;">Note 1</td>
-                    <td style="width:10%;">Note 2</td>
-                    <td style="width:10%;">Note 3</td>
-                    <td style="width:10%;">Note 4</td>
-                    <td style="width:10%;">Note 5</td>
-                    <td style="width:10%;">Note 6</td>
-                    <td style="width:4%;">Moy</td>
-                    <td style="width:4%;">Rang</td>
-
-                    </tr>
+                {# <div
+                    style="margin-top:-25px;text-align:center;bosrder: 1px solid #000;padding:8px;font-size:15px;font-weight:bold"
+                    class=""> #}
+                    {# <b>DOIT</b><br><br> #}
+                    <table>
                     
+                        <tr style="background-color: #dddddd">
+                            <th style="width:4%;">N</th>
+                            <th style="width:10%;">Matricule</th>
+                            <th style="width:20%;">Nom et Prénoms</th>
 
-                    <tr>
-                        <td style="width:2%;">N</td>
-                        <td style="width:10%;">Matricule</td>
-                        <td style="width:20%;">Nom et Prénoms</td>
-                        <td style="width:10%;">Note 1</td>
-                        <td style="width:10%;">Note 2</td>
-                        <td style="width:10%;">Note 3</td>
-                        <td style="width:10%;">Note 4</td>
-                        <td style="width:10%;">Note 5</td>
-                        <td style="width:10%;">Note 6</td>
-                        <td style="width:4%;">Moy</td>
-                        <td style="width:4%;">Rang</td>
-                    
-                    </tr>
+                            {% for col in 1..menu.getNoteTotalByControle(controle,item.id) %}
+                                
+                            <th style="width:10%;">Note {{col}} </th>
+                            {% endfor %}
+                            {# <th style="width:10%;">Note 2</th>
+                            <th style="width:10%;">Note 3</th>
+                            <th style="width:10%;">Note 4</th>
+                            <th style="width:10%;">Note 5</th>
+                            <th style="width:10%;">Note 6</th> #}
+                            <th style="width:5%;">Moy</th>
+                            <th style="width:6%;">Rang</th>
+                        
+                                                </tr>
+                        {% for key,etudiant in etudiants %}
+                        {% set etat_encart = menu.getEncoreByEtudiant(etudiant.etudiant.id) %}
+                                <tr>
+                                                <td style="width:2%;">{{key+1}}</td>
+                                               <td style="">{{etat_encart > 0 ? etudiant.etudiant.encartBacs[0].matricule : 'RAS'}}</td>
+                                                <td style="width:20%;">{{etudiant.etudiant.getNomComplet}}</td>
 
+                                                {% for note in menu.getNotesByControleClasseEtudiant(controle,etudiant.etudiant) %}
+                                                    
+                                                <td style="width:10%;" style="text-align:center">{{note.note}}</td>
+                                                {% endfor %}
+                                                <td style="width:4%;" style="text-align:center">{{menu.getMoyenneMatiereEtudiant(controle,etudiant.etudiant).moyenneMatiere}}</td>
+                                                <td style="width:4%;" style="text-align:center">{{menu.getMoyenneMatiereEtudiant(controle,etudiant.etudiant).rang}} {{menu.getMoyenneMatiereEtudiant(controle,etudiant.etudiant).exposant}}</td>
 
-                    <tr>
-                        <td style="width:2%;">N</td>
-                        <td style="width:10%;">Matricule</td>
-                        <td style="width:20%;">Nom et Prénoms</td>
-                        <td style="width:10%;">Note 1</td>
-                        <td style="width:10%;">Note 2</td>
-                        <td style="width:10%;">Note 3</td>
-                        <td style="width:10%;">Note 4</td>
-                        <td style="width:10%;">Note 5</td>
-                        <td style="width:10%;">Note 6</td>
-                        <td style="width:4%;">Moy</td>
-                        <td style="width:4%;">Rang</td>
-                    
-                    </tr>
+                                                </tr>
+                        {% endfor %}
+                                        
+                        
 
+                        
 
-
-                    <tr>
-                        <td style="width:2%;">N</td>
-                        <td style="width:10%;">Matricule</td>
-                        <td style="width:20%;">Nom et Prénoms</td>
-                        <td style="width:10%;">Note 1</td>
-                        <td style="width:10%;">Note 2</td>
-                        <td style="width:10%;">Note 3</td>
-                        <td style="width:10%;">Note 4</td>
-                        <td style="width:10%;">Note 5</td>
-                        <td style="width:10%;">Note 6</td>
-                        <td style="width:4%;">Moy</td>
-                        <td style="width:4%;">Rang</td>
-                    
-                    </tr>
-
-                </table>
-                {#
-            </div> #}
+                    </table>
+                    {#
+                </div> #}
+            </div>
         </div>
-    </div>
-
-
-    </div>
-
-
+  
+        <br>
+  {% endfor %}
     
-    <br>
-    {# <div style="border-top:20px solid grey"></div> #}<br>
+{% endfor %}
+
     </div>
+{% endfor %}
+
+    {# <div style="border-top:20px solid grey"></div> #}<br>
+ 
 
         <htmlpagefooter name="pageFooter">
        {#  <table style="width:100%">

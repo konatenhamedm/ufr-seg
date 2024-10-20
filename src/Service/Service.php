@@ -5,6 +5,7 @@ namespace App\Service;
 
 use App\Entity\AnneeScolaire;
 use App\Entity\ArticleMagasin;
+use App\Entity\CoefValeurNote;
 use App\Entity\Decision;
 use App\Entity\DecisionExamen;
 use App\Entity\Document;
@@ -22,6 +23,7 @@ use App\Entity\Sortie;
 use App\Repository\AnneeScolaireRepository;
 use App\Repository\ArticleMagasinRepository;
 use App\Repository\ClasseRepository;
+use App\Repository\CoefValeurNoteRepository;
 use App\Repository\CoursRepository;
 use App\Repository\DecisionExamenRepository;
 use App\Repository\DocumentRepository;
@@ -74,6 +76,7 @@ class Service
     private $promotionRepository;
     private $typeControleRepository;
     private $niveauRepository;
+    private $coefValeurNoteRepository;
 
 
     public function __construct(
@@ -99,7 +102,8 @@ class Service
         NoteExamenRepository $noteExamenRepository,
         PromotionRepository $promotionRepository,
         TypeControleRepository $typeControleRepository,
-        NiveauRepository $niveauRepository
+        NiveauRepository $niveauRepository,
+        CoefValeurNoteRepository $coefValeurNoteRepository
     ) {
         $this->em = $em;
         $this->security = $security;
@@ -125,6 +129,7 @@ class Service
         $this->niveauRepository = $promotionRepository;
         $this->typeControleRepository = $typeControleRepository;
         $this->niveauRepository = $niveauRepository;
+        $this->coefValeurNoteRepository = $coefValeurNoteRepository;
 
         //$this->verifieIfFile2(15,2);
     }
@@ -871,6 +876,21 @@ class Service
                         $nbreTour += 2;
                     }
                 }
+                $verifCoefValeurNote = $this->coefValeurNoteRepository->findOneBy(['valeurNote' => $value]);
+
+                if($verifCoefValeurNote){
+                    $verifCoefValeurNote->setCoef($coef);
+
+                    $this->em->persist($verifCoefValeurNote);
+                    $this->em->flush();
+                }else{
+                    $coefValeurNote = new CoefValeurNote();
+                    $coefValeurNote->setCoef($coef);
+                    $coefValeurNote->setValeurNote($value);
+                    $this->em->persist($coefValeurNote);
+                    $this->em->flush();
+                }
+
             }
 
 

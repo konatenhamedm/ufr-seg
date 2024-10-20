@@ -126,6 +126,9 @@
 </head>
 
 <body style="font-size:12px;">
+  {% for item in data %} 
+<div style="page-break-after: always;">
+
     <div class="clearfix">
         <div style="width:10%;text-align:left;float:left;" class="">
             {% set var = "uploads/" ~ 'media_etudiant' ~"/"~ 'lg.jpeg' %}
@@ -154,7 +157,7 @@
             <div style="text-align:center;margin-top:-45px" class="">
                 République de COTE D'IVOIRE <br>
                 <span style="text-decoration: underline;">Union - Discipline - Travail</span> <br>
-                <b style="font-weight: bolder;">Année scolaire : 2021-2022</b>
+                <b style="font-weight: bolder;">Année scolaire : {{item.anneeScolaire.libelle}}</b>
             </div>
 
         </div>
@@ -162,11 +165,11 @@
 
 
     <br>
- <form action="/action_page.php">
+        <form action="/action_page.php">
           <fieldset>
             <legend></legend>
             <h2 class="text-center" style="text-align: center;">
-              LISTE DE PRESENCE CLASSE : {{ "dd"}}
+              LISTE DE PRESENCE CLASSE : {{ item.libelle }}
             </h2>
           </fieldset>
         </form>
@@ -180,7 +183,7 @@
            
                 <div for="">
                    <b>
-                    Date : ......../......../20......
+                  {#   Date : ......../......../20...... #}
                    </b>
                 </div><br>
             
@@ -214,9 +217,10 @@
 
                     </tr>
 
-                    <tr>
-                        <td style="width:4%;">1</td>
-                        <td style="">ADJI Marie Anne Lyse</td>
+                    {% for key,etudiant in etudiants %}
+                          <tr>
+                        <td style="width:4%;">{{key+1}}</td>
+                        <td style="">{{etudiant.etudiant.getNomComplet}}</td>
                         <td style=""></td>
                     
                         <td style=""></td>
@@ -233,69 +237,13 @@
                         <td style="width:6%;"></td>
                     
                     </tr>
+                    {% endfor %}
+
+                  
 
 
 
-                    <tr>
-                        <td style="width:4%;">1</td>
-                        <td style="">ADJI Marie Anne Lyse</td>
-                        <td style=""></td>
-                    
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style=""></td>
-                    
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style=""></td>
-                    
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style="width:6%;"></td>
-                    
-                    </tr>
-
-
-                    <tr>
-                        <td style="width:4%;">1</td>
-                        <td style="">ADJI Marie Anne Lyse</td>
-                        <td style=""></td>
-                    
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style=""></td>
-                    
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style=""></td>
-                    
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style="width:6%;"></td>
-                    
-                    </tr>
-
-                    <tr>
-                        <td style="width:4%;">1</td>
-                        <td style="">ADJI Marie Anne Lyse</td>
-                        <td style=""></td>
-                    
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style=""></td>
-                    
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style=""></td>
-                    
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style=""></td>
-                        <td style="width:6%;"></td>
-                    
-                    </tr>
+                   
 
 
                 </table>
@@ -309,7 +257,7 @@
 
     </div>
 
-
+{% endfor %}
 
     <br>
     {# <div style="border-top:20px solid grey"></div> #}<br>

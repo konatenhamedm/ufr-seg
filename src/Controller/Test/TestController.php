@@ -571,12 +571,18 @@ class TestController extends AbstractController
 
 
     #[Route('/test2/{etat}/{classe}', name: 'app_classe_detaille', methods: ['GET', 'POST'])]
-    public function imprimerAll2(Request $request, Menu $menu, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
+    public function imprimerAll2(Request $request,ControleRepository $controleRepository,InscriptionRepository $inscriptionRepository, Menu $menu,MoyenneMatiereRepository $moyenneMatiereRepository,MentionRepository $mentionRepository, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
     {
+
+       //dd($menu->getNoteTotalByControle(2,$classe));
         /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
             dd($value->getEtudiant()->getEncartBacs()[0]);
         } */
         //  $array = ;
+
+        $etudiants = $inscriptionRepository->findBy(['classe'=> $classe]);
+        $matieres = $inscriptionRepository->findBy(['classe'=> $classe]);
+        $classeData = $classeRepository->find($classe);
         $data = [];
         $array_final = '[' . implode(',', explode(',', $classe)) . ']';
         $tableaus = json_decode($array_final, true);
@@ -603,7 +609,7 @@ class TestController extends AbstractController
             ], [
                 'orientation' => 'P',
                 'protected' => true,
-                'file_name' => "point_versments",
+                'file_name' => "fiche_classe",
 
                 'format' => 'A4',
 
@@ -618,15 +624,15 @@ class TestController extends AbstractController
             //return $this->renderForm("stock/sortie/imprime.html.twig");
         } elseif ($etat == 'ETAT_PRESENCE') {
             $rest = $this->renderPdf("test/liste_presence.html.twig", [
-                'total_payer' => $totalPayer,
-                'total_impaye' => $totalImpaye,
+               'classe' => $classeData,
+                'etudiants' => $etudiants,
                 'data' => $data,
                 //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
                 //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
             ], [
                 'orientation' => 'P',
                 'protected' => true,
-                'file_name' => "point_versments",
+                'file_name' => "fiche_presence",
 
                 'format' => 'A4',
 
@@ -640,16 +646,31 @@ class TestController extends AbstractController
             ], true);
             //return $this->renderForm("stock/sortie/imprime.html.twig");
         } elseif ($etat == 'ETAT_NOTE') {
+
+             // dd($menu->getRang($classe,1,124,1));
+            $semestres = $moyenneMatiereRepository->getSemestresByClasse($classe);
+           
+            //$ues = $controleRepository->getUe($classe,3);
+
+            //dd($moyenneMatiereRepository->getMatieres(29,200));
+            $mentions = $mentionRepository->findAll();
+            $results = [];
+            foreach ($mentions as $mention) {
+                $results["{$mention->getMoyenneMin()}-{$mention->getMoyenneMax()}"] = $mention->getLibelle();
+            }
+       
+
             $rest = $this->renderPdf("test/fiche_de_note.html.twig", [
-                'total_payer' => $totalPayer,
-                'total_impaye' => $totalImpaye,
+                'semestres' => $semestres,
+                'classe' => $classeData,
+                'etudiants' => $etudiants,
                 'data' => $data,
                 //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
                 //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
             ], [
                 'orientation' => 'P',
                 'protected' => true,
-                'file_name' => "point_versments",
+                'file_name' => "fiche_notes",
 
                 'format' => 'A4',
 

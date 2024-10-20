@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ValeurNoteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -25,6 +27,33 @@ class ValeurNote
     #[ORM\ManyToOne]
     #[Gedmo\Blameable(on: 'create')]
     private ?Utilisateur $utilisateur = null;
+
+
+    #[ORM\OneToOne(mappedBy: 'valeurNote')]
+    private ?CoefValeurNote $coefValeurNote = null;
+
+    public function __construct()
+    {
+       
+    }
+
+    public function getCoefValeurNote(): ?CoefValeurNote
+    {
+        return $this->coefValeurNote;
+    }
+
+    public function setCoefValeurNote(CoefValeurNote $coefValeurNote): static
+    {
+        // set the owning side of the relation if necessary
+        if ($coefValeurNote->getValeurNote() !== $this) {
+            $coefValeurNote->setValeurNote($this);
+        }
+
+        $this->coefValeurNote = $coefValeurNote;
+
+        return $this;
+    }
+
 
     public function getId(): ?int
     {
@@ -74,4 +103,6 @@ class ValeurNote
 
         return $this;
     }
+
+   
 }
