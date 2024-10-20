@@ -25,10 +25,17 @@
         <div class="card-body content">
             {{ include('_includes/ajax/response.html.twig') }}
             <div class="row">
-                 <div class="col-md-3">{{ form_row(form.semestre) }}</div>
-            <div class="col-md-3">{{ form_row(form.classe) }}</div>
+                 <div class="col-md-2">{{ form_row(form.semestre) }}</div>
+            <div class="col-md-2">{{ form_row(form.classe) }}</div>
             <div class="col-md-3">{{ form_row(form.ue) }}</div>
             <div class="col-md-3">{{ form_row(form.matiere) }}</div>
+            <div class="col-md-2">
+            
+             <a href="" {# target="_blank" #} type="button" style="margin-top:20px" class="btn btn-warning btn-md imprimer" name="search[imprime]">
+                 <i class="fa fa-print text-light"></i> Imprime fiche
+                 </a>
+                 
+                 </div>
             </div>
           
             <div class="card">
@@ -67,6 +74,29 @@
          const $classe = $('#{{ form.classe.vars.id }}');
          const $ue = $('#{{ form.ue.vars.id }}');
          const $matiere = $('#{{ form.matiere.vars.id }}');
+
+
+         function exexuteUrl(classe, etat) {
+        var urlTemplate = "{{ path('app_classe_detaille', {etat: 'etat', classe: 'classe'}) }}";
+
+        // Remplacer les espaces réservés par les valeurs
+        var url = urlTemplate
+            .replace('etat', etat)
+            .replace('classe', classe);
+        window.open(url, '_blank');
+    }
+
+    $('.imprimer').on('click', function (e) {
+        e.preventDefault();  // Empêche le comportement par défaut
+
+        let classes = $classe.val() ? $classe.val() : null;
+
+        if (classes) {
+            exexuteUrl(classes, 'recap');
+        } else {
+            alert('Veuillez sélectionner une classe.');
+        }
+    });
 
          //function load_content(url,semestre,classe,matiere,ue) {
         function load_content(url,filters = []) {

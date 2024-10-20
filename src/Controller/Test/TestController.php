@@ -659,7 +659,7 @@ class TestController extends AbstractController
             }
        
 
-            $rest = $this->renderPdf("test/fiche_de_note.html.twig", [
+            $rest = $this->renderPdf("test/fiche_notes.html.twig", [
                 'semestres' => $semestres,
                 'classe' => $classeData,
                 'etudiants' => $etudiants,
@@ -682,28 +682,42 @@ class TestController extends AbstractController
                 'entreprise' => ''
             ], true);
             //return $this->renderForm("stock/sortie/imprime.html.twig");
-        } else {
-            $rest = $this->renderPdf("test/liste_de_class.html.twig", [
-                'total_payer' => $totalPayer,
-                'total_impaye' => $totalImpaye,
-                'data' => $data,
-                //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
-                //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
-            ], [
-                'orientation' => 'P',
-                'protected' => true,
-                'file_name' => "point_versments",
-
-                'format' => 'A4',
-
-                'showWaterkText' => true,
-                'fontDir' => [
-                    $this->getParameter('font_dir') . '/arial',
-                    $this->getParameter('font_dir') . '/trebuchet',
-                ],
-                'watermarkImg' => $imgFiligrame,
-                'entreprise' => ''
-            ], true);
+        } else  {
+               // dd($menu->getRang($classe,1,124,1));
+               $semestres = $moyenneMatiereRepository->getSemestresByClasse($classe);
+           
+               //$ues = $controleRepository->getUe($classe,3);
+   
+               //dd($moyenneMatiereRepository->getMatieres(29,200));
+               $mentions = $mentionRepository->findAll();
+               $results = [];
+               foreach ($mentions as $mention) {
+                   $results["{$mention->getMoyenneMin()}-{$mention->getMoyenneMax()}"] = $mention->getLibelle();
+               }
+          
+   
+               $rest = $this->renderPdf("test/fiche_de_note.html.twig", [
+                   'semestres' => $semestres,
+                   'classe' => $classeData,
+                   'etudiants' => $etudiants,
+                   'data' => $data,
+                   //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
+                   //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)
+               ], [
+                   'orientation' => 'P',
+                   'protected' => true,
+                   'file_name' => "fiche_notes",
+   
+                   'format' => 'A4',
+   
+                   'showWaterkText' => true,
+                   'fontDir' => [
+                       $this->getParameter('font_dir') . '/arial',
+                       $this->getParameter('font_dir') . '/trebuchet',
+                   ],
+                   'watermarkImg' => $imgFiligrame,
+                   'entreprise' => ''
+               ], true);
             //return $this->renderForm("stock/sortie/imprime.html.twig");
         }
 
