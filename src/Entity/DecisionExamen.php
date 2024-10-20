@@ -14,8 +14,8 @@ class DecisionExamen
 {
 
     const DECISION = [
-        'Admis' => 'Admis',
-        'Refuser' => 'Refuser',
+        'Valide' => 'Validé',
+        'Invalide' => 'Invalidé',
     ];
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -48,6 +48,9 @@ class DecisionExamen
 
     #[ORM\ManyToOne(inversedBy: 'decisionExamens')]
     private ?Niveau $niveau = null;
+
+    #[ORM\ManyToOne(inversedBy: 'decisionExamens')]
+    private ?UniteEnseignement $ue = null;
 
 
     public function __construct()
@@ -153,6 +156,18 @@ class DecisionExamen
     public function setNiveau(?Niveau $niveau): static
     {
         $this->niveau = $niveau;
+
+        return $this;
+    }
+
+    public function getUe(): ?UniteEnseignement
+    {
+        return $this->ue;
+    }
+
+    public function setUe(?UniteEnseignement $ue): static
+    {
+        $this->ue = $ue;
 
         return $this;
     }

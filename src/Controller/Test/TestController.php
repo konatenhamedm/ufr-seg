@@ -573,20 +573,19 @@ class TestController extends AbstractController
     #[Route('/test2/{etat}/{classe}', name: 'app_classe_detaille', methods: ['GET', 'POST'])]
     public function imprimerAll2(Request $request,ControleRepository $controleRepository,InscriptionRepository $inscriptionRepository, Menu $menu,MoyenneMatiereRepository $moyenneMatiereRepository,MentionRepository $mentionRepository, $classe,  $etat, ClasseRepository $classeRepository, SessionInterface $session): Response
     {
-
-       //dd($menu->getNoteTotalByControle(2,$classe));
         /* foreach ($menu->getListeEtudiantByClasseImprime(41) as $key => $value) {
             dd($value->getEtudiant()->getEncartBacs()[0]);
-        } */
-        //  $array = ;
-
-        $etudiants = $inscriptionRepository->findBy(['classe'=> $classe]);
-        $matieres = $inscriptionRepository->findBy(['classe'=> $classe]);
-        $classeData = $classeRepository->find($classe);
-        $data = [];
-        $array_final = '[' . implode(',', explode(',', $classe)) . ']';
-        $tableaus = json_decode($array_final, true);
-        $longeur = count($tableaus);
+            } */
+           //  $array = ;
+           
+           $etudiants = $inscriptionRepository->findBy(['classe'=> $classe]);
+           $matieres = $inscriptionRepository->findBy(['classe'=> $classe]);
+           $classeData = $classeRepository->find($classe);
+           //dd($etudiants);
+            $data = [];
+            $array_final = '[' . implode(',', explode(',', $classe)) . ']';
+            $tableaus = json_decode($array_final, true);
+            $longeur = count($tableaus);
         // dd($longeur);
         for ($i = 0; $i < $longeur; $i++) {
             $data[] = $classeRepository->find($tableaus[$i]);
@@ -717,6 +716,7 @@ class TestController extends AbstractController
     MoyenneMatiereRepository $moyenneMatiereRepository,
    ClasseRepository $classeRepository,InscriptionRepository $inscriptionRepository,MentionRepository $mentionRepository,Menu $menu): Response
     {
+        ///dd($menu->getAllNoteForExamen(2,124));
 
        // dd($menu->getRang($classe,1,124,1));
         $semestres = $moyenneMatiereRepository->getSemestres($classe, $etudiant);

@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Controle;
 use App\Entity\Cours;
 use App\Entity\EncartBac;
+use App\Entity\GroupeType;
 use App\Entity\InfoInscription;
 use App\Entity\Inscription;
 use App\Entity\MatiereUe;
@@ -186,12 +187,51 @@ class Menu
         return $cpte;
 
     }
+    public function getNoteTotalByControleGroupeType($controle){
+        $groupes = $this->em->getRepository(GroupeType::class)->findBy(['controle'=> $controle]);
+        
+        return $groupes;
+
+    }
     public function getNotesByControleClasseEtudiant($controle,$etudiant){
       
         $note = $this->em->getRepository(Note::class)->findOneBy(['controle'=> $controle,'etudiant'=> $etudiant]);
-      $valeursNotes = $this->em->getRepository(ValeurNote::class)->findBy(['noteEntity'=> $note]);
+        $valeursNotes = $this->em->getRepository(ValeurNote::class)->findBy(['noteEntity'=> $note]);
 
         return $valeursNotes;
+
+    }
+    public function getAllNoteForExamen($ue,$etudiant){
+      
+        $allControles = $this->em->getRepository(Controle::class)->findBy(['ue'=> $ue]);
+        $cpte = 0;
+        foreach($allControles as $controle){
+            $ecueData = $this->em->getRepository(MatiereUe::class)->findOneBy(['uniteEnseignement'=> $ue,'matiere'=> $controle->getMatiere()]);
+            $note = $this->em->getRepository(Note::class)->findOneBy(['controle'=> $controle,'etudiant'=> $etudiant]);
+            $valeursNotes = $this->em->getRepository(ValeurNote::class)->findBy(['noteEntity'=> $note]);
+/* dd($valeursNotes); */
+            foreach($valeursNotes as $valeursNote){
+            if((int)$valeursNote->getCoefValeurNote()->getCoef() == 10 ){
+
+                if($ecueData->getNoteEliminatoire() >= $valeursNote->getNote()*2){
+                    $cpte = $cpte + 1;
+                }
+            }elseif((int)$valeursNote->getCoefValeurNote()->getCoef() == 20 ){
+                if($ecueData->getNoteEliminatoire() >= $valeursNote->getNote()){
+                    $cpte = $cpte + 1;
+                }
+            }else{
+                if($ecueData->getNoteEliminatoire() >= $valeursNote->getNote()/2){
+                    $cpte = $cpte + 1;
+                }
+            }
+                
+            
+            }
+           
+        }
+        
+        return $cpte;
 
     }
     public function getMoyenneMatiereEtudiant($controle,$etudiant){

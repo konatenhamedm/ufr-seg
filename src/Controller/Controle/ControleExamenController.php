@@ -363,7 +363,7 @@ class ControleExamenController extends AbstractController
                     }
                 } else {
 
-                    foreach ($decisionExamenRepository->findBy(['decision' => DecisionExamen::DECISION['Refuser'], 'niveau' => $niveau]) as $decision) {
+                    foreach ($decisionExamenRepository->findBy(['decision' => DecisionExamen::DECISION['Valide'], 'niveau' => $niveau]) as $decision) {
                         $note = new NoteExamen();
                         $note->setEtudiant($decision->getEtudiant());
                         //$note->setNote('');
@@ -403,10 +403,10 @@ class ControleExamenController extends AbstractController
 
         if ($form->isSubmitted()) {
             $response = [];
-            $redirect = $this->generateUrl('app_controle_controle_examen_new_load', [
-                'session' => $session,
+            $redirect = $this->generateUrl('app_controle_controle_examen_new', [
+                /* 'session' => $session,
                 'niveau' => $niveau,
-                'ue' => $ue,
+                'ue' => $ue, */
             ]);
 
             $dataNotes = $form->get('noteExamens')->getData();

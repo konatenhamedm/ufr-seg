@@ -77,6 +77,7 @@ class Service
     private $typeControleRepository;
     private $niveauRepository;
     private $coefValeurNoteRepository;
+    private $menu;
 
 
     public function __construct(
@@ -103,7 +104,8 @@ class Service
         PromotionRepository $promotionRepository,
         TypeControleRepository $typeControleRepository,
         NiveauRepository $niveauRepository,
-        CoefValeurNoteRepository $coefValeurNoteRepository
+        CoefValeurNoteRepository $coefValeurNoteRepository,
+        Menu $menu
     ) {
         $this->em = $em;
         $this->security = $security;
@@ -130,6 +132,7 @@ class Service
         $this->typeControleRepository = $typeControleRepository;
         $this->niveauRepository = $niveauRepository;
         $this->coefValeurNoteRepository = $coefValeurNoteRepository;
+        $this->menu = $menu;
 
         //$this->verifieIfFile2(15,2);
     }
@@ -919,7 +922,7 @@ class Service
 
                 $matiereUeValide = $this->matiereUeRepository->findOneBy(['matiere' => $data['matiere']]);
 
-                $newMoyenneMatiere->setValide('seelater');
+                $newMoyenneMatiere->setValide($moyenneEtudiant  >= $matiereUeValide->getMoyenneValidation() ? 'Oui' : 'Non');
                 //$newMoyenneMatiere->setValide($moyenneEtudiant  >= $matiereUeValide->getMoyenneValidation() ? 'Oui' : 'Non'); TODO
                 $newMoyenneMatiere->setUe($this->ueRepository->find($data['ue']));
                 $this->em->persist($newMoyenneMatiere);
@@ -969,9 +972,13 @@ class Service
                     if ((int)$groupe->getMax() == 40)
                         $nbreTour += 2;
                 } */
-                $groupe = $groupeTypes[$key1];
-                $coef = (int)$groupe->getCoef();
+               // $groupe = $groupeTypes[0];
+                //dd((int)$groupe->getCoef());
+               // $coef = (int)$groupe->getCoef();
+                $coef = 20;
                 $note = $valeur->getNote();
+
+                //dd($note);
 
                 // Vérifie si la note n'est ni "NC" ni vide
                 if ($note !== "NC" && $note !== "") {
@@ -987,116 +994,113 @@ class Service
                     }
                 }
 
-                /*    $groupe = $groupeTypes[$key1];
-
-                if ((int)$groupe->getCoef() == 10) {
-                    //dd($value->getGroupeTypes());
-                    if ($valeur->getNote() != "NC" || $valeur->getNote() != "") {
-                        //dd($value->getNote());
-                        $nbreTour = $nbreTour + 0.5;
-                    }
-                }
-                if ((int)$groupe->getCoef() == 20) {
-                    if ($valeur->getNote() != "NC" || $valeur->getNote() != "") {
-                        //dd($value->getNote());
-                        $nbreTour = $nbreTour + 1;
-                    }
-                }
-                if ((int)$groupe->getCoef() == 40) {
-
-                    if ($valeur->getNote() != "NC" || $valeur->getNote() != "") {
-                        //dd($value->getNote());
-                        $nbreTour = $nbreTour + 2;
-                    }
-                } */
-
-
                 $noteExamen = $note;
                 /* $somme += (int)$valeur->getNote(); */
             }
-            $moyenneEXamen = $somme / $nbreTour;
+            $moyenneEXamen = $somme ;
 
             // je vais calculer la moyenne des ue de l'etudiant ici
             $sommeUe = 0;
+            $nbreUe = 0;
             $cpteNombreInvalide = 0;
+            
             $moyenneMatiereEtudiant = $this->moyenneMatiereRepository->findBy(['etudiant' => $ligne->getEtudiant(), 'ue' => $data['ue']]);
             foreach ($moyenneMatiereEtudiant as $key => $moyenneUe) {
                 $matiereUeValide = $this->matiereUeRepository->findOneBy(['uniteEnseignement' => $data['ue'], 'matiere' => $moyenneUe->getMatiere()]);
                 $sommeUe += $moyenneUe->getMoyenne();
-
-                if ($moyenneUe->getMoyenne() <= $matiereUeValide->getMoyenneValidation())
+                $nbreUe++;
+                if ($moyenneUe->getMoyenne() < $matiereUeValide->getMoyenneValidation())
                     $cpteNombreInvalide++;
+                
             }
 
+               if($nbreUe > 0){
+                $moyenneEtudiantControle = $sommeUe/$nbreUe;
+
+            }else{
+                $moyenneEtudiantControle = $sommeUe ;
+
+            }
             $typeExamen = $this->typeControleRepository->findOneByCode("EXA");
             $typeControle = $this->typeControleRepository->findOneByCode("CC");
-            $moyenneEtudiantControle = $sommeUe / count($moyenneMatiereEtudiant);
+         
+            
             $moyenneUe = ($moyenneEtudiantControle * $typeControle->getCoef() / 100)  + ($moyenneEXamen * $typeExamen->getCoef() / 100);
             $ligne->setMoyenneConrole(round($moyenneEtudiantControle, 2));
             $ligne->setMoyenneUe(round($moyenneUe, 2));
 
-            if ($moyenneUe >= 10 && $cpteNombreInvalide == 0) {
+            if ($moyenneUe >= 10 && $cpteNombreInvalide == 0 && $this->menu->getAllNoteForExamen($data['ue'], $ligne->getEtudiant()) == 0) {
                 //dd("admis");
-                $ligne->setDecision(DecisionExamen::DECISION["Admis"]);
+                $ligne->setDecision(DecisionExamen::DECISION["Valide"]);
             } else {
-                $ligne->setDecision(DecisionExamen::DECISION["Refuser"]);
+                $ligne->setDecision(DecisionExamen::DECISION["Invalide"]);
             }
-            $decisionExam = $this->decisionExamenRepository->findOneBy(['etudiant' => $ligne->getEtudiant(), 'niveau' => $this->niveauRepository->find($data['niveau']), 'session' => $this->sessionRepository->find($data['session'])]);
+            $decisionExam = $this->decisionExamenRepository->findOneBy(['ue'=>$data['ue'],'etudiant' => $ligne->getEtudiant(), 'niveau' => $this->niveauRepository->find($data['niveau']), 'session' => $this->sessionRepository->find($data['session'])]);
             //dd($decisionExam);
 
             if ($decisionExam) {
 
                 $decisionExam->setEtudiant($ligne->getEtudiant());
+                $decisionExam->setUe($this->ueRepository->find($data['ue']));
                 $decisionExam->setMoyenneAnnuelle(round($moyenneUe, 2));
                 $decisionExam->setMoyenneControle(round($moyenneEtudiantControle, 2));
                 $decisionExam->setNoteExamen($noteExamen);
                 $decisionExam->setSession($this->sessionRepository->find($data['session']));
                 $decisionExam->setNiveau($this->niveauRepository->find($data['niveau']));
-                $decisionExam->setNombreCredit("30");
-                if ($moyenneUe >= 10 && $cpteNombreInvalide == 0) {
+                if ($moyenneUe >= 10 && $cpteNombreInvalide == 0 && $this->menu->getAllNoteForExamen($data['ue'], $ligne->getEtudiant()) == 0) {
+                    $decisionExam->setNombreCredit($this->ueRepository->find($data['ue'])->getCoef());
                     //dd("admis");
-                    $decisionExam->setDecision("Admis");
+                    $decisionExam->setDecision("Validé");
                 } else {
-                    $decisionExam->setDecision("Refuser");
+                    $decisionExam->setDecision("Invalidé");
+                    $decisionExam->setNombreCredit(0);
+
                 }
                 $this->em->persist($decisionExam);
                 $this->em->flush();
             } else {
                 $decisionExamen = new DecisionExamen();
                 $decisionExamen->setEtudiant($ligne->getEtudiant());
+                $decisionExamen->setUe($this->ueRepository->find($data['ue']));
                 $decisionExamen->setMoyenneAnnuelle($moyenneUe);
                 $decisionExamen->setMoyenneControle($moyenneEtudiantControle);
                 $decisionExamen->setNoteExamen($noteExamen);
                 $decisionExamen->setSession($this->sessionRepository->find($data['session']));
                 $decisionExamen->setNiveau($this->niveauRepository->find($data['niveau']));
-                $decisionExamen->setNombreCredit("30");
-                if ($moyenneUe >= 10 && $cpteNombreInvalide == 0) {
+                if ($moyenneUe >= 10 && $cpteNombreInvalide == 0 && $this->menu->getAllNoteForExamen($data['ue'], $ligne->getEtudiant()) == 0) {
+                    $decisionExamen->setNombreCredit($this->ueRepository->find($data['ue'])->getCoef());
+
                     //dd("admis");
-                    $decisionExamen->setDecision("Admis");
+                    $decisionExamen->setDecision("Validé");
                 } else {
-                    $decisionExamen->setDecision("Refuser");
+                    $decisionExamen->setDecision("Invalidé");
+                    $decisionExamen->setNombreCredit(0);
+
                 }
                 $this->em->persist($decisionExamen);
                 $this->em->flush();
             }
         }
 
-        if ($controleVefication) {
+        //dd();
+      if ($controleVefication) {
 
-            //dd($controleVefication);
 
 
-            $controleVefication->setPromotion($this->niveauRepository->find($data['niveau']));
+            $controleVefication->setNiveau($this->ueRepository->find($data['ue'])->getNiveau());
+            $controleVefication->setTypeControle($typeExamen);
             $controleVefication->setUe($this->ueRepository->find($data['ue']));
             $controleVefication->setSession($this->sessionRepository->find($data['session']));
             $this->em->persist($controleVefication);
+            $this->em->flush(); 
         } else {
-            $controle->setPromotion($this->niveauRepository->find($data['niveau']));
+            $controle->setTypeControle($typeExamen);
+            $controle->setNiveau($this->ueRepository->find($data['ue'])->getNiveau());
             $controle->setUe($this->ueRepository->find($data['ue']));
             $controle->setSession($this->sessionRepository->find($data['session']));
             $this->em->persist($controle);
+            $this->em->flush(); 
         }
-        $this->em->flush();
 
 
 

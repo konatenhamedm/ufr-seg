@@ -194,7 +194,7 @@
                 </tr>
                 <tr style=" border: 0px !important;">
                     <th style="width:50% border: 0px !important;">Enseignant : {{ menu.getCours(item.id,controle.matiere).employe.getNomComplet}}</th>
-                    <th style="width:50% border: 0px !important;">Trimestre : {{ semestre.libelle}}</th>
+                    <th style="width:50% border: 0px !important;">Sémestre : {{ semestre.libelle}}</th>
                 </tr>
             
             
@@ -213,35 +213,40 @@
                     class=""> #}
                     {# <b>DOIT</b><br><br> #}
                     <table>
-                    
-                        <tr style="background-color: #dddddd">
-                            <th style="width:4%;">N</th>
-                            <th style="width:10%;">Matricule</th>
-                            <th style="width:20%;">Nom et Prénoms</th>
 
-                            {% for col in 1..menu.getNoteTotalByControle(controle,item.id) %}
+                  <tr >
+                            <th style="width:4%; background-color: #dddddd;border: 1px solid white;" rowspan="2">N</th>
+                            <th style="width:1%; background-color: #dddddd;border: 1px solid white;" rowspan="2">Code</th>
+                            <th style="width:20%; background-color: #dddddd;border: 1px solid white;" rowspan="2">Nom et Prénoms</th>
+                              {% for key,col in menu.getNoteTotalByControleGroupeType(controle) %}
                                 
-                            <th style="width:10%;">Note {{col}} </th>
+                            <th style="width:%;text-align:center;"> {{col.typeEvaluation.code}} </th>
                             {% endfor %}
-                            {# <th style="width:10%;">Note 2</th>
-                            <th style="width:10%;">Note 3</th>
-                            <th style="width:10%;">Note 4</th>
-                            <th style="width:10%;">Note 5</th>
-                            <th style="width:10%;">Note 6</th> #}
-                            <th style="width:5%;">Moy</th>
-                            <th style="width:6%;">Rang</th>
-                        
-                                                </tr>
+                            <th style="width:5%; background-color: #dddddd;border: 1px solid white;" rowspan="2">Moy</th>
+                            <th style="width:6%; background-color: #dddddd;border: 1px solid white; " rowspan="2">Rang</th>
+                     
+                  </tr>
+                  <tr   >
+                            {% for key,col in menu.getNoteTotalByControleGroupeType(controle) %}
+
+                                
+                            <th style="width:%;border-top: 1px solid black; text-align:center;" >{{col.dateSaisie | date('d/m/Y')}} </th>
+                            {% endfor %}
+
+                    </tr>
+
+                   
                         {% for key,etudiant in etudiants %}
                         {% set etat_encart = menu.getEncoreByEtudiant(etudiant.etudiant.id) %}
                                 <tr>
                                                 <td style="width:2%;">{{key+1}}</td>
-                                               <td style="">{{etat_encart > 0 ? etudiant.etudiant.encartBacs[0].matricule : 'RAS'}}</td>
+                                               <td style="width:1%;">{{etudiant.code}}</td>
+                                              {#  <td style="">{{etat_encart > 0 ? etudiant.etudiant.encartBacs[0].matricule : 'RAS'}}</td> #}
                                                 <td style="width:20%;">{{etudiant.etudiant.getNomComplet}}</td>
 
                                                 {% for note in menu.getNotesByControleClasseEtudiant(controle,etudiant.etudiant) %}
                                                     
-                                                <td style="width:10%;" style="text-align:center">{{note.note}}</td>
+                                                <td style="width:1%;" style="text-align:center">{{note.note}}</td>
                                                 {% endfor %}
                                                 <td style="width:4%;" style="text-align:center">{{menu.getMoyenneMatiereEtudiant(controle,etudiant.etudiant).moyenneMatiere}}</td>
                                                 <td style="width:4%;" style="text-align:center">{{menu.getMoyenneMatiereEtudiant(controle,etudiant.etudiant).rang}} {{menu.getMoyenneMatiereEtudiant(controle,etudiant.etudiant).exposant}}</td>

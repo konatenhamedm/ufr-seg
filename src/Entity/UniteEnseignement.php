@@ -45,9 +45,13 @@ class UniteEnseignement
     #[ORM\OneToMany(mappedBy: 'uniteEnseignement', targetEntity: MatiereUe::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $matiereUes;
 
+    #[ORM\OneToMany(mappedBy: 'ue', targetEntity: DecisionExamen::class)]
+    private Collection $decisionExamens;
+
     public function __construct()
     {
         $this->matiereUes = new ArrayCollection();
+        $this->decisionExamens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -175,6 +179,36 @@ class UniteEnseignement
             // set the owning side to null (unless already changed)
             if ($matiereUe->getUniteEnseignement() === $this) {
                 $matiereUe->setUniteEnseignement(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DecisionExamen>
+     */
+    public function getDecisionExamens(): Collection
+    {
+        return $this->decisionExamens;
+    }
+
+    public function addDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if (!$this->decisionExamens->contains($decisionExamen)) {
+            $this->decisionExamens->add($decisionExamen);
+            $decisionExamen->setUe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if ($this->decisionExamens->removeElement($decisionExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($decisionExamen->getUe() === $this) {
+                $decisionExamen->setUe(null);
             }
         }
 

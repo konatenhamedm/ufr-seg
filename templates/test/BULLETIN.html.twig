@@ -432,7 +432,7 @@
                                         style="width: 20%;border-top: 1px solid #000; border-left: 1px solid #000;  border-right: 0px solid #000;border-bottom: 1px solid #000;" class="contenu">
                                       
                                         
-                                        {% if cpte == 0 and (somme / nbre) >= 10 and cpteMoyenneValidation == 0  %}
+                                        {% if menu.getAllNoteForExamen(ue.id,etudiant) == 0 and (somme / nbre) >= 10 and cpteMoyenneValidation == 0  %}
                                             Validé
                                         {% else %}
                                         Invalidé
@@ -440,7 +440,7 @@
                                          </td>
                                     <td class="contenu"
                                         style="width: 20%;border-top: 1px solid #000; border-left: 0px solid #000;  border-right: 1px solid #000;border-bottom: 1px solid #000;" class="contenu">
-                                        Crédits :   {% if cpte == 0 and (somme / nbre) >= 10 and  cpteMoyenneValidation == 0  %}
+                                        Crédits :   {% if  menu.getAllNoteForExamen(ue.id,etudiant) == 0 and (somme / nbre) >= 10 and  cpteMoyenneValidation == 0  %}
                                             {{ ue.coef }}
                                         {% else %}
                                         N/A
