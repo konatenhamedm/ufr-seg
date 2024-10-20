@@ -716,7 +716,7 @@ class TestController extends AbstractController
     MoyenneMatiereRepository $moyenneMatiereRepository,
    ClasseRepository $classeRepository,InscriptionRepository $inscriptionRepository,MentionRepository $mentionRepository,Menu $menu): Response
     {
-        ///dd($menu->getAllNoteForExamen(2,124));
+        //dd($menu->getAllNoteForExamen(2,124));
 
        // dd($menu->getRang($classe,1,124,1));
         $semestres = $moyenneMatiereRepository->getSemestres($classe, $etudiant);
