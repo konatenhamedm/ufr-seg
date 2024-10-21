@@ -113,7 +113,7 @@
       const $mode = $('#{{ form.mode.vars.id }}');
       
        $('.imprimer').on('click', function (e) {
-
+ e.preventDefault(); 
         let niveau_data = $niveau.val() ? $niveau.val()  : null
         let caissiere_data = $caissiere.val() ? $caissiere.val()  : null
         let dateDebut_data = $dateDebut.val() ? $dateDebut.val().toString().replace(/\//g, "-")  : null

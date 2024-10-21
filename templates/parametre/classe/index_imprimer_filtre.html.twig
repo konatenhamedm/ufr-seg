@@ -81,7 +81,7 @@
       }
     
        $('.imprimer').on('click', function (e) {
-
+ e.preventDefault(); 
        let classes = $classe.val() ? $classe.val()  : null
         let etat = $etat.val() ? $etat.val()  : null
       

@@ -125,7 +125,7 @@
       }
     
        $('.imprimer').on('click', function (e) {
-
+ e.preventDefault(); 
         let niveau_data = $niveau.val() ? $niveau.val()  : null
       
        exexuteUrl(niveau_data)
