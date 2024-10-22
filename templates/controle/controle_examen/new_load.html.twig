@@ -166,15 +166,14 @@
               const val = $(this).val();
 
                 load_ue(val)
+                  load_ue_matiere($ue.val())
                  var urlTemplate = "{{ path('app_controle_controle_examen_new_load', {session: 'session', classe: 'classe',ue:'ue',matiere:'matiere'}) }}";
                 var url = urlTemplate
                 .replace('session', $session.val())
                 .replace('classe', val)
                 .replace('ue', $ue.val())
                 .replace('matiere', $matiere.val());
-                load_content(url,{session: $session.val(),classe:$classe.val(),ue: val,matiere: $matiere.val(),})
-               
-              
+                load_content(url,{session: $session.val(),classe:val,ue: $ue.val(),matiere: $matiere.val(),})
                  load_principal({session: $session.val(),classe:val,ue: $ue.val(),matiere:$matiere.val()}) 
 
           });
@@ -187,10 +186,8 @@
                 .replace('classe', $classe.val())
                 .replace('ue', val)
                 .replace('matiere', $matiere.val());
-               load_content(url,{session: $session.val(),classe:$classe.val(),ue: val,matiere: $matiere.val(),})
-               
-                //load_matiere(val)
                 load_ue_matiere(val)
+               load_content(url,{session: $session.val(),classe:$classe.val(),ue: val,matiere: $matiere.val(),})
                  load_principal({session: $session.val(),classe:$classe.val(),ue: val,matiere:$matiere.val()}) 
                
           });
@@ -204,7 +201,6 @@
                 .replace('ue', $ue.val())
                 .replace('matiere',val);
                load_content(url,{session: $session.val(),classe:$classe.val(),ue: $ue.val(),matiere: val})
-          
                 load_principal({session: $session.val(),classe:$classe.val(),ue: $ue.val(),matiere:val}) 
                
           });

@@ -200,6 +200,15 @@
 
       window.open(url, '_blank')
       }
+
+       $('.imprimer_pv').on('click', function (e) {
+ e.preventDefault(); 
+       let classes = $classe.val() ? $classe.val()  : null
+        let periode = $periode.val() ? $periode.val()  : null
+      
+       exexuteUrlPv(classes,periode)
+     
+      });
     
        $('.imprimer').on('click', function (e) {
  e.preventDefault(); 
@@ -209,14 +218,7 @@
        exexuteUrl(classe,periode)
      
       });
-       $('.imprimer_pv').on('click', function (e) {
- e.preventDefault(); 
-       let classes = $classe.val() ? $classe.val()  : null
-        let periode = $periode.val() ? $periode.val()  : null
       
-       exexuteUrlPv(classes,periode)
-     
-      });
       
 
     });

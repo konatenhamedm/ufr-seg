@@ -3,14 +3,18 @@
 namespace App\Controller\Test;
 
 use App\Controller\FileTrait;
+use App\Entity\Matiere;
 use App\Entity\Test;
 use App\Form\TestType;
 use App\Repository\ClasseRepository;
 use App\Repository\ControleRepository;
+use App\Repository\DecisionExamenRepository;
 use App\Repository\EtudiantRepository;
 use App\Repository\InscriptionRepository;
+use App\Repository\MatiereRepository;
 use App\Repository\MentionRepository;
 use App\Repository\MoyenneMatiereRepository;
+use App\Repository\SessionRepository;
 use App\Repository\TestRepository;
 use App\Repository\UniteEnseignementRepository;
 use App\Service\ActionRender;
@@ -775,20 +779,34 @@ class TestController extends AbstractController
         //return $this->renderForm("stock/sortie/imprime.html.twig");
 
     }
-    #[Route('/imprime/pv/{periode}/{classe}', name: 'app_imprime_pv', methods: ['GET', 'POST'])]
-    public function imprimerPv(Request $request,UniteEnseignementRepository $uniteEnseignementRepository, ControleRepository $controleRepository,InscriptionRepository $inscriptionRepository, Menu $menu,$periode,$classe, ClasseRepository $classeRepository, SessionInterface $session): Response
+    #[Route('/imprime/pv/{classe}/{ue}/{matiere}/{sessions}', name: 'app_imprime_pv', methods: ['GET', 'POST'])]
+    public function imprimerPv(Request $request,UniteEnseignementRepository $uniteEnseignementRepository,
+     ControleRepository $controleRepository,
+     InscriptionRepository $inscriptionRepository,
+      Menu $menu,$sessions,$ue,$matiere,$classe, 
+      ClasseRepository $classeRepository,
+      SessionRepository $sessionRepository,
+      MatiereRepository $matiereRepository,
+
+       SessionInterface $session,DecisionExamenRepository $decisionExamenRepository,
+       ): Response
     {
 
        // dd($menu->getAllMatiereByUeByEtudiantPV(2,61,93)->getMoyenne());
-        $listeUes = $controleRepository->getUe( $classe ,$periode);
+       // $listeUes = $controleRepository->getUe( $classe ,$periode);
+        $listeUes = $decisionExamenRepository->findBy(['ue'=> $ue,'matiere'=> $matiere,'classe'=> $classe,'session'=> $sessions,'etudiant'=> $inscriptionRepository->findOneBy(['classe'=> $classe])->getEtudiant()]);
+        $count = $decisionExamenRepository->findBy(['ue'=> $ue,'matiere'=> $matiere,'classe'=> $classe,'session'=> $sessions,'etudiant'=> $inscriptionRepository->findOneBy(['classe'=> $classe])->getEtudiant()]);
         $listeEtudiants = $inscriptionRepository->findBy(['classe'=> $classe]);
-      
+     /*  dd(count($count)); */
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
         return $this->renderPdf("test/pv.html.twig", [
             'ues' =>$listeUes,
             'etudiants' => $listeEtudiants,
             'classeData' => $classeRepository->find($classe),
-            'periode'=>$periode,
+            'ue'=>$uniteEnseignementRepository->find($ue),
+            'matiere'=>$matiereRepository->find($matiere),
+            'sessions'=>$sessionRepository->find($sessions),
+            'nombre'=>count($count),
             //'uniteEnseignementRepository'=>$uniteEnseignementRepository,
             //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)

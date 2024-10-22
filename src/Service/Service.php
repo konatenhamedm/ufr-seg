@@ -954,31 +954,16 @@ class Service
         return $compteIfNoteSuperieurMax;
     }
 
-
-
     public function gestionNotesExamen($dataNotes, $groupeTypes, $data = [], $controleVefication, $controle): int
     {
-
         foreach ($dataNotes as $key => $ligne) {
           
             $noteExamen = 0;
             $nbreTour = 0;
             foreach ($ligne->getValeurNoteExamens() as $key1 => $valeur) {
-                /*  foreach ($groupeTypes as $key => $groupe) {
-                    if ((int)$groupe->getMax() == 10)
-                        $nbreTour += 0.5;
-                    if ((int)$groupe->getMax() == 20)
-                        $nbreTour += 1;
-                    if ((int)$groupe->getMax() == 40)
-                        $nbreTour += 2;
-                } */
-               // $groupe = $groupeTypes[0];
-                //dd((int)$groupe->getCoef());
-               // $coef = (int)$groupe->getCoef();
+              
                 $coef = 20;
                 $note = $valeur->getNote();
-
-                //dd($note);
 
                 // Vérifie si la note n'est ni "NC" ni vide
                 if ($note !== "NC" && $note !== "") {
@@ -998,13 +983,11 @@ class Service
                 /* $somme += (int)$valeur->getNote(); */
             }
            
-
-           
             $typeExamen = $this->typeControleRepository->findOneByCode("EXA");
             $typeControle = $this->typeControleRepository->findOneByCode("CC");
 
             $moyenneMatiere = $this->moyenneMatiereRepository->findOneBy(['ue' => $data['ue'], 'etudiant' => $ligne->getEtudiant(), 'matiere' => $data['matiere']]);
-         
+            $matiereUe = $this->matiereUeRepository->findOneBy(['uniteEnseignement' => $data['ue'], 'matiere' => $data['matiere']]);
             
             $moyenneEcue = ((int)$moyenneMatiere->getMoyenne() * $typeControle->getCoef() / 100)  + ($noteExamen * $typeExamen->getCoef() / 100);
             $ligne->setMoyenneConrole(round($noteExamen, 2));
@@ -1028,6 +1011,7 @@ class Service
             if ($decisionExam) {
 
                 $decisionExam->setEtudiant($ligne->getEtudiant());
+                $decisionExam->setCodeEcue($matiereUe->getCode());
                 $decisionExam->setClasse( $this->classeRepository->find($data['classe']));
                 $decisionExam->setMatiere($this->matiereRepository->find($data['matiere']));
                 $decisionExam->setUe($this->ueRepository->find($data['ue']));
@@ -1051,6 +1035,7 @@ class Service
                 $this->em->flush();
             } else {
                 $decisionExamen = new DecisionExamen();
+                $decisionExamen->setCodeEcue($matiereUe->getCode());
                 $decisionExamen->setClasse( $this->classeRepository->find($data['classe']));
                 $decisionExamen->setMatiere($this->matiereRepository->find($data['matiere']));
                 $decisionExamen->setEtudiant($ligne->getEtudiant());
@@ -1078,9 +1063,6 @@ class Service
 
         //dd();
       if ($controleVefication) {
-
-
-
             $controleVefication->setClasse($this->classeRepository->find($data['classe']));
             $controleVefication->setMatiere($this->matiereRepository->find($data['matiere']));
             $controleVefication->setTypeControle($typeExamen);
@@ -1097,10 +1079,6 @@ class Service
             $this->em->persist($controle);
             $this->em->flush(); 
         }
-
-
-
-
         return 0;
     }
 
@@ -1154,21 +1132,7 @@ class Service
                 }
             }
 
-            /*  $existeRang = $noteRepository->findBy(['controle' => $allNotes->getControle(), 'rang' => $rang]);
-
-                    if ($note) {
-                        if (count($existeRang) > 1) {
-                            $note->setExposant("ex");
-                        } else {
-                            if ($rang == 1) {
-                                $note->setExposant("er");
-                            } else {
-                                $note->setExposant("e");
-                            }
-                        }
-                        $entityManager->persist($note);
-                        $entityManager->flush();
-                    } */
+          
         }
     }
     public function rangExposantExamen($dataNotes)
@@ -1221,21 +1185,7 @@ class Service
                 }
             }
 
-            /*  $existeRang = $noteRepository->findBy(['controle' => $allNotes->getControle(), 'rang' => $rang]);
-
-                    if ($note) {
-                        if (count($existeRang) > 1) {
-                            $note->setExposant("ex");
-                        } else {
-                            if ($rang == 1) {
-                                $note->setExposant("er");
-                            } else {
-                                $note->setExposant("e");
-                            }
-                        }
-                        $entityManager->persist($note);
-                        $entityManager->flush();
-                    } */
+           
         }
     }
 

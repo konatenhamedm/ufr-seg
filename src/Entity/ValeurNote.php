@@ -21,7 +21,7 @@ class ValeurNote
     #[ORM\Column(length: 255)]
     private ?string $note = null;
 
-    #[ORM\ManyToOne(inversedBy: 'valeurNotes')]
+    #[ORM\ManyToOne(inversedBy: 'valeurNotes', cascade:['persist'])]
     private ?Note $noteEntity = null;
 
     #[ORM\ManyToOne]

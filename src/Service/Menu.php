@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Controle;
 use App\Entity\Cours;
+use App\Entity\DecisionExamen;
 use App\Entity\EncartBac;
 use App\Entity\GroupeType;
 use App\Entity\InfoInscription;
@@ -153,10 +154,10 @@ class Menu
 
         return $this->em->getRepository(MatiereUe::class)->getUeMatiere($matiere,$ue);
     }
-    public function getUeMatierepv($ue)
+    public function getUeMatierepv($ue,$etudiant,$matiere,$session)
     {
 
-        return $this->em->getRepository(MatiereUe::class)->getUeMatierepv($ue);
+        return $this->em->getRepository(DecisionExamen::class)->findBy(['ue'=> $ue,'etudiant'=> $etudiant,'matiere'=> $matiere,'session'=> $session]);
     }
     public function getCoursMatiereClasse($matiere,$classe)
     {

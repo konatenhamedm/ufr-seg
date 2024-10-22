@@ -2,7 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Classe;
 use App\Entity\Cours;
+use App\Entity\Matiere;
+use App\Entity\MatiereUe;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -16,7 +19,7 @@ use Symfony\Bundle\SecurityBundle\Security;
  * @method Cours[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class CoursRepository extends ServiceEntityRepository
-{
+{ use TableInfoTrait;
     private $user;
     public function __construct(ManagerRegistry $registry, Security $security)
     {
@@ -57,6 +60,37 @@ class CoursRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function getListeMatiere($ue,$classe)
+    {
+        $em = $this->getEntityManager();
+        $connection = $em->getConnection();
+        $cours = $this->getTableName(Cours::class, $em);
+        $matiere = $this->getTableName(Matiere::class, $em);
+        $matiereUe = $this->getTableName(MatiereUe::class, $em);
+        $classe = $this->getTableName(Classe::class, $em);
+
+        //dd($dateDebut,$dateFin);
+
+
+        $sql = <<<SQL
+SELECT distinct(m.id), m.id,m.libelle
+FROM {$cours} d
+Left JOIN {$matiere} m ON d.matiere_id = m.id
+Inner JOIN {$matiereUe} e ON e.matiere_id = m.id
+WHERE   d.classe_id = :classe and e.unite_enseignement_id = :ue 
+ORDER BY  m.id
+
+SQL;
+
+
+        $params['ue'] = $ue;
+         $params['classe'] = $classe;
+
+
+        $stmt = $connection->executeQuery($sql, $params);
+        return $stmt->fetchAllAssociative();
+    }
+
     public function getClasse($annee)
     {
         $sql =  $this->createQueryBuilder('c')

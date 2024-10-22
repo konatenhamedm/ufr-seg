@@ -326,8 +326,8 @@ class ControleExamenController extends AbstractController
         $all = $request->query->all();
 
        
-        $controleVefication = $controleExamenRepository->findOneBy(['classe' => $classe,  'session' => $session, 'ue' => $ue]);
-
+        $controleVefication = $controleExamenRepository->findOneBy(['classe' => $classe,  'session' => $session, 'ue' => $ue,'matiere'=> $matiere]);
+        //dd($controleVefication);
         if ($controleVefication) {
             $form = $this->createForm(ControleExamenType::class, $controleVefication, [
                 'method' => 'POST',
@@ -417,7 +417,7 @@ class ControleExamenController extends AbstractController
 
             $dataNotes = $form->get('noteExamens')->getData();
             $groupeTypes = $form->get('groupeTypeExamens')->getData();
-            //dd($dataNotes);
+        //dd($dataNotes);
             if ($form->isValid()) {
 
 

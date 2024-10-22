@@ -52,6 +52,9 @@ class DecisionExamen
     #[ORM\ManyToOne(inversedBy: 'decisionExamens')]
     private ?Classe $classe = null;
 
+    #[ORM\Column(length: 255,nullable: true)]
+    private ?string $codeEcue = null;
+
 
     public function __construct()
     {
@@ -168,6 +171,18 @@ class DecisionExamen
     public function setClasse(?Classe $classe): static
     {
         $this->classe = $classe;
+
+        return $this;
+    }
+
+    public function getCodeEcue(): ?string
+    {
+        return $this->codeEcue;
+    }
+
+    public function setCodeEcue(string $codeEcue): static
+    {
+        $this->codeEcue = $codeEcue;
 
         return $this;
     }

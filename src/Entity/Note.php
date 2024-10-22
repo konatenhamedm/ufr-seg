@@ -17,7 +17,7 @@ class Note
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'notes')]
+    #[ORM\ManyToOne(inversedBy: 'notes', cascade:['persist'])]
     private ?Controle $controle = null;
 
     #[ORM\ManyToOne(inversedBy: 'notes')]
