@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Classe;
 use App\Entity\ControleExamen;
 use App\Entity\Matiere;
 use App\Entity\Niveau;
@@ -32,18 +33,18 @@ class ControleExamenType extends AbstractType
         $anneeScolaire = $options['anneeScolaire'];
 
         $builder
-            ->add('niveau', EntityType::class, [
-                'class' => Niveau::class,
-                'label' => "Niveau",
-                'choice_label' => 'getFullCodeLibelle',
-                'attr' => ['class' => 'has-select2 form-select niveau'],
-                'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
-                    return $er->createQueryBuilder('c')
-                        ->andWhere("c.anneeScolaire = :annee")
-                        ->setParameter('annee', $anneeScolaire);
-                },
+        ->add('classe', EntityType::class, [
+            /* 'placeholder' => 'choisissez une classe', */
+            'class' => Classe::class,
+            'choice_label' => 'libelle',
+            'attr' => ['class' => 'has-select2 form-select classe'],
+            'query_builder' => function (EntityRepository $er) use ($anneeScolaire) {
+                return $er->createQueryBuilder('c')
+                    ->andWhere("c.anneeScolaire = :annee")
+                    ->setParameter('annee', $anneeScolaire);
+            },
+        ])
 
-            ])
 
             ->add('ue', EntityType::class, [
                 /*   'label' => "Unité d'enseignement",
@@ -51,6 +52,13 @@ class ControleExamenType extends AbstractType
                 'class' => UniteEnseignement::class,
                 'choice_label' => 'libelle',
                 'attr' => ['class' => 'has-select2 form-select ue']
+            ])
+
+            ->add('matiere', EntityType::class, [
+                //'placeholder' => 'choisissez une matiere',
+                'class' => Matiere::class,
+                'choice_label' => 'libelle',
+                'attr' => ['class' => 'has-select2 form-select matiere']
             ])
 
             ->add('session', EntityType::class, [

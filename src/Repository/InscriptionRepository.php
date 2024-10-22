@@ -41,14 +41,14 @@ class InscriptionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getListeEtudiant($niveau)
+    public function getListeEtudiant($classe)
     {
 
         return $this->createQueryBuilder('i')
             ->innerJoin('i.niveau', 'n')
             ->innerJoin('i.etudiant', 'e')
-            ->andWhere('n = :niveau')
-            ->setParameter('niveau', $niveau)
+            ->andWhere('i.classe = :classe')
+            ->setParameter('classe', $classe)
             ->orderBy('e.nom', 'ASC')
             ->getQuery()
             ->getResult();

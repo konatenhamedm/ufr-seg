@@ -43,6 +43,12 @@ class Classe
     #[ORM\OneToMany(mappedBy: 'classe', targetEntity: CoursParent::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $coursParents;
 
+    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: ControleExamen::class)]
+    private Collection $controleExamens;
+
+    #[ORM\OneToMany(mappedBy: 'classe', targetEntity: DecisionExamen::class)]
+    private Collection $decisionExamens;
+
 
 
     public function __construct()
@@ -52,6 +58,8 @@ class Classe
         $this->controles = new ArrayCollection();
         $this->blocEcheanciers = new ArrayCollection();
         $this->coursParents = new ArrayCollection();
+        $this->controleExamens = new ArrayCollection();
+        $this->decisionExamens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -249,6 +257,66 @@ class Classe
             // set the owning side to null (unless already changed)
             if ($coursParent->getClasse() === $this) {
                 $coursParent->setClasse(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ControleExamen>
+     */
+    public function getControleExamens(): Collection
+    {
+        return $this->controleExamens;
+    }
+
+    public function addControleExamen(ControleExamen $controleExamen): static
+    {
+        if (!$this->controleExamens->contains($controleExamen)) {
+            $this->controleExamens->add($controleExamen);
+            $controleExamen->setClasse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeControleExamen(ControleExamen $controleExamen): static
+    {
+        if ($this->controleExamens->removeElement($controleExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($controleExamen->getClasse() === $this) {
+                $controleExamen->setClasse(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DecisionExamen>
+     */
+    public function getDecisionExamens(): Collection
+    {
+        return $this->decisionExamens;
+    }
+
+    public function addDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if (!$this->decisionExamens->contains($decisionExamen)) {
+            $this->decisionExamens->add($decisionExamen);
+            $decisionExamen->setClasse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if ($this->decisionExamens->removeElement($decisionExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($decisionExamen->getClasse() === $this) {
+                $decisionExamen->setClasse(null);
             }
         }
 

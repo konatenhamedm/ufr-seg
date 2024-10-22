@@ -10,6 +10,7 @@ use App\Entity\NoteExamen;
 use App\Entity\ValeurNoteExamen;
 use App\Form\ControleExamenType;
 use App\Repository\AnneeScolaireRepository;
+use App\Repository\ClasseRepository;
 use App\Repository\ControleExamenRepository;
 use App\Repository\DecisionExamenRepository;
 use App\Repository\DecisionRepository;
@@ -70,7 +71,7 @@ class ControleExamenController extends AbstractController
     }
 
     #[Route('/liste/session', name: 'get_session', methods: ['GET'])]
-    public function getSession(Request $request, SessionRepository $sessionRepository)
+    public function getSession(Request $request, SessionRepository $sessionRepository,ClasseRepository $classeRepository)
     {
         $response = new Response();
         $tabUnite = array();
@@ -80,8 +81,7 @@ class ControleExamenController extends AbstractController
 
         if ($idPromotion) {
 
-
-            $uniteEnseigenments = $sessionRepository->findby(['niveau' => $idPromotion]);
+            $uniteEnseigenments = $sessionRepository->findby(['niveau' => $classeRepository->find($idPromotion)->getNiveau()]);
 
             $i = 0;
 
@@ -196,10 +196,13 @@ class ControleExamenController extends AbstractController
         AnneeScolaireRepository $anneeScolaireRepository
     ): Response {
 
-        $promotion = $request->query->get('niveau');
+        $classe = $request->query->get('classe');
         $session = $request->query->get('session');
         $ue = $request->query->get('ue');
-        //dd($promotion, $session, $ue);
+        $matiere = $request->query->get('matiere');
+ 
+
+
 
         $annee = $sessionData->get('anneeScolaire');
 
@@ -209,7 +212,7 @@ class ControleExamenController extends AbstractController
             $sessionData->set('anneeScolaire', $anneeScolaireRepository->findOneBy(['actif' => 1]));
         }
 
-        $controleVefication = $controleExamenRepository->findOneBy(['niveau' => $promotion, 'session' => $session, 'ue' => $ue]);
+        $controleVefication = $controleExamenRepository->findOneBy(['classe' => $classe, 'session' => $session, 'ue' => $ue, 'matiere' => $matiere]);
 
         if ($controleVefication) {
             $form = $this->createForm(ControleExamenType::class, $controleVefication, [
@@ -226,11 +229,11 @@ class ControleExamenController extends AbstractController
             $groupe->setDateCompo(new \DateTime());
 
             // dd($inscriptionRepository->findBy(['niveau' => $promotion]), $promotion);
-            if (count($inscriptionRepository->findBy(['niveau' => $promotion])) > 0)
+            if (count($inscriptionRepository->findBy(['classe' => $classe])) > 0)
                 $controleExaman->addGroupeTypeExamen($groupe);
 
 
-            foreach ($inscriptionRepository->getListeEtudiant($promotion) as $inscription) {
+            foreach ($inscriptionRepository->getListeEtudiant($classe) as $inscription) {
                 $note = new NoteExamen();
                 $note->setEtudiant($inscription->getEtudiant());
                 //$note->setNote('');
@@ -296,12 +299,12 @@ class ControleExamenController extends AbstractController
 
         return $this->render('controle/controle_examen/new.html.twig', [
             'controle' => $controleVefication ?? $controleExaman,
-            'nombre' => $controleVefication ? $controleVefication->getGroupeTypeExamens()->count() : (count($inscriptionRepository->findBy(['niveau' => $promotion])) > 0 ? 1 : 0),
+            'nombre' => $controleVefication ? $controleVefication->getGroupeTypeExamens()->count() : (count($inscriptionRepository->findBy(['classe' => $classe])) > 0 ? 1 : 0),
             'form' => $form->createView(),
             'title' => 'Gestion des contrôles',
         ]);
     }
-    #[Route('/new/load/{session}/{niveau}/{ue}', name: 'app_controle_controle_examen_new_load', methods: ['GET', 'POST'], options: ['expose' => true])]
+    #[Route('/new/load/{session}/{classe}/{ue}/{matiere}', name: 'app_controle_controle_examen_new_load', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function newLoad(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -310,9 +313,10 @@ class ControleExamenController extends AbstractController
         InscriptionRepository $inscriptionRepository,
         TypeControleRepository $typeControleRepository,
         DecisionRepository $decisionRepository,
-        $niveau = null,
+        $classe = null,
         $session = null,
         $ue = null,
+        $matiere = null,
         SessionRepository $sessionRepository,
         DecisionExamenRepository $decisionExamenRepository,
         Service $service,
@@ -321,8 +325,8 @@ class ControleExamenController extends AbstractController
 
         $all = $request->query->all();
 
-        //dd("");
-        $controleVefication = $controleExamenRepository->findOneBy(['niveau' => $niveau,  'session' => $session, 'ue' => $ue]);
+       
+        $controleVefication = $controleExamenRepository->findOneBy(['classe' => $classe,  'session' => $session, 'ue' => $ue]);
 
         if ($controleVefication) {
             $form = $this->createForm(ControleExamenType::class, $controleVefication, [
@@ -330,8 +334,9 @@ class ControleExamenController extends AbstractController
                 'anneeScolaire' => $sessionData->get("anneeScolaire"),
                 'action' => $this->generateUrl('app_controle_controle_examen_new_load', [
                     'session' => $session,
-                    'niveau' => $niveau,
+                    'classe' => $classe,
                     'ue' => $ue,
+                    'matiere' => $matiere,
                 ])
             ]);
         } else {
@@ -343,13 +348,13 @@ class ControleExamenController extends AbstractController
             $groupe->setDateCompo(new \DateTime());
 
             // dd($inscriptionRepository->findBy(['niveau' => $promotion]), $promotion);
-            if (count($inscriptionRepository->findBy(['niveau' => $niveau])) > 0)
+            if (count($inscriptionRepository->findBy(['classe' => $classe])) > 0)
                 $controleExaman->addGroupeTypeExamen($groupe);
 
             // dd($session);
             if ($session != "null") {
                 if ((int)$sessionRepository->find($session)->getNumero() == 1) {
-                    foreach ($inscriptionRepository->getListeEtudiant($niveau) as $inscription) {
+                    foreach ($inscriptionRepository->getListeEtudiant($classe) as $inscription) {
                         $note = new NoteExamen();
                         $note->setEtudiant($inscription->getEtudiant());
                         //$note->setNote('');
@@ -363,7 +368,7 @@ class ControleExamenController extends AbstractController
                     }
                 } else {
 
-                    foreach ($decisionExamenRepository->findBy(['decision' => DecisionExamen::DECISION['Valide'], 'niveau' => $niveau]) as $decision) {
+                    foreach ($decisionExamenRepository->findBy(['decision' => DecisionExamen::DECISION['Valide'], 'classe' => $classe]) as $decision) {
                         $note = new NoteExamen();
                         $note->setEtudiant($decision->getEtudiant());
                         //$note->setNote('');
@@ -385,8 +390,9 @@ class ControleExamenController extends AbstractController
                 'anneeScolaire' => $sessionData->get("anneeScolaire"),
                 'action' => $this->generateUrl('app_controle_controle_examen_new_load', [
                     'session' => $session,
-                    'niveau' => $niveau,
+                    'classe' => $classe,
                     'ue' => $ue,
+                    'matiere' => $matiere,
                 ])
             ]);
         }
@@ -416,7 +422,7 @@ class ControleExamenController extends AbstractController
 
 
 
-                $compteIfNoteSuperieurMax = $service->gestionNotesExamen($dataNotes, $groupeTypes, ['session' => $session, 'niveau' => $niveau,  'ue' => $ue], $controleVefication ?? null, !$controleVefication ? $controleExaman : null);
+                $compteIfNoteSuperieurMax = $service->gestionNotesExamen($dataNotes, $groupeTypes, ['session' => $session, 'classe' => $classe,  'ue' => $ue,'matiere' => $matiere], $controleVefication ?? null, !$controleVefication ? $controleExaman : null);
                 // dd("");
                 $service->rangExposantExamen($dataNotes);
 
@@ -453,7 +459,7 @@ class ControleExamenController extends AbstractController
 
         return $this->render('controle/controle_examen/new_load.html.twig', [
             'controle' => $controleVefication ?? $controleExaman,
-            'nombre' => $controleVefication ? $controleVefication->getGroupeTypeExamens()->count() : (count($inscriptionRepository->findBy(['niveau' => $niveau])) > 0 ? 1 : 0),
+            'nombre' => $controleVefication ? $controleVefication->getGroupeTypeExamens()->count() : (count($inscriptionRepository->findBy(['classe' => $classe])) > 0 ? 1 : 0),
             'form' => $form->createView(),
             'title' => 'Gestion des contrôles',
         ]);

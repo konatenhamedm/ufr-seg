@@ -12,8 +12,8 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: SessionRepository::class)]
-#[UniqueConstraint(name: "numero_session", fields: ["numero", "promotion"])]
-#[UniqueEntity(fields: ['numero', 'promotion'], message: 'cette session existe deja pour cette promotion')]
+#[UniqueConstraint(name: "numero_session", fields: ["numero", "niveau"])]
+#[UniqueEntity(fields: ['numero', 'niveau'], message: 'cette session existe deja pour cette promotion')]
 #[Table(name: 'param_session')]
 class Session
 {

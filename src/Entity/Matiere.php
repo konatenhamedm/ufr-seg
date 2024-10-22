@@ -52,6 +52,12 @@ class Matiere
     #[ORM\OneToMany(mappedBy: 'matiere', targetEntity: ControleExamen::class)]
     private Collection $controleExamens;
 
+    #[ORM\OneToMany(mappedBy: 'matiere', targetEntity: ControleExamen::class)]
+    private Collection $ecue;
+
+    #[ORM\OneToMany(mappedBy: 'matiere', targetEntity: DecisionExamen::class)]
+    private Collection $decisionExamens;
+
     public function __construct()
     {
         $this->cours = new ArrayCollection();
@@ -59,6 +65,8 @@ class Matiere
         $this->moyenneMatieres = new ArrayCollection();
         $this->controles = new ArrayCollection();
         $this->controleExamens = new ArrayCollection();
+        $this->ecue = new ArrayCollection();
+        $this->decisionExamens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -258,6 +266,66 @@ class Matiere
             // set the owning side to null (unless already changed)
             if ($controleExamen->getMatiere() === $this) {
                 $controleExamen->setMatiere(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ControleExamen>
+     */
+    public function getEcue(): Collection
+    {
+        return $this->ecue;
+    }
+
+    public function addEcue(ControleExamen $ecue): static
+    {
+        if (!$this->ecue->contains($ecue)) {
+            $this->ecue->add($ecue);
+            $ecue->setMatiere($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEcue(ControleExamen $ecue): static
+    {
+        if ($this->ecue->removeElement($ecue)) {
+            // set the owning side to null (unless already changed)
+            if ($ecue->getMatiere() === $this) {
+                $ecue->setMatiere(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DecisionExamen>
+     */
+    public function getDecisionExamens(): Collection
+    {
+        return $this->decisionExamens;
+    }
+
+    public function addDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if (!$this->decisionExamens->contains($decisionExamen)) {
+            $this->decisionExamens->add($decisionExamen);
+            $decisionExamen->setMatiere($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDecisionExamen(DecisionExamen $decisionExamen): static
+    {
+        if ($this->decisionExamens->removeElement($decisionExamen)) {
+            // set the owning side to null (unless already changed)
+            if ($decisionExamen->getMatiere() === $this) {
+                $decisionExamen->setMatiere(null);
             }
         }
 

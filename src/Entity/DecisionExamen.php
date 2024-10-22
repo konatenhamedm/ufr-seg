@@ -31,12 +31,6 @@ class DecisionExamen
     private ?string $noteExamen = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $moyenneControle = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $nombreCredit = null;
-
-    #[ORM\Column(length: 255)]
     private ?string $moyenneAnnuelle = null;
 
     #[ORM\Column(length: 20, nullable: true)]
@@ -51,6 +45,12 @@ class DecisionExamen
 
     #[ORM\ManyToOne(inversedBy: 'decisionExamens')]
     private ?UniteEnseignement $ue = null;
+
+    #[ORM\ManyToOne(inversedBy: 'decisionExamens')]
+    private ?Matiere $matiere = null;
+
+    #[ORM\ManyToOne(inversedBy: 'decisionExamens')]
+    private ?Classe $classe = null;
 
 
     public function __construct()
@@ -82,30 +82,6 @@ class DecisionExamen
     public function setNoteExamen(string $noteExamen): static
     {
         $this->noteExamen = $noteExamen;
-
-        return $this;
-    }
-
-    public function getMoyenneControle(): ?string
-    {
-        return $this->moyenneControle;
-    }
-
-    public function setMoyenneControle(string $moyenneControle): static
-    {
-        $this->moyenneControle = $moyenneControle;
-
-        return $this;
-    }
-
-    public function getNombreCredit(): ?string
-    {
-        return $this->nombreCredit;
-    }
-
-    public function setNombreCredit(string $nombreCredit): static
-    {
-        $this->nombreCredit = $nombreCredit;
 
         return $this;
     }
@@ -168,6 +144,30 @@ class DecisionExamen
     public function setUe(?UniteEnseignement $ue): static
     {
         $this->ue = $ue;
+
+        return $this;
+    }
+
+    public function getMatiere(): ?Matiere
+    {
+        return $this->matiere;
+    }
+
+    public function setMatiere(?Matiere $matiere): static
+    {
+        $this->matiere = $matiere;
+
+        return $this;
+    }
+
+    public function getClasse(): ?Classe
+    {
+        return $this->classe;
+    }
+
+    public function setClasse(?Classe $classe): static
+    {
+        $this->classe = $classe;
 
         return $this;
     }

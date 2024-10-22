@@ -33,7 +33,12 @@ class ControleExamen
     private ?TypeControle $typeControle = null;
 
     #[ORM\ManyToOne(inversedBy: 'controleExamens')]
-    private ?Niveau $niveau = null;
+    private ?Classe $classe = null;
+
+    #[ORM\ManyToOne(inversedBy: 'ecue')]
+    private ?Matiere $matiere = null;
+
+   
 
     public function __construct()
     {
@@ -145,15 +150,29 @@ class ControleExamen
         return $this;
     }
 
-    public function getNiveau(): ?Niveau
+    public function getClasse(): ?Classe
     {
-        return $this->niveau;
+        return $this->classe;
     }
 
-    public function setNiveau(?Niveau $niveau): static
+    public function setClasse(?Classe $classe): static
     {
-        $this->niveau = $niveau;
+        $this->classe = $classe;
 
         return $this;
     }
+
+    public function getMatiere(): ?Matiere
+    {
+        return $this->matiere;
+    }
+
+    public function setMatiere(?Matiere $matiere): static
+    {
+        $this->matiere = $matiere;
+
+        return $this;
+    }
+
+  
 }

@@ -38,12 +38,15 @@
         });
 
         const $session = $('#{{ form.session.vars.id }}');
-         const $niveau = $('#{{ form.niveau.vars.id }}');
+         const $classe = $('#{{ form.classe.vars.id }}');
+         const $matiere = $('#{{ form.matiere.vars.id }}');
          const $ue = $('#{{ form.ue.vars.id }}');
 
+        
 
          //function load_content(url,semestre,classe,matiere,ue) {
         function load_content(url,filters = []) {
+         
             const $form_content = $(`#form-content`);
          
            
@@ -54,11 +57,10 @@
                 data:filters,
                 beforeSend: function () {
                     
-                     $form_content.html(`<div class="text-center "> 
+                        $form_content.html(`<div class="text-center "> 
                     <strong>Chargement des données de l'étape</strong><br>
                                 <div class="spinner-border ms-auto" role="status" aria-hidden="true">
                     </div>`);
-                   
                 },
                 success: function (html) {
                     $form_content.html(html);
@@ -91,13 +93,32 @@
 
         }
 
-       
-        function load_ue(promotion){
+        function load_matiere(classe){
             $.ajax({
-                    url:  "{{ path('get_ue_promotion')}}",
+                    url:  "{{ path('get_matiere')}}",
                     type:  'get',
                     async: false,
-                    data:     {id:niveau},
+                    data:     {id:classe},
+                    dataType:   'json',
+                    success: function(json){
+
+                      $('#'+ $('.matiere').attr("id")).html(''); //je vide la 2ème list
+                      //$('#'+ $('.matiere').attr("id")).append('<option value selected="default" >Choisissez</option>');
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $("#"+ $('.matiere').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          });
+                    }
+                });
+        }
+        function load_ue(classe){
+            $.ajax({
+                    url:  "{{ path('get_ue')}}",
+                    type:  'get',
+                    async: false,
+                    data:     {id:classe},
                     dataType:   'json',
                     success: function(json){
 
@@ -112,12 +133,88 @@
                     }
                 });
         }
-        function load_session(niveau){
+        function load_ue_matiere(ue){
+           
+            $.ajax({
+                    url:  "{{ path('get_ue_matiere')}}",
+                    type:  'get',
+                    async: false,
+                    data:     {id:ue},
+                    dataType:   'json',
+                    success: function(json){
+
+                      $('#'+ $('.matiere').attr("id")).html(''); //je vide la 2ème list
+                      //$('#'+ $('.matiere').attr("id")).append('<option value selected="default" >Choisissez</option>');
+
+                        $.each(json, function(index, value) { // et une boucle sur la réponse contenu dans la variable passé à la function du success "json"       
+                              
+                            $("#"+ $('.matiere').attr("id")).append('<option value="'+ value.id +'"  >' + value.libelle +'</option>');
+                      
+                          });
+                    }
+                });
+        }
+
+        
+      
+
+           //load_matiere($classe.val())
+
+          $classe.on('change', function () {
+     
+              const $this = $(this);
+              const val = $(this).val();
+
+                load_ue(val)
+                 var urlTemplate = "{{ path('app_controle_controle_examen_new_load', {session: 'session', classe: 'classe',ue:'ue',matiere:'matiere'}) }}";
+                var url = urlTemplate
+                .replace('session', $session.val())
+                .replace('classe', val)
+                .replace('ue', $ue.val())
+                .replace('matiere', $matiere.val());
+                load_content(url,{session: $session.val(),classe:$classe.val(),ue: val,matiere: $matiere.val(),})
+               
+              
+                 load_principal({session: $session.val(),classe:val,ue: $ue.val(),matiere:$matiere.val()}) 
+
+          });
+          $ue.on('change', function () {
+                const $this = $(this);
+                const val = $(this).val();
+                var urlTemplate = "{{ path('app_controle_controle_examen_new_load', {session: 'session', classe: 'classe',ue:'ue',matiere:'matiere'}) }}";
+                var url = urlTemplate
+                .replace('session', $session.val())
+                .replace('classe', $classe.val())
+                .replace('ue', val)
+                .replace('matiere', $matiere.val());
+               load_content(url,{session: $session.val(),classe:$classe.val(),ue: val,matiere: $matiere.val(),})
+               
+                //load_matiere(val)
+                load_ue_matiere(val)
+                 load_principal({session: $session.val(),classe:$classe.val(),ue: val,matiere:$matiere.val()}) 
+               
+          });
+          $matiere.on('change', function () {
+                const $this = $(this);
+                const val = $(this).val();
+                var urlTemplate = "{{ path('app_controle_controle_examen_new_load', {session: 'session', classe: 'classe',ue:'ue',matiere:'matiere'}) }}";
+                var url = urlTemplate
+                .replace('session', $session.val())
+                .replace('classe', $classe.val())
+                .replace('ue', $ue.val())
+                .replace('matiere',val);
+               load_content(url,{session: $session.val(),classe:$classe.val(),ue: $ue.val(),matiere: val})
+          
+                load_principal({session: $session.val(),classe:$classe.val(),ue: $ue.val(),matiere:val}) 
+               
+          });
+
+        function load_session(classe){
             $.ajax({
                     url:  "{{ path('get_session')}}",
                     type:  'get',
                     async: false,
-                    data:     {id:niveau},
+                    data:     {id:classe},
                     dataType:   'json',
                     success: function(json){
 
@@ -134,21 +231,32 @@
         }
 
         
-          $promotion.on('change', function () {
+          /* $niveau.on('change', function () {
      
               const $this = $(this);
               const val = $(this).val();
 
            load_ue(val)
            load_session(val)
-          load_content(`/admin/controle/controle/examen/new/load/${$session.val()}/${$niveau.val()}/${$ue.val()}`,{session: $session.val(),promotion:val,ue: $ue.val()})
-          load_principal({session: $session.val(),promotion:val,ue: $ue.val()})
-          });
+          load_content(`/admin/controle/controle/examen/new/load/${$session.val()}/${$niveau.val()}/${$ue.val()}`,{session: $session.val(),niveau:val,ue: $ue.val()})
+          load_principal({session: $session.val(),niveau:val,ue: $ue.val()})
+          });*/
 
-           load_ue($niveau.val())
-           load_session($niveau.val())
-          load_content(`/admin/controle/controle/examen/new/load/${$session.val()}/${$niveau.val()}/${$ue.val()}`,{session: $session.val(),niveau:$classe.val(),ue: $ue.val()})
-          load_principal({session: $session.val(),niveau:$niveau.val(),ue: $ue.val()})
+           var urlGeneral = "{{ path('app_controle_controle_examen_new_load', {session: 'session', classe: 'classe',ue:'ue',matiere:'matiere'}) }}";
 
+        // Remplacer les espaces réservés par les valeurs
+        var urlPrincipal = urlGeneral
+            .replace('session', $session.val())
+            .replace('classe', $classe.val())
+            .replace('ue', $ue.val())
+            .replace('matiere', $matiere.val());
+
+          load_ue($classe.val())
+          load_ue_matiere($ue.val())
+          load_session($classe.val())
+          load_content(urlPrincipal,{session: $session.val(),classe:$classe.val(),ue: $ue.val(),matiere:$matiere.val()})
+          load_principal({session: $session.val(),classe:$classe.val(),ue: $ue.val(),matiere:$matiere.val()}) 
+
+       
     </script>
 {% endblock %}

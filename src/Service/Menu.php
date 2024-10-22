@@ -8,6 +8,7 @@ use App\Entity\EncartBac;
 use App\Entity\GroupeType;
 use App\Entity\InfoInscription;
 use App\Entity\Inscription;
+use App\Entity\Matiere;
 use App\Entity\MatiereUe;
 use App\Entity\MoyenneMatiere;
 use App\Entity\Note;
@@ -233,6 +234,10 @@ class Menu
         
         return $cpte;
 
+    }
+
+    public function getMoyenneEliminatoire($ue,$matiere){
+        return $this->em->getRepository(MatiereUe::class)->findOneBy(['uniteEnseignement'=> $ue,'matiere'=> $matiere])->getNoteEliminatoire();
     }
     public function getMoyenneMatiereEtudiant($controle,$etudiant){
       

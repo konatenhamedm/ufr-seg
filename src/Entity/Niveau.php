@@ -65,8 +65,6 @@ class Niveau
     #[ORM\OneToMany(mappedBy: 'niveau', targetEntity: DecisionExamen::class)]
     private Collection $decisionExamens;
 
-    #[ORM\OneToMany(mappedBy: 'niveau', targetEntity: ControleExamen::class)]
-    private Collection $controleExamens;
 
     #[ORM\OneToMany(mappedBy: 'niveau', targetEntity: Examen::class)]
     private Collection $examens;
@@ -93,7 +91,6 @@ class Niveau
         $this->uniteEnseignements = new ArrayCollection();
         $this->classes = new ArrayCollection();
         $this->decisionExamens = new ArrayCollection();
-        $this->controleExamens = new ArrayCollection();
         $this->examens = new ArrayCollection();
         $this->sessions = new ArrayCollection();
         $this->echeancierNiveaux = new ArrayCollection();
@@ -366,35 +363,8 @@ class Niveau
         return $this;
     }
 
-    /**
-     * @return Collection<int, ControleExamen>
-     */
-    public function getControleExamens(): Collection
-    {
-        return $this->controleExamens;
-    }
-
-    public function addControleExamen(ControleExamen $controleExamen): static
-    {
-        if (!$this->controleExamens->contains($controleExamen)) {
-            $this->controleExamens->add($controleExamen);
-            $controleExamen->setNiveau($this);
-        }
-
-        return $this;
-    }
-
-    public function removeControleExamen(ControleExamen $controleExamen): static
-    {
-        if ($this->controleExamens->removeElement($controleExamen)) {
-            // set the owning side to null (unless already changed)
-            if ($controleExamen->getNiveau() === $this) {
-                $controleExamen->setNiveau(null);
-            }
-        }
-
-        return $this;
-    }
+ 
+    
 
     /**
      * @return Collection<int, Examen>
