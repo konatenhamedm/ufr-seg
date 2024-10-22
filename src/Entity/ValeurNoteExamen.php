@@ -19,7 +19,7 @@ class ValeurNoteExamen
     #[ORM\Column(length: 255)]
     private ?string $note = null;
 
-    #[ORM\ManyToOne(inversedBy: 'valeurNoteExamens')]
+    #[ORM\ManyToOne(inversedBy: 'valeurNoteExamens', cascade:['persist'])]
     private ?NoteExamen $noteEntity = null;
 
     #[ORM\ManyToOne]
