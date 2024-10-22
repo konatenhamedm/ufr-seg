@@ -154,10 +154,10 @@ class Menu
 
         return $this->em->getRepository(MatiereUe::class)->getUeMatiere($matiere,$ue);
     }
-    public function getUeMatierepv($ue,$etudiant,$matiere,$session)
+    public function getUeMatierepv($ue,$etudiant,$session)
     {
 
-        return $this->em->getRepository(DecisionExamen::class)->findBy(['ue'=> $ue,'etudiant'=> $etudiant,'matiere'=> $matiere,'session'=> $session]);
+        return $this->em->getRepository(DecisionExamen::class)->findBy(['ue'=> $ue,'etudiant'=> $etudiant,'session'=> $session]);
     }
     public function getCoursMatiereClasse($matiere,$classe)
     {

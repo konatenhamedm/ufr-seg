@@ -792,21 +792,30 @@ class TestController extends AbstractController
        ): Response
     {
 
-       // dd($menu->getAllMatiereByUeByEtudiantPV(2,61,93)->getMoyenne());
-       // $listeUes = $controleRepository->getUe( $classe ,$periode);
-        $listeUes = $decisionExamenRepository->findBy(['ue'=> $ue,'matiere'=> $matiere,'classe'=> $classe,'session'=> $sessions,'etudiant'=> $inscriptionRepository->findOneBy(['classe'=> $classe])->getEtudiant()]);
-        $count = $decisionExamenRepository->findBy(['ue'=> $ue,'matiere'=> $matiere,'classe'=> $classe,'session'=> $sessions,'etudiant'=> $inscriptionRepository->findOneBy(['classe'=> $classe])->getEtudiant()]);
+        if($sessionRepository->find($sessions)->getNumero() == 1){
+            $template= "test/pv.html.twig";
+        }else{
+            $template= "test/pv_session_2.html.twig";
+
+        }
+       
+        $listeUes = $decisionExamenRepository->findBy(['ue'=> $ue,'classe'=> $classe,'session'=> $sessions,'etudiant'=> $inscriptionRepository->findOneBy(['classe'=> $classe])->getEtudiant()]);
+        $listeUes_seconde = $decisionExamenRepository->findBy(['ue'=> $ue,'classe'=> $classe,'session'=> $sessions,'etudiant'=> $decisionExamenRepository->findOneBy(['ue'=> $ue,'classe'=> $classe,'session'=> $sessions,])->getEtudiant()]);
+        $count = $decisionExamenRepository->findBy(['ue'=> $ue,'classe'=> $classe,'session'=> $sessions,'etudiant'=> $inscriptionRepository->findOneBy(['classe'=> $classe])->getEtudiant()]);
         $listeEtudiants = $inscriptionRepository->findBy(['classe'=> $classe]);
      /*  dd(count($count)); */
         $imgFiligrame = "uploads/" . 'media_etudiant' . "/" . 'lg.jpeg';
-        return $this->renderPdf("test/pv.html.twig", [
+        return $this->renderPdf( $template, [
             'ues' =>$listeUes,
+            'ues_seconde' =>$listeUes_seconde,
             'etudiants' => $listeEtudiants,
+            'etudiants_seconde_session' => $decisionExamenRepository->findBy(['ue'=> $ue,'classe'=> $classe,'session'=> $sessions,/* 'decision'=> 'Validé' */]),
             'classeData' => $classeRepository->find($classe),
             'ue'=>$uniteEnseignementRepository->find($ue),
             'matiere'=>$matiereRepository->find($matiere),
             'sessions'=>$sessionRepository->find($sessions),
             'nombre'=>count($count),
+            'nombre_seconde'=>count($listeUes_seconde),
             //'uniteEnseignementRepository'=>$uniteEnseignementRepository,
             //'anneeScolaire' =>  $anneeScolaire = $session->get('anneeScolaire')->getLibelle()
             //'data_info'=>$infoPreinscriptionRepository->findOneByPreinscription($preinscription)

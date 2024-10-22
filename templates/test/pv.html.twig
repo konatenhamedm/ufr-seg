@@ -149,7 +149,7 @@
                             <td style="">{{key+1}}</td>
                             <td style="">{{etudiant.etudiant.nom }} {{ etudiant.etudiant.prenom }}</td>
                             {% if ecu_nombre > 0 %}
-                            {% for ecue in menu.getUeMatierepv(ue,etudiant.etudiant,matiere,sessions) %}
+                            {% for ecue in menu.getUeMatierepv(ue,etudiant.etudiant,sessions) %}
                                  <td style=";">{{ ecue.moyenneAnnuelle}}</td>
                                  {% set total = total + ecue.moyenneAnnuelle %}
                                   {% set nbre = nbre + 1 %}

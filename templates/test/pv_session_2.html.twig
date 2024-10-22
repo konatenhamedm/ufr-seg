@@ -89,13 +89,14 @@
 
         <br/>
 
-        {% for ue in ues %}
+      
             <div class="clearfix">
 {# {{ dump( )}} #}
             <div style="width:100%;text-align:right;float:right;">
-                {% set ecu_nombre = menu.getUeMatierepv(ue.id) | length %}
+                {% set ecu_nombre = nombre_seconde %}
                 {% set ecu_nombre_first = ecu_nombre + 6 %}
                 {% set ecu_nombre_seconde = ecu_nombre + 2 %}
+
                     <table>
 
                       <tr>
@@ -103,7 +104,7 @@
                         
                       </tr>
                       <tr>
-                            <td colspan="{{ ecu_nombre_seconde }}">{{ue.codeUe}}  {{ue.libelle}} {{ue.id}}</td>
+                            <td colspan="{{ ecu_nombre_seconde }}">{{ue.codeUe}}  {{ue.libelle}} {{sessions.libelle}}</td>
                             <td ></td>
                             <td ></td>
                             <td ></td>
@@ -116,8 +117,8 @@
                             <th style="width:4%;">N</th>
                             <th style="">Nom et prénoms</th>
                             {% if ecu_nombre > 0 %}
-                                {% for item in menu.getUeMatierepv(ue.id) %}
-                                  <th style="">{{item.code}}</th>
+                                {% for item in ues_seconde %}
+                                  <th style="">{{item.codeEcue}}</th>
                                  {% endfor %} 
                             {% endif %}
                            
@@ -136,49 +137,58 @@
                             {% endif %}
                       </tr>
 
-                        {% for key,etudiant in etudiants %}
+                        {% for key,etudiant in etudiants_seconde_session %}
                        {# {% set etat_encart = menu.getEncoreByEtudiant(etudiant.etudiant.id) %} #}
 
                        {% set total = 0 %}
                        {% set nbre = 0 %}
+                       {% set decision = "" %}
+                       {% set cpteInvalide = 0 %}
                           {% set cpte = 0 %}
                                <tr>
                             <td style="">{{key+1}}</td>
                             <td style="">{{etudiant.etudiant.nom }} {{ etudiant.etudiant.prenom }}</td>
-                               {% if ecu_nombre > 0 %}
-                                {% for item in menu.getUeMatierepv(ue.id) %}
-                                    {# <td style=";">{{ ue.id }} {{item.matiere.id}} {{etudiant.etudiant.id }}</td> #}
-                                      {% set nbre = nbre + 1 %}
-                                    {% if menu.getAllMatiereByUeByEtudiantPV(ue.id,item.matiere.id,etudiant.etudiant.id) %}
-                                      {% set total = total + menu.getAllMatiereByUeByEtudiantPV(ue.id,item.matiere.id,etudiant.etudiant.id).moyenne %}
-                                      
-                                    {% endif %}
-                                     <td style=";">{{ menu.getAllMatiereByUeByEtudiantPV(ue.id,item.matiere.id,etudiant.etudiant.id) ? menu.getAllMatiereByUeByEtudiantPV(ue.id,item.matiere.id,etudiant.etudiant.id).moyenne :'RAS' }}</td>
+                            {% if ecu_nombre > 0 %}
+                            {% for ecue in menu.getUeMatierepv(ue,etudiant.etudiant,sessions) %}
+                                 <td style=";">{{ ecue.moyenneAnnuelle}}</td>
+                                 {% set total = total + ecue.moyenneAnnuelle %}
+                                  {% set nbre = nbre + 1 %}
+                                  {% set decision = ecue.decision %}
+
+                                  {% if ecue.decision == "Invalidé" %}
+                                    
+                                  {% set cpteInvalide = cpteInvalide +1  %}
+                                  {% endif %}
+                            {% endfor %}
                                 
 
-                                        {% for item2 in menu.getAllNote(ue.id,item.matiere.id,etudiant.etudiant.id) %}
-                                          {% if item2.note <= menu.getUeMatiere(item.matiere.id,ue.id).noteEliminatoire %}
-                                                {% set cpte = cpte + 1 %}
-                                            {% endif %}
-                                          {% endfor %}
-                                        
-                                 {% endfor %} 
                             {% endif %}
-                            <td style="">{{total}}</td>
-                            <td style="">{{total/nbre }}</td>
-                            <td style="">
-                            {% if cpte == 0 and (total / nbre) >= 10   %}
-                                            {{ ue.coef }}
-                                        {% else %}
-                                        N/A
-                                        {% endif %}
+                            <td style="text-align:center">{{total}}</td>
+                            <td style="text-align:center">{{total/nbre }}</td>
+                            <td style="text-align:center">
+                            {% if cpteInvalide > 0 %}
+                              N/A
+                            {% else %}
+                              {% if total/nbre >= 10 %}
+                               N/A
+                              {% else %}
+                               N/A
+                              {% endif %}
+                            {% endif %}
+                           
                             </td>
-                            <td style="">
-                            {% if cpte == 0 and (total / nbre) >= 10   %}
-                                            Validé
-                                        {% else %}
-                                        Invalidé
-                                        {% endif %}
+                            <td style="text-align:center">
+
+                            {% if cpteInvalide > 0 %}
+                             N/A
+                            {% else %}
+                              {% if total/nbre >= 10 %}
+                                N/A
+                              {% else %}
+                                N/A
+                              {% endif %}
+                            {% endif %}
+                          
                             </td>
                           
 
@@ -198,7 +208,7 @@
             </div>
         </div> <br><br>
      
-        {% endfor %}
+ 
         
 
           <div for="">

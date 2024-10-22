@@ -201,9 +201,6 @@ class ControleExamenController extends AbstractController
         $ue = $request->query->get('ue');
         $matiere = $request->query->get('matiere');
  
-
-
-
         $annee = $sessionData->get('anneeScolaire');
 
 
@@ -232,7 +229,7 @@ class ControleExamenController extends AbstractController
             if (count($inscriptionRepository->findBy(['classe' => $classe])) > 0)
                 $controleExaman->addGroupeTypeExamen($groupe);
 
-
+            
             foreach ($inscriptionRepository->getListeEtudiant($classe) as $inscription) {
                 $note = new NoteExamen();
                 $note->setEtudiant($inscription->getEtudiant());
@@ -368,7 +365,7 @@ class ControleExamenController extends AbstractController
                     }
                 } else {
 
-                    foreach ($decisionExamenRepository->findBy(['decision' => DecisionExamen::DECISION['Valide'], 'classe' => $classe]) as $decision) {
+                    foreach ($decisionExamenRepository->findBy(['decision' => DecisionExamen::DECISION['Invalide'], 'classe' => $classe]) as $decision) {
                         $note = new NoteExamen();
                         $note->setEtudiant($decision->getEtudiant());
                         //$note->setNote('');

@@ -989,23 +989,41 @@ class Service
             $moyenneMatiere = $this->moyenneMatiereRepository->findOneBy(['ue' => $data['ue'], 'etudiant' => $ligne->getEtudiant(), 'matiere' => $data['matiere']]);
             $matiereUe = $this->matiereUeRepository->findOneBy(['uniteEnseignement' => $data['ue'], 'matiere' => $data['matiere']]);
             
-            $moyenneEcue = ((int)$moyenneMatiere->getMoyenne() * $typeControle->getCoef() / 100)  + ($noteExamen * $typeExamen->getCoef() / 100);
-            $ligne->setMoyenneConrole(round($noteExamen, 2));
-            $ligne->setMoyenneUe(round($moyenneEcue, 2));
+            if( $this->sessionRepository->find($data['session']) === 1 ) {
 
-            if($this->menu->getMoyenneEliminatoire($data['ue'], $data['matiere']) >= $moyenneEcue){
-                $ligne->setDecision(DecisionExamen::DECISION["Invalide"]);
-                
-            }else{
-                  if ($moyenneEcue >= 10  ) {
-                //dd("admis");
-                $ligne->setDecision(DecisionExamen::DECISION["Valide"]);
-                } else {
+                $moyenneEcue = ((int)$moyenneMatiere->getMoyenne() * $typeControle->getCoef() / 100)  + ($noteExamen * $typeExamen->getCoef() / 100);
+                $ligne->setMoyenneConrole(round($noteExamen, 2));
+                $ligne->setMoyenneUe(round($moyenneEcue, 2));
+    
+                if($this->menu->getMoyenneEliminatoire($data['ue'], $data['matiere']) >= $moyenneEcue){
                     $ligne->setDecision(DecisionExamen::DECISION["Invalide"]);
+                    
+                }else{
+                      if ($moyenneEcue >= 10  ) {
+                    //dd("admis");
+                    $ligne->setDecision(DecisionExamen::DECISION["Valide"]);
+                    } else {
+                        $ligne->setDecision(DecisionExamen::DECISION["Invalide"]);
+                    }
                 }
+            }else{
+                $moyenneEcue = $noteExamen;
+                $ligne->setMoyenneConrole(round($noteExamen, 2));
+                $ligne->setMoyenneUe(round($moyenneEcue, 2));
+
+                if ($moyenneEcue >= 10  ) {
+                    //dd("admis");
+                    $ligne->setDecision(DecisionExamen::DECISION["Valide"]);
+                    } else {
+                        $ligne->setDecision(DecisionExamen::DECISION["Invalide"]);
+                    }
             }
+
+          
             
             $decisionExam = $this->decisionExamenRepository->findOneBy(['ue'=>$data['ue'],'etudiant' => $ligne->getEtudiant(),'classe' => $data['classe'], 'matiere' => $data['matiere'], 'niveau' => $this->classeRepository->find($data['classe'])->getNiveau(), 'session' => $this->sessionRepository->find($data['session'])]);
+            
+            
             //dd($decisionExam);
 
             if ($decisionExam) {
